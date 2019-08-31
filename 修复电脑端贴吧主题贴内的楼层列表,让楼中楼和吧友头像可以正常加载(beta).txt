@@ -3,9 +3,10 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  手机端可能使用这个可能会有问题，所以单独弄一个脚本
-// @author       You
+// @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
 // @grant        none
+// @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript
 // ==/UserScript==
 
 (function()
