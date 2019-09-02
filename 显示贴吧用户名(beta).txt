@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         显示贴吧用户名(beta)
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.22
 // @description  显示主题贴列表,楼层,楼中楼的贴吧用户名，仅支持电脑端贴吧
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -10,10 +10,11 @@
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript
 // ==/UserScript==
 
-(function()
-{
+(function($)
+ {
     'use strict';
     var names=new Array();
+    var names2=new Array();
     //var namesi=0;
     var hrefs=window.location.href;
     function showName0()//主题贴列表
@@ -31,16 +32,16 @@
             }
             //console.log($("a.frs-author-name").parents('div.threadlist_author').children('p.miao01')[0]);
             $("a.j_user_card").each(function()
-            {
+                                    {
                 //alert("233");
                 //alert("a.j_user_card").parents('div.threadlist_author').children('p.miao01')[0]);
                 if($(this).parents('div.threadlist_author').children('p.miao01')[0]==null)
                 {
-                     $(this).parents('.tb_icon_author').after('<p class="miao01" style="color:#999;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(' +JSON.parse(($(this)).attr('data-field')).un+')</p>');
+                    $(this).parents('.tb_icon_author').after('<p class="miao01" style="color:#999;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(' +JSON.parse(($(this)).attr('data-field')).un+')</p>');
                 }
                 if($(this).parents('div.threadlist_author').children('p.miao02')[0]==null)
                 {
-                     $(this).parents('.tb_icon_author_rely').after('<p class="miao00002" style="color:#999;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(' +JSON.parse(($(this)).attr('data-field')).un+')</p>');
+                    $(this).parents('.tb_icon_author_rely').after('<p class="miao00002" style="color:#999;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(' +JSON.parse(($(this)).attr('data-field')).un+')</p>');
                 }
             });
         }
@@ -67,13 +68,14 @@
             //console.log(233);
             //$("a.p_author_name.j_user_card").parents('li.d_name').children('a.p_author_name')[15].innerHTML
             $("a.p_author_name.j_user_card").each(function()
-            {
+                                                  {
                 if($(this).parents('li.d_name').children('p.p_author_name')[0]==null)
                 {
                     let s1=$(this).parents('li.d_name').children('a.p_author_name')[0].innerHTML;//获取昵称名+表情图标签
                     let s2=JSON.parse($(this).attr('data-field')).un;
                     $(this).after('<p class="p_author_name" style="color:#999;font-size:12px;">(' + s2 +')</p>');
-                    names[s1]=s2;
+                    names[s1]=s2;//昵称作为索引
+                    names2[s2]=s2;//用户名作为索引
                     //sessionStorage.setItem(s1,s2);//储存用户昵称 真名
                     //save(s1);
                     //alert(s1);
@@ -105,7 +107,7 @@
                 return;
             }
             $("div.lzl_cnt").each(function()//楼中楼xx:
-            {
+                                  {
                 if($(this).children('span.miao1')[0]==null)
                 {
                     //$("div.lzl_cnt").children("a.at")[0].text//获取昵称
@@ -113,7 +115,8 @@
                     let s2=String($(this).children('a.at').attr('username'));//获取真名
                     //console.log(s1);
                     $(this).append('<span class="miao1"></span>');
-                    names[s1]=s2;
+                    names[s1]=s2;//昵称作为索引
+                    names2[s2]=s2;//用户名作为索引
                     //sessionStorage.setItem(s1,s2);//储存用户昵称 真名
                     //save(s1);
                 }
@@ -124,11 +127,12 @@
             //$("span.lzl_content_main").children("a.at.j_user_card")[0].text//获取昵称
             //$("span.lzl_content_main").children("a.at.j_user_card").attr("portrait");
             $("div.lzl_cnt").children("a.at.j_user_card").each(function()//找子节点
-            {
+                                                               {
                 if($(this).parents("div.lzl_cnt").children('span.miao2')[0]==null)
                 {
                     let s1=$(this)[0].innerHTML;
-                    let s2=names[s1];//sessionStorage.getItem(s1)
+                    let s2=names[s1]||names2[s1];//先尝试用昵称取用户名，为null后用户名取用户名
+                    //sessionStorage.getItem(s1)
                     if(s2!=null)
                     {
                         $(this).after('<span class="miao2" style="color:#999;font-size:10px;">( ' +s2+')</span>');
@@ -141,11 +145,12 @@
             });
             //找子节点 //楼中楼xx 回复 xx span.lzl_content_main
             $("div.lzl_cnt").children("span.lzl_content_main").children("a.at").each(function()
-            {
+                                                                                     {
                 if($(this).parents("span.lzl_content_main").children('span.miao3')[0]==null)
                 {
-                    let s1=$(this)[0].innerHTML;
-                    let s2=names[s1]//sessionStorage.getItem(s1)
+                    let s1=$(this)[0].innerHTML;//获取用户名字(可能是昵称，也可能是用户名)
+                    let s2=names[s1]||names2[s1];
+                    //sessionStorage.getItem(s1)
                     if(s2!=null)
                     {
                         $(this).after('<span class="miao3" style="color:#999;font-size:10px;">( ' +s2+')</span>');
@@ -161,7 +166,17 @@
             {
                 names = [];//清空数组
                 names=new Array();
-               /* for(let x=0;x<names.length;x++)
+                /* for(let x=0;x<names.length;x++)
+                {
+                    sessionStorage.removeItem(names[x]);
+                }
+                namesi=0;*/
+            }
+            if(names2.length>10000)//定量清理缓存数据
+            {
+                names2 = [];//清空数组
+                names2=new Array();
+                /* for(let x=0;x<names.length;x++)
                 {
                     sessionStorage.removeItem(names[x]);
                 }
@@ -198,7 +213,7 @@
     }
     var t3=setInterval(showName2,2000);//每一秒启动一次
     GM_registerMenuCommand("关闭楼中楼真名显示计时器(不再新增真名,但已有真名保留)", stop);
-})();
+})($);
 
 /*
 function initListener()
@@ -208,15 +223,15 @@ function initListener()
         document.addEventListener('animationstart',superBawu.showName0, false);
     }
 */
-    //var t1=setTimeout(superBawu.showName0,1000);//显示主题贴列表用户真实贴吧名字
-    //var t2=setTimeout(superBawu.showName,1000)//显示楼层用户真实贴吧名字
-    //var t4=setTimeout(initListener,1000)
-    //initListener();
-    //alert(window.location.href);得到网页链接
-    //clearTimeout(t1)
-    //superBawu.showName2();
+//var t1=setTimeout(superBawu.showName0,1000);//显示主题贴列表用户真实贴吧名字
+//var t2=setTimeout(superBawu.showName,1000)//显示楼层用户真实贴吧名字
+//var t4=setTimeout(initListener,1000)
+//initListener();
+//alert(window.location.href);得到网页链接
+//clearTimeout(t1)
+//superBawu.showName2();
 
- /*
+/*
  https://www.cnblogs.com/snandy/archive/2011/04/04/2005156.html
 JavaScript中清空数组的三种方式
 方式1，splice
