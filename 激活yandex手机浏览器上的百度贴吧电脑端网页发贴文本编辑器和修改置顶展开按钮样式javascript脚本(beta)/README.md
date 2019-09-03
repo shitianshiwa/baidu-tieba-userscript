@@ -1,4 +1,4 @@
 # 安装
-- [Install From GitHub]()
+- [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E4%BF%AE%E5%A4%8D%E7%94%B5%E8%84%91%E7%AB%AF%E8%B4%B4%E5%90%A7%E4%B8%BB%E9%A2%98%E8%B4%B4%E5%86%85%E7%9A%84%E6%A5%BC%E5%B1%82%E5%88%97%E8%A1%A8%2C%E8%AE%A9%E6%A5%BC%E4%B8%AD%E6%A5%BC%E5%92%8C%E5%90%A7%E5%8F%8B%E5%A4%B4%E5%83%8F%E5%8F%AF%E4%BB%A5%E6%AD%A3%E5%B8%B8%E5%8A%A0%E8%BD%BD(beta)/%E4%BF%AE%E5%A4%8D%E7%94%B5%E8%84%91%E7%AB%AF%E8%B4%B4%E5%90%A7%E4%B8%BB%E9%A2%98%E8%B4%B4%E5%86%85%E7%9A%84%E6%A5%BC%E5%B1%82%E5%88%97%E8%A1%A8%2C%E8%AE%A9%E6%A5%BC%E4%B8%AD%E6%A5%BC%E5%92%8C%E5%90%A7%E5%8F%8B%E5%A4%B4%E5%83%8F%E5%8F%AF%E4%BB%A5%E6%AD%A3%E5%B8%B8%E5%8A%A0%E8%BD%BD(beta).user.js)
 # 简介
 用来在yandex手机浏览器激活百度贴吧电脑端网页发贴文本编辑器的(注意运行环境限定)。这里也提示下，这个浏览器上的贴吧置顶贴折叠后无法再展开（因为展开折叠按钮点不到，在显示界面外，可以清除浏览器数据恢复原样。这里修改了置顶展开按钮样式来显示按钮)。激活的原理？不清楚！但发主题贴的文本编辑器点标题文本框可以达到激活显示效果，不过贴子里的文本编辑器是没有标题文本框的，所以加一个没有任何作用的文本框以供点击。备注:即使点了文本框，文本编辑器可能一时半会也出不了。。！(猜测是yandex手机浏览器加载网页是动态的，文本编辑器因未知原因显示不出来,而查看问题网页的源代码发现少了文本编辑器的html代码)   这个javascript脚本需要使用浏览器脚本管理器(例如tampermonkey)或浏览器开发者工具，github上搜FirefoxBar可以了解更多(http://team.firefoxcn.net/)  2019-9-4
