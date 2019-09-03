@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         显示贴吧用户名(beta)
 // @namespace    http://tampermonkey.net/
-// @version      0.22
+// @version      0.23
 // @description  显示主题贴列表,楼层,楼中楼的贴吧用户名，仅支持电脑端贴吧
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -134,13 +134,20 @@
                     let s1=$(this)[0].innerHTML;
                     let s2=names[s1]||names2[s1];//先尝试用昵称取用户名，为null后用户名取用户名
                     //sessionStorage.getItem(s1)
-                    if(s2!=null)
+                    if(s1!=s2)
                     {
-                        $(this).after('<span class="miao2" style="color:#999;font-size:10px;">( ' +s2+')</span>');
+                        if(s2!=null)
+                        {
+                            $(this).after('<span class="miao2" style="color:#999;font-size:10px;">( ' +s2+')</span>');
+                        }
+                        else
+                        {
+                            $(this).after('<span class="miao2" style="color:#999;font-size:10px;">(null)</span>');
+                        }
                     }
                     else
                     {
-                        $(this).after('<span class="miao2" style="color:#999;font-size:10px;">(null)</span>');
+                        $(this).after('<span class="miao2" style="color:#999;font-size:10px;"></span>');
                     }
                 }
             });
@@ -150,15 +157,24 @@
                 if($(this).parents("span.lzl_content_main").children('span.miao3')[0]==null)
                 {
                     let s1=$(this)[0].innerHTML;//获取用户名字(可能是昵称，也可能是用户名)
-                    let s2=names[s1]||names2[s1];
+                    let s3=s1.split('@')[1];
+                    let s2=names[s1]||names[s3]||names2[s3]||names2[s1];//对付带@的用户名或者昵称的楼中楼回复,纯@人可能在该网页无法找到用户名,可以判断无用户名账号
+                    //console.log(s3);
                     //sessionStorage.getItem(s1)
-                    if(s2!=null)
+                    if(s1!=s2)//一般来说肯定会有昵称，但不一定有用户名，昵称应该可以取到的
                     {
-                        $(this).after('<span class="miao3" style="color:#999;font-size:10px;">( ' +s2+')</span>');
+                        if(s2!=null)
+                        {
+                            $(this).after('<span class="miao3" style="color:#999;font-size:10px;">( ' +s2+')</span>');
+                        }
+                        else
+                        {
+                            $(this).after('<span class="miao3" style="color:#999;font-size:10px;">(null)</span>');//九成以上概率说明这位没有回过贴子,这网页里不存在其用户名
+                        }
                     }
                     else
                     {
-                        $(this).after('<span class="miao3" style="color:#999;font-size:10px;">(null)</span>');//九成以上概率说明这位没有回过贴子,这网页里不存在其用户名
+                        $(this).after('<span class="miao3" style="color:#999;font-size:10px;"></span>');
                     }
                 }
             });
@@ -348,4 +364,13 @@ alert(end - start);
                 document.querySelectorAll(".lzl_content_main")
                 $("span.lzl_content_main").children('span.miao2')[0]
                 $("span.lzl_content_main>a.at").each(function()
+
+                color:rgba(0,0,0,0)
+                1.css3新增的一个属性rgba,语法
+                  R：红色值。正整数 | 百分数
+                  G：绿色值。正整数 | 百分数
+                  B：蓝色值。正整数| 百分数
+                  A：透明度。取值0~1之间
+               2.设置透明度是不会被继承的，所以不用头疼继承的问题.字体透明度便设置成color:rgba(0,0,0,0.5);边框：border:5px solid rgba(0,0,0,0.5);或者背景都可以。
+               3.兼容性。支持ie9及以上的浏览器
 */
