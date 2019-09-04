@@ -1,5 +1,5 @@
 # baidu-tieba-userscript
-* [github](https://github.com/shitianshiwa/baidu-tieba-userscript)
+[github](https://github.com/shitianshiwa/baidu-tieba-userscript)<br/>
 测试（beta）
 需要：支持扩展的浏览器，例如谷歌，yandex，火狐等；扩展：Tampermonkey脚本管理器; http://tampermonkey.net/
 javascript
