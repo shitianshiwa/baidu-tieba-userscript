@@ -17,7 +17,7 @@
 // @grant           GM_addStyle
 // @grant           GM_xmlhttpRequest
 // ==/UserScript==
-//系统删贴提醒无效
+//删贴和通知提醒都已确认失效。
 //GM_addStyle 在tampermonkey4.0以后被弃用，使用@grant          GM_addStyle解决  https://stackoverflow.com/questions/23683439/gm-addstyle-equivalent-in-tampermonkey/33176845#33176845
 //来源：https://t.52fisher.cn/tb-remind.html
 /*
@@ -202,7 +202,7 @@ Tiebamessage.prototype.getUserinfo = function(rs,rj){
                     "http://tieba.baidu.com/i/sys/jump?u=" + _this.userinfo.data.user_portrait + "&type=replyme",
                     "http://tieba.baidu.com/i/sys/jump?u=" + _this.userinfo.data.user_portrait + "&type=feature",
                     "http://tieba.baidu.com/i/sys/jump?u=" + _this.userinfo.data.user_portrait + "&type=atme",
-                    "http://tieba.baidu.com/pmc/recycle"
+                    "http://tieba.baidu.com/pmc/recycle"//已失效
                 ];
                 rs('success');
             }catch(e){
