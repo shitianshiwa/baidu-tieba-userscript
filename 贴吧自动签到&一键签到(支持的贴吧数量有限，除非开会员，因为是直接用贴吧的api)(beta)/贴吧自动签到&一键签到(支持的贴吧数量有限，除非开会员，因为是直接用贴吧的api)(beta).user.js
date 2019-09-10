@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         贴吧自动签到&一键签到(支持的贴吧数量有限，除非开会员，因为是直接用贴吧的api)(beta)
 // @namespace    http://tampermonkey.net/
-// @version      0.24
+// @version      0.34
 // @description  一键签到支持的贴吧数量有限，除非开会员，因为是直接用贴吧的api,和贴吧主页那里点击一键签到一个效果。超会，普会PC网页端自动签到可能一次不能成功，可以刷新一下
-// @author       You
+// @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
 // @grant        GM_registerMenuCommand
 // @run-at       document-idle
+// @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
 
 (function ($,PageData)
@@ -134,6 +135,32 @@
         let c={'tbs':PageData.tbs||PageData.user.tbs,'ie':IE};
         postpost(s,c);
     }
+    function HH2()
+    {
+           var c={'tn':"bdFBW",'tab':"favorite"};
+           var u="/mo/q-----1-1-0----/m";
+           $.get(u,c,function(data)
+           {
+               sessionStorage.setItem("HH2temp",$(data.body)[0].innerText.split("."));
+           },"xml");
+           var temp2=new Array();
+           function xianshi()
+    		{
+    			clearTimeout(t)
+    			var ii=0;
+
+    			var temp=sessionStorage.getItem("HH2temp").split(",");
+    			for(var i=1;i<temp.length;i++)
+    			{
+    			console.log(temp[i].split("等级")[0]);
+    			temp2[ii]=temp[i].split("等级")[0];
+    			ii++;
+    			}
+        		alert(temp2);
+    		}
+    		var t=setTimeout(xianshi,1000);
+    }
+
     function postpost(a,b)
     {
         $.post(a,b,function(o)
@@ -150,6 +177,7 @@
     }
 
     GM_registerMenuCommand("一键签到", HH);
+   // GM_registerMenuCommand("一键签到(获取贴吧名，逐个自动签到)", HH2);
     GM_registerMenuCommand("报错后重启", resetx);// @grant        GM_registerMenuCommand
 
     //注释：null 表示无值，而 undefined 表示一个未声明的变量，或已声明但没有赋值的变量，或一个并不存在的对象属性。

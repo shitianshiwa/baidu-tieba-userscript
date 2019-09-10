@@ -3,11 +3,12 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.21
 // @description  用来在yandex手机浏览器激活百度贴吧电脑端网页发贴文本编辑器的(注意运行环境限定)。这里也提示下，这个浏览器上的贴吧置顶贴折叠后无法再展开（因为展开折叠按钮点不到，在显示界面外，可以清除浏览器数据恢复原样。这里修改了置顶展开按钮样式来显示按钮)。激活的原理？不清楚！但发主题贴的文本编辑器点标题文本框可以达到激活显示效果，不过贴子里的文本编辑器是没有标题文本框的，所以加一个没有任何作用的文本框以供点击。备注:即使点了文本框，文本编辑器可能一时半会也出不了。。！(猜测是yandex手机浏览器加载网页是动态的，文本编辑器因未知原因显示不出来,而查看问题网页的源代码发现少了文本编辑器的html代码)   这个javascript脚本需要使用浏览器脚本管理器(例如tampermonkey)或浏览器开发者工具，github上搜FirefoxBar可以了解更多(http://team.firefoxcn.net/)  2019-7-24
-// @author       You
+// @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
 // @grant        GM_registerMenuCommand
 // @run-at       document-idle
+// @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
 //用try-catch错误处理代替判断链接，只有贴吧主页有展开置顶按钮可以捕捉，贴子里面捉不到，返回为null
 //// @require    http://code.jquery.com/jquery-1.11.0.min.js
@@ -20,7 +21,7 @@
     //注释：null 表示无值，而 undefined 表示一个未声明的变量，或已声明但没有赋值的变量，或一个并不存在的对象属性。
     function fixyandextieba()
     {
-        clearTimeout(t1)
+        clearTimeout(t1);
         //alert("233");
         //激活发贴文本编辑器
         var c='<input type="text" name="" value="点击激活文本编辑器" style="width:110px;font-weight:bold;"/>';//文本框

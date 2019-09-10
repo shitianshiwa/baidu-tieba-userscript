@@ -7,8 +7,7 @@
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
 // @grant        GM_registerMenuCommand
-// @updateURL    https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/显示贴吧用户名(beta)/显示贴吧用户名(beta).meta.js
-// @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/显示贴吧用户名(beta)/显示贴吧用户名(beta).user.js
+// @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
 
 (function($)

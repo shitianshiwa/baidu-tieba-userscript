@@ -3,10 +3,11 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.11
 // @description  手机端可能使用这个可能会有问题，所以单独弄一个脚本
-// @author       You
+// @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
 // @grant        none
 // @run-at       document-idle
+// @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
 
 (function($)
@@ -43,5 +44,5 @@
         }
     }
     fixzhutitie();
-    var t2=setInterval(fixzhutitie,1000);//每秒1s工作一次
+    //var t2=setInterval(fixzhutitie,1000);//每秒1s工作一次
 })($);
