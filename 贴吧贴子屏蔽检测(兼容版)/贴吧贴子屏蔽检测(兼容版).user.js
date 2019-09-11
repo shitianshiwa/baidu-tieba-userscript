@@ -1,27 +1,27 @@
 // ==UserScript==
-// @name        Ìù°ÉÌù×ÓÆÁ±Î¼ì²â(¼æÈİ°æ)
-// @version     ²âÊÔ(beta)0.3
-// @description 1.¿ÉÄÜÖ§³ÖÎŞÓÃ»§ÃûµÄÌù°ÉÕËºÅ£¨Â¥ÖĞÂ¥Î´ÍêÈ«ÑéÖ¤¹ı£©2.ĞŞ¸ÄÎªÖ»ÔÚ¸÷¸öÌù°ÉµÄÖ÷ÌâÁĞ±íºÍÖ÷ÌâÌùÄÚÔËĞĞ 3.·¢Ö÷ÌâÌùºó£¬ÆÁ±ÎÑùÊ½»áÏûÊ§£¬Ë¢ĞÂÌù°É¼´¿É
+// @name        è´´å§è´´å­å±è”½æ£€æµ‹(å…¼å®¹ç‰ˆ)
+// @version     æµ‹è¯•(beta)0.3
+// @description 1.å¯èƒ½æ”¯æŒæ— ç”¨æˆ·åçš„è´´å§è´¦å·ï¼ˆæ¥¼ä¸­æ¥¼æœªå®Œå…¨éªŒè¯è¿‡ï¼‰2.ä¿®æ”¹ä¸ºåªåœ¨å„ä¸ªè´´å§çš„ä¸»é¢˜åˆ—è¡¨å’Œä¸»é¢˜è´´å†…è¿è¡Œ 3.å‘ä¸»é¢˜è´´åï¼Œå±è”½æ ·å¼ä¼šæ¶ˆå¤±ï¼Œåˆ·æ–°è´´å§å³å¯
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
 // @grant       none
 // @license     GPL-3.0
-// @author      shitianshiwa,864907600cc(Ô­ÏîÄ¿)
+// @author      shitianshiwa,864907600cc(åŸé¡¹ç›®)
 // @namespace   https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
-//¿ÉÄÜÖ§³ÖÎŞÓÃ»§ÃûµÄÌù°ÉÕËºÅ£¨Â¥ÖĞÂ¥Î´ÍêÈ«ÑéÖ¤¹ı£©
-//ĞŞ¸ÄÎªÖ»ÔÚ¸÷¸öÌù°ÉµÄÖ÷ÌâÁĞ±íºÍÖ÷ÌâÌùÄÚÔËĞĞ
-//·¢Ö÷ÌâÌù»ò»ØÌùºó£¬ÆÁ±ÎÑùÊ½»áÏûÊ§£¬Ë¢ĞÂÌù°É¼´¿É
+//å¯èƒ½æ”¯æŒæ— ç”¨æˆ·åçš„è´´å§è´¦å·ï¼ˆæ¥¼ä¸­æ¥¼æœªå®Œå…¨éªŒè¯è¿‡ï¼‰
+//ä¿®æ”¹ä¸ºåªåœ¨å„ä¸ªè´´å§çš„ä¸»é¢˜åˆ—è¡¨å’Œä¸»é¢˜è´´å†…è¿è¡Œ
+//å‘ä¸»é¢˜è´´æˆ–å›è´´åï¼Œå±è”½æ ·å¼ä¼šæ¶ˆå¤±ï¼Œåˆ·æ–°è´´å§å³å¯
 
 (function($)
  {
     'use strict';
     const threadCache = {};
     const replyCache = {};
-    var t1,t2,t3,t4;//¼ÆÊ±Æ÷`
+    var t1,t2,t3,t4;//è®¡æ—¶å™¨`
     const css1=`
-/*¹Ì¶¨µ½ÍøÒ³ÓÒ±ß*/
+/*å›ºå®šåˆ°ç½‘é¡µå³è¾¹*/
 .miaocsss2
 {
 width:120px;
@@ -36,18 +36,18 @@ font-weight:bold;
 }
 `;
     /**
- * ¾«¼ò·â×° fetch ÇëÇó£¬×Ô´øÇëÇó + Í¨ÓÃÅäÖÃ + ×Ô¶¯ .text()
+ * ç²¾ç®€å°è£… fetch è¯·æ±‚ï¼Œè‡ªå¸¦è¯·æ±‚ + é€šç”¨é…ç½® + è‡ªåŠ¨ .text()
  *
- * @param {string} url - ÇëÇó URL
- * @param {object} [options={}] - fetch Request ÅäÖÃ
- * @returns {Promise<string>} fetch ÇëÇó
+ * @param {string} url - è¯·æ±‚ URL
+ * @param {object} [options={}] - fetch Request é…ç½®
+ * @returns {Promise<string>} fetch è¯·æ±‚
  */
     const request = (url, options = {}) => fetch(url, Object.assign(
         {
             credentials: 'omit',
-            // ²¿·ÖÌù°É£¨Èç firefox °É£©»áÇ¿ÖÆÌø×ª»Ø http
+            // éƒ¨åˆ†è´´å§ï¼ˆå¦‚ firefox å§ï¼‰ä¼šå¼ºåˆ¶è·³è½¬å› http
             redirect: 'follow',
-            // ×èÖ¹ä¯ÀÀÆ÷·¢³ö CORS ¼ì²âµÄ HEAD ÇëÇóÍ·
+            // é˜»æ­¢æµè§ˆå™¨å‘å‡º CORS æ£€æµ‹çš„ HEAD è¯·æ±‚å¤´
             mode: 'same-origin',
             headers:
             {
@@ -56,127 +56,127 @@ font-weight:bold;
         }, options)).then(res => res.text());
 
     /**
- * »ñÈ¡µ±Ç°ÓÃ»§ÊÇ·ñµÇÂ¼
+ * è·å–å½“å‰ç”¨æˆ·æ˜¯å¦ç™»å½•
  *
- * @returns {number|boolean} ÊÇ·ñµÇÂ¼£¬ÈôÒÑµÇÂ¼£¬Ìù°ÉÒ³Îª 1£¬Ìù×ÓÒ³Îª true
+ * @returns {number|boolean} æ˜¯å¦ç™»å½•ï¼Œè‹¥å·²ç™»å½•ï¼Œè´´å§é¡µä¸º 1ï¼Œè´´å­é¡µä¸º true
  */
     const getIsLogin = () => window.PageData.user.is_login;
     /**
- * »ñÈ¡µ±Ç°ÓÃ»§µÄid
+ * è·å–å½“å‰ç”¨æˆ·çš„id
  *
  * @returns {string} id
  */
     const getUserid = () => window.PageData.user.id;
     /**
- * »ñÈ¡µ±Ç°ÓÃ»§µÄÓÃ»§Ãû
+ * è·å–å½“å‰ç”¨æˆ·çš„ç”¨æˆ·å
  *
- * @returns {string} ÓÃ»§Ãû
+ * @returns {string} ç”¨æˆ·å
  */
     const getUsername = () => window.PageData.user.name || window.PageData.user.user_name;
     /**
- * »ñÈ¡ \u ĞÎÊ½µÄ unicode ×Ö·û´®
+ * è·å– \u å½¢å¼çš„ unicode å­—ç¬¦ä¸²
  *
- * @param {string} str - ĞèÒª×ªÂëµÄ×Ö·û´®
- * @returns {string} ×ªÂëºóµÄ×Ö·û´®
+ * @param {string} str - éœ€è¦è½¬ç çš„å­—ç¬¦ä¸²
+ * @returns {string} è½¬ç åçš„å­—ç¬¦ä¸²
  */
     const getEscapeString = str => escape(str).replace(/%/g, '\\').toLowerCase();
 
     /**
- * »ñÈ¡Ö÷ÌâÌùµÄÒÆ¶¯¶ËµØÖ·
+ * è·å–ä¸»é¢˜è´´çš„ç§»åŠ¨ç«¯åœ°å€
  *
- * @param {number} tid - Ìù×Ó id
+ * @param {number} tid - è´´å­ id
  * @returns {string} URL
  */
-    const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;//Ö÷ÌâÌùÅĞ¶Ï
+    const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;//ä¸»é¢˜è´´åˆ¤æ–­
 
     /**
- * »ñÈ¡»Ø¸´ÌùµÄÒÆ¶¯¶ËµØÖ·
+ * è·å–å›å¤è´´çš„ç§»åŠ¨ç«¯åœ°å€
  *
- * @param {number} tid - Ìù×Ó id
- * @param {number} pid - »Ø¸´ id
- * @param {number} [pn=0] - Ò³Âë
+ * @param {number} tid - è´´å­ id
+ * @param {number} pid - å›å¤ id
+ * @param {number} [pn=0] - é¡µç 
  * @returns {string} URL
  */
-    const getReplyMoUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/mo/q-----1-1-0----/flr?pid=${pid}&kz=${tid}&pn=${pn}`;//Â¥²ãÅĞ¶Ï
+    const getReplyMoUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/mo/q-----1-1-0----/flr?pid=${pid}&kz=${tid}&pn=${pn}`;//æ¥¼å±‚åˆ¤æ–­
 
     /**
- * »ñÈ¡»Ø¸´ÌùµÄ ajax µØÖ·
+ * è·å–å›å¤è´´çš„ ajax åœ°å€
  *
- * @param {number} tid - Ìù×Ó id
- * @param {number} pid - Ö÷»Ø¸´ id
- * @param {number} spid - Â¥ÖĞÂ¥»Ø¸´ id
- * @param {number} [pn=0] - Ò³Âë
+ * @param {number} tid - è´´å­ id
+ * @param {number} pid - ä¸»å›å¤ id
+ * @param {number} spid - æ¥¼ä¸­æ¥¼å›å¤ id
+ * @param {number} [pn=0] - é¡µç 
  * @returns {string} URL
  */
-    const getReplyUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/p/comment?tid=${tid}&pid=${pid}&pn=${pn}&t=${Date.now()}`;//Â¥ÖĞÂ¥ÅĞ¶Ï
+    const getReplyUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/p/comment?tid=${tid}&pid=${pid}&pn=${pn}&t=${Date.now()}`;//æ¥¼ä¸­æ¥¼åˆ¤æ–­
 
     /**
- * ´ÓÒ³ÃæÄÚÈİÅĞ¶ÏÌù×ÓÊÇ·ñÖ±½ÓÏûÊ§
+ * ä»é¡µé¢å†…å®¹åˆ¤æ–­è´´å­æ˜¯å¦ç›´æ¥æ¶ˆå¤±
  *
- * @param {string} res - Ò³ÃæÄÚÈİ
- * @returns {boolean} ÊÇ·ñ±»ÆÁ±Î
+ * @param {string} res - é¡µé¢å†…å®¹
+ * @returns {boolean} æ˜¯å¦è¢«å±è”½
  */
-    const threadIsNotExist = res => res.indexOf('ÄúÒªä¯ÀÀµÄÌù×Ó²»´æÔÚ') >= 0;
+    const threadIsNotExist = res => res.indexOf('æ‚¨è¦æµè§ˆçš„è´´å­ä¸å­˜åœ¨') >= 0;
 
     /**
- * »ñÈ¡Ö÷ÌâÌùÊÇ·ñ±»ÆÁ±Î
+ * è·å–ä¸»é¢˜è´´æ˜¯å¦è¢«å±è”½
  *
- * @param {number} tid - Ìù×Ó id
- * @returns {Promise<boolean>} ÊÇ·ñ±»ÆÁ±Î
+ * @param {number} tid - è´´å­ id
+ * @returns {Promise<boolean>} æ˜¯å¦è¢«å±è”½
  */
     const getThreadBlocked = tid => request(getThreadMoUrl(tid))
     .then(threadIsNotExist);
 
     /**
- * »ñÈ¡»Ø¸´ÌùÊÇ·ñ±»ÆÁ±Î
+ * è·å–å›å¤è´´æ˜¯å¦è¢«å±è”½
  *
- * @param {number} tid - Ìù×Ó id
- * @param {number} pid - »Ø¸´ id
- * @returns {Promise<boolean>} ÊÇ·ñ±»ÆÁ±Î
+ * @param {number} tid - è´´å­ id
+ * @param {number} pid - å›å¤ id
+ * @returns {Promise<boolean>} æ˜¯å¦è¢«å±è”½
  */
     const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
-    .then(res => threadIsNotExist(res) || res.indexOf('Ë¢ĞÂ</a><div>Â¥.&#160;<br/>') >= 0);
+    .then(res => threadIsNotExist(res) || res.indexOf('åˆ·æ–°</a><div>æ¥¼.&#160;<br/>') >= 0);
 
     /**
- * »ñÈ¡Â¥ÖĞÂ¥ÊÇ·ñ±»ÆÁ±Î
+ * è·å–æ¥¼ä¸­æ¥¼æ˜¯å¦è¢«å±è”½
  *
- * @param {number} tid - Ìù×Ó id
- * @param {number} pid - Ö÷»Ø¸´ id
- * @param {number} spid - Â¥ÖĞÂ¥»Ø¸´ id
- * @returns {Promise<boolean>} ÊÇ·ñ±»ÆÁ±Î
+ * @param {number} tid - è´´å­ id
+ * @param {number} pid - ä¸»å›å¤ id
+ * @param {number} spid - æ¥¼ä¸­æ¥¼å›å¤ id
+ * @returns {Promise<boolean>} æ˜¯å¦è¢«å±è”½
  */
     const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
-    // Â¥ÖĞÂ¥ ajax ·­Ò³ºó±»ÆÁ±ÎµÄÂ¥ÖĞÂ¥²»»áÕ¹Ê¾£¬ËùÒÔ²»ĞèÒª¿¼ÂÇ pn£¬Í¬Àí²»ĞèÒª¿¼ÂÇ²»ÔÚµÚÒ»Ò³µÄÂ¥ÖĞÂ¥
+    // æ¥¼ä¸­æ¥¼ ajax ç¿»é¡µåè¢«å±è”½çš„æ¥¼ä¸­æ¥¼ä¸ä¼šå±•ç¤ºï¼Œæ‰€ä»¥ä¸éœ€è¦è€ƒè™‘ pnï¼ŒåŒç†ä¸éœ€è¦è€ƒè™‘ä¸åœ¨ç¬¬ä¸€é¡µçš„æ¥¼ä¸­æ¥¼
     .then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
 
     /**
- * »ñÈ¡´¥·¢ CSS ÑùÊ½
+ * è·å–è§¦å‘ CSS æ ·å¼
  *
- * @param {string} username - ÓÃ»§Ãû
- * @returns {string} ÑùÊ½±í
+ * @param {string} username - ç”¨æˆ·å
+ * @returns {string} æ ·å¼è¡¨
  */
     const getTriggerStyle = (username) =>
     {
         const escapedUsername = getEscapeString(username).replace(/\\/g, '\\\\');
 
         return `
-/* Ê¹ÓÃ animation ¼à²â DOM ±ä»¯ */
+/* ä½¿ç”¨ animation ç›‘æµ‹ DOM å˜åŒ– */
 @-webkit-keyframes __tieba_blocked_detect__ {}
 @-moz-keyframes __tieba_blocked_detect__ {}
 @keyframes __tieba_blocked_detect__ {}
 
-/* Ö÷ÌâÌù */
+/* ä¸»é¢˜è´´ */
 #thread_list .j_thread_list[data-field*='"author_name":"${escapedUsername}"'],
-/* »Ø¸´Ìù */
+/* å›å¤è´´ */
 #j_p_postlist .l_post[data-field*='"user_name":"${escapedUsername}"'],
-/* Â¥ÖĞÂ¥ */
+/* æ¥¼ä¸­æ¥¼ */
 .j_lzl_m_w .lzl_single_post[data-field*="'user_name':'${username}'"] {
 -webkit-animation: __tieba_blocked_detect__;
 -moz-animation: __tieba_blocked_detect__;
 animation: __tieba_blocked_detect__;
 }
 
-/* ±»ÆÁ±ÎÑùÊ½ */
+/* è¢«å±è”½æ ·å¼ */
 .__tieba_blocked__,
 .__tieba_blocked__ .d_post_content_main {
 background: rgba(255, 0, 0, 0.1);
@@ -205,17 +205,17 @@ padding-bottom: 6px;
 
 .__tieba_blocked__.j_thread_list::after,
 .__tieba_blocked__.core_title::after {
-content: '¸ÃÌùÒÑ±»ÆÁ±Î';
+content: 'è¯¥è´´å·²è¢«å±è”½';
 right: 0;
 top: 0;
 }
 .__tieba_blocked__.l_post::after {
-content: '¸ÃÂ¥²ãÒÑ±»ÆÁ±Î';
+content: 'è¯¥æ¥¼å±‚å·²è¢«å±è”½';
 right: 0;
 top: 0;
 }
 .__tieba_blocked__.lzl_single_post::after {
-content: '¸ÃÂ¥ÖĞÂ¥ÒÑ±»ÆÁ±Î';
+content: 'è¯¥æ¥¼ä¸­æ¥¼å·²è¢«å±è”½';
 left: 0;
 bottom: 0;
 }
@@ -223,11 +223,11 @@ bottom: 0;
     };
 
     /**
- * ¼ì²âÌù×Ó/»Ø¸´ÆÁ±Î»Øµ÷º¯Êı
+ * æ£€æµ‹è´´å­/å›å¤å±è”½å›è°ƒå‡½æ•°
  *
- * @param {AnimationEvent} event - ´¥·¢µÄÊÂ¼ş¶ÔÏó
+ * @param {AnimationEvent} event - è§¦å‘çš„äº‹ä»¶å¯¹è±¡
  */
-    //Ö÷ÌâÌùÁĞ±í
+    //ä¸»é¢˜è´´åˆ—è¡¨
     const detectBlocked0 = () =>
     {
         //$(".tb_icon_author").parents('li.j_thread_list')
@@ -242,7 +242,7 @@ bottom: 0;
                 //alert(JSON.parse($(this).attr("data-field")).user_id+","+getUserid());
                 if(JSON.parse($(this).attr("data-field")).user_id==getUserid()&&$(this)[0].classList.contains("__tieba_blocked__")==false)
                 {
-                    const tid = $(this).parents('li.j_thread_list').attr('data-tid');//×Ó½ÚµãÕÒ¸¸½Úµã
+                    const tid = $(this).parents('li.j_thread_list').attr('data-tid');//å­èŠ‚ç‚¹æ‰¾çˆ¶èŠ‚ç‚¹
                     TID1[index1]=tid;
                     tizi1[index1]=$(this);
                     index1++;
@@ -251,7 +251,7 @@ bottom: 0;
         t4=setInterval(tzaction,400);
         function tzaction()
         {
-            $("#miaocount1").html("1.Ê£Óà¼ì²âÌù×ÓÊı£º"+index1);
+            $("#miaocount1").html("1.å‰©ä½™æ£€æµ‹è´´å­æ•°ï¼š"+index1);
             if(index1>0)
             {
                 index1--;
@@ -280,7 +280,7 @@ bottom: 0;
                 Promise.resolve(checker).then(result =>{
                     if (result)
                     {
-                        tizi1[index1].parents('li.j_thread_list')[0].classList.add("__tieba_blocked__");//×Ó½ÚµãÕÒ¸¸½Úµã
+                        tizi1[index1].parents('li.j_thread_list')[0].classList.add("__tieba_blocked__");//å­èŠ‚ç‚¹æ‰¾çˆ¶èŠ‚ç‚¹
                         //alert(result);
                         //alert("460");
                     }
@@ -289,14 +289,14 @@ bottom: 0;
         }
     }
 
-    //Â¥²ã
+    //æ¥¼å±‚
     const detectBlocked = () =>
     {
-        //document.querySelectorAll(".l_post")[0].classList.add("__tieba_blocked__")//Ìí¼ÓÆÁ±ÎÑùÊ½
+        //document.querySelectorAll(".l_post")[0].classList.add("__tieba_blocked__")//æ·»åŠ å±è”½æ ·å¼
         //JSON.parse(($(".l_post")).attr('data-field')).author.user_id
-        //j_thread_list clearfix Ö÷ÌâÌùÁĞ±í
-        //l_post l_post_bright j_l_post clearfix  Â¥²ã
-        //lzl_single_post Â¥ÖĞÂ¥
+        //j_thread_list clearfix ä¸»é¢˜è´´åˆ—è¡¨
+        //l_post l_post_bright j_l_post clearfix  æ¥¼å±‚
+        //lzl_single_post æ¥¼ä¸­æ¥¼
 
         clearTimeout(t2);
         var TID2=new Array();
@@ -324,7 +324,7 @@ bottom: 0;
         function lcaction()
         {
             //alert("2333");
-            $("#miaocount2").html("2.Ê£Óà¼ì²âÂ¥²ãÊı£º"+index2);
+            $("#miaocount2").html("2.å‰©ä½™æ£€æµ‹æ¥¼å±‚æ•°ï¼š"+index2);
             if(index2>0)
             {
                 index2--;
@@ -339,7 +339,7 @@ bottom: 0;
             let checker;
             if (!pid)
             {
-                // ĞÂ»Ø¸´¿ÉÄÜÃ»ÓĞ pid
+                // æ–°å›å¤å¯èƒ½æ²¡æœ‰ pid
                 return;
             }
             if (replyCache[pid])
@@ -371,7 +371,7 @@ bottom: 0;
         }
     };
     //alert(checker);
-    //Â¥ÖĞÂ¥
+    //æ¥¼ä¸­æ¥¼
     const detectBlocked2 = (event) =>
     {
         if (event.animationName !== '__tieba_blocked_detect__')
@@ -390,7 +390,7 @@ bottom: 0;
             const pageNumber = parent.querySelector('.tP');
             if (pageNumber && pageNumber.textContent.trim() !== '1')
             {
-                // ·­Ò³ºóµÄÂ¥ÖĞÂ¥²»»áÏÔÊ¾ÆÁ±ÎµÄÂ¥ÖĞÂ¥£¬ËùÒÔÃüÖĞµÄÂ¥ÖĞÂ¥Ò»¶¨ÊÇ²»»áÆÁ±ÎµÄ£¬²»ĞèÒª´¦Àí
+                // ç¿»é¡µåçš„æ¥¼ä¸­æ¥¼ä¸ä¼šæ˜¾ç¤ºå±è”½çš„æ¥¼ä¸­æ¥¼ï¼Œæ‰€ä»¥å‘½ä¸­çš„æ¥¼ä¸­æ¥¼ä¸€å®šæ˜¯ä¸ä¼šå±è”½çš„ï¼Œä¸éœ€è¦å¤„ç†
                 return;
             }
             const tid = window.PageData.thread.thread_id;
@@ -398,7 +398,7 @@ bottom: 0;
             const spid = (field.match(/'spid':'?(\d+)'?/) || [])[1];
             if (!spid)
             {
-                // ĞÂ»Ø¸´Ã»ÓĞ spid
+                // æ–°å›å¤æ²¡æœ‰ spid
                 return;
             }
             if (replyCache[spid])
@@ -429,9 +429,9 @@ bottom: 0;
     //https://www.cnblogs.com/yunfeifei/p/4453690.html
 
     /**
-* ³õÊ¼»¯ÑùÊ½
+* åˆå§‹åŒ–æ ·å¼
 *
-* @param {string} username - ÓÃ»§Ãû
+* @param {string} username - ç”¨æˆ·å
 */
     const initStyle = (username) =>
     {
@@ -441,35 +441,35 @@ bottom: 0;
     };
 
     /**
- * ³õÊ¼»¯ÊÂ¼ş¼àÌı
+ * åˆå§‹åŒ–äº‹ä»¶ç›‘å¬
  *
  */
     const initListener = () =>
     {
-        document.addEventListener('webkitAnimationStart',detectBlocked2, false);//Õâ¸öÊÂ¼şÖ»¶Ô×Ô¼ºµÄÌù×ÓÆğ×÷ÓÃ(Â¥ÖĞÂ¥)
+        document.addEventListener('webkitAnimationStart',detectBlocked2, false);//è¿™ä¸ªäº‹ä»¶åªå¯¹è‡ªå·±çš„è´´å­èµ·ä½œç”¨(æ¥¼ä¸­æ¥¼)
         document.addEventListener('MSAnimationStart', detectBlocked2, false);
         document.addEventListener('animationstart', detectBlocked2, false);
     };
     /*
     http://www.softwhy.com/article-9936-1.html
-    JavaScript animationStart ÊÂ¼ş
-    £¨1£©.IE10+ä¯ÀÀÆ÷Ö§³Ö´ËÊÂ¼ş¡£
-    £¨2£©.¹È¸èä¯ÀÀÆ÷Ö§³Ö´ËÊÂ¼ş£¨µ±Ç°ĞèÒª¼ÓwebkitÇ°×º£©¡£
-    £¨3£©.»ğºüä¯ÀÀÆ÷Ö§³Ö´ËÊÂ¼ş£¨µ±Ç°ĞèÒª¼ÓmozÇ°×º£©¡£
-    £¨4£©.operaä¯ÀÀÆ÷Ö§³Ö´ËÊÂ¼ş£¨µ±Ç°ĞèÒª¼ÓoÇ°×º£©¡£
-    £¨5£©.safriaä¯ÀÀÆ÷Ö§³Ö´ËÊÂ¼ş£¨µ±Ç°ĞèÒª¼ÓwebkitÇ°×º£©¡£
-    ¶¨ÒåºÍÓÃ·¨
-    animationstart ÊÂ¼şÔÚ CSS ¶¯»­¿ªÊ¼²¥·ÅÊ±´¥·¢¡£
-    CSS ¶¯»­²¥·ÅÊ±£¬»á·¢ÉúÒÔÏÂÈı¸öÊÂ¼ş£º
-    animationstart - CSS ¶¯»­¿ªÊ¼ºó´¥·¢
-    animationiteration - CSS ¶¯»­ÖØ¸´²¥·ÅÊ±´¥·¢
-    animationend - CSS ¶¯»­Íê³Éºó´¥·¢
-    true - ÊÂ¼ş¾ä±úÔÚ²¶»ñ½×¶ÎÖ´ĞĞ
-    false- Ä¬ÈÏ¡£ÊÂ¼ş¾ä±úÔÚÃ°Åİ½×¶ÎÖ´ĞĞ
+    JavaScript animationStart äº‹ä»¶
+    ï¼ˆ1ï¼‰.IE10+æµè§ˆå™¨æ”¯æŒæ­¤äº‹ä»¶ã€‚
+    ï¼ˆ2ï¼‰.è°·æ­Œæµè§ˆå™¨æ”¯æŒæ­¤äº‹ä»¶ï¼ˆå½“å‰éœ€è¦åŠ webkitå‰ç¼€ï¼‰ã€‚
+    ï¼ˆ3ï¼‰.ç«ç‹æµè§ˆå™¨æ”¯æŒæ­¤äº‹ä»¶ï¼ˆå½“å‰éœ€è¦åŠ mozå‰ç¼€ï¼‰ã€‚
+    ï¼ˆ4ï¼‰.operaæµè§ˆå™¨æ”¯æŒæ­¤äº‹ä»¶ï¼ˆå½“å‰éœ€è¦åŠ oå‰ç¼€ï¼‰ã€‚
+    ï¼ˆ5ï¼‰.safriaæµè§ˆå™¨æ”¯æŒæ­¤äº‹ä»¶ï¼ˆå½“å‰éœ€è¦åŠ webkitå‰ç¼€ï¼‰ã€‚
+    å®šä¹‰å’Œç”¨æ³•
+    animationstart äº‹ä»¶åœ¨ CSS åŠ¨ç”»å¼€å§‹æ’­æ”¾æ—¶è§¦å‘ã€‚
+    CSS åŠ¨ç”»æ’­æ”¾æ—¶ï¼Œä¼šå‘ç”Ÿä»¥ä¸‹ä¸‰ä¸ªäº‹ä»¶ï¼š
+    animationstart - CSS åŠ¨ç”»å¼€å§‹åè§¦å‘
+    animationiteration - CSS åŠ¨ç”»é‡å¤æ’­æ”¾æ—¶è§¦å‘
+    animationend - CSS åŠ¨ç”»å®Œæˆåè§¦å‘
+    true - äº‹ä»¶å¥æŸ„åœ¨æ•è·é˜¶æ®µæ‰§è¡Œ
+    false- é»˜è®¤ã€‚äº‹ä»¶å¥æŸ„åœ¨å†’æ³¡é˜¶æ®µæ‰§è¡Œ
 */
 
     /**
-* ¼ÓÔØ²¢Ã»ÓĞÊ²Ã´ÂÑÓÃµÄ»º´æ
+* åŠ è½½å¹¶æ²¡æœ‰ä»€ä¹ˆåµç”¨çš„ç¼“å­˜
 *
 */
     const loadCache = () =>
@@ -501,9 +501,9 @@ bottom: 0;
     }
 
     /**
-* ±£´æ²¢Ã»ÓĞÊ²Ã´ÂÑÓÃµÄ»º´æ
+* ä¿å­˜å¹¶æ²¡æœ‰ä»€ä¹ˆåµç”¨çš„ç¼“å­˜
 *
-* @param {string} key - »º´æ key
+* @param {string} key - ç¼“å­˜ key
 */
     const saveCache = (key) =>
     {
@@ -518,7 +518,7 @@ bottom: 0;
     }
 
     /**
-* ³õÊ¼»¯Ö´ĞĞ
+* åˆå§‹åŒ–æ‰§è¡Œ
 *
 */
     const init = () =>
@@ -528,13 +528,13 @@ bottom: 0;
             const username = getUsername();
             loadCache();
             initStyle(username);
-            t1=setTimeout(detectBlocked0,1000);//Ö÷ÌâÌùÁĞ±í
-            t2=setTimeout(detectBlocked,1000);//Ö÷ÌâÌùÀïµÄÂ¥²ã
-            initListener();//Ö÷ÌâÌùÀïµÄÂ¥²ãÀïµÄÂ¥ÖĞÂ¥
-            const style = document.createElement('style');//´´½¨ĞÂÑùÊ½½Úµã
-            style.textContent = css1;//Ìí¼ÓÑùÊ½ÄÚÈİ
-            document.head.appendChild(style);//¸øheadÍ·Ìí¼ÓĞÂÑùÊ½½Úµã
-            $("body").append('<div class="miaocsss2"><span>Ìù×ÓÆÁ±Î¼ì²â</span><br/><span id="miaocount1">1.Ê£Óà¼ì²âÌù×ÓÊı:</span><br/><span id="miaocount2">2.Ê£Óà¼ì²âÂ¥²ãÊı:</span></div>');
+            t1=setTimeout(detectBlocked0,1000);//ä¸»é¢˜è´´åˆ—è¡¨
+            t2=setTimeout(detectBlocked,1000);//ä¸»é¢˜è´´é‡Œçš„æ¥¼å±‚
+            initListener();//ä¸»é¢˜è´´é‡Œçš„æ¥¼å±‚é‡Œçš„æ¥¼ä¸­æ¥¼
+            const style = document.createElement('style');//åˆ›å»ºæ–°æ ·å¼èŠ‚ç‚¹
+            style.textContent = css1;//æ·»åŠ æ ·å¼å†…å®¹
+            document.head.appendChild(style);//ç»™headå¤´æ·»åŠ æ–°æ ·å¼èŠ‚ç‚¹
+            $("body").append('<div class="miaocsss2"><span>è´´å­å±è”½æ£€æµ‹</span><br/><span id="miaocount1">1.å‰©ä½™æ£€æµ‹è´´å­æ•°:</span><br/><span id="miaocount2">2.å‰©ä½™æ£€æµ‹æ¥¼å±‚æ•°:</span></div>');
         }
     }
     init();
