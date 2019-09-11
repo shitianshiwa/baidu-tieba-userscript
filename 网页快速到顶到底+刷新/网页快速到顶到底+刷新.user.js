@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         网页快速到顶到底+刷新(beta)
+// @name         网页快速到顶到底+刷新
 // @namespace    http://tampermonkey.net/
-// @version      0.5
-// @description  网页快速到顶到底+刷新(大概没什么用吧)
+// @version      测试(beta)0.6
+// @description  网页快速到顶到底+刷新(大概没什么用吧)。部分网站存在两个body，会导致出现两条按钮列表的bug，暂没方法解决(例如：广告。。！)
 // @author       shitianshiwa
 // @include      http*://*
 // @grant        GM_registerMenuCommand
@@ -54,7 +54,7 @@ z-index: 1005;
         const style = document.createElement('style');//创建新样式节点
         style.textContent = css1;//添加样式内容
         document.head.appendChild(style);//给head头添加新样式节点
-
+        //------------------------------------------------------
         var temp1=document.createElement("div");//创建节点<input/>
         temp1.setAttribute('class','miaocsss');
         if(mouseX!=null&&mouseY!=null)
@@ -81,6 +81,7 @@ z-index: 1005;
             if(temp2[0].value=="隐藏↑  ")
             {
                 temp2[0].value="展开↓ ";
+                temp2[0].value="展开↓"+(b3+1);
                 b1=true;
                 for(let i=1;i<=3;i++)
                 {
@@ -101,7 +102,12 @@ z-index: 1005;
                 }
                 else
                 {
+                    if(b1==true)
+                    {
+                        b2=true;
+                    }
                     b3++;
+                    temp2[0].value="展开↓"+(b3+1);
                 }
             }
             temp2[0].addEventListener('mousedown', () => {
@@ -117,8 +123,9 @@ z-index: 1005;
                 if(b2==true)
                 {
                     b3=0;
-                    temp1.style.left = event.x+"px";//设置left数值
-                    temp1.style.top = event.y+"px";//设置top数值
+                    temp2[0].value="展开↓"+(b3+1);
+                    temp1.style.left = event.x-30+"px";//设置left数值
+                    temp1.style.top = event.y-15+"px";//设置top数值
                     sessionStorage.setItem("miaox",event.x);
                     sessionStorage.setItem("miaoy",event.y);
                 }
