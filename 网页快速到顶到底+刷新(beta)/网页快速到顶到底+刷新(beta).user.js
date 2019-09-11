@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         网页快速到顶到底+刷新(beta)
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  网页快速到顶到底+刷新(大概没什么用吧)
 // @author       shitianshiwa
 // @include      http*://*
@@ -12,6 +12,7 @@
 
 (function()
  {
+    var b1=false,b2=false,b3=0;;
     'use strict';
     const css1=`
 /*按钮样式*/
@@ -36,11 +37,11 @@ border: 2px solid #3e89fa;
 /*固定到网页右边*/
 .miaocsss
 {
-width:20px;
+width:60px;
 height:120px;
 position: fixed;
-left: 94%;
-bottom: 40px;
+left:0px;
+bottom:30px;
 z-index: 1005;
 }
 `;
@@ -55,6 +56,7 @@ z-index: 1005;
 
         var temp1=document.createElement("div");//创建节点<input/>
         temp1.setAttribute('class','miaocsss');
+        temp1.style.left = window.innerWidth*0.90+"px";
         for(let i=0;i<=3;i++)
         {
             temp2[i]=document.createElement("input");//创建节点<input/>
@@ -64,11 +66,12 @@ z-index: 1005;
             temp2[i].setAttribute('value',s2[i]);
             temp1.appendChild(temp2[i]);
         }
-        temp2[0].style="color:#f00;"
+        temp2[0].style="color:#f00;"//展开折叠按钮文字改为红色#ff0000,red,green,blue
         temp2[0].addEventListener('click', () => {
             if(temp2[0].value=="隐藏↑ ")
             {
                 temp2[0].value="展开↓ ";
+                b1=true;
                 for(let i=1;i<=3;i++)
                 {
                     temp2[i].style="display:none;";//修改样式
@@ -76,12 +79,39 @@ z-index: 1005;
             }
             else
             {
-                temp2[0].value="隐藏↑ ";
-                for(let i=1;i<=3;i++)
+                if(b3==1)
                 {
-                    temp2[i].style="display:block;";//修改样式
+                    b3=0;
+                    temp2[0].value="隐藏↑ ";
+                    b1=false;
+                    for(let i=1;i<=3;i++)
+                    {
+                        temp2[i].style="display:block;";//修改样式
+                    }
+                }
+                else
+                {
+                    b3++;
                 }
             }
+            temp2[0].addEventListener('mousedown', () => {
+                if(b1==true)
+                {
+                    b2=true;
+                }
+            });
+            temp2[0].addEventListener('mouseup', () => {
+                b2=false;
+            });
+            document.body.addEventListener('mousemove', (event) => {
+                if(b2==true)
+                {
+                    b3=0;
+                    temp1.style.left = event.x+"px";//设置left数值
+                    temp1.style.top = event.y+"px";//设置top数值
+                }
+            })
+
         })
         temp2[1].addEventListener('click', () => {
             window.location.reload();//刷新网页
