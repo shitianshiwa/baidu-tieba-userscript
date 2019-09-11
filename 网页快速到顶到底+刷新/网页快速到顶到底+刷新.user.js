@@ -76,13 +76,14 @@ z-index: 1005;
             temp2[i].setAttribute('value',s2[i]);
             temp1.appendChild(temp2[i]);
         }
+        //-----------------------
         temp2[0].style="color:#f00;"//展开折叠按钮文字改为红色#ff0000,red,green,blue
         temp2[0].addEventListener('click', () => {
-            if(temp2[0].value=="隐藏↑  ")
+            if(temp2[0].value=="隐藏↑  ")//1
             {
+                b1=true;
                 temp2[0].value="展开↓ ";
                 temp2[0].value="展开↓"+(b3+1);
-                b1=true;
                 for(let i=1;i<=3;i++)
                 {
                     temp2[i].style="display:none;";//修改样式
@@ -90,48 +91,43 @@ z-index: 1005;
             }
             else
             {
-                if(b3==1)
+                b1=false;
+                if(b3==2)//3
                 {
                     b3=0;
                     temp2[0].value="隐藏↑  ";
-                    b1=false;
                     for(let i=1;i<=3;i++)
                     {
                         temp2[i].style="display:block;";//修改样式
                     }
                 }
-                else
+                else//2
                 {
-                    if(b1==true)
-                    {
-                        b2=true;
-                    }
                     b3++;
+                    if(b3==2)
+                    {
+                        b2=false;
+                    }
                     temp2[0].value="展开↓"+(b3+1);
                 }
             }
             temp2[0].addEventListener('mousedown', () => {
-                if(b1==true)
+                if(b1==true)//1
                 {
-                    b2=true;
+                    b2=true;//2
                 }
             });
-            temp2[0].addEventListener('mouseup', () => {
-                b2=false;
-            });
-            document.body.addEventListener('mousemove', (event) => {
-                if(b2==true)
+            document.body.addEventListener('mousedown', (event) => {
+                if(b2==true)//2
                 {
-                    b3=0;
-                    temp2[0].value="展开↓"+(b3+1);
                     temp1.style.left = event.x-30+"px";//设置left数值
                     temp1.style.top = event.y-15+"px";//设置top数值
-                    sessionStorage.setItem("miaox",event.x);
-                    sessionStorage.setItem("miaoy",event.y);
+                    sessionStorage.setItem("miaox",event.x-30);
+                    sessionStorage.setItem("miaoy",event.y-15);
                 }
             })
-
         })
+        //-----------------------
         temp2[1].addEventListener('click', () => {
             window.location.reload();//刷新网页
         })
