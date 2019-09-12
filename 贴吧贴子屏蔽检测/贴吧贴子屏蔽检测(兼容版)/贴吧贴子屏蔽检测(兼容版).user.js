@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.3
+// @version     测试(beta)0.4
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -21,11 +21,12 @@
     const threadCache = {};
     const replyCache = {};
     var t1,t2,t3,t4;//计时器`
+    var countx1=0,countx2=0;
     const css1=`
 /*固定到网页右边*/
 .miaocsss2
 {
-width:120px;
+width:140px;
 height:120px;
 position: fixed;
 right:30px;
@@ -249,10 +250,11 @@ bottom: 0;
                     index1++;
                 }
             });
+        countx1=index1;
         t4=setInterval(tzaction,400);
         function tzaction()
         {
-            $("#miaocount1").html("1.剩余检测贴子数："+index1);
+            $("#miaocount1").html("1.剩余检测贴子数："+index1+"/"+countx1);
             if(index1>0)
             {
                 index1--;
@@ -321,11 +323,12 @@ bottom: 0;
                     //console.log(pid);
                 }
             });
+        countx2=index2;
         t3=setInterval(lcaction,500);
         function lcaction()
         {
             //alert("2333");
-            $("#miaocount2").html("2.剩余检测楼层数："+index2);
+            $("#miaocount2").html("2.剩余检测楼层数："+index2+"/"+countx2);
             if(index2>0)
             {
                 index2--;
