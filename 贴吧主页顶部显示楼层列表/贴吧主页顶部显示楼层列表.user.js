@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         贴吧主页顶部显示楼层列表(beta)
+// @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      0.34
+// @version      测试(beta)0.35
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
@@ -239,8 +239,8 @@ border: 1px solid #3e89fa;
             alert(error+",贴吧主页顶部显示楼层列表已停止运行");
         }
     }
-    louceliebiao();
-    //t2=setInterval(louceliebiao,1000);//延迟1s工作，等网页基本加载完毕
+    //louceliebiao();重复切换楼层后，就上面就不显示楼层列表了
+    t2=setInterval(louceliebiao,1000);//延迟1s工作，等网页基本加载完毕
     //t2=setInterval(()=>{louceliebiao();},1000);//延迟1s工作，等网页基本加载完毕
 })($);
 /*
