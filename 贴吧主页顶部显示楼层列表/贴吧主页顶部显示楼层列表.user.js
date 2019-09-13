@@ -239,7 +239,7 @@ border: 1px solid #3e89fa;
             alert(error+",贴吧主页顶部显示楼层列表已停止运行");
         }
     }
-    //louceliebiao();重复切换楼层后，就上面就不显示楼层列表了
+    //louceliebiao();使用这个的话，重复切换楼层后，上面就不显示楼层列表了
     t2=setInterval(louceliebiao,1000);//延迟1s工作，等网页基本加载完毕
     //t2=setInterval(()=>{louceliebiao();},1000);//延迟1s工作，等网页基本加载完毕
 })($);
