@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         网页快速到顶到底+刷新
 // @namespace    http://tampermonkey.net/
-// @version      测试(beta)0.6
+// @version      测试(beta)0.61
 // @description  网页快速到顶到底+刷新(大概没什么用吧)。部分网站存在两个body，会导致出现两条按钮列表的bug，暂没方法解决(例如：广告。。！)
 // @author       shitianshiwa
 // @include      http*://*
@@ -9,7 +9,10 @@
 // @run-at       document-idle
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
-//部分网站存在两个body，会导致出现两条按钮列表的bug，暂没方法解决(例如：广告。。！)
+/*
+1.部分网站存在两个body，会导致出现两条按钮列表的bug，暂没方法解决(例如：广告。。！)
+2.有些网页会报错，暂没方法解决
+*/
 (function()
  {
     var b1=false,b2=false,b3=0;//解决按键点击动作与移动按钮动作之间的冲突
@@ -53,7 +56,11 @@ z-index: 1005;
         var mouseY=sessionStorage.getItem("miaoy")||null;
         const style = document.createElement('style');//创建新样式节点
         style.textContent = css1;//添加样式内容
-        document.head.appendChild(style);//给head头添加新样式节点
+        var temp0=document.head;
+        if(temp0!=null)
+        {
+            temp0.appendChild(style);//给head头添加新样式节点
+        }
         //------------------------------------------------------
         var temp1=document.createElement("div");//创建节点<input/>
         temp1.setAttribute('class','miaocsss');
@@ -137,7 +144,11 @@ z-index: 1005;
         temp2[3].addEventListener('click', () => {
             window.scrollTo(0,document.body.scrollHeight);//到底
         })
-        document.body.appendChild(temp1);
+        var temp3=document.body;
+        if(temp3!=null)
+        {
+            temp3.appendChild(temp1);
+        }
     }
     catch(error)
     {
