@@ -9,5 +9,5 @@
 * 这个会消耗额外的流量，使用wap贴吧的api来判断贴子是否显示（只能判断自己的贴子是否被隐藏）
 * 用portrait代替用户名 http://tieba.baidu.com/f/user/json_userinfo
 * api参考 
-** https://t.52fisher.cn/tb-remind.html
-** https://t.52fisher.cn/js/remind.uesr.js
+* https://t.52fisher.cn/tb-remind.html
+* https://t.52fisher.cn/js/remind.uesr.js
