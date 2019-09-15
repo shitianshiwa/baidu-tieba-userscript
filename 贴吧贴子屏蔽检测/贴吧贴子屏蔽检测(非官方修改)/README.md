@@ -10,3 +10,4 @@
 * 用portrait代替用户名 http://tieba.baidu.com/f/user/json_userinfo
 * api参考 
 * https://t.52fisher.cn/tb-remind.html
+* 开始使用时，不一定会马上见效，重复刷新几次网页看看
