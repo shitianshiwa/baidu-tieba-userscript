@@ -16,7 +16,7 @@
 1.无用户名的贴吧账号无法正常运行此脚本（经修复，无用户名，补用户名，有用户名都可以运行）
 2.修改为只在各个贴吧的主页和主题贴里运行
 3.修改了屏蔽显示样式，已避免特殊情况下，导致楼层错位（'position: absolute;'改为'position: relative;''）
-4.用portrait代替贴吧帐号用户名(http://tieba.baidu.com/f/user/json_userinfo),api参考(https://t.52fisher.cn/tb-remind.html,https://t.52fisher.cn/js/remind.uesr.js)
+4.用portrait代替贴吧帐号用户名(http://tieba.baidu.com/f/user/json_userinfo),api参考(https://t.52fisher.cn/tb-remind.html)
 */
 'use strict';
 
