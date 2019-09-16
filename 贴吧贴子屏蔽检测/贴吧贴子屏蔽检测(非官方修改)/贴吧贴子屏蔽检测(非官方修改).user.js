@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(非官方修改)
-// @version     1.0(非官方修改beta0.3)
+// @version     1.0(非官方修改beta0.31)
 // @description 贴吧都快凉了，过去的痕迹都没了，你为什么还在刷贴吧呢？你们建个群不好吗？
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -388,6 +388,7 @@ const saveCache = (key) => {
  *
  */
 const init = () => {
+    clearTimeout(t);
     if (getIsLogin()) {
         const username = (getUsername().split("?t=")[0])||null;//没登陆贴吧就是返回null，null就是没有作用
         const username2 =getUsername()||null;
@@ -402,4 +403,5 @@ const init = () => {
     }
 };
 
-init();
+var t=setTimeout(init,1000);//延迟1s
+//init();
