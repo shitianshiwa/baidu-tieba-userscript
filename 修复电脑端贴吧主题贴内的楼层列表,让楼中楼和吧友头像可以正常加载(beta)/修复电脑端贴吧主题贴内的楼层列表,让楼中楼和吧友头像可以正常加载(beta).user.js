@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         修复电脑端贴吧主题贴内的楼层列表,让楼中楼和吧友头像可以正常加载(beta)
 // @namespace    http://tampermonkey.net/
-// @version      0.11
+// @version      0.12
 // @description  手机端可能使用这个可能会有问题，所以单独弄一个脚本
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -10,9 +10,9 @@
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
 
-(function($)
-{
+(function() {
     'use strict';
+    var $ = window.jQuery;
     function fixzhutitie()
     {
         try
@@ -39,10 +39,10 @@
         }
         catch(error)
         {
-            clearInterval(t2);
+            // clearInterval(t2);
             alert(error+",修复主题贴内的楼层列表未正常运行");
         }
     }
     fixzhutitie();
     //var t2=setInterval(fixzhutitie,1000);//每秒1s工作一次
-})($);
+})();

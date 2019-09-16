@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         显示贴吧用户名(beta)
 // @namespace    http://tampermonkey.net/
-// @version      0.23
+// @version      0.24
 // @description  显示主题贴列表,楼层,楼中楼的贴吧用户名，仅支持电脑端贴吧
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -10,9 +10,9 @@
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
 
-(function($)
- {
+(function() {
     'use strict';
+    var $ = window.jQuery;
     var names=new Array();
     var names2=new Array();
     //var namesi=0;
@@ -229,8 +229,7 @@
     }
     var t3=setInterval(showName2,2000);//每一秒启动一次
     GM_registerMenuCommand("关闭楼中楼真名显示计时器(不再新增真名,但已有真名保留)", stop);
-})($);
-
+})();
 /*
 function initListener()
     {
