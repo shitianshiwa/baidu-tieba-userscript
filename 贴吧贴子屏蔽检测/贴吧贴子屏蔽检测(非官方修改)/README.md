@@ -7,7 +7,7 @@
 * 修改为只在各个贴吧的主页和主题贴里运行
 * 修改了屏蔽显示样式，已避免特殊情况下，导致楼层错位（'position: absolute;'改为'position: relative;''）
 * 这个会消耗额外的流量，使用wap贴吧的api来判断贴子是否显示（只能判断自己的贴子是否被隐藏）
-* 发主题贴或回贴后，屏蔽样式会消失，刷新贴吧即可
+* 发主题贴或回贴后，屏蔽样式可能会消失，刷新贴吧即可
 * 用portrait代替用户名 http://tieba.baidu.com/f/user/json_userinfo
 * api参考 
 * https://t.52fisher.cn/tb-remind.html

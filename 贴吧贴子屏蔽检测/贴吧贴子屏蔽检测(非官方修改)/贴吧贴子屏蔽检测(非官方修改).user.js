@@ -17,6 +17,7 @@
 2.修改为只在各个贴吧的主页和主题贴里运行
 3.修改了屏蔽显示样式，已避免特殊情况下，导致楼层错位（'position: absolute;'改为'position: relative;''）
 4.用portrait代替贴吧帐号用户名(http://tieba.baidu.com/f/user/json_userinfo),api参考(https://t.52fisher.cn/tb-remind.html)
+5.发主题贴或回贴后，屏蔽样式可能会消失，刷新贴吧即可
 */
 'use strict';
 
