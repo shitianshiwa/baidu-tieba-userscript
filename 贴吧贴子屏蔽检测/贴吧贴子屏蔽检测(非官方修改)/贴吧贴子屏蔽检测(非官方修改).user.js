@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(非官方修改)
-// @version     1.0(非官方修改beta0.31)
+// @version     1.0(非官方修改beta0.32)
 // @description 贴吧都快凉了，过去的痕迹都没了，你为什么还在刷贴吧呢？你们建个群不好吗？
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -13,26 +13,62 @@
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B/%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B(%E9%9D%9E%E5%AE%98%E6%96%B9%E4%BF%AE%E6%94%B9)
 // ==/UserScript==
 /*
-1.无用户名的贴吧账号无法正常运行此脚本（经修复，无用户名，补用户名，有用户名都可以运行）
+1.无用户名的贴吧账号无法正常运行此脚本（经修复，贴吧账号无用户名，后来补用户名，原本就有用户名的都可以运行）
 2.修改为只在各个贴吧的主页和主题贴里运行
 3.修改了屏蔽显示样式，已避免特殊情况下，导致楼层错位（'position: absolute;'改为'position: relative;''）
 4.用portrait代替贴吧帐号用户名(http://tieba.baidu.com/f/user/json_userinfo),api参考(https://t.52fisher.cn/tb-remind.html)
 */
 'use strict';
 
+/*
+原页面中已引入 jQuery, 但是 tampermonkey 编辑器中总是提示
+
+$ is not defined
+
+虽然不影响实际运行，但是看上去非常不爽。
+
+在代码头部插入
+
+var $ = unsafeWindow.jQuery;
+即可解决。
+
+tampermonkey $ is not defined - Tampermonkey - 大象笔记
+https://www.sunzhongwei.com/tampermonkey-dollar-is-not-defined?from=sidebar_related
+
+另一种情况，确实是没有引入 jQuery
+例如， unsafeWindow.jQuery 也是 null，说明页面并没有引入 jQuery。
+
+这时就需要在 tampermonkey 中指定引入 jQuery。例如：
+
+// @require      https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js
+*/
+
+var $ = window.jQuery;
 const threadCache = {};
 const replyCache = {};
-$.post("/f/user/json_userinfo","",
-       function(o)
-       {
-    if(o!=null)
-    {
-        sessionStorage.setItem("miaouserid",o.data.user_portrait);
-    }
-},"json");
+
+if(sessionStorage.getItem("miaouserid")==null)
+{
+    $.get("/f/user/json_userinfo","",
+          function(o)
+          {
+        if(o!=null)
+        {
+            sessionStorage.setItem("miaouserid",o.data.user_portrait);
+        }
+    },"json");
+}
 /*
 获取portrait,需要传递用户cookie，用户未登录返回null。
 各贴吧首页主题贴列表和各个贴子的网页代码的head标签里的script标签里json代码里的portrait与贴子，楼层，楼中楼有差异，所以不取。
+
+百度贴吧使用的jquery版本为1.7.2
+https://cdn.staticfile.org/jquery/1.7.2/jquery.min.js
+$.fn.jquery
+$.prototype.jquery
+这两种方式都可以获取到jquery的版本号
+获取jQuery版本号 - fullStack-yang - 博客园
+https://www.cnblogs.com/fullstack-yang/p/6101650.html
 */
 
 /**
@@ -403,5 +439,5 @@ const init = () => {
     }
 };
 
-var t=setTimeout(init,1000);//延迟1s
+var t=setTimeout(init,1000);//延迟1s,感觉没用？
 //init();
