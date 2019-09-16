@@ -11,4 +11,4 @@
 * api参考 
 * https://t.52fisher.cn/tb-remind.html
 * https://t.52fisher.cn/js/remind.user.js
-* 开始使用时，不一定会马上见效，重复刷新几次网页看看
+* 开始使用时，不一定会马上见效，重复刷新几次网页看看（也许修好了？）
