@@ -15,7 +15,8 @@
 
 (function() {
     'use strict';
-    var $ = window.jQuery;
+    var $ = unsafeWindow.jQuery;// @grant        不能为none，否则不能用
+    //var $ = window.jQuery;
     //捕捉class用.，id对象用#?,$=document.getElementById?
     //alert("233");
     var t1;

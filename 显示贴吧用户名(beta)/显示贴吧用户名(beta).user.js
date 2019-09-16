@@ -10,9 +10,12 @@
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
 
+
+
 (function() {
     'use strict';
-    var $ = window.jQuery;
+    var $ = unsafeWindow.jQuery;// @grant        不能为none，否则不能用
+    //var $ = window.jQuery;
     var names=new Array();
     var names2=new Array();
     //var namesi=0;

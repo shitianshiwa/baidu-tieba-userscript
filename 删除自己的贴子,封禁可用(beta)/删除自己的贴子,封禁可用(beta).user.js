@@ -18,7 +18,7 @@
 
 (function() {
     'use strict';
-    var $ = window.jQuery;
+    var $ = unsafeWindow.jQuery;// @grant        不能为none，否则不能用
     const css1=`
 /*按钮样式*/
 .miaocss02
