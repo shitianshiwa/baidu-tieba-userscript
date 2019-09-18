@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.50
+// @version     测试(beta)0.51
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -26,7 +26,7 @@ var $ = window.jQuery;
 const threadCache = {};
 const replyCache = {};
 var t1,t2,t3,t4;//计时器`
-var countx1=0,countx2=0;
+var countx1=0,countx2=0,countx3=0,countx4=0;;
 if(sessionStorage.getItem("miaouserid")==null)
 {
     $.get("/f/user/json_userinfo","",
@@ -306,6 +306,7 @@ const detectBlocked0 = () =>
                 if (result)
                 {
                     tizi1[tid]=true;
+                    countx4++;
                     //tizi1[index1].parents('li.j_thread_list')[0].classList.add("__tieba_blocked__");//子节点找父节点
                     //alert(result);
                     //alert("460");
@@ -326,7 +327,9 @@ const detectBlocked0 = () =>
                     $(this).parents('li.j_thread_list')[0].classList.add("__tieba_blocked__");//子节点找父节点
                 }
             });
+        $("#miaocount4").html("4.被屏蔽的贴子数:"+countx4);
     }
+
 }
 
 //楼层
@@ -409,6 +412,7 @@ const detectBlocked = () =>
                     if (result)
                     {
                         tizi24[pid]=true;
+                        countx4++;
                         //tizi2[index2][0].classList.add("__tieba_blocked__");
                         //console.log(index2);
                         //alert(result);
@@ -429,6 +433,7 @@ const detectBlocked = () =>
                         $(this)[0].classList.add("__tieba_blocked__");
                     }
                 });
+            $("#miaocount4").html("4.被屏蔽的贴子数:"+countx4);
         }
     }
     catch(error)
@@ -447,6 +452,7 @@ const detectBlocked2 = (event) =>
     //detectBlocked();
     const { target } = event;
     const { classList } = target;
+    countx3++;
     let checker;
     if (classList.contains('lzl_single_post'))
     {
@@ -486,11 +492,14 @@ const detectBlocked2 = (event) =>
             if (result)
             {
                 classList.add("__tieba_blocked__");
+                countx4++;
                 //alert(result);
                 //alert("460");
+                $("#miaocount4").html("4.被屏蔽的贴子数:"+countx4);
             }
         });
     }
+    $("#miaocount3").html("3.检测到的楼中楼数(不能获得总数):"+countx3);
 };
 //https://www.cnblogs.com/yunfeifei/p/4453690.html
 
@@ -603,7 +612,7 @@ const init = () =>
         const style = document.createElement('style');//创建新样式节点
         style.textContent = css1;//添加样式内容
         document.head.appendChild(style);//给head头添加新样式节点
-        $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数:</span><br/><span id="miaocount4">4.被屏蔽的贴子数:</span></div>');
+        $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(不能获得总数):</span><br/><span id="miaocount4">4.被屏蔽的贴子数:</span></div>');
     }
 }
 var t=setTimeout(init,1000);//延迟1s,感觉没用？
