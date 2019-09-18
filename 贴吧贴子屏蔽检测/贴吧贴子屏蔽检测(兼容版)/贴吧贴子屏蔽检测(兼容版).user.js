@@ -271,9 +271,10 @@ const detectBlocked0 = () =>
             }
         });
     countx1=index1;
-    t4=setInterval(tzaction,400);
+    t4=setInterval(tzaction,10);
     function tzaction()
     {
+        clearInterval(t4);
         $("#miaocount1").html("1.剩余检测贴子数："+index1+"/"+countx1);
         if(index1>0)
         {
@@ -281,7 +282,6 @@ const detectBlocked0 = () =>
         }
         else
         {
-            clearInterval(t4);
             tzaction2();
             return;
         }
@@ -311,6 +311,7 @@ const detectBlocked0 = () =>
                     //alert(result);
                     //alert("460");
                 }
+                t4=setInterval(tzaction,10);
             });
         }
     }
@@ -369,10 +370,11 @@ const detectBlocked = () =>
                 }
             });
         countx2=index2;
-        t3=setInterval(lcaction,500);
+        t3=setInterval(lcaction,10);
         function lcaction()
         {
             //alert("2333");
+            clearInterval(t3);
             $("#miaocount2").html("2.剩余检测楼层数："+index2+"/"+countx2);
             if(index2>0)
             {
@@ -381,7 +383,6 @@ const detectBlocked = () =>
             else
             {
                 tzaction3();
-                clearInterval(t3);
                 return;
             }
             const tid = window.PageData.thread.thread_id;
@@ -418,6 +419,7 @@ const detectBlocked = () =>
                         //alert(result);
                         //alert("460");
                     }
+                    t3=setInterval(lcaction,10);
                 });
             }
         }
