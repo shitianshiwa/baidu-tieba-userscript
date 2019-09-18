@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(非官方修改)
-// @version     1.0(非官方修改beta0.32)
+// @version     1.0(非官方修改beta0.33)
 // @description 贴吧都快凉了，过去的痕迹都没了，你为什么还在刷贴吧呢？你们建个群不好吗？
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -17,7 +17,7 @@
 2.修改为只在各个贴吧的主页和主题贴里运行
 3.修改了屏蔽显示样式，已避免特殊情况下，导致楼层错位（'position: absolute;'改为'position: relative;''）
 4.用portrait代替贴吧帐号用户名(http://tieba.baidu.com/f/user/json_userinfo),api参考(https://t.52fisher.cn/tb-remind.html)
-5.发主题贴或回贴后，屏蔽样式可能会消失，刷新贴吧即可
+5.发贴后可能会误判断，刷新一下贴吧应该可以解决
 */
 'use strict';
 
@@ -57,7 +57,7 @@ if(sessionStorage.getItem("miaouserid")==null)
         {
             sessionStorage.setItem("miaouserid",o.data.user_portrait);
         }
-    },"json");
+    },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
 }
 /*
 获取portrait,需要传递用户cookie，用户未登录返回null。
@@ -222,7 +222,7 @@ animation: __tieba_blocked_detect__;
 /* 被屏蔽样式 */
 .__tieba_blocked__,
 .__tieba_blocked__ .d_post_content_main {
-background: rgba(255, 0, 0, 0.1);
+background: rgba(255, 0, 0, 0.3);
 position: relative;
 }
 .__tieba_blocked__.core_title {
