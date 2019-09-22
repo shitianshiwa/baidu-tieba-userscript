@@ -148,101 +148,115 @@ font-weight:bold;
 
     function HH()//一键签到，一键签到有时间段限制，每日0:00至1:00无法使用
     {
-        if(localStorage.getItem("miaoerror")!=null)
+        try
         {
-            alert("已经启动慢速自动签到或者出现其它错误了！点‘报错后重启’");
-            return;
+            if(localStorage.getItem("miaoerror")!=null)
+            {
+                alert("已经启动慢速自动签到或者出现其它错误了！点‘报错后重启’");
+                return;
+            }
+            let s="/tbmall/onekeySignin1";
+            let c={'tbs':PageData.tbs||PageData.user.tbs,'ie':IE};
+            postpost(s,c);
         }
-        let s="/tbmall/onekeySignin1";
-        let c={'tbs':PageData.tbs||PageData.user.tbs,'ie':IE};
-        postpost(s,c);
+        catch(error)
+        {
+            alert(error);
+        }
     }
 
     var tt1,tt2,failtemp="";
     function HH2()//慢速自动签到
     {
-        if(localStorage.getItem("miaoerror")!=null)
+        try
         {
-            alert("已经启动慢速自动签到或者出错了！点‘报错后重启’");
-            return;
-        }
-        //$("div.miaoqiandaocss1").remove();
-        localStorage.setItem("miaoerror","suo");
-        alert("开始自动签到贴吧！刷新可中断");
-        var c={'tn':"bdFBW",'tab':"favorite"};
-        var u="/mo/q-----1-1-0----/m";
-        $.get(u,c,function(data){
-            sessionStorage.setItem("HH2temp",$(data.body)[0].innerText.split("."));
-        },"xml");
-        var temp2=new Array(),ii=0,time=0;
-        function xianshi()
-        {
-            clearTimeout(tt1);
-            var temp=sessionStorage.getItem("HH2temp").split(",");
-            for(var i=1;i<temp.length;i++)
+            if(localStorage.getItem("miaoerror")!=null)
             {
+                alert("已经启动慢速自动签到或者出错了！点‘报错后重启’");
+                return;
+            }
+            //$("div.miaoqiandaocss1").remove();
+            localStorage.setItem("miaoerror","suo");
+            alert("开始自动签到贴吧！刷新可中断");
+            var c={'tn':"bdFBW",'tab':"favorite"};
+            var u="/mo/q-----1-1-0----/m";
+            $.get(u,c,function(data){
+                sessionStorage.setItem("HH2temp",$(data.body)[0].innerText.split("."));
+            },"xml");
+            var temp2=new Array(),ii=0,time=0;
+            function xianshi()
+            {
+                clearTimeout(tt1);
+                var temp=sessionStorage.getItem("HH2temp").split(",");
+                for(var i=1;i<temp.length;i++)
+                {
 
-                temp2[ii]=temp[i].split("等级")[0];
-                //console.log(temp[i].split("等级")[0]);
-                ii++;
-            }
-            $.post("/dc/common/tbs","",function(o){sessionStorage.setItem("miaousertbs",o.tbs);},"json");//获取用户tbs口令号并储存在sessionStorage中，待使用
-            $("body").append('<div class="miaoqiandaocss1"><span id="miaoqiandaocount1">签到中（刷新可中断）</span></div>');
-            time=2000+parseInt(Math.random()*1000);//至少延迟1s以上，否则会被贴吧系统要求输入验证码,停止很长一段时间后大概能解除限制
-            tt2=setTimeout(xianshi2,time);
-            //alert(temp2);
-        }
-        tt1=setTimeout(xianshi,1000);
-        var url="/sign/add";
-        function xianshi2()
-        {
-            clearTimeout(tt2);
-            if(localStorage.getItem("miaoerror")==null)
-            {
-                $("div.miaoqiandaocss1").remove();
-                failtemp="";
-                alert("意外结束自动签到贴吧！");
-                return;
-            }
-            $("#miaoqiandaocount1").html("签到中（刷新可中断）<br/>剩余贴吧数："+(ii)+"<br/>签到失败的贴吧：<br/>"+failtemp);
-            if(ii>0)
-            {
-                //console.log(ii);
-                ii--;
-            }
-            else
-            {
-                failtemp="";
-                localStorage.removeItem("miaoerror");
-                alert("结束自动签到贴吧！");
-                return;
-            }
-            //console.log(temp2[ii]);
-            var c={'tbs':sessionStorage.getItem("miaousertbs"),'kw':temp2[ii],'ie':"utf-8"};
-            $.post(url,c,function(o){
-                if(o.no==0)//签到成功
-                {
-                    console.log(temp2[ii]+",OK,"+time+"s");
-                    //return;
+                    temp2[ii]=temp[i].split("等级")[0];
+                    //console.log(temp[i].split("等级")[0]);
+                    ii++;
                 }
-                else if(o.no==1010)//贴吧目录出问题啦，请到贴吧签到吧反馈
+                $.post("/dc/common/tbs","",function(o){sessionStorage.setItem("miaousertbs",o.tbs);},"json");//获取用户tbs口令号并储存在sessionStorage中，待使用
+                $("body").append('<div class="miaoqiandaocss1"><span id="miaoqiandaocount1">签到中（刷新可中断）</span></div>');
+                time=2000+parseInt(Math.random()*1000);//至少延迟1s以上，否则会被贴吧系统要求输入验证码,停止很长一段时间后大概能解除限制
+                tt2=setTimeout(xianshi2,time);
+                //alert(temp2);
+            }
+            tt1=setTimeout(xianshi,1000);
+            var url="/sign/add";
+            function xianshi2()
+            {
+                clearTimeout(tt2);
+                if(localStorage.getItem("miaoerror")==null)
                 {
-                    console.log(temp2[ii]+",贴吧目录出问题啦，请到贴吧签到吧反馈,"+time+"s");
-                    failtemp+=temp2[ii]+"<br/>";
+                    $("div.miaoqiandaocss1").remove();
+                    failtemp="";
+                    alert("意外结束自动签到贴吧！");
+                    return;
                 }
-                else if(o.no==1101)//亲，你之前已经签过了
+                $("#miaoqiandaocount1").html("签到中（刷新可中断）<br/>剩余贴吧数："+(ii)+"<br/>签到失败的贴吧：<br/>"+failtemp);
+                if(ii>0)
                 {
-                    console.log(temp2[ii]+",亲，你之前已经签过了,"+time+"s");
+                    //console.log(ii);
+                    ii--;
                 }
                 else
                 {
-                    console.log(temp2[ii]+",no:"+o.no+"nerr_code:"+o.err_code+"nerror:"+o.error+","+time+"s");
-                    failtemp+=temp2[ii]+"<br/>";
+                    failtemp="";
+                    localStorage.removeItem("miaoerror");
+                    alert("结束自动签到贴吧！");
+                    return;
                 }
-            },"json");
-            $.get("/dc/common/tbs","",function(o){sessionStorage.setItem("miaousertbs",o.tbs);},"json");//获取用户tbs口令号并储存在sessionStorage中，待使用
-            time=2000+parseInt(Math.random()*1000);
-            tt2=setTimeout(xianshi2,time);
+                //console.log(temp2[ii]);
+                var c={'tbs':sessionStorage.getItem("miaousertbs"),'kw':temp2[ii],'ie':"utf-8"};
+                $.post(url,c,function(o){
+                    if(o.no==0)//签到成功
+                    {
+                        console.log(temp2[ii]+",OK,"+time+"s");
+                        //return;
+                    }
+                    else if(o.no==1010)//贴吧目录出问题啦，请到贴吧签到吧反馈
+                    {
+                        console.log(temp2[ii]+",贴吧目录出问题啦，请到贴吧签到吧反馈,"+time+"s");
+                        failtemp+=temp2[ii]+"<br/>";
+                    }
+                    else if(o.no==1101)//亲，你之前已经签过了
+                    {
+                        console.log(temp2[ii]+",亲，你之前已经签过了,"+time+"s");
+                    }
+                    else
+                    {
+                        console.log(temp2[ii]+",no:"+o.no+"nerr_code:"+o.err_code+"nerror:"+o.error+","+time+"s");
+                        failtemp+=temp2[ii]+"<br/>";
+                    }
+                },"json");
+                $.get("/dc/common/tbs","",function(o){sessionStorage.setItem("miaousertbs",o.tbs);},"json");//获取用户tbs口令号并储存在sessionStorage中，待使用
+                time=2000+parseInt(Math.random()*1000);
+                tt2=setTimeout(xianshi2,time);
+            }
+        }
+        catch(error)
+        {
+            alert(error);
         }
     }
 
