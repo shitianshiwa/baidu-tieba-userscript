@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         贴吧自动签到&一键签到&慢速自动签到
-// @version      测试(beta)0.50
+// @version      测试(beta)0.51
 // @description  ’一键签到‘支持的贴吧数量有限，除非开会员，因为是直接用贴吧的api,和贴吧主页那里点击一键签到一个效果（每日0:00至1:00无法使用）。超会，普会PC网页端自动签到可能一次不能成功，可以刷新一下。
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -187,7 +187,7 @@ font-weight:bold;
                 ii++;
             }
             $.post("/dc/common/tbs","",function(o){sessionStorage.setItem("miaousertbs",o.tbs);},"json");//获取用户tbs口令号并储存在sessionStorage中，待使用
-            $("body").append('<div class="miaoqiandaocss1"><span id="miaoqiandaocount1">签到中。剩余贴吧数：</span></div>');
+            $("body").append('<div class="miaoqiandaocss1"><span id="miaoqiandaocount1">签到中（刷新可中断）</span></div>');
             time=2000+parseInt(Math.random()*1000);//至少延迟1s以上，否则会被贴吧系统要求输入验证码,停止很长一段时间后大概能解除限制
             tt2=setTimeout(xianshi2,time);
             //alert(temp2);
@@ -204,10 +204,11 @@ font-weight:bold;
                 alert("意外结束自动签到贴吧！");
                 return;
             }
+            $("#miaoqiandaocount1").html("签到中（刷新可中断）<br/>剩余贴吧数："+(ii)+"<br/>签到失败的贴吧：<br/>"+failtemp);
             if(ii>0)
             {
+                //console.log(ii);
                 ii--;
-                $("#miaoqiandaocount1").html("签到中（刷新可中断）<br/>剩余贴吧数："+ii+"<br/>签到失败的贴吧：<br/>"+failtemp);
             }
             else
             {
