@@ -1,6 +1,6 @@
 # 测试中！！！！！！
 
 # 安装
-- [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E8%B4%B4%E5%90%A7%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%26%E4%B8%80%E9%94%AE%E7%AD%BE%E5%88%B0(%E6%94%AF%E6%8C%81%E7%9A%84%E8%B4%B4%E5%90%A7%E6%95%B0%E9%87%8F%E6%9C%89%E9%99%90%EF%BC%8C%E9%99%A4%E9%9D%9E%E5%BC%80%E4%BC%9A%E5%91%98%EF%BC%8C%E5%9B%A0%E4%B8%BA%E6%98%AF%E7%9B%B4%E6%8E%A5%E7%94%A8%E8%B4%B4%E5%90%A7%E7%9A%84api)(beta)/%E8%B4%B4%E5%90%A7%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%26%E4%B8%80%E9%94%AE%E7%AD%BE%E5%88%B0(%E6%94%AF%E6%8C%81%E7%9A%84%E8%B4%B4%E5%90%A7%E6%95%B0%E9%87%8F%E6%9C%89%E9%99%90%EF%BC%8C%E9%99%A4%E9%9D%9E%E5%BC%80%E4%BC%9A%E5%91%98%EF%BC%8C%E5%9B%A0%E4%B8%BA%E6%98%AF%E7%9B%B4%E6%8E%A5%E7%94%A8%E8%B4%B4%E5%90%A7%E7%9A%84api)(beta).user.js)
+- [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E8%B4%B4%E5%90%A7%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%26%E4%B8%80%E9%94%AE%E7%AD%BE%E5%88%B0%26%E6%85%A2%E9%80%9F%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0/%E8%B4%B4%E5%90%A7%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%26%E4%B8%80%E9%94%AE%E7%AD%BE%E5%88%B0%26%E6%85%A2%E9%80%9F%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0.user.js)
 # 简介
-半人工辅助脚本。可以在看贴的过程中就自动签到关注的贴吧，有一键签到按钮可选（每天0点至1点会无法使用）
+半人工辅助脚本。可以在看贴的过程中就自动签到关注的贴吧，有一键签到按钮（每天0点至1点会无法使用）和慢速自动签到可选（每两秒+随机数0-1000s，签到一次）
