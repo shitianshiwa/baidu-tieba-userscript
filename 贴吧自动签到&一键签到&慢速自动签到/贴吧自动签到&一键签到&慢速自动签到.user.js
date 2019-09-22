@@ -199,6 +199,7 @@ font-weight:bold;
             clearTimeout(tt2);
             if(localStorage.getItem("miaoerror")==null)
             {
+                $("div.miaoqiandaocss1").remove();
                 failtemp="";
                 alert("意外结束自动签到贴吧！");
                 return;
