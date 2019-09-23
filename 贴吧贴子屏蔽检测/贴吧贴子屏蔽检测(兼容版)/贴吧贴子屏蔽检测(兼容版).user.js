@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.51
+// @version     测试(beta)0.53
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -27,17 +27,17 @@ const threadCache = {};
 const replyCache = {};
 var t1,t2,t3,t4;//计时器`
 var countx1=0,countx2=0,countx3=0,countx4=0;;
-if(sessionStorage.getItem("miaouserid")==null)
-{
-    $.get("/f/user/json_userinfo","",
-          function(o)
-          {
-        if(o!=null)
-        {
-            sessionStorage.setItem("miaouserid",o.data.user_portrait);
-        }
-    },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
-}
+//if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
+//{
+$.get("/f/user/json_userinfo","",
+      function(o)
+      {
+    if(o!=null)
+    {
+        sessionStorage.setItem("miaouserid",o.data.user_portrait);
+    }
+},"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
+//}
 const css1=`
 /*固定到网页右边*/
 .miaocsss2
@@ -46,7 +46,7 @@ width:140px;
 height:120px;
 position: fixed;
 right:30px;
-bottom:440px;
+bottom:420px;
 z-index: 1005;
 color:#f00;
 font-size:10px;
@@ -604,6 +604,11 @@ const init = () =>
     if (getIsLogin())
     {
         //const username = getUsername();//sessionStorage.getItem("miaouserid");
+        if(getUsername()=="")
+        {
+            alert("楼中楼检测无效");
+            //console.log("楼中楼检测无效");
+        }
         const username = (getUsername().split("?t=")[0])||null;//没登陆贴吧就是返回null，null就是没有作用
         //alert(username);
         loadCache();

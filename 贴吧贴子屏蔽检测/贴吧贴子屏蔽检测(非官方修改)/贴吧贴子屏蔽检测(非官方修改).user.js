@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(非官方修改)
-// @version     1.0(非官方修改beta0.33)
+// @version     1.0(非官方修改beta0.34)
 // @description 贴吧都快凉了，过去的痕迹都没了，你为什么还在刷贴吧呢？你们建个群不好吗？
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -48,17 +48,17 @@ var $ = window.jQuery;
 const threadCache = {};
 const replyCache = {};
 
-if(sessionStorage.getItem("miaouserid")==null)
-{
-    $.get("/f/user/json_userinfo","",
-          function(o)
-          {
-        if(o!=null)
-        {
-            sessionStorage.setItem("miaouserid",o.data.user_portrait);
-        }
-    },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
-}
+//if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
+//{
+$.get("/f/user/json_userinfo","",
+      function(o)
+      {
+    if(o!=null)
+    {
+        sessionStorage.setItem("miaouserid",o.data.user_portrait);
+    }
+},"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
+//}
 /*
 获取portrait,需要传递用户cookie，用户未登录返回null。
 各贴吧首页主题贴列表和各个贴子的网页代码的head标签里的script标签里json代码里的portrait与贴子，楼层，楼中楼有差异，所以不取。
@@ -199,7 +199,8 @@ const getTriggerStyle = (username,username2) => {
     //const escapedUsername = getEscapeString(username).replace(/\\/g, '\\\\');//把\uXXXX转成中文
     if(username==null||username2==null)
     {
-        //alert("贴吧贴子屏蔽检测未正常运行");
+        //console.log("贴吧贴子屏蔽检测未正常运行");
+        alert("贴吧贴子屏蔽检测未正常运行");
         return;
     }
     return `
