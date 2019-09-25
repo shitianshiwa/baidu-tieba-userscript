@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(非官方修改2)
-// @version     1.0(非官方修改2beta0.34)
+// @version     1.0(非官方修改2beta0.44)
 // @description 贴吧都快凉了，过去的痕迹都没了，你为什么还在刷贴吧呢？你们建个群不好吗？
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -48,8 +48,8 @@ var $ = window.jQuery;
 const threadCache = {};
 const replyCache = {};
 
-//if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
-//{
+/*if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
+{
 var c={'_':Date.now()};
 $.get("/f/user/json_userinfo",c,
       function(o)
@@ -59,7 +59,7 @@ $.get("/f/user/json_userinfo",c,
         sessionStorage.setItem("miaouserid",o.data.user_portrait);
     }
 },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
-//}
+}*/
 /*
 获取portrait,需要传递用户cookie，用户未登录返回null。
 各贴吧首页主题贴列表和各个贴子的网页代码的head标签里的script标签里json代码里的portrait与贴子，楼层，楼中楼有差异，所以不取。
@@ -104,7 +104,7 @@ const getIsLogin = () => window.PageData.user.is_login;
  *
  * @returns {string} 用户名
  */
-const getUsername = () => sessionStorage.getItem("miaouserid")||"";
+const getUsername = () => "";//sessionStorage.getItem("miaouserid")||""
 //decodeURI(document.querySelectorAll("div.user_name>a")[0].href);//得到我的贴吧链接；window.PageData.user.name || window.PageData.user.user_name;
 /**
 encodeURI(URIstring)
@@ -227,6 +227,7 @@ animation: __tieba_blocked_detect__;
 background: rgba(255, 0, 0, 0.3);
 position: relative;
 }
+
 .__tieba_blocked__.core_title {
 background: #fae2e3;
 }
@@ -426,21 +427,48 @@ const saveCache = (key) => {
  * 初始化执行
  *
  */
+var useridx="",t1,t2;
 const init = () => {
-    clearTimeout(t);
+    clearTimeout(t1);
+    sessionStorage.removeItem("miaouserid");
     if (getIsLogin()) {
-        const username = (getUsername().split("?t=")[0])||null;//没登陆贴吧就是返回null，null就是没有作用
-        const username2 =getUsername()||null;
-        loadCache();
-        initListener();
-        initStyle(username,username2);
-        //let temp=$("div.user_name").children("a.")[0].href.split("id=")[1].split("&")[0];
-        //temp||sessionStorage.getItem("miaouserid").split("?")[0]||null;getUsername().split("id=")[1].split("&")[0];
-        //temp||sessionStorage.getItem("miaouserid")||null;改用id(portrait)来判断,来来注册样式事件？
-        //alert(username);
-        //alert(username2);
+        useridx=$("a.u_username_wrap")[0].href.split("id=")[1];
+        if(useridx!=null)
+        {
+            useridx=useridx.split("&")[0];
+            init2();
+        }
+        else
+        {
+            var c={'_':Date.now()};
+            $.get("/f/user/json_userinfo",c,
+                  function(o)
+                  {
+                if(o!=null)
+                {
+                    sessionStorage.setItem("miaouserid",o.data.user_portrait);
+                    t2=setTimeout(init2,1000);//延迟1s，因为sessionStorage储存速度慢，不延迟取不到值
+                }
+            },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
+        }
     }
 };
-
-var t=setTimeout(init,1000);//延迟1s,感觉没用？
+const init2 = () => {
+    if(t2!=null)
+    {
+        clearTimeout(t2);
+    }
+    var getUsername2=useridx||sessionStorage.getItem("miaouserid")||"";//两种获取用户id，先取网页里的id，取不到就用网页api取，仍取不到就不能运行
+    const username = (getUsername2.split("?t=")[0])||null;//没登陆贴吧就是返回null，null就是没有作用
+    const username2 =getUsername2||null;
+    loadCache();
+    initListener();
+    initStyle(username,username2);
+    //let temp=$("div.user_name").children("a.")[0].href.split("id=")[1].split("&")[0];
+    //temp||sessionStorage.getItem("miaouserid").split("?")[0]||null;getUsername().split("id=")[1].split("&")[0];
+    //temp||sessionStorage.getItem("miaouserid")||null;改用id(portrait)来判断,来来注册样式事件？
+    //alert(username);
+    //alert(username2);
+};
+t1=setTimeout(init,1000);//延迟1s，否则网页里取不到用户id
 //init();
