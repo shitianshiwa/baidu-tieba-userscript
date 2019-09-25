@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.53
+// @version     测试(beta)0.60
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -26,9 +26,9 @@ var $ = window.jQuery;
 const threadCache = {};
 const replyCache = {};
 var t1,t2,t3,t4;//计时器`
-var countx1=0,countx2=0,countx3=0,countx4=0;;
-//if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
-//{
+var countx1=0,countx2=0,countx3=0,countx4=0;
+/*if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
+{
 var c={'_':Date.now()};
 $.get("/f/user/json_userinfo",c,
       function(o)
@@ -38,7 +38,7 @@ $.get("/f/user/json_userinfo",c,
         sessionStorage.setItem("miaouserid",o.data.user_portrait);
     }
 },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
-//}
+}*/
 const css1=`
 /*固定到网页右边*/
 .miaocsss2
@@ -91,7 +91,8 @@ const getUserid = () => window.PageData.user.id;
  *
  * @returns {string} 用户名
  */
-const getUsername = () => sessionStorage.getItem("miaouserid")||"";//window.PageData.user.name || window.PageData.user.user_name;
+const getUsername = () => "";//sessionStorage.getItem("miaouserid")||""
+//const getUsername = () => $("a.u_username_wrap")[0].href.split("id=")[1].split("&")[0];//sessionStorage.getItem("miaouserid")||"";//window.PageData.user.name || window.PageData.user.user_name;
 /**
  * 获取 \u 形式的 unicode 字符串
  *
@@ -177,7 +178,12 @@ const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
 const getTriggerStyle = (username) =>
 {
     //const escapedUsername = getEscapeString(username).replace(/\\/g, '\\\\');
-
+    if(username==null)
+    {
+        alert("楼中楼检测无效");
+        return;
+        //console.log("楼中楼检测无效");
+    }
     return `
 /* 使用 animation 监测 DOM 变化 */
 @-webkit-keyframes __tieba_blocked_detect__ {}
@@ -445,7 +451,8 @@ const detectBlocked = () =>
     }
 };
 //alert(checker);
-//楼中楼
+//楼中楼 一个贴子的楼中楼一层最多有10个回复楼，而只有第一层楼中楼会出现贴子被屏蔽现象，二层及以上被屏蔽的贴子不会显示出来
+//$("div.j_lzl_c_b_a")
 const detectBlocked2 = (event) =>
 {
     if (event.animationName !== '__tieba_blocked_detect__')
@@ -599,29 +606,61 @@ const saveCache = (key) =>
 * 初始化执行
 *
 */
-const init = () =>
-{
-    clearTimeout(t);
+var useridx="",t5,t6;
+const init = () => {
+    clearTimeout(t5);
+    sessionStorage.removeItem("miaouserid");
     if (getIsLogin())
     {
-        //const username = getUsername();//sessionStorage.getItem("miaouserid");
-        if(getUsername()=="")
+        try
         {
-            alert("楼中楼检测无效");
-            //console.log("楼中楼检测无效");
+            useridx=$("a.u_username_wrap")[0].href.split("id=")[1].split("&")[0];
         }
-        const username = (getUsername().split("?t=")[0])||null;//没登陆贴吧就是返回null，null就是没有作用
-        //alert(username);
-        loadCache();
-        initStyle(username);
-        t1=setTimeout(detectBlocked0,1000);//主题贴列表
-        t2=setTimeout(detectBlocked,1000);//主题贴里的楼层
-        initListener();//主题贴里的楼层里的楼中楼
-        const style = document.createElement('style');//创建新样式节点
-        style.textContent = css1;//添加样式内容
-        document.head.appendChild(style);//给head头添加新样式节点
-        $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(不能获得总数):</span><br/><span id="miaocount4">4.被屏蔽的贴子数:</span></div>');
+        catch(error)
+        {
+            //console.log(error);
+            useridx=null;
+        }
+        if(useridx!=null)
+        {
+            init2();
+        }
+        else
+        {
+            var c={'_':Date.now()};
+            $.get("/f/user/json_userinfo",c,
+                  function(o)
+                  {
+                if(o!=null)
+                {
+                    sessionStorage.setItem("miaouserid",o.data.user_portrait);
+                    t6=setTimeout(init2,1000);//延迟1s，因为sessionStorage储存速度慢，不延迟取不到值
+                }
+            },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
+        }
     }
-}
-var t=setTimeout(init,1000);//延迟1s,感觉没用？
+};
+const init2 = () => {
+    if(t4!=null)
+    {
+        clearTimeout(t6);
+    }
+    var getUsername2=useridx||sessionStorage.getItem("miaouserid")||"";//两种获取用户id，先取网页里的id，取不到就用网页api取，仍取不到就不能运行
+    const username = (getUsername2.split("?t=")[0])||null;//没登陆贴吧就是返回null，null就是没有作用
+    loadCache();
+    initStyle(username);
+    initListener();
+    t1=setTimeout(detectBlocked0,1000);//主题贴列表
+    t2=setTimeout(detectBlocked,1000);//主题贴里的楼层
+    const style = document.createElement('style');//创建新样式节点
+    style.textContent = css1;//添加样式内容
+    document.head.appendChild(style);//给head头添加新样式节点
+    $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(不能获得总数):</span><br/><span id="miaocount4">4.被屏蔽的贴子数:</span></div>');
+    //let temp=$("div.user_name").children("a.")[0].href.split("id=")[1].split("&")[0];
+    //temp||sessionStorage.getItem("miaouserid").split("?")[0]||null;getUsername().split("id=")[1].split("&")[0];
+    //temp||sessionStorage.getItem("miaouserid")||null;改用id(portrait)来判断,来来注册样式事件？
+    //alert(username);
+    //alert(username2);
+};
+t5=setTimeout(init,1000);//延迟1s，否则网页里取不到用户id
 //init();

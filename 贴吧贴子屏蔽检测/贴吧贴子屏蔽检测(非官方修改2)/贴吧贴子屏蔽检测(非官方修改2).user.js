@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(非官方修改2)
-// @version     1.0(非官方修改2beta0.44)
+// @version     1.0(非官方修改2beta0.45)
 // @description 贴吧都快凉了，过去的痕迹都没了，你为什么还在刷贴吧呢？你们建个群不好吗？
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -431,11 +431,19 @@ var useridx="",t1,t2;
 const init = () => {
     clearTimeout(t1);
     sessionStorage.removeItem("miaouserid");
-    if (getIsLogin()) {
-        useridx=$("a.u_username_wrap")[0].href.split("id=")[1];
+    if (getIsLogin())
+    {
+        try
+        {
+            useridx=$("a.u_username_wrap")[0].href.split("id=")[1].split("&")[0];
+        }
+        catch(error)
+        {
+            //console.log(error);
+            useridx=null;
+        }
         if(useridx!=null)
         {
-            useridx=useridx.split("&")[0];
             init2();
         }
         else
