@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(非官方修改1)
-// @version     1.0(非官方修改1beta0.1)
+// @version     1.0(非官方修改1beta0.11)
 // @description 贴吧都快凉了，过去的痕迹都没了，你为什么还在刷贴吧呢？你们建个群不好吗？
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -26,19 +26,19 @@ const replyCache = {};
  * @returns {Promise<string>} fetch 请求
  */
 const request = (url, options = {}) => fetch(url, Object.assign({
-	credentials: 'omit',
-	// 部分贴吧（如 firefox 吧）会强制跳转回 http
-	redirect: 'follow',
-	// 阻止浏览器发出 CORS 检测的 HEAD 请求头
-	mode: 'same-origin',
-	headers: {
-		'X-Requested-With': 'XMLHttpRequest'
-	}
+    credentials: 'omit',
+    // 部分贴吧（如 firefox 吧）会强制跳转回 http
+    redirect: 'follow',
+    // 阻止浏览器发出 CORS 检测的 HEAD 请求头
+    mode: 'same-origin',
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+    }
 }, options)).then(res => res.text());
 
 /**
  * 获取当前用户是否登录
- * 
+ *
  * @returns {number|boolean} 是否登录，若已登录，贴吧页为 1，贴子页为 true
  */
 const getIsLogin = () => window.PageData.user.is_login;
@@ -48,7 +48,7 @@ const getIsLogin = () => window.PageData.user.is_login;
  *
  * @returns {string} 用户名
  */
-const getUsername = () => window.PageData.user.name || PageData.user.user_name;
+const getUsername = () => window.PageData.user.name || window.PageData.user.user_name;
 
 /**
  * 获取 \u 形式的 unicode 字符串
@@ -93,7 +93,7 @@ const getReplyUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/p/comment?tid=${tid
  * @param {string} res - 页面内容
  * @returns {boolean} 是否被屏蔽
  */
-const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >= 0;
+const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >= 0||res.indexOf('1970-1-1') >= 0;//2019-9-27修改判断条件，以修复判断主题贴屏蔽失效
 
 /**
  * 获取主题贴是否被屏蔽
@@ -102,7 +102,7 @@ const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >=
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getThreadBlocked = tid => request(getThreadMoUrl(tid))
-	.then(threadIsNotExist);
+.then(threadIsNotExist);
 
 /**
  * 获取回复贴是否被屏蔽
@@ -112,7 +112,7 @@ const getThreadBlocked = tid => request(getThreadMoUrl(tid))
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
-	.then(res => threadIsNotExist(res) || res.indexOf('刷新</a><div>楼.&#160;<br/>') >= 0);
+.then(res => threadIsNotExist(res) || res.indexOf('刷新</a><div>楼.&#160;<br/>') >= 0);
 
 /**
  * 获取楼中楼是否被屏蔽
@@ -123,8 +123,8 @@ const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
-	// 楼中楼 ajax 翻页后被屏蔽的楼中楼不会展示，所以不需要考虑 pn，同理不需要考虑不在第一页的楼中楼
-	.then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
+// 楼中楼 ajax 翻页后被屏蔽的楼中楼不会展示，所以不需要考虑 pn，同理不需要考虑不在第一页的楼中楼
+.then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
 
 /**
  * 获取触发 CSS 样式
@@ -133,66 +133,66 @@ const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
  * @returns {string} 样式表
  */
 const getTriggerStyle = (username) => {
-	const escapedUsername = getEscapeString(username).replace(/\\/g, '\\\\');
+    const escapedUsername = getEscapeString(username).replace(/\\/g, '\\\\');
 
-	return `
-		/* 使用 animation 监测 DOM 变化 */
-		@-webkit-keyframes __tieba_blocked_detect__ {}
-		@-moz-keyframes __tieba_blocked_detect__ {}
-		@keyframes __tieba_blocked_detect__ {}
-		/* 主题贴 */
-		#thread_list .j_thread_list[data-field*='"author_name":"${escapedUsername}"'],
-		/* 回复贴 */
-		#j_p_postlist .l_post[data-field*='"user_name":"${escapedUsername}"'],
-		/* 楼中楼 */
-		.j_lzl_m_w .lzl_single_post[data-field*="'user_name':'${username}'"] {
-			-webkit-animation: __tieba_blocked_detect__;
-			-moz-animation: __tieba_blocked_detect__;
-			animation: __tieba_blocked_detect__;
-		}
-		/* 被屏蔽样式 */
-		.__tieba_blocked__,
-		.__tieba_blocked__ .d_post_content_main {
-			background: rgba(255, 0, 0, 0.3);
-			position: relative;
-		}
-		.__tieba_blocked__.core_title {
-			background: #fae2e3;
-		}
-		.__tieba_blocked__::after {
-			background: #f22737;
-			position: relative;
-			padding: 5px 10px;
-			color: #ffffff;
-			font-size: 14px;
-			line-height: 1.5em;
-			z-index: 399;
-		}
-		.__tieba_blocked__.lzl_single_post {
-			margin-left: -15px;
-			margin-right: -15px;
-			margin-bottom: -6px;
-			padding-left: 15px;
-			padding-right: 15px;
-			padding-bottom: 6px;
-		}
-		.__tieba_blocked__.j_thread_list::after,
-		.__tieba_blocked__.core_title::after {
-			content: '该贴已被屏蔽';
-			right: 0;
-			top: 0;
-		}
-		.__tieba_blocked__.l_post::after {
-			content: '该楼层已被屏蔽';
-			right: 0;
-			top: 0;
-		}
-		.__tieba_blocked__.lzl_single_post::after {
-			content: '该楼中楼已被屏蔽';
-			left: 0;
-			bottom: 0;
-		}
-	`;
+    return `
+/* 使用 animation 监测 DOM 变化 */
+@-webkit-keyframes __tieba_blocked_detect__ {}
+@-moz-keyframes __tieba_blocked_detect__ {}
+@keyframes __tieba_blocked_detect__ {}
+/* 主题贴 */
+#thread_list .j_thread_list[data-field*='"author_name":"${escapedUsername}"'],
+/* 回复贴 */
+#j_p_postlist .l_post[data-field*='"user_name":"${escapedUsername}"'],
+/* 楼中楼 */
+.j_lzl_m_w .lzl_single_post[data-field*="'user_name':'${username}'"] {
+-webkit-animation: __tieba_blocked_detect__;
+-moz-animation: __tieba_blocked_detect__;
+animation: __tieba_blocked_detect__;
+}
+/* 被屏蔽样式 */
+.__tieba_blocked__,
+.__tieba_blocked__ .d_post_content_main {
+background: rgba(255, 0, 0, 0.3);
+position: relative;
+}
+.__tieba_blocked__.core_title {
+background: #fae2e3;
+}
+.__tieba_blocked__::after {
+background: #f22737;
+position: relative;
+padding: 5px 10px;
+color: #ffffff;
+font-size: 14px;
+line-height: 1.5em;
+z-index: 399;
+}
+.__tieba_blocked__.lzl_single_post {
+margin-left: -15px;
+margin-right: -15px;
+margin-bottom: -6px;
+padding-left: 15px;
+padding-right: 15px;
+padding-bottom: 6px;
+}
+.__tieba_blocked__.j_thread_list::after,
+.__tieba_blocked__.core_title::after {
+content: '该贴已被屏蔽';
+right: 0;
+top: 0;
+}
+.__tieba_blocked__.l_post::after {
+content: '该楼层已被屏蔽';
+right: 0;
+top: 0;
+}
+.__tieba_blocked__.lzl_single_post::after {
+content: '该楼中楼已被屏蔽';
+left: 0;
+bottom: 0;
+}
+`;
 };
 
 /**
@@ -201,91 +201,91 @@ const getTriggerStyle = (username) => {
  * @param {AnimationEvent} event - 触发的事件对象
  */
 const detectBlocked = (event) => {
-	if (event.animationName !== '__tieba_blocked_detect__') {
-		return;
-	}
+    if (event.animationName !== '__tieba_blocked_detect__') {
+        return;
+    }
 
-	const { target } = event;
-	const { classList } = target;
-	let checker;
+    const { target } = event;
+    const { classList } = target;
+    let checker;
 
-	if (classList.contains('j_thread_list')) {
-		const tid = target.dataset.tid;
-		if (threadCache[tid]) {
-			checker = threadCache[tid];
-		}
-		else {
-			checker = getThreadBlocked(tid).then(result => {
-				threadCache[tid] = result;
-				saveCache('thread');
+    if (classList.contains('j_thread_list')) {
+        const tid = target.dataset.tid;
+        if (threadCache[tid]) {
+            checker = threadCache[tid];
+        }
+        else {
+            checker = getThreadBlocked(tid).then(result => {
+                threadCache[tid] = result;
+                saveCache('thread');
 
-				return result;
-			});
-		}
-	}
-	else if (classList.contains('l_post')) {
-		const tid = window.PageData.thread.thread_id;
-		const pid = target.dataset.pid || '';
-		if (!pid) {
-			// 新回复可能没有 pid
-			return;
-		}
+                return result;
+            });
+        }
+    }
+    else if (classList.contains('l_post')) {
+        const tid = window.PageData.thread.thread_id;
+        const pid = target.dataset.pid || '';
+        if (!pid) {
+            // 新回复可能没有 pid
+            return;
+        }
 
-		if (replyCache[pid]) {
-			checker = replyCache[pid];
-		}
-		else {
-			checker = getReplyBlocked(tid, pid).then(result => {
-				replyCache[pid] = result;
-				saveCache('reply');
-				try {
-					if (result && JSON.parse(target.dataset.field).content.post_no === 1) {
-						document.querySelector('.core_title').classList.add('__tieba_blocked__');
-					}
-				}
-				catch (err) { }
+        if (replyCache[pid]) {
+            checker = replyCache[pid];
+        }
+        else {
+            checker = getReplyBlocked(tid, pid).then(result => {
+                replyCache[pid] = result;
+                saveCache('reply');
+                try {
+                    if (result && JSON.parse(target.dataset.field).content.post_no === 1) {
+                        document.querySelector('.core_title').classList.add('__tieba_blocked__');
+                    }
+                }
+                catch (err) { }
 
-				return result;
-			});
-		}
-	}
-	else if (classList.contains('lzl_single_post')) {
-		const field = target.dataset.field || '';
-		const parent = target.parentElement;
-		const pageNumber = parent.querySelector('.tP');
-		if (pageNumber && pageNumber.textContent.trim() !== '1') {
-			// 翻页后的楼中楼不会显示屏蔽的楼中楼，所以命中的楼中楼一定是不会屏蔽的，不需要处理
-			return;
-		}
+                return result;
+            });
+        }
+    }
+    else if (classList.contains('lzl_single_post')) {
+        const field = target.dataset.field || '';
+        const parent = target.parentElement;
+        const pageNumber = parent.querySelector('.tP');
+        if (pageNumber && pageNumber.textContent.trim() !== '1') {
+            // 翻页后的楼中楼不会显示屏蔽的楼中楼，所以命中的楼中楼一定是不会屏蔽的，不需要处理
+            return;
+        }
 
-		const tid = window.PageData.thread.thread_id;
-		const pid = (field.match(/'pid':'?(\d+)'?/) || [])[1];
-		const spid = (field.match(/'spid':'?(\d+)'?/) || [])[1];
-		if (!spid) {
-			// 新回复没有 spid
-			return;
-		}
+        const tid = window.PageData.thread.thread_id;
+        const pid = (field.match(/'pid':'?(\d+)'?/) || [])[1];
+        const spid = (field.match(/'spid':'?(\d+)'?/) || [])[1];
+        if (!spid) {
+            // 新回复没有 spid
+            return;
+        }
 
-		if (replyCache[spid]) {
-			checker = replyCache[spid];
-		}
-		else {
-			checker = getLzlBlocked(tid, pid, spid).then(result => {
-				replyCache[spid] = result;
-				saveCache('reply');
+        if (replyCache[spid]) {
+            checker = replyCache[spid];
+        }
+        else {
+            checker = getLzlBlocked(tid, pid, spid).then(result => {
+                replyCache[spid] = result;
+                saveCache('reply');
 
-				return result;
-			});
-		}
-	}
+                return result;
+            });
+        }
+    }
 
-	if (checker) {
-		Promise.resolve(checker).then(result => {
-			if (result) {
-				classList.add('__tieba_blocked__');
-			}
-		});
-	}
+    if (checker) {
+        Promise.resolve(checker).then(result => {
+            if (result) {
+                classList.add('__tieba_blocked__');
+            }
+        });
+    }
 };
 
 /**
@@ -294,9 +294,9 @@ const detectBlocked = (event) => {
  * @param {string} username - 用户名
  */
 const initStyle = (username) => {
-	const style = document.createElement('style');
-	style.textContent = getTriggerStyle(username);
-	document.head.appendChild(style);
+    const style = document.createElement('style');
+    style.textContent = getTriggerStyle(username);
+    document.head.appendChild(style);
 };
 
 /**
@@ -304,9 +304,9 @@ const initStyle = (username) => {
  *
  */
 const initListener = () => {
-	document.addEventListener('webkitAnimationStart', detectBlocked, false);
-	document.addEventListener('MSAnimationStart', detectBlocked, false);
-	document.addEventListener('animationstart', detectBlocked, false);
+    document.addEventListener('webkitAnimationStart', detectBlocked, false);
+    document.addEventListener('MSAnimationStart', detectBlocked, false);
+    document.addEventListener('animationstart', detectBlocked, false);
 };
 
 /**
@@ -314,20 +314,20 @@ const initListener = () => {
  *
  */
 const loadCache = () => {
-	const thread = sessionStorage.getItem('tieba-blocked-cache-thread');
-	const reply = sessionStorage.getItem('tieba-blocked-cache-reply');
-	if (thread) {
-		try {
-			threadCache = JSON.parse(thread);
-		}
-		catch (error) { }
-	}
-	if (reply) {
-		try {
-			replyCache = JSON.parse(reply);
-		}
-		catch (error) { }
-	}
+    const thread = sessionStorage.getItem('tieba-blocked-cache-thread');
+    const reply = sessionStorage.getItem('tieba-blocked-cache-reply');
+    if (thread) {
+        try {
+            threadCache = JSON.parse(thread);
+        }
+        catch (error) { }
+    }
+    if (reply) {
+        try {
+            replyCache = JSON.parse(reply);
+        }
+        catch (error) { }
+    }
 }
 
 /**
@@ -336,12 +336,12 @@ const loadCache = () => {
  * @param {string} key - 缓存 key
  */
 const saveCache = (key) => {
-	if (key === 'thread') {
-		sessionStorage.setItem('tieba-blocked-cache-thread', JSON.stringify(threadCache));
-	}
-	else if (key === 'reply') {
-		sessionStorage.setItem('tieba-blocked-cache-reply', JSON.stringify(replyCache));
-	}
+    if (key === 'thread') {
+        sessionStorage.setItem('tieba-blocked-cache-thread', JSON.stringify(threadCache));
+    }
+    else if (key === 'reply') {
+        sessionStorage.setItem('tieba-blocked-cache-reply', JSON.stringify(replyCache));
+    }
 }
 
 /**
@@ -349,12 +349,12 @@ const saveCache = (key) => {
  *
  */
 const init = () => {
-	if (getIsLogin()) {
-		const username = getUsername();
-		loadCache();
-		initListener();
-		initStyle(username);
-	}
+    if (getIsLogin()) {
+        const username = getUsername();
+        loadCache();
+        initListener();
+        initStyle(username);
+    }
 };
 
 init();

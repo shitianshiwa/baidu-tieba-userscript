@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(非官方修改2)
-// @version     1.0(非官方修改2beta0.45)
+// @version     1.0(非官方修改2beta0.46)
 // @description 贴吧都快凉了，过去的痕迹都没了，你为什么还在刷贴吧呢？你们建个群不好吗？
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -157,7 +157,7 @@ const getReplyUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/p/comment?tid=${tid
  * @param {string} res - 页面内容
  * @returns {boolean} 是否被屏蔽
  */
-const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >= 0;
+const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >= 0||res.indexOf('1970-1-1') >= 0;//2019-9-27修改判断条件，以修复判断主题贴屏蔽失效
 
 /**
  * 获取主题贴是否被屏蔽

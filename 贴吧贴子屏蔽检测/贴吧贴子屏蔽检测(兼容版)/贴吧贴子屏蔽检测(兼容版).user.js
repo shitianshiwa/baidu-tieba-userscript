@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.60
+// @version     测试(beta)0.64
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -136,7 +136,7 @@ const getReplyUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/p/comment?tid=${tid
  * @param {string} res - 页面内容
  * @returns {boolean} 是否被屏蔽
  */
-const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >= 0;
+const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >= 0||res.indexOf('1970-1-1') >= 0;//2019-9-27修改判断条件，以修复判断主题贴屏蔽失效
 
 /**
  * 获取主题贴是否被屏蔽
