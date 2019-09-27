@@ -207,5 +207,5 @@
         }
     }
     killad();
-    var t=setTimeout(killad,1000);
+    var t=setTimeout(killad,2000);
 })();//运行
