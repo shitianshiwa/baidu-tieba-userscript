@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         Kill TieBa AD(非官方修改)(beta)
-// @name:zh-CN   貼吧廣告清理(非官方修改)(beta)
-// @name:zh-TW   貼吧廣告去除(非官方修改)(beta)
+// @name         Kill TieBa AD(非官方修改)
+// @name:zh-CN   貼吧廣告清理(非官方修改)
+// @name:zh-TW   貼吧廣告去除(非官方修改)
 // @namespace    hoothin
-// @version      1.3.2(0.31)
+// @version      1.3.2((beta)0.32)
 // @description        Just Kill TieBa AD
 // @description:zh-CN  清理百度貼吧（tieba.baidu.com）内的列表僞裝，帖内僞裝，觸點廣告，頁首廣告，推薦應用等各類廣告
 // @description:zh-TW  去除百度貼吧（tieba.baidu.com）内的列表偽裝，帖內偽裝，觸點廣告，頁首廣告，推薦應用等各類廣告
@@ -30,6 +30,11 @@
     {
         try
         {
+	        if(t!=null)
+	 	   	{
+        		clearTimeout(t);
+    		}
+            //alert("233");
             var observer, option;
             var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
             var tcss = ".j_encourage_entry,#video_frs_head,#encourage_entry,.tpoint-skin,#pb_adbanner,.iframe_wrapper,div.tpoint-skin,.j_click_stats,#thread_list>li:not(.j_thread_list):not(.thread_top_list_folder),#j_p_postlist>.clearfix:not([data-field*=post_id]){display:none !important;}";
@@ -202,5 +207,5 @@
         }
     }
     killad();
-    //setTimeout(killad,1000);
+    var t=setTimeout(killad,1000);
 })();//运行
