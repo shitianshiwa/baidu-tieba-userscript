@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.65
+// @version     测试(beta)0.651
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -25,8 +25,12 @@ $.post("/f/user/json_userinfo","",function(o){localStorage.setItem("userid",o.da
 var $ = window.jQuery;
 const threadCache = {};
 const replyCache = {};
-var t1,t2,t3,t4;//计时器`
-var countx1=0,countx2=0,countx3=0,countx4=0,countx5=0;
+var t1, t2, t3, t4; //计时器`
+var countx1 = 0,
+    countx2 = 0,
+    countx3 = 0,
+    countx4 = 0,
+    countx5 = 0;
 /*if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
 {
 var c={'_':Date.now()};
@@ -39,7 +43,7 @@ $.get("/f/user/json_userinfo",c,
     }
 },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
 }*/
-const css1=`
+const css1 = `
 /*固定到网页右边*/
 .miaocsss2
 {
@@ -61,18 +65,16 @@ font-weight:bold;
  * @param {object} [options={}] - fetch Request 配置
  * @returns {Promise<string>} fetch 请求
  */
-const request = (url, options = {}) => fetch(url, Object.assign(
-    {
-        credentials: 'omit',
-        // 部分贴吧（如 firefox 吧）会强制跳转回 http
-        redirect: 'follow',
-        // 阻止浏览器发出 CORS 检测的 HEAD 请求头
-        mode: 'same-origin',
-        headers:
-        {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    }, options)).then(res => res.text());
+const request = (url, options = {}) => fetch(url, Object.assign({
+    credentials: 'omit',
+    // 部分贴吧（如 firefox 吧）会强制跳转回 http
+    redirect: 'follow',
+    // 阻止浏览器发出 CORS 检测的 HEAD 请求头
+    mode: 'same-origin',
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+}, options)).then(res => res.text());
 
 /**
  * 获取当前用户是否登录
@@ -91,7 +93,7 @@ const getUserid = () => window.PageData.user.id;
  *
  * @returns {string} 用户名
  */
-const getUsername = () => "";//sessionStorage.getItem("miaouserid")||""
+const getUsername = () => ""; //sessionStorage.getItem("miaouserid")||""
 //const getUsername = () => $("a.u_username_wrap")[0].href.split("id=")[1].split("&")[0];//sessionStorage.getItem("miaouserid")||"";//window.PageData.user.name || window.PageData.user.user_name;
 /**
  * 获取 \u 形式的 unicode 字符串
@@ -107,7 +109,7 @@ const getEscapeString = str => escape(str).replace(/%/g, '\\').toLowerCase();
  * @param {number} tid - 贴子 id
  * @returns {string} URL
  */
-const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;//主题贴判断
+const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`; //主题贴判断
 
 /**
  * 获取回复贴的移动端地址
@@ -117,7 +119,7 @@ const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`
  * @param {number} [pn=0] - 页码
  * @returns {string} URL
  */
-const getReplyMoUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/mo/q-----1-1-0----/flr?pid=${pid}&kz=${tid}&pn=${pn}`;//楼层判断
+const getReplyMoUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/mo/q-----1-1-0----/flr?pid=${pid}&kz=${tid}&pn=${pn}`; //楼层判断
 
 /**
  * 获取回复贴的 ajax 地址
@@ -128,7 +130,7 @@ const getReplyMoUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/mo/q-----1-1-0---
  * @param {number} [pn=0] - 页码
  * @returns {string} URL
  */
-const getReplyUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/p/comment?tid=${tid}&pid=${pid}&pn=${pn}&t=${Date.now()}`;//楼中楼判断
+const getReplyUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/p/comment?tid=${tid}&pid=${pid}&pn=${pn}&t=${Date.now()}`; //楼中楼判断
 
 /**
  * 从页面内容判断贴子是否直接消失
@@ -136,7 +138,7 @@ const getReplyUrl = (tid, pid, pn = 0) => `//tieba.baidu.com/p/comment?tid=${tid
  * @param {string} res - 页面内容
  * @returns {boolean} 是否被屏蔽
  */
-const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >= 0||res.indexOf('1970-1-1') >= 0;//2019-9-27修改判断条件，以修复判断主题贴屏蔽失效
+const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('1970-1-1') >= 0; //2019-9-27修改判断条件，以修复判断主题贴屏蔽失效
 
 /**
  * 获取主题贴是否被屏蔽
@@ -145,7 +147,7 @@ const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >=
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getThreadBlocked = tid => request(getThreadMoUrl(tid))
-.then(threadIsNotExist);
+    .then(threadIsNotExist);
 
 /**
  * 获取回复贴是否被屏蔽
@@ -155,7 +157,7 @@ const getThreadBlocked = tid => request(getThreadMoUrl(tid))
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
-.then(res => threadIsNotExist(res) || res.indexOf('刷新</a><div>楼.&#160;<br/>') >= 0);
+    .then(res => threadIsNotExist(res) || res.indexOf('刷新</a><div>楼.&#160;<br/>') >= 0);
 
 /**
  * 获取楼中楼是否被屏蔽
@@ -166,8 +168,8 @@ const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
-// 楼中楼 ajax 翻页后被屏蔽的楼中楼不会展示，所以不需要考虑 pn，同理不需要考虑不在第一页的楼中楼
-.then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
+    // 楼中楼 ajax 翻页后被屏蔽的楼中楼不会展示，所以不需要考虑 pn，同理不需要考虑不在第一页的楼中楼
+    .then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
 
 /**
  * 获取触发 CSS 样式
@@ -175,11 +177,9 @@ const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
  * @param {string} username - 用户名
  * @returns {string} 样式表
  */
-const getTriggerStyle = (username) =>
-{
+const getTriggerStyle = (username) => {
     //const escapedUsername = getEscapeString(username).replace(/\\/g, '\\\\');
-    if(username==null)
-    {
+    if (username == null) {
         alert("楼中楼检测无效");
         return;
         //console.log("楼中楼检测无效");
@@ -253,122 +253,105 @@ bottom: 0;
  * @param {AnimationEvent} event - 触发的事件对象
  */
 //主题贴列表
-const detectBlocked0 = () =>
-{
+const detectBlocked0 = () => {
     //alert(sessionStorage.getItem("miaouserid"));
     //$(".tb_icon_author").parents('li.j_thread_list')
     //JSON.parse($(".tb_icon_author").attr("data-field")).user_id
     clearTimeout(t1);
-    var TID1=new Array();
-    var tizi1=new Array();
-    var tizi12=new Array();
-    var index1=0;
+    var TID1 = new Array();
+    var tizi1 = new Array();
+    var tizi12 = new Array();
+    var index1 = 0;
     $(".tb_icon_author").each(
-        function()
-        {
+        function() {
             //alert(JSON.parse($(this).attr("data-field")).user_id+","+getUserid());
-            if(JSON.parse($(this).attr("data-field")).user_id==getUserid()&&$(this)[0].classList.contains("__tieba_blocked__")==false)
-            {
-                const tid = $(this).parents('li.j_thread_list').attr('data-tid');//子节点找父节点
+            if (JSON.parse($(this).attr("data-field")).user_id == getUserid() && $(this)[0].classList.contains("__tieba_blocked__") == false) {
+                const tid = $(this).parents('li.j_thread_list').attr('data-tid'); //子节点找父节点
                 //console.log(tid);
-                tizi12[index1]=tid;
-                TID1[tizi12[index1]]=tid;
-                tizi1[tizi12[index1]]=false;
+                tizi12[index1] = tid;
+                TID1[tizi12[index1]] = tid;
+                tizi1[tizi12[index1]] = false;
                 index1++;
             }
         });
-    countx1=index1;
-    t4=setInterval(tzaction,10);
-    function tzaction()
-    {
+    countx1 = index1;
+    t4 = setInterval(tzaction, 10);
+
+    function tzaction() {
         clearInterval(t4);
-        $("#miaocount1").html("1.剩余检测贴子数："+index1+"/"+countx1);
-        if(index1>0)
-        {
+        $("#miaocount1").html("1.剩余检测贴子数：" + index1 + "/" + countx1);
+        if (index1 > 0) {
             index1--;
-        }
-        else
-        {
+        } else {
             tzaction2();
             return;
         }
         let checker;
         const tid = TID1[tizi12[index1]];
         //console.log(TID1[tizi2[index1]]);
-        if (threadCache[tid])
-        {
+        if (threadCache[tid]) {
             checker = threadCache[tid];
-        }
-        else
-        {
-            checker = getThreadBlocked(tid).then(result =>{
+        } else {
+            checker = getThreadBlocked(tid).then(result => {
                 threadCache[tid] = result;
                 saveCache('thread');
                 return result;
             });
         }
-        if (checker)
-        {
-            Promise.resolve(checker).then(result =>{
-                if (result)
-                {
-                    tizi1[tid]=true;
+        if (checker) {
+            Promise.resolve(checker).then(result => {
+                if (result) {
+                    tizi1[tid] = true;
                     countx4++;
                     //tizi1[index1].parents('li.j_thread_list')[0].classList.add("__tieba_blocked__");//子节点找父节点
                     //alert(result);
                     //alert("460");
                 }
-                t4=setInterval(tzaction,10);
+                t4 = setInterval(tzaction, 10);
             });
         }
     }
-    function tzaction2()
-    {
-        $(".tb_icon_author").each(
-            function()
-            {
-                const tid = $(this).parents('li.j_thread_list').attr('data-tid');//子节点找父节点
-                //console.log(tid);
-                if(tizi1[tid]==true)
-                {
 
-                    $(this).parents('li.j_thread_list')[0].classList.add("__tieba_blocked__");//子节点找父节点
+    function tzaction2() {
+        $(".tb_icon_author").each(
+            function() {
+                const tid = $(this).parents('li.j_thread_list').attr('data-tid'); //子节点找父节点
+                //console.log(tid);
+                if (tizi1[tid] == true) {
+
+                    $(this).parents('li.j_thread_list')[0].classList.add("__tieba_blocked__"); //子节点找父节点
                 }
             });
-        $("#miaocount4").html("4.被屏蔽的主题贴或楼层数:"+countx4);
+        $("#miaocount4").html("4.被屏蔽的主题贴或楼层数:" + countx4);
     }
 
 }
 
 //楼层
-const detectBlocked = () =>
-{
+const detectBlocked = () => {
     //document.querySelectorAll(".l_post")[0].classList.add("__tieba_blocked__")//添加屏蔽样式
     //JSON.parse(($(".l_post")).attr('data-field')).author.user_id
     //j_thread_list clearfix 主题贴列表
     //l_post l_post_bright j_l_post clearfix  楼层
     //lzl_single_post 楼中楼
 
-    try
-    {
+    try {
         clearTimeout(t2);
         //var TID2=0;
-        var PID2=new Array();
-        var tizi22=new Array();
-        var tizi23=new Array();
-        var tizi24=new Array();
-        var index2=0;
+        var PID2 = new Array();
+        var tizi22 = new Array();
+        var tizi23 = new Array();
+        var tizi24 = new Array();
+        var index2 = 0;
         $("div.l_post").each(
-            function()
-            {
-                if(JSON.parse(($(this)).attr('data-field')).author.user_id==getUserid()&&$(this)[0].classList.contains("__tieba_blocked__")==false)
-                {
+            function() {
+                if (JSON.parse(($(this)).attr('data-field')).author.user_id == getUserid() && $(this)[0].classList.contains("__tieba_blocked__") == false) {
                     //const tid = window.PageData.thread.thread_id; //const tid = JSON.parse(($(".l_post")).attr('data-field')).content.thread_id;
-                    const pid = $(this).attr('data-pid')|| '';
+                    const pid = $(this).attr('data-pid') || '';
                     //TID2=tid;
-                    tizi22[index2]=pid;
-                    tizi23[tizi22[index2]]=pid;
-                    tizi24[tizi22[index2]]=false;
+                    tizi22[index2] = pid;
+                    tizi23[tizi22[index2]] = pid;
+                    tizi24[tizi22[index2]] = false;
                     index2++;
                     //console.log(tizi2[index2]);
                     //alert("233");
@@ -376,37 +359,30 @@ const detectBlocked = () =>
                     //console.log(pid);
                 }
             });
-        countx2=index2;
-        t3=setInterval(lcaction,10);
-        function lcaction()
-        {
+        countx2 = index2;
+        t3 = setInterval(lcaction, 10);
+
+        function lcaction() {
             //alert("2333");
             clearInterval(t3);
-            $("#miaocount2").html("2.剩余检测楼层数："+index2+"/"+countx2);
-            if(index2>0)
-            {
+            $("#miaocount2").html("2.剩余检测楼层数：" + index2 + "/" + countx2);
+            if (index2 > 0) {
                 index2--;
-            }
-            else
-            {
+            } else {
                 tzaction3();
                 return;
             }
             const tid = window.PageData.thread.thread_id;
             const pid = tizi22[index2]
             let checker;
-            if (!pid)
-            {
+            if (!pid) {
                 // 新回复可能没有 pid
                 return;
             }
-            if (replyCache[pid])
-            {
+            if (replyCache[pid]) {
                 checker = replyCache[pid];
-            }
-            else
-            {
-                checker = getReplyBlocked(tid, pid).then(result =>{
+            } else {
+                checker = getReplyBlocked(tid, pid).then(result => {
                     //console.log("233");
                     replyCache[pid] = result;
                     saveCache('reply');
@@ -414,49 +390,41 @@ const detectBlocked = () =>
                     return result;
                 });
             }
-            if (checker)
-            {
-                Promise.resolve(checker).then(result =>{
-                    if (result)
-                    {
-                        tizi24[pid]=true;
+            if (checker) {
+                Promise.resolve(checker).then(result => {
+                    if (result) {
+                        tizi24[pid] = true;
                         countx4++;
                         //tizi2[index2][0].classList.add("__tieba_blocked__");
                         //console.log(index2);
                         //alert(result);
                         //alert("460");
                     }
-                    t3=setInterval(lcaction,10);
+                    t3 = setInterval(lcaction, 10);
                 });
             }
         }
-        function tzaction3()
-        {
+
+        function tzaction3() {
             $("div.l_post").each(
-                function()
-                {
-                    const pid = $(this).attr('data-pid')|| '';
+                function() {
+                    const pid = $(this).attr('data-pid') || '';
                     //console.log(pid);
-                    if(tizi24[pid]==true)
-                    {
+                    if (tizi24[pid] == true) {
                         $(this)[0].classList.add("__tieba_blocked__");
                     }
                 });
-            $("#miaocount4").html("4.被屏蔽的主题贴或楼层数:"+countx4);
+            $("#miaocount4").html("4.被屏蔽的主题贴或楼层数:" + countx4);
         }
-    }
-    catch(error)
-    {
+    } catch (error) {
         alert(error);
     }
 };
 //alert(checker);
 //楼中楼 一个贴子的楼中楼一层最多有10个回复楼，而只有第一层楼中楼会出现贴子被屏蔽现象，二层及以上被屏蔽的贴子不会显示出来
 //$("div.j_lzl_c_b_a")
-const detectBlocked2 = (event) =>
-{
-    if (event.animationName !== '__tieba_blocked_detect__')
-    {
+const detectBlocked2 = (event) => {
+    if (event.animationName !== '__tieba_blocked_detect__') {
         return;
     }
     //detectBlocked();
@@ -464,62 +432,53 @@ const detectBlocked2 = (event) =>
     const { classList } = target;
     countx3++;
     let checker;
-    if (classList.contains('lzl_single_post'))
-    {
+    if (classList.contains('lzl_single_post')) {
         //alert("450");
         const field = target.dataset.field || '';
         const parent = target.parentElement;
         const pageNumber = parent.querySelector('.tP');
-        if (pageNumber && pageNumber.textContent.trim() !== '1')
-        {
+        if (pageNumber && pageNumber.textContent.trim() !== '1') {
             // 翻页后的楼中楼不会显示屏蔽的楼中楼，所以命中的楼中楼一定是不会屏蔽的，不需要处理
             return;
         }
         const tid = window.PageData.thread.thread_id;
         const pid = (field.match(/'pid':'?(\d+)'?/) || [])[1];
         const spid = (field.match(/'spid':'?(\d+)'?/) || [])[1];
-        if (!spid)
-        {
+        if (!spid) {
             // 新回复没有 spid
             return;
         }
-        if (replyCache[spid])
-        {
+        if (replyCache[spid]) {
             checker = replyCache[spid];
-        }
-        else
-        {
-            checker = getLzlBlocked(tid, pid, spid).then(result =>{
+        } else {
+            checker = getLzlBlocked(tid, pid, spid).then(result => {
                 replyCache[spid] = result;
                 saveCache('reply');
                 return result;
             });
         }
     }
-    if (checker)
-    {
-        Promise.resolve(checker).then(result =>{
-            if (result)
-            {
+    if (checker) {
+        Promise.resolve(checker).then(result => {
+            if (result) {
                 classList.add("__tieba_blocked__");
                 countx5++;
                 //alert(result);
                 //alert("460");
-                $("#miaocount5").html("5.被屏蔽的楼中楼数:"+countx5);
+                $("#miaocount5").html("5.被屏蔽的楼中楼数:" + countx5);
             }
         });
     }
-    $("#miaocount3").html("3.检测到的楼中楼数(不能获得总数):"+countx3);
+    $("#miaocount3").html("3.检测到的楼中楼数(无法直接一次性获得总数):" + countx3);
 };
 //https://www.cnblogs.com/yunfeifei/p/4453690.html
 
 /**
-* 初始化样式
-*
-* @param {string} username - 用户名
-*/
-const initStyle = (username) =>
-{
+ * 初始化样式
+ *
+ * @param {string} username - 用户名
+ */
+const initStyle = (username) => {
     const style = document.createElement('style');
     style.textContent = getTriggerStyle(username);
     document.head.appendChild(style);
@@ -529,9 +488,8 @@ const initStyle = (username) =>
  * 初始化事件监听
  *
  */
-const initListener = () =>
-{
-    document.addEventListener('webkitAnimationStart',detectBlocked2, false);//这个事件只对自己的贴子起作用(楼中楼)
+const initListener = () => {
+    document.addEventListener('webkitAnimationStart', detectBlocked2, false); //这个事件只对自己的贴子起作用(楼中楼)
     document.addEventListener('MSAnimationStart', detectBlocked2, false);
     document.addEventListener('animationstart', detectBlocked2, false);
 };
@@ -554,113 +512,91 @@ const initListener = () =>
 */
 
 /**
-* 加载并没有什么卵用的缓存
-*
-*/
-const loadCache = () =>
-{
+ * 加载并没有什么卵用的缓存
+ *
+ */
+const loadCache = () => {
     const thread = sessionStorage.getItem('tieba-blocked-cache-thread');
     const reply = sessionStorage.getItem('tieba-blocked-cache-reply');
-    if (thread)
-    {
-        try
-        {
+    if (thread) {
+        try {
             threadCache = JSON.parse(thread);
-        }
-        catch (error)
-        {
+        } catch (error) {
             //alert(error);
         }
     }
-    if (reply)
-    {
-        try
-        {
+    if (reply) {
+        try {
             replyCache = JSON.parse(reply);
-        }
-        catch (error)
-        {
+        } catch (error) {
             //alert(error);
         }
     }
 }
 
 /**
-* 保存并没有什么卵用的缓存
-*
-* @param {string} key - 缓存 key
-*/
-const saveCache = (key) =>
-{
-    if (key === 'thread')
-    {
+ * 保存并没有什么卵用的缓存
+ *
+ * @param {string} key - 缓存 key
+ */
+const saveCache = (key) => {
+    if (key === 'thread') {
         sessionStorage.setItem('tieba-blocked-cache-thread', JSON.stringify(threadCache));
-    }
-    else if (key === 'reply')
-    {
+    } else if (key === 'reply') {
         sessionStorage.setItem('tieba-blocked-cache-reply', JSON.stringify(replyCache));
     }
 }
 
 /**
-* 初始化执行
-*
-*/
-var useridx="",t5,t6;
+ * 初始化执行
+ *
+ */
+var useridx = "",
+    t5, t6;
 const init = () => {
     clearTimeout(t5);
     sessionStorage.removeItem("miaouserid");
-    if (getIsLogin())
-    {
-        try
-        {
-            useridx=$("a.u_username_wrap")[0].href.split("id=")[1].split("&")[0];
-        }
-        catch(error)
-        {
+    if (getIsLogin()) {
+        try {
+            useridx = $("a.u_username_wrap")[0].href.split("id=")[1].split("&")[0];
+        } catch (error) {
             //console.log(error);
-            useridx=null;
+            useridx = null;
         }
-        if(useridx!=null)
-        {
+        if (useridx != null) {
             init2();
-        }
-        else
-        {
-            var c={'_':Date.now()};
-            $.get("/f/user/json_userinfo",c,
-                  function(o)
-                  {
-                if(o!=null)
-                {
-                    sessionStorage.setItem("miaouserid",o.data.user_portrait);
-                    t6=setTimeout(init2,1000);//延迟1s，因为sessionStorage储存速度慢，不延迟取不到值
-                }
-            },"json");//参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
+        } else {
+            var c = { '_': Date.now() };
+            $.get("/f/user/json_userinfo", c,
+                function(o) {
+                    if (o != null) {
+                        sessionStorage.setItem("miaouserid", o.data.user_portrait);
+                        t6 = setTimeout(init2, 1000); //延迟1s，因为sessionStorage储存速度慢，不延迟取不到值
+                    }
+                }, "json"); //参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
         }
     }
 };
 const init2 = () => {
-    if(t4!=null)
-    {
+    if (t4 != null) {
         clearTimeout(t6);
     }
-    var getUsername2=useridx||sessionStorage.getItem("miaouserid")||"";//两种获取用户id，先取网页里的id，取不到就用网页api取，仍取不到就不能运行
-    const username = (getUsername2.split("?t=")[0])||null;//没登陆贴吧就是返回null，null就是没有作用
+    var getUsername2 = useridx || sessionStorage.getItem("miaouserid") || ""; //两种获取用户id，先取网页里的id，取不到就用网页api取，仍取不到就不能运行
+    const username = (getUsername2.split("?t=")[0]) || null; //没登陆贴吧就是返回null，null就是没有作用
     loadCache();
     initStyle(username);
     initListener();
-    t1=setTimeout(detectBlocked0,1000);//主题贴列表
-    t2=setTimeout(detectBlocked,1000);//主题贴里的楼层
-    const style = document.createElement('style');//创建新样式节点
-    style.textContent = css1;//添加样式内容
-    document.head.appendChild(style);//给head头添加新样式节点
-    $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测(只检测自己的贴子)</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(不能获得总数):</span><br/><span id="miaocount4">4.被屏蔽的主题贴或楼层数:</span><br/><span id="miaocount5">5.被屏蔽的楼中楼数:</span></div>');
+    t1 = setTimeout(detectBlocked0, 1000); //主题贴列表
+    t2 = setTimeout(detectBlocked, 1000); //主题贴里的楼层
+    const style = document.createElement('style'); //创建新样式节点
+    style.textContent = css1; //添加样式内容
+    document.head.appendChild(style); //给head头添加新样式节点
+    $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测(只检测自己的贴子)</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(无法直接一次性获得总数):</span><br/><span id="miaocount4">4.被屏蔽的主题贴或楼层数:</span><br/><span id="miaocount5">5.被屏蔽的楼中楼数:</span></div>');
     //let temp=$("div.user_name").children("a.")[0].href.split("id=")[1].split("&")[0];
     //temp||sessionStorage.getItem("miaouserid").split("?")[0]||null;getUsername().split("id=")[1].split("&")[0];
     //temp||sessionStorage.getItem("miaouserid")||null;改用id(portrait)来判断,来来注册样式事件？
     //alert(username);
     //alert(username2);
 };
-t5=setTimeout(init,1000);//延迟1s，否则网页里取不到用户id
+t5 = setTimeout(init, 1000); //延迟1s，否则网页里取不到用户id
 //init();
