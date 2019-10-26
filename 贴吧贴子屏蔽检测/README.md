@@ -1,5 +1,8 @@
 # 源项目
 * [Tieba_Blocked_Detect(贴吧贴子屏蔽检测)](https://github.com/FirefoxBar/userscript/tree/master/Tieba_Blocked_Detect)
+
+# 最新情况。2019年10月26日经初版测试，百度贴吧系统没有再自动屏蔽长串数字和链接了，可能几天前就解除了屏蔽？（发的贴子别人看不到，只有自己可以看见）。
+
 # 修改版
 * 版本1（非官方修改）：修改为只在各个贴吧的主页和主题贴里运行。修改了屏蔽显示样式，已避免特殊情况下，导致楼层错位（'position: absolute;'改为'position: relative;''）,加深了屏蔽颜色
 
