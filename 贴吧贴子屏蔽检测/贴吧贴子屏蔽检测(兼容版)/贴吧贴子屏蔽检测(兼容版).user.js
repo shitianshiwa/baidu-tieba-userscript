@@ -26,11 +26,11 @@ var $ = window.jQuery;
 const threadCache = {};
 const replyCache = {};
 var t1, t2, t3, t4; //计时器`
-var countx1 = 0,
-    countx2 = 0,
-    countx3 = 0,
-    countx4 = 0,
-    countx5 = 0,
+var countx1 = 0,//剩余检测贴子数
+    countx2 = 0,//剩余检测楼层数
+    countx3 = 0,//检测到的楼中楼数(无法直接一次性获得总数)
+    countx4 = 0,//被屏蔽的主题贴或楼层数
+    countx5 = 0,//被屏蔽的楼中楼数
     countx6 = 0;//总被屏蔽贴子数
 /*if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
 {
