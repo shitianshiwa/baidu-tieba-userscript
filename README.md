@@ -2,6 +2,7 @@
 [github](https://github.com/shitianshiwa/baidu-tieba-userscript)<br/>
 测试（beta）
 需要：支持扩展的浏览器，例如谷歌，yandex，火狐等；扩展：Tampermonkey脚本管理器; http://tampermonkey.net/
+通过github安装脚本可能需要代理才能装上
 javascript
 # 源项目
 * [Tieba_Blocked_Detect(贴吧贴子屏蔽检测)](https://github.com/FirefoxBar/userscript/tree/master/Tieba_Blocked_Detect)
