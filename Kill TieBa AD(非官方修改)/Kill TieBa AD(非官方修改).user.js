@@ -145,7 +145,7 @@
                     easyADs[0].style="display:none;";
                 }
             }
-            document.querySelectorAll("div#branding_ads")[0].style="display:none;";
+            document.querySelectorAll("div#branding_ads")[0].style="display:none;";//2019-11-1发现的广告 <div id="branding_ads">
         }
         catch(error)
         {
