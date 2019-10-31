@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.651
+// @version     测试(beta)0.652
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -30,7 +30,8 @@ var countx1 = 0,
     countx2 = 0,
     countx3 = 0,
     countx4 = 0,
-    countx5 = 0;
+    countx5 = 0,
+    countx6 = 0;//总被屏蔽贴子数
 /*if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
 {
 var c={'_':Date.now()};
@@ -48,14 +49,20 @@ const css1 = `
 .miaocsss2
 {
 width:140px;
-height:120px;
+height:300px;
 position: fixed;
 right:30px;
-bottom:400px;
+bottom:200px;
 z-index: 1005;
 color:#f00;
 font-size:10px;
 font-weight:bold;
+padding:10px;
+background-color:transparent;//透明
+}
+.miaocsss2:hover
+{
+background-color:#66ccff;
 }
 `;
 /**
@@ -320,9 +327,11 @@ const detectBlocked0 = () => {
                 if (tizi1[tid] == true) {
 
                     $(this).parents('li.j_thread_list')[0].classList.add("__tieba_blocked__"); //子节点找父节点
+                    countx6++;
                 }
             });
         $("#miaocount4").html("4.被屏蔽的主题贴或楼层数:" + countx4);
+        $("#miaocount6").html("6.被屏蔽的贴子总数(主题贴或(楼层+楼中楼)):" + countx6);
     }
 
 }
@@ -395,6 +404,7 @@ const detectBlocked = () => {
                     if (result) {
                         tizi24[pid] = true;
                         countx4++;
+                        countx6++;
                         //tizi2[index2][0].classList.add("__tieba_blocked__");
                         //console.log(index2);
                         //alert(result);
@@ -415,6 +425,7 @@ const detectBlocked = () => {
                     }
                 });
             $("#miaocount4").html("4.被屏蔽的主题贴或楼层数:" + countx4);
+            $("#miaocount6").html("6.被屏蔽的贴子总数(主题贴或(楼层+楼中楼)):" + countx6);
         }
     } catch (error) {
         alert(error);
@@ -463,9 +474,11 @@ const detectBlocked2 = (event) => {
             if (result) {
                 classList.add("__tieba_blocked__");
                 countx5++;
+                countx6++;
                 //alert(result);
                 //alert("460");
                 $("#miaocount5").html("5.被屏蔽的楼中楼数:" + countx5);
+                $("#miaocount6").html("6.被屏蔽的贴子总数(主题贴或(楼层+楼中楼)):" + countx6);
             }
         });
     }
@@ -591,7 +604,7 @@ const init2 = () => {
     const style = document.createElement('style'); //创建新样式节点
     style.textContent = css1; //添加样式内容
     document.head.appendChild(style); //给head头添加新样式节点
-    $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测(只检测自己的贴子)</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(无法直接一次性获得总数):</span><br/><span id="miaocount4">4.被屏蔽的主题贴或楼层数:</span><br/><span id="miaocount5">5.被屏蔽的楼中楼数:</span></div>');
+    $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测(只检测自己的贴子)</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(无法直接一次性获得总数):</span><br/><span id="miaocount4">4.被屏蔽的主题贴或楼层数:</span><br/><span id="miaocount5">5.被屏蔽的楼中楼数:</span><br/><span id="miaocount6">6.被屏蔽的贴子总数(主题贴或(楼层+楼中楼)):</span></div>');
     //let temp=$("div.user_name").children("a.")[0].href.split("id=")[1].split("&")[0];
     //temp||sessionStorage.getItem("miaouserid").split("?")[0]||null;getUsername().split("id=")[1].split("&")[0];
     //temp||sessionStorage.getItem("miaouserid")||null;改用id(portrait)来判断,来来注册样式事件？
