@@ -2,12 +2,13 @@
 // @name               Kill Baidu AD(非官方修改)(beta)
 // @name:zh-CN         百度广告(首尾推广及右侧广告)清理(非官方修改)(beta)
 // @namespace          hoothin
-// @version            0.86(0.2)
+// @version            0.86(0.21)
 // @description        Just Kill Baidu AD
 // @description:zh-CN  彻底清理百度搜索(www.baidu.com)结果首尾的推广广告、二次顽固广告与右侧广告，并防止反复
 // @author             hoothin
 // @include            http*://www.baidu.com/*
 // @include            http*://m.baidu.com/*
+// @include            http*://baike.baidu.com/item/*
 // @grant              none
 // @run-at             document-body
 // @license            MIT License
@@ -107,6 +108,11 @@
                     d.setAttribute('style','display:none;');
                     //d.remove();
                 }
+            }
+            eb2 = document.querySelectorAll("div#side_box_unionAd");//百度百科右边下广告
+            if(eb2[0]!=null)
+            {
+                eb2[0].setAttribute('style','display:none;');//隐藏广告
             }
         }
         catch(error)
