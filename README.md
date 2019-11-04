@@ -5,6 +5,7 @@
 通过github安装脚本可能需要代理才能装上<br/>
 是javascript脚本
 # 源项目
+* [https://greasyfork.org/en/scripts/26992-贴吧全能助手](https://greasyfork.org/en/scripts/26992-贴吧全能助手)
 * [Tieba_Blocked_Detect(贴吧贴子屏蔽检测)](https://github.com/FirefoxBar/userscript/tree/master/Tieba_Blocked_Detect)
 * [Kill Baidu AD(百度广告(首尾推广及右侧广告)清理||百度廣告(首尾推廣及右側廣告)清理)](https://github.com/hoothin/UserScripts/tree/master/Kill%20Baidu%20AD)
 * [Kill TieBa AD(贴吧广告清理||貼吧廣告去除)](https://github.com/hoothin/UserScripts/blob/master/Kill%20TieBa%20AD)
