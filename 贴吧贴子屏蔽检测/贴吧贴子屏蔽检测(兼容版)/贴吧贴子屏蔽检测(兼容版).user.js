@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.652
+// @version     测试(beta)0.653
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -25,13 +25,16 @@ $.post("/f/user/json_userinfo","",function(o){localStorage.setItem("userid",o.da
 var $ = window.jQuery;
 const threadCache = {};
 const replyCache = {};
-var t1, t2, t3, t4; //计时器`
+var t1, t2, t3, t4, t7; //计时器`
+var useridx = "",
+    t5, t6;
 var countx1 = 0,//剩余检测贴子数
     countx2 = 0,//剩余检测楼层数
     countx3 = 0,//检测到的楼中楼数(无法直接一次性获得总数)
     countx4 = 0,//被屏蔽的主题贴或楼层数
     countx5 = 0,//被屏蔽的楼中楼数
-    countx6 = 0;//总被屏蔽贴子数
+    countx6 = 0,//总被屏蔽贴子数
+    times=0;//点击显示UI的次数
 /*if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
 {
 var c={'_':Date.now()};
@@ -63,6 +66,12 @@ background-color:transparent;//透明
 .miaocsss2:hover
 {
 background-color:#66ccff;
+}
+#miaocount0
+{
+font-size:15px;
+font-weight:bold;
+color:#F00;
 }
 `;
 /**
@@ -154,7 +163,7 @@ const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >=
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getThreadBlocked = tid => request(getThreadMoUrl(tid))
-    .then(threadIsNotExist);
+.then(threadIsNotExist);
 
 /**
  * 获取回复贴是否被屏蔽
@@ -164,7 +173,7 @@ const getThreadBlocked = tid => request(getThreadMoUrl(tid))
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
-    .then(res => threadIsNotExist(res) || res.indexOf('刷新</a><div>楼.&#160;<br/>') >= 0);
+.then(res => threadIsNotExist(res) || res.indexOf('刷新</a><div>楼.&#160;<br/>') >= 0);
 
 /**
  * 获取楼中楼是否被屏蔽
@@ -175,8 +184,8 @@ const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
-    // 楼中楼 ajax 翻页后被屏蔽的楼中楼不会展示，所以不需要考虑 pn，同理不需要考虑不在第一页的楼中楼
-    .then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
+// 楼中楼 ajax 翻页后被屏蔽的楼中楼不会展示，所以不需要考虑 pn，同理不需要考虑不在第一页的楼中楼
+.then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
 
 /**
  * 获取触发 CSS 样式
@@ -564,8 +573,6 @@ const saveCache = (key) => {
  * 初始化执行
  *
  */
-var useridx = "",
-    t5, t6;
 const init = () => {
     clearTimeout(t5);
     sessionStorage.removeItem("miaouserid");
@@ -581,12 +588,12 @@ const init = () => {
         } else {
             var c = { '_': Date.now() };
             $.get("/f/user/json_userinfo", c,
-                function(o) {
-                    if (o != null) {
-                        sessionStorage.setItem("miaouserid", o.data.user_portrait);
-                        t6 = setTimeout(init2, 1000); //延迟1s，因为sessionStorage储存速度慢，不延迟取不到值
-                    }
-                }, "json"); //参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
+                  function(o) {
+                if (o != null) {
+                    sessionStorage.setItem("miaouserid", o.data.user_portrait);
+                    t6 = setTimeout(init2, 1000); //延迟1s，因为sessionStorage储存速度慢，不延迟取不到值
+                }
+            }, "json"); //参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
         }
     }
 };
@@ -604,12 +611,70 @@ const init2 = () => {
     const style = document.createElement('style'); //创建新样式节点
     style.textContent = css1; //添加样式内容
     document.head.appendChild(style); //给head头添加新样式节点
-    $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测(只检测自己的贴子)</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(无法直接一次性获得总数):</span><br/><span id="miaocount4">4.被屏蔽的主题贴或楼层数:</span><br/><span id="miaocount5">5.被屏蔽的楼中楼数:</span><br/><span id="miaocount6">6.被屏蔽的贴子总数(主题贴或(楼层+楼中楼)):</span></div>');
+    $("body").append('<div class="miaocsss2"><span>贴子屏蔽检测(只检测自己的贴子)</span><br/><span id="miaocount1">1.剩余检测贴子数:</span><br/><span id="miaocount2">2.剩余检测楼层数:</span><br/><span id="miaocount3">3.检测到的楼中楼数(无法直接一次性获得总数):</span><br/><span id="miaocount4">4.被屏蔽的主题贴或楼层数:</span><br/><span id="miaocount5">5.被屏蔽的楼中楼数:</span><br/><span id="miaocount6">6.被屏蔽的贴子总数(主题贴或(楼层+楼中楼)):</span><br/><br/><span id="miaocount0">点击可以移动</span></div>');
+    t7 = setTimeout(init3, 1000); //延迟1s，否则网页里取不到用户id
+
     //let temp=$("div.user_name").children("a.")[0].href.split("id=")[1].split("&")[0];
     //temp||sessionStorage.getItem("miaouserid").split("?")[0]||null;getUsername().split("id=")[1].split("&")[0];
     //temp||sessionStorage.getItem("miaouserid")||null;改用id(portrait)来判断,来来注册样式事件？
     //alert(username);
     //alert(username2);
+};
+const init3 = () => {
+    let tempx=$("div.miaocsss2");
+    if(sessionStorage.getItem("miaox2")!=null&& sessionStorage.getItem("miaoy2")!=null)
+    {
+        tempx[0].style.left = sessionStorage.getItem("miaox2")-70+"px";//设置left数值
+        tempx[0].style.top = sessionStorage.getItem("miaoy2")-150+"px";//设置top数值
+    }
+    //注册显示UI移动事件事件1
+    tempx.mousedown(function(event)
+    {
+        if(times==2)
+        {
+
+            times=0;
+        }
+        times++;
+        if(times==1)
+        {
+            $("#miaocount0").html("再点击不可以移动");
+        }
+        else
+        {
+            $("#miaocount0").html("点击可以移动");
+        }
+    });
+    //注册显示UI移动事件事件2
+    document.body.addEventListener('mousedown', (event) => {
+        if(times==1)
+        {
+            let tempx=$("div.miaocsss2");
+            tempx[0].style.left = event.x-70+"px";//设置left数值
+            tempx[0].style.top = event.y-150+"px";//设置top数值
+            sessionStorage.setItem("miaox2",event.x);//储存显示UI的X坐标
+            sessionStorage.setItem("miaoy2",event.y);//储存显示UI的Y坐标
+            //console.log(event.x);
+        }
+    })
+    /*
+     $("body").mousedown(function(event)
+                   {
+        if(times==1)
+        {
+        let tempx=$("div.miaocsss2");
+        tempx[0].style.left = event.x+"px";//设置left数值
+        tempx[0].style.top = event.y+"px";//设置top数值
+        tempx[0].style.left = sessionStorage.getItem("miaox2")+"px";//设置left数值
+        tempx[0].style.top = sessionStorage.getItem("miaoy2")+"px";//设置top数值
+        tempx[0].style = "display:none;";
+        alert("233");
+        }
+        else
+        {
+           tempx[0].style = "display:block;";
+        }
+        });*/
 };
 t5 = setTimeout(init, 1000); //延迟1s，否则网页里取不到用户id
 //init();
