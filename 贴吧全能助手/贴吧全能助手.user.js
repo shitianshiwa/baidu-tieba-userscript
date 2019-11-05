@@ -3209,12 +3209,12 @@
                 "	/*楼层*/",
                 "	border: none !important;",
                 "	border-bottom: 1px solid rgba(0,0,0,.1) !important;",
-                "	background: transparent !important;",
                 "	width: 100%!important;",
                 "	position: relative;",
                 "	box-sizing: border-box;",
                 "	display: flex;",
                 "	flex-wrap: wrap;",
+                "   color:#000;",
                 "",
                 "}",
                 ".l_post_bright.noborder_bottom,",
@@ -3437,7 +3437,7 @@
                 "	margin-right: 0 !important;",
                 "	position: relative !important;",
                 "	margin: 10px 0 !important;",
-                "	color: #bbb !important;",
+                "	color: #000 !important;",
                 "	float: right;",
                 "	box-sizing: border-box;",
                 "}",
@@ -8966,3 +8966,4 @@ a.jx, .ptr	{ cursor: pointer		}
         }, 500);
     })();
 })();
+//备份3212行 "	background: transparent !important;",
