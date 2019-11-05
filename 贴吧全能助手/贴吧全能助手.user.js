@@ -3535,7 +3535,7 @@
                 "}",
                 ".lzl_jb_in:before,",
                 ".j_jb_ele > a:before {",
-                "	content: \"\\e160\";",
+
                 "	font-family: \'Material Icons\';",
                 "	line-height: 1;",
                 "	display: block;",
@@ -8967,3 +8967,4 @@ a.jx, .ptr	{ cursor: pointer		}
     })();
 })();
 //备份3212行 "	background: transparent !important;",
+//备份3538行 "	content: \"\\e160\";",
