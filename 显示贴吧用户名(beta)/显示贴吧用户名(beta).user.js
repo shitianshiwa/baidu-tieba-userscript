@@ -9,7 +9,7 @@
 // @grant        GM_registerMenuCommand
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
-
+//发现不兼容的贴子链接 https://tieba.baidu.com/f?kz=xxxxxxxx  是远古贴吧的贴子链接？
 
 
 (function() {
