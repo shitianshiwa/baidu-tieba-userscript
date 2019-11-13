@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.011beta)
+// @version      2.1(0.012beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -8312,7 +8312,7 @@ display:none !important;
                         $('.u_tb_profile').before($menuItem2);
                         if (!GM_getValue("jinyongtiebameihua")) {
                             var lis = $parent.find("ul>li");
-                            lis[1].style.display = lis[2].style.display = lis[6].style.display = lis[7].style.display = "none";
+                            lis[1].style.display = lis[2].style.display =lis[7].style.display= "none";//取消屏蔽服务中心 = lis[6].style.display
                         }
                         $menuLink2.click(function() {
                             GM_setValue("jinyongtiebameihua", GM_getValue("jinyongtiebameihua") ? false : true);
