@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.013beta)
+// @version      2.1(0.014beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -181,7 +181,7 @@
                 //".tbui_fbar_favor,/*右侧浮层-爱逛的吧*/",
                 ".tbui_fbar_props,/*右侧浮层-魔法道具*/",
                 ".tbui_fbar_tsukkomi,/*右侧浮层-神来一句*/",
-                ".search_main_fixed,/*搜索栏浮层*/",
+                //".search_main_fixed,/*搜索栏浮层*/",//取消隐藏
                 "",
                 "",
                 "",
@@ -2652,10 +2652,10 @@
                 "	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.08) !important;",
                 "}",
                 ".search_main_fixed .search_btn_wrap+.search_btn_wrap{",
-                "	margin-right: 16px !important;",
+                "	margin-right: 0px !important;",//让后面的高级搜索按钮可以紧贴前面的按钮
                 "}",
                 ".search_main_fixed .senior-search-link{",
-                "	display: none !important;",
+                "	display: block !important;", //取消隐藏
                 "}",
                 "/*搜索推荐浮层*/",
                 "",
