@@ -1,5 +1,5 @@
 # 贴吧全能助手
-* 原版脚本
+* 原作者的发布链接
 [https://greasyfork.org/en/scripts/26992-贴吧全能助手](https://greasyfork.org/en/scripts/26992-贴吧全能助手)<br/>
 # 安装
 * [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B.user.js)
