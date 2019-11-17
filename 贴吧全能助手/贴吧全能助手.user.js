@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.014beta)
+// @version      2.1(0.0141beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -37,6 +37,7 @@
 //查看发帖 by 文科
 //百度贴吧图片点击放大 by lliwhx
 //备份1547行
+//发现一个bug，电脑端贴吧主题贴列表网页右边的"大家都在搜"（class="search_back_box")和"贴吧热议榜"（class="topic_list_box"）在网页拉到底时会向class中自动添加"search-back-fixed"和"topic-search-back-fixed",这个会导致发主题贴编辑器右边冒出一个"大家都在搜"，暂时用计时器定时删除新加的class来解决这个问题
 /*
 ".threadlist_bright .threadlist_author{",
                 "	float: none !important;",
@@ -2652,7 +2653,7 @@
                 "	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.08) !important;",
                 "}",
                 ".search_main_fixed .search_btn_wrap+.search_btn_wrap{",
-                "	margin-right: 0px !important;",//让后面的高级搜索按钮可以紧贴前面的按钮
+                "	margin-right: 0px !important;", //让后面的高级搜索按钮可以紧贴前面的按钮
                 "}",
                 ".search_main_fixed .senior-search-link{",
                 "	display: block !important;", //取消隐藏
@@ -8957,7 +8958,10 @@ a.jx, .ptr	{ cursor: pointer		}
                 parentNode.appendChild(thread2.thread);
             }
         }
-
+        setInterval(() => {
+            $("div.search_back_box")[0].classList.remove("search-back-fixed");
+            $("div.topic_list_box")[0].classList.remove("topic-search-back-fixed");
+        }, 500);
         setTimeout(() => {
             var a = document.createElement('a');
             a.textContent = '按发帖时间排序';
