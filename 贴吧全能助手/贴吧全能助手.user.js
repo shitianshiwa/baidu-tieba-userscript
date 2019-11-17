@@ -8959,8 +8959,10 @@ a.jx, .ptr	{ cursor: pointer		}
             }
         }
         setInterval(() => {
-            $("div.search_back_box")[0].classList.remove("search-back-fixed");
-            $("div.topic_list_box")[0].classList.remove("topic-search-back-fixed");
+            try {
+                $("div.search_back_box")[0].classList.remove("search-back-fixed");
+                $("div.topic_list_box")[0].classList.remove("topic-search-back-fixed");
+            } catch (error) { /*alert(error);*/ }
         }, 500);
         setTimeout(() => {
             var a = document.createElement('a');
