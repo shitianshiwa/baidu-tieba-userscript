@@ -62,7 +62,7 @@ color:#f00;
 font-size:10px;
 font-weight:bold;
 padding:10px;
-background-color:transparent;//透明
+background-color:transparent;/*透明*/
 }
 .miaocsss2:hover
 {
@@ -282,13 +282,15 @@ const detectBlocked0 = () => {
     $(".tb_icon_author").each(
         function() {
             //alert(JSON.parse($(this).attr("data-field")).user_id+","+getUserid());
-            if (JSON.parse($(this).attr("data-field")).user_id == getUserid() && $(this)[0].classList.contains("__tieba_blocked__") == false) {
-                const tid = $(this).parents('li.j_thread_list').attr('data-tid'); //子节点找父节点
-                //console.log(tid);
-                tizi12[index1] = tid;
-                TID1[tizi12[index1]] = tid;
-                tizi1[tizi12[index1]] = false;
-                index1++;
+            if (($(this)).attr('data-field') != undefined) {
+                if (JSON.parse($(this).attr("data-field")).user_id == getUserid() && $(this)[0].classList.contains("__tieba_blocked__") == false) {
+                    const tid = $(this).parents('li.j_thread_list').attr('data-tid'); //子节点找父节点
+                    //console.log(tid);
+                    tizi12[index1] = tid;
+                    TID1[tizi12[index1]] = tid;
+                    tizi1[tizi12[index1]] = false;
+                    index1++;
+                }
             }
         });
     countx1 = index1;

@@ -116,7 +116,7 @@
                 "	height: 0 !important;",
                 "	background-size: cover;",
                 "	background-position: center;",
-                "	background-image: url(http://ww2.sinaimg.cn/large/7bde02fbgw1f3yt89p0xej20xc064tae.jpg);",
+                "	background-image: url(https://ww2.sinaimg.cn/large/7bde02fbgw1f3yt89p0xej20xc064tae.jpg);",
                 "}",
                 "",
                 "/*替换吧头像*/",
