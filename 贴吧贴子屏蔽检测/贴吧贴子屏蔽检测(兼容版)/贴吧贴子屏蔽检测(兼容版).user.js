@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.653
+// @version     测试(beta)0.654
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -21,6 +21,7 @@ $.post("/f/user/json_userinfo","",function(o){localStorage.setItem("userid",o.da
 //发主题贴或回贴后，屏蔽样式会消失，刷新贴吧即可
 //网络有问题可能会导致判断出错(应该修好了)
 //主题贴楼层可能会出现虚页数（不应该出现的页数）导致楼层屏蔽检测失效，因为被屏蔽的贴子不会显示出来，自然无法检测到了
+//2019-11-18修复无法检测贴子里的楼层bug，因为以前测试时一直使用贴吧广告清理脚本（直接删掉广告标签），导致长期未发现这个bug
 'use strict';
 var $ = window.jQuery;
 const threadCache = {};
@@ -28,13 +29,13 @@ const replyCache = {};
 var t1, t2, t3, t4, t7; //计时器`
 var useridx = "",
     t5, t6;
-var countx1 = 0,//剩余检测贴子数
-    countx2 = 0,//剩余检测楼层数
-    countx3 = 0,//检测到的楼中楼数(无法直接一次性获得总数)
-    countx4 = 0,//被屏蔽的主题贴或楼层数
-    countx5 = 0,//被屏蔽的楼中楼数
-    countx6 = 0,//总被屏蔽贴子数
-    times=0;//点击显示UI的次数
+var countx1 = 0, //剩余检测贴子数
+    countx2 = 0, //剩余检测楼层数
+    countx3 = 0, //检测到的楼中楼数(无法直接一次性获得总数)
+    countx4 = 0, //被屏蔽的主题贴或楼层数
+    countx5 = 0, //被屏蔽的楼中楼数
+    countx6 = 0, //总被屏蔽贴子数
+    times = 0; //点击显示UI的次数
 /*if(sessionStorage.getItem("miaouserid")==null)//用这个的话，切换贴吧账号后id不会变成新的，导致屏蔽检测失效，贴吧自己在刷新时也会再次调用这个api233
 {
 var c={'_':Date.now()};
@@ -163,7 +164,7 @@ const threadIsNotExist = res => res.indexOf('您要浏览的贴子不存在') >=
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getThreadBlocked = tid => request(getThreadMoUrl(tid))
-.then(threadIsNotExist);
+    .then(threadIsNotExist);
 
 /**
  * 获取回复贴是否被屏蔽
@@ -173,7 +174,7 @@ const getThreadBlocked = tid => request(getThreadMoUrl(tid))
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
-.then(res => threadIsNotExist(res) || res.indexOf('刷新</a><div>楼.&#160;<br/>') >= 0);
+    .then(res => threadIsNotExist(res) || res.indexOf('刷新</a><div>楼.&#160;<br/>') >= 0);
 
 /**
  * 获取楼中楼是否被屏蔽
@@ -184,8 +185,8 @@ const getReplyBlocked = (tid, pid) => request(getReplyMoUrl(tid, pid))
  * @returns {Promise<boolean>} 是否被屏蔽
  */
 const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
-// 楼中楼 ajax 翻页后被屏蔽的楼中楼不会展示，所以不需要考虑 pn，同理不需要考虑不在第一页的楼中楼
-.then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
+    // 楼中楼 ajax 翻页后被屏蔽的楼中楼不会展示，所以不需要考虑 pn，同理不需要考虑不在第一页的楼中楼
+    .then(res => threadIsNotExist(res) || res.indexOf(`<a rel="noopener" name="${spid}">`) < 0);
 
 /**
  * 获取触发 CSS 样式
@@ -363,18 +364,20 @@ const detectBlocked = () => {
         var index2 = 0;
         $("div.l_post").each(
             function() {
-                if (JSON.parse(($(this)).attr('data-field')).author.user_id == getUserid() && $(this)[0].classList.contains("__tieba_blocked__") == false) {
-                    //const tid = window.PageData.thread.thread_id; //const tid = JSON.parse(($(".l_post")).attr('data-field')).content.thread_id;
-                    const pid = $(this).attr('data-pid') || '';
-                    //TID2=tid;
-                    tizi22[index2] = pid;
-                    tizi23[tizi22[index2]] = pid;
-                    tizi24[tizi22[index2]] = false;
-                    index2++;
-                    //console.log(tizi2[index2]);
-                    //alert("233");
-                    //console.log(tid);
-                    //console.log(pid);
+                if (($(this)).attr('data-field') != undefined) {
+                    if (JSON.parse(($(this)).attr('data-field')).author.user_id == getUserid() && $(this)[0].classList.contains("__tieba_blocked__") == false) {
+                        //const tid = window.PageData.thread.thread_id; //const tid = JSON.parse(($(".l_post")).attr('data-field')).content.thread_id;
+                        const pid = $(this).attr('data-pid') || '';
+                        //TID2=tid;
+                        tizi22[index2] = pid;
+                        tizi23[tizi22[index2]] = pid;
+                        tizi24[tizi22[index2]] = false;
+                        index2++;
+                        //console.log(tizi2[index2]);
+                        //alert("233");
+                        //console.log(tid);
+                        //console.log(pid);
+                    }
                 }
             });
         countx2 = index2;
@@ -437,7 +440,7 @@ const detectBlocked = () => {
             $("#miaocount6").html("6.被屏蔽的贴子总数(主题贴或(楼层+楼中楼)):" + countx6);
         }
     } catch (error) {
-        alert(error);
+        alert(error); //这个偶尔会报错 SyntaxError: Unexpected token u in JSON at position 0
     }
 };
 //alert(checker);
@@ -588,12 +591,12 @@ const init = () => {
         } else {
             var c = { '_': Date.now() };
             $.get("/f/user/json_userinfo", c,
-                  function(o) {
-                if (o != null) {
-                    sessionStorage.setItem("miaouserid", o.data.user_portrait);
-                    t6 = setTimeout(init2, 1000); //延迟1s，因为sessionStorage储存速度慢，不延迟取不到值
-                }
-            }, "json"); //参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
+                function(o) {
+                    if (o != null) {
+                        sessionStorage.setItem("miaouserid", o.data.user_portrait);
+                        t6 = setTimeout(init2, 1000); //延迟1s，因为sessionStorage储存速度慢，不延迟取不到值
+                    }
+                }, "json"); //参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
         }
     }
 };
@@ -621,60 +624,53 @@ const init2 = () => {
     //alert(username2);
 };
 const init3 = () => {
-    let tempx=$("div.miaocsss2");
-    if(sessionStorage.getItem("miaox2")!=null&& sessionStorage.getItem("miaoy2")!=null)
-    {
-        tempx[0].style.left = sessionStorage.getItem("miaox2")-70+"px";//设置left数值
-        tempx[0].style.top = sessionStorage.getItem("miaoy2")-150+"px";//设置top数值
+    let tempx = $("div.miaocsss2");
+    if (sessionStorage.getItem("miaox2") != null && sessionStorage.getItem("miaoy2") != null) {
+        tempx[0].style.left = sessionStorage.getItem("miaox2") - 70 + "px"; //设置left数值
+        tempx[0].style.top = sessionStorage.getItem("miaoy2") - 150 + "px"; //设置top数值
     }
     //注册显示UI移动事件事件1
-    tempx.mousedown(function(event)
-    {
-        if(times==2)
-        {
+    tempx.mousedown(function(event) {
+        if (times == 2) {
 
-            times=0;
+            times = 0;
         }
         times++;
-        if(times==1)
-        {
+        if (times == 1) {
             $("#miaocount0").html("再点击不可以移动");
-        }
-        else
-        {
+        } else {
             $("#miaocount0").html("点击可以移动");
         }
     });
     //注册显示UI移动事件事件2
     document.body.addEventListener('mousedown', (event) => {
-        if(times==1)
-        {
+            if (times == 1) {
+                let tempx = $("div.miaocsss2");
+                tempx[0].style.left = event.x - 70 + "px"; //设置left数值
+                tempx[0].style.top = event.y - 150 + "px"; //设置top数值
+                sessionStorage.setItem("miaox2", event.x); //储存显示UI的X坐标
+                sessionStorage.setItem("miaoy2", event.y); //储存显示UI的Y坐标
+                //console.log(event.x);
+            }
+        })
+        /*
+         $("body").mousedown(function(event)
+                       {
+            if(times==1)
+            {
             let tempx=$("div.miaocsss2");
-            tempx[0].style.left = event.x-70+"px";//设置left数值
-            tempx[0].style.top = event.y-150+"px";//设置top数值
-            sessionStorage.setItem("miaox2",event.x);//储存显示UI的X坐标
-            sessionStorage.setItem("miaoy2",event.y);//储存显示UI的Y坐标
-            //console.log(event.x);
-        }
-    })
-    /*
-     $("body").mousedown(function(event)
-                   {
-        if(times==1)
-        {
-        let tempx=$("div.miaocsss2");
-        tempx[0].style.left = event.x+"px";//设置left数值
-        tempx[0].style.top = event.y+"px";//设置top数值
-        tempx[0].style.left = sessionStorage.getItem("miaox2")+"px";//设置left数值
-        tempx[0].style.top = sessionStorage.getItem("miaoy2")+"px";//设置top数值
-        tempx[0].style = "display:none;";
-        alert("233");
-        }
-        else
-        {
-           tempx[0].style = "display:block;";
-        }
-        });*/
+            tempx[0].style.left = event.x+"px";//设置left数值
+            tempx[0].style.top = event.y+"px";//设置top数值
+            tempx[0].style.left = sessionStorage.getItem("miaox2")+"px";//设置left数值
+            tempx[0].style.top = sessionStorage.getItem("miaoy2")+"px";//设置top数值
+            tempx[0].style = "display:none;";
+            alert("233");
+            }
+            else
+            {
+               tempx[0].style = "display:block;";
+            }
+            });*/
 };
 t5 = setTimeout(init, 1000); //延迟1s，否则网页里取不到用户id
 //init();
