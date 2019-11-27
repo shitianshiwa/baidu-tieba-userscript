@@ -4,6 +4,7 @@
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
+// @exclude     http*://tieba.baidu.com/f/good?kw=*
 // @grant       none
 // @license     GPL-3.0
 // @author      shitianshiwa,864907600cc(原项目作者)
