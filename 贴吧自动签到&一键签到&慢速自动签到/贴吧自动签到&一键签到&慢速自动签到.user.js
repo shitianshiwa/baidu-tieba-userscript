@@ -5,6 +5,7 @@
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
+// @include      http*://tieba.baidu.com/f/good?kw=*
 // @grant        GM_registerMenuCommand
 // @run-at       document-idle
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
