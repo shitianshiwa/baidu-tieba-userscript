@@ -5,6 +5,7 @@
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
 // @exclude     http*://tieba.baidu.com/f/good?kw=*
+// @exclude     http*://tieba.baidu.com/f?kw=*&tab=good
 // @grant       none
 // @license     GPL-3.0
 // @author      shitianshiwa,864907600cc(原项目作者)
