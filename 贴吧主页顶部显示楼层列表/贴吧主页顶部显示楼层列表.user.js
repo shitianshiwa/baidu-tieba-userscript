@@ -1,22 +1,22 @@
 // ==UserScript==
 // @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      测试(beta)0.35
+// @version      测试(beta)0.351
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
+// @include      http*://tieba.baidu.com/f/good?kw=*
 // @author       shitianshiwa
 // @grant        none
 // @run-at       document-idle
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
-/**/
-(function($)
- {
+/*能兼容这个链接了https://tieba.baidu.com/f/good?kw=xxxxxx&tab=good*/
+(function($) {
     'use strict';
-    var t1,t2,t3;
-    var hrefs=window.location.href;
-    const css1=`
+    var t1, t2, t3;
+    var hrefs = window.location.href;
+    const css1 = `
 /*按钮样式*/
 .miaocss01
 {
@@ -79,55 +79,53 @@ color: #3e89fa;
 border: 1px solid #3e89fa;
 }
 `;
-    const style = document.createElement('style');//创建新样式节点
-    style.textContent = css1;//添加样式内容
-    document.head.appendChild(style);//给head头添加新样式节点
+    const style = document.createElement('style'); //创建新样式节点
+    style.textContent = css1; //添加样式内容
+    document.head.appendChild(style); //给head头添加新样式节点
     //const text0='跳到 <input  class="miaojump1" type="text" style="width:40px;" value="1"/> 页&nbsp;<input  class="miaojump2" type="button" value="确定"/>';
-    function louceliebiao()
-    {
-        try
-        {
+    function louceliebiao() {
+        try {
             //clearTimeout(t2);
             //1-------------------------------------------------
-            if(hrefs.split("?")[0].split("/")[3]=="f"||hrefs.indexOf("tab=album")==-1)//解决非主题列表和贴吧图片区报错
+            if (hrefs.split("?")[0].split("/")[3] == "f" || hrefs.indexOf("tab=album") == -1) //解决非主题列表和贴吧图片区报错
             {
-                if($("input.miaojump2")[0]!=null)//用来解决翻页后，上下楼层列表不一致的问题,删除上面的，然后再生成一次
+                if ($("input.miaojump2")[0] != null) //用来解决翻页后，上下楼层列表不一致的问题,删除上面的，然后再生成一次
                 {
-                    if($("input.miaojump2")[0].className=="miaojump2 miaocss01")//用跳转确认按钮的class来作条件
+                    if ($("input.miaojump2")[0].className == "miaojump2 miaocss01") //用跳转确认按钮的class来作条件
                     {
                         $("div.miaoliebiao").remove();
                         //alert("45000000000000000");
                     }
                 }
-                if($("div.miaoliebiao")[0]==null)
-                {
-                    if($("#frs_list_pager").html()!=null)
-                    {
-                        let text1='<div class="miaoliebiao"><div id="frs_list_pager" class="pagination-default clearfix" style="position:relative;left:1px;width:968px;background: #FEFEFE;border:1px solid #e4e6eb;padding:5px;">&nbsp;&nbsp;&nbsp;&nbsp;'+$("#frs_list_pager").html()+'</div></div>';
-                        $("div.head_content").append(text1);//电脑端贴吧主页主题贴列表顶部增加楼层列表
+                if ($("div.miaoliebiao")[0] == null) {
+                    if ($("#frs_list_pager").html() != null) {
+                        let text1 = '<div class="miaoliebiao"><div id="frs_list_pager" class="pagination-default clearfix" style="position:relative;left:1px;width:968px;background: #FEFEFE;border:1px solid #e4e6eb;padding:5px;">&nbsp;&nbsp;&nbsp;&nbsp;' + $("#frs_list_pager").html() + '</div></div>';
+                        if (hrefs.indexOf("/f/good?kw=") != -1) {
+                            $("div.nav_wrap ").after(text1); //专门给https://tieba.baidu.com/f/good?kw=XXXXX用的
+                        } else {
+                            $("div.head_content").append(text1); //电脑端贴吧主页主题贴列表顶部增加楼层列表
+
+                        }
                     }
                 }
                 $("div.pagination-default").children("a").each(
-                    function()//主题贴列表
+                    function() //主题贴列表
                     {
-                        let a=false;
-                        for(let i=0;i<$(this)[0].classList.length;i++)
-                        {
+                        let a = false;
+                        for (let i = 0; i < $(this)[0].classList.length; i++) {
                             //alert($(this)[0].classList[i]);
-                            if($(this)[0].classList[i]=="miaosuo01")//使用class来判断是否注册过事件，如果注册了就会检测到
+                            if ($(this)[0].classList[i] == "miaosuo01") //使用class来判断是否注册过事件，如果注册了就会检测到
                             {
-                                a=true;
+                                a = true;
                                 break;
                             }
                         }
                         //alert($(this)[0].className);
-                        if(a==false)
-                        {
-                            $(this)[0].classList.add("miaosuo01");//添加class
-                            $(this).click(function()
-                                          {
-                                $("input.miaojump2").remove();//跳转确认按钮
-                                $("div.miaoliebiao").remove();//上面的楼层列表
+                        if (a == false) {
+                            $(this)[0].classList.add("miaosuo01"); //添加class
+                            $(this).click(function() {
+                                $("input.miaojump2").remove(); //跳转确认按钮
+                                $("div.miaoliebiao").remove(); //上面的楼层列表
                                 //alert("4500");
                             });
                         }
@@ -137,71 +135,61 @@ border: 1px solid #3e89fa;
 
                 //2--------------------------------------------------------
                 $("div.frs_good_nav_wrap").children("span").children("a").each(
-                    function()//精品区列表按钮
+                    function() //精品区列表按钮
                     {
                         //alert("2233");
-                        let a=false;
-                        for(let i=0;i<$(this)[0].classList.length;i++)
-                        {
+                        let a = false;
+                        for (let i = 0; i < $(this)[0].classList.length; i++) {
                             //alert($(this)[0].classList[i]);
-                            if($(this)[0].classList[i]=="miaosuo02")
-                            {
-                                a=true;
+                            if ($(this)[0].classList[i] == "miaosuo02") {
+                                a = true;
                                 break;
                             }
                         }
-                        if(a==false)
-                        {
+                        if (a == false) {
                             $(this)[0].classList.add("miaosuo02");
-                            $(this).click(function()
-                                          {
+                            $(this).click(function() {
                                 // alert("6666");
-                                clearInterval(t2);//清除计时器，反正网页跳转没有完成前，又自动添加楼层列表
+                                clearInterval(t2); //清除计时器，反正网页跳转没有完成前，又自动添加楼层列表
                                 $("div.miaoliebiao").remove();
-                                t2=setInterval(()=>{louceliebiao();},1000);//延迟1s工作
+                                t2 = setInterval(() => { louceliebiao(); }, 1000); //延迟1s工作
                             });
                         }
                     });
 
                 //3--------------------------------------------------
                 $("input.miaojump2").each(
-                    function()//跳转楼层
+                    function() //跳转楼层
                     {
-                        let a=false;
-                        for(let i=0;i<$(this)[0].classList.length;i++)
-                        {
+                        let a = false;
+                        for (let i = 0; i < $(this)[0].classList.length; i++) {
                             //alert($(this)[0].classList[i]);
-                            if($(this)[0].classList[i]=="miaosuo03")
-                            {
-                                a=true;
+                            if ($(this)[0].classList[i] == "miaosuo03") {
+                                a = true;
                                 break;
                             }
                         }
-                        if(a==false)
-                        {
+                        if (a == false) {
                             $(this)[0].classList.add("miaosuo03");
                             $(this).click(
-                                function(event)
-                                {
+                                function(event) {
                                     //alert("3333");
                                     //alert(String(event.target.previousElementSibling.value));//event.target.parentNode.childNodes.length-2
-                                    clearInterval(t2);//没有原因，反正先关掉计时器
-                                    let temp=window.location.href;//得到该网页的链接
-                                    if(temp.indexOf("pn")!=-1)//用来解决链接无效变长问题，防止无限增加&pn=xxx，https://tieba.baidu.com/f?kw=xxxx&ie=utf-8&tp=0&pn=0&tp=0&pn=0&tp=0&pn=0&tp=0&pn=0
+                                    clearInterval(t2); //没有原因，反正先关掉计时器
+                                    let temp = window.location.href; //得到该网页的链接
+                                    if (temp.indexOf("pn") != -1) //用来解决链接无效变长问题，防止无限增加&pn=xxx，https://tieba.baidu.com/f?kw=xxxx&ie=utf-8&tp=0&pn=0&tp=0&pn=0&tp=0&pn=0&tp=0&pn=0
                                     {
-                                        let temp2=temp.split("&");//字符串切割
-                                        let temp3=temp2[0];
-                                        for(let i=1;i<temp2.length-1;i++)//字符串数组不要最后一个
+                                        let temp2 = temp.split("&"); //字符串切割
+                                        let temp3 = temp2[0];
+                                        for (let i = 1; i < temp2.length - 1; i++) //字符串数组不要最后一个
                                         {
-                                            temp3=temp3+"&"+temp2[i];//字符串合成
+                                            temp3 = temp3 + "&" + temp2[i]; //字符串合成
                                             //alert(temp2[i]);
                                         }
                                         //alert(temp3);
-                                        window.location.href=temp3+"&pn="+String(event.target.previousElementSibling.value-1)*50;//得到按钮所在地,前一个文本框的内容
-                                    }
-                                    else
-                                    {
-                                        window.location.href=temp+"&pn="+String(event.target.previousElementSibling.value-1)*50;
+                                        window.location.href = temp3 + "&pn=" + String(event.target.previousElementSibling.value - 1) * 50; //得到按钮所在地,前一个文本框的内容
+                                    } else {
+                                        window.location.href = temp + "&pn=" + String(event.target.previousElementSibling.value - 1) * 50;
                                     }
                                 });
                             //alert($("#miaojump1")[0].value);
@@ -209,38 +197,43 @@ border: 1px solid #3e89fa;
                             //alert(String(window.location.href).split("&")[0]+"&pn="+String(($("#miaojump1")[0].value-1)*50));
                         }
                     });
-                for(var i=0;i<2;i++)
+            }
+        } catch (error) {
+            clearInterval(t2);
+            alert(error + ",贴吧主页顶部显示楼层列表已停止运行");
+        }
+        try {
+            for (var i = 0; i < 2; i++) //楼层跳转输入框和确定按钮
+            {
+                if ($("input.miaojump1")[i] == null && $("div.pagination-default")[0] != null) //只有class可以捕捉多个标签，id不行
                 {
-                    if($("input.miaojump1")[i]==null&&$("div.pagination-default")[0]!=null)//只有class可以捕捉多个标签，id不行
-                    {
-                        let temp1=document.createElement("input");//创建节点<input/>
-                        temp1.setAttribute('class','miaojump1');//为input添加属性<input class="miaojump1"/>
-                        temp1.setAttribute('type','text');//<input class="miaojump1" type="text"/>
-                        temp1.setAttribute('style','width:40px;');//<input class="miaojump1" type="text" style="width:40px;"/>
-                        temp1.setAttribute('value','1');//<input class="miaojump1" type="button" value="1" style="width:40px;"/>
-                        //---------------------------------------------------
-                        let temp2=document.createElement("input");//创建节点<input/>
-                        temp2.setAttribute('class','miaojump2 miaocss01');//为input添加属性<input class="miaojump2 miaocss01"/>//贴吧自带的楼层跳转链接样式class为pagination-item
-                        temp2.setAttribute('type','button');//<input  class="miaojump2 miaocss01" type="button"/>
-                        temp2.setAttribute('value','确定');//<input  class="miaojump2 miaocss01" type="button" value="确定"/>
-                        let temp3=document.querySelectorAll("div.pagination-default");
-                        //---------------------------------------------------
+                    let temp1 = document.createElement("input"); //创建节点<input/>
+                    temp1.setAttribute('class', 'miaojump1'); //为input添加属性<input class="miaojump1"/>
+                    temp1.setAttribute('type', 'text'); //<input class="miaojump1" type="text"/>
+                    temp1.setAttribute('style', 'width:40px;'); //<input class="miaojump1" type="text" style="width:40px;"/>
+                    temp1.setAttribute('value', '1'); //<input class="miaojump1" type="button" value="1" style="width:40px;"/>
+                    //---------------------------------------------------
+                    let temp2 = document.createElement("input"); //创建节点<input/>
+                    temp2.setAttribute('class', 'miaojump2 miaocss01'); //为input添加属性<input class="miaojump2 miaocss01"/>//贴吧自带的楼层跳转链接样式class为pagination-item
+                    temp2.setAttribute('type', 'button'); //<input  class="miaojump2 miaocss01" type="button"/>
+                    temp2.setAttribute('value', '确定'); //<input  class="miaojump2 miaocss01" type="button" value="确定"/>
+                    let temp3 = document.querySelectorAll("div.pagination-default");
+                    //---------------------------------------------------
+                    if (temp3[i] != null) {
                         temp3[i].append(" 跳到: ");
-                        temp3[i].append(temp1);//添加跳转文本框和确认按钮
+                        temp3[i].append(temp1); //添加跳转文本框和确认按钮
                         temp3[i].append(" 页 ");
                         temp3[i].append(temp2);
                     }
                 }
             }
-        }
-        catch(error)
-        {
+        } catch (error) {
             clearInterval(t2);
-            alert(error+",贴吧主页顶部显示楼层列表已停止运行");
+            alert(error + ",贴吧主页顶部显示楼层列表已停止运行_添加添加跳转文本框和确认按钮");
         }
     }
     //louceliebiao();使用这个的话，重复切换楼层后，上面就不显示楼层列表了
-    t2=setInterval(louceliebiao,1000);//延迟1s工作，等网页基本加载完毕
+    t2 = setInterval(louceliebiao, 1000); //延迟1s工作，等网页基本加载完毕
     //t2=setInterval(()=>{louceliebiao();},1000);//延迟1s工作，等网页基本加载完毕
 })($);
 /*
