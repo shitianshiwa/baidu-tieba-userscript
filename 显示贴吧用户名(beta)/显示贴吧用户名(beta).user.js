@@ -6,6 +6,7 @@
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
+// @include      http*://tieba.baidu.com/f/good?kw=*
 // @grant        GM_registerMenuCommand
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
@@ -14,81 +15,71 @@
 
 (function() {
     'use strict';
-    var $ = unsafeWindow.jQuery;// @grant        不能为none，否则不能用
+    var $ = unsafeWindow.jQuery; // @grant        不能为none，否则不能用
     //var $ = window.jQuery;
-    var names=new Array();
-    var names2=new Array();
+    var names = new Array();
+    var names2 = new Array();
     //var namesi=0;
-    var hrefs=window.location.href;
-    function showName0()//主题贴列表
+    var hrefs = window.location.href;
+
+    function showName0() //主题贴列表
     {
         //alert(hrefs.indexOf("tab=album"));
-        try
-        {
-            if(hrefs.split("?")[0].split("/")[3]!="f"||hrefs.indexOf("tab=album")!=-1)//解决非主题列表和贴吧图片区报错
+        try {
+            if (hrefs.split("?")[0].split("/")[3] != "f" || hrefs.indexOf("tab=album") != -1) //解决非主题列表和贴吧图片区报错
             {
                 return;
             }
-            if($("a.frs-author-name").parents('div.threadlist_author').children('p.miao01')[0]!=null)//主题贴列表最后一个贴子
+            if ($("a.frs-author-name").parents('div.threadlist_author').children('p.miao01')[0] != null) //主题贴列表最后一个贴子
             {
                 return;
             }
             //console.log($("a.frs-author-name").parents('div.threadlist_author').children('p.miao01')[0]);
-            $("a.j_user_card").each(function()
-                                    {
+            $("a.j_user_card").each(function() {
                 //alert("233");
                 //alert("a.j_user_card").parents('div.threadlist_author').children('p.miao01')[0]);
-                if($(this).parents('div.threadlist_author').children('p.miao01')[0]==null)
-                {
-                    $(this).parents('.tb_icon_author').after('<p class="miao01" style="color:#999;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(' +JSON.parse(($(this)).attr('data-field')).un+')</p>');
+                if ($(this).parents('div.threadlist_author').children('p.miao01')[0] == null) {
+                    $(this).parents('.tb_icon_author').after('<p class="miao01" style="color:#999;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(' + JSON.parse(($(this)).attr('data-field')).un + ')</p>');
                 }
-                if($(this).parents('div.threadlist_author').children('p.miao02')[0]==null)
-                {
-                    $(this).parents('.tb_icon_author_rely').after('<p class="miao00002" style="color:#999;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(' +JSON.parse(($(this)).attr('data-field')).un+')</p>');
+                if ($(this).parents('div.threadlist_author').children('p.miao02')[0] == null) {
+                    $(this).parents('.tb_icon_author_rely').after('<p class="miao00002" style="color:#999;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(' + JSON.parse(($(this)).attr('data-field')).un + ')</p>');
                 }
             });
-        }
-        catch(error)
-        {
+        } catch (error) {
             clearTimeout(t3);
-            alert(error+",1.显示贴吧用户名(beta)已停止运行");
+            alert(error + ",1.显示贴吧用户名(beta)已停止运行");
         }
     }
-    function showName1()//楼层
+
+    function showName1() //楼层
     {
         //alert("66666666");
-        try
-        {
+        try {
             //alert(hrefs.split("/")[3])
-            if(hrefs.split("/")[3]!="p")
-            {
+            if (hrefs.split("/")[3] != "p") {
                 return;
             }
-            if($("a.p_author_name.j_user_card").parents('li.d_name').children('p.p_author_name')[0]!=null)//楼层列表最后一个贴子
+            if ($("a.p_author_name.j_user_card").parents('li.d_name').children('p.p_author_name')[0] != null) //楼层列表最后一个贴子
             {
                 return;
             }
             //console.log(233);
             //$("a.p_author_name.j_user_card").parents('li.d_name').children('a.p_author_name')[15].innerHTML
-            $("a.p_author_name.j_user_card").each(function()
-                                                  {
-                if($(this).parents('li.d_name').children('p.p_author_name')[0]==null)
-                {
-                    let s1=$(this).parents('li.d_name').children('a.p_author_name')[0].innerHTML;//获取昵称名+表情图标签
-                    let s2=JSON.parse($(this).attr('data-field')).un;
-                    $(this).after('<p class="p_author_name" style="color:#999;font-size:12px;">(' + s2 +')</p>');
-                    names[s1]=s2;//昵称作为索引
-                    names2[s2]=s2;//用户名作为索引
+            $("a.p_author_name.j_user_card").each(function() {
+                if ($(this).parents('li.d_name').children('p.p_author_name')[0] == null) {
+                    let s1 = $(this).parents('li.d_name').children('a.p_author_name')[0].innerHTML; //获取昵称名+表情图标签
+                    let s2 = JSON.parse($(this).attr('data-field')).un;
+                    $(this).after('<p class="p_author_name" style="color:#999;font-size:12px;">(' + s2 + ')</p>');
+                    names[s1] = s2; //昵称作为索引
+                    names2[s2] = s2; //用户名作为索引
                     //sessionStorage.setItem(s1,s2);//储存用户昵称 真名
                     //save(s1);
                     //alert(s1);
                 }
             });
-        }
-        catch(error)
-        {
+        } catch (error) {
             clearTimeout(t3);
-            alert(error+",2.显示贴吧用户名(beta)已停止运行");
+            alert(error + ",2.显示贴吧用户名(beta)已停止运行");
         }
         //j_thread_list clearfix
         //threadlist_author pull_right
@@ -96,116 +87,98 @@
         //alert("233");
         //+JSON.parse($(".l_post,.l_post_bright,.j_l_post clearfix").attr('data-pid'))
     }
-    function showName2()//楼中楼
+
+    function showName2() //楼中楼
     {
         showName0();
         showName1();
-        try
-        {
+        try {
             //$('div.lzl_cnt').children('a.at')[0]//第一个
             //$('div.lzl_cnt').children('a.at').attr('username')
             //alert(hrefs.split("/")[3])
-            if(hrefs.split("/")[3]!="p")
-            {
+            if (hrefs.split("/")[3] != "p") {
                 return;
             }
-            $("div.lzl_cnt").each(function()//楼中楼xx:
-                                  {
-                if($(this).children('span.miao1')[0]==null)
+            $("div.lzl_cnt").each(function() //楼中楼xx:
                 {
-                    //$("div.lzl_cnt").children("a.at")[0].text//获取昵称
-                    let s1=$(this).children("a.at.j_user_card")[0].innerHTML;//获取昵称名+表情图标签
-                    let s2=String($(this).children('a.at').attr('username'));//获取真名
-                    //console.log(s1);
-                    $(this).append('<span class="miao1"></span>');
-                    names[s1]=s2;//昵称作为索引
-                    names2[s2]=s2;//用户名作为索引
-                    //sessionStorage.setItem(s1,s2);//储存用户昵称 真名
-                    //save(s1);
-                }
-            });
+                    if ($(this).children('span.miao1')[0] == null) {
+                        //$("div.lzl_cnt").children("a.at")[0].text//获取昵称
+                        let s1 = $(this).children("a.at.j_user_card")[0].innerHTML; //获取昵称名+表情图标签
+                        let s2 = String($(this).children('a.at').attr('username')); //获取真名
+                        //console.log(s1);
+                        $(this).append('<span class="miao1"></span>');
+                        names[s1] = s2; //昵称作为索引
+                        names2[s2] = s2; //用户名作为索引
+                        //sessionStorage.setItem(s1,s2);//储存用户昵称 真名
+                        //save(s1);
+                    }
+                });
             //楼中楼xx
             //j_lzl_m_w
             //$("span.lzl_content_main").parents('ul.j_lzl_m_w').children('a.at.j_user_card')
             //$("span.lzl_content_main").children("a.at.j_user_card")[0].text//获取昵称
             //$("span.lzl_content_main").children("a.at.j_user_card").attr("portrait");
-            $("div.lzl_cnt").children("a.at.j_user_card").each(function()//找子节点
-                                                               {
-                if($(this).parents("div.lzl_cnt").children('span.miao2')[0]==null)
+            $("div.lzl_cnt").children("a.at.j_user_card").each(function() //找子节点
                 {
-                    let s1=$(this)[0].innerHTML;
-                    let s2=names[s1]||names2[s1];//先尝试用昵称取用户名，为null后用户名取用户名
-                    //sessionStorage.getItem(s1)
-                    if(s1!=s2)
-                    {
-                        if(s2!=null)
-                        {
-                            $(this).after('<span class="miao2" style="color:#999;font-size:10px;">( ' +s2+')</span>');
-                        }
-                        else
-                        {
-                            $(this).after('<span class="miao2" style="color:#999;font-size:10px;">(null)</span>');
+                    if ($(this).parents("div.lzl_cnt").children('span.miao2')[0] == null) {
+                        let s1 = $(this)[0].innerHTML;
+                        let s2 = names[s1] || names2[s1]; //先尝试用昵称取用户名，为null后用户名取用户名
+                        //sessionStorage.getItem(s1)
+                        if (s1 != s2) {
+                            if (s2 != null) {
+                                $(this).after('<span class="miao2" style="color:#999;font-size:10px;">( ' + s2 + ')</span>');
+                            } else {
+                                $(this).after('<span class="miao2" style="color:#999;font-size:10px;">(null)</span>');
+                            }
+                        } else {
+                            $(this).after('<span class="miao2" style="color:#999;font-size:10px;"></span>');
                         }
                     }
-                    else
-                    {
-                        $(this).after('<span class="miao2" style="color:#999;font-size:10px;"></span>');
-                    }
-                }
-            });
+                });
             //找子节点 //楼中楼xx 回复 xx span.lzl_content_main
-            $("div.lzl_cnt").children("span.lzl_content_main").children("a.at").each(function()
-                                                                                     {
-                if($(this).parents("span.lzl_content_main").children('span.miao3')[0]==null)
-                {
-                    let s1=$(this)[0].innerHTML;//获取用户名字(可能是昵称，也可能是用户名)
-                    let s3=s1.split('@')[1];
-                    let s2=names[s1]||names[s3]||names2[s3]||names2[s1];//对付带@的用户名或者昵称的楼中楼回复,纯@人可能在该网页无法找到用户名,可以判断无用户名账号
+            $("div.lzl_cnt").children("span.lzl_content_main").children("a.at").each(function() {
+                if ($(this).parents("span.lzl_content_main").children('span.miao3')[0] == null) {
+                    let s1 = $(this)[0].innerHTML; //获取用户名字(可能是昵称，也可能是用户名)
+                    let s3 = s1.split('@')[1];
+                    let s2 = names[s1] || names[s3] || names2[s3] || names2[s1]; //对付带@的用户名或者昵称的楼中楼回复,纯@人可能在该网页无法找到用户名,可以判断无用户名账号
                     //console.log(s3);
                     //sessionStorage.getItem(s1)
-                    if(s1!=s2)//一般来说肯定会有昵称，但不一定有用户名，昵称应该可以取到的
+                    if (s1 != s2) //一般来说肯定会有昵称，但不一定有用户名，昵称应该可以取到的
                     {
-                        if(s2!=null)
-                        {
-                            $(this).after('<span class="miao3" style="color:#999;font-size:10px;">( ' +s2+')</span>');
+                        if (s2 != null) {
+                            $(this).after('<span class="miao3" style="color:#999;font-size:10px;">( ' + s2 + ')</span>');
+                        } else {
+                            $(this).after('<span class="miao3" style="color:#999;font-size:10px;">(null)</span>'); //九成以上概率说明这位没有回过贴子,这网页里不存在其用户名
                         }
-                        else
-                        {
-                            $(this).after('<span class="miao3" style="color:#999;font-size:10px;">(null)</span>');//九成以上概率说明这位没有回过贴子,这网页里不存在其用户名
-                        }
-                    }
-                    else
-                    {
+                    } else {
                         $(this).after('<span class="miao3" style="color:#999;font-size:10px;"></span>');
                     }
                 }
             });
             //alert(namesi)
-            if(names.length>10000)//定量清理缓存数据
+            if (names.length > 10000) //定量清理缓存数据
             {
-                names = [];//清空数组
-                names=new Array();
+                names = []; //清空数组
+                names = new Array();
                 /* for(let x=0;x<names.length;x++)
                 {
                     sessionStorage.removeItem(names[x]);
                 }
                 namesi=0;*/
             }
-            if(names2.length>10000)//定量清理缓存数据
+            if (names2.length > 10000) //定量清理缓存数据
             {
-                names2 = [];//清空数组
-                names2=new Array();
+                names2 = []; //清空数组
+                names2 = new Array();
                 /* for(let x=0;x<names.length;x++)
                 {
                     sessionStorage.removeItem(names[x]);
                 }
                 namesi=0;*/
             }
-        }
-        catch(error)
-        {
+        } catch (error) {
             clearTimeout(t3);
-            alert(error+",3.显示贴吧用户名(beta)已停止运行");
+            alert(error + ",3.显示贴吧用户名(beta)已停止运行");
         }
     }
     /*function save(s)//避免重复储存
@@ -225,12 +198,11 @@
             namesi++;
         }
     }*/
-    function stop()
-    {
+    function stop() {
         alert("显示贴吧用户名(beta)已关闭");
         clearInterval(t3);
     }
-    var t3=setInterval(showName2,2000);//每一秒启动一次
+    var t3 = setInterval(showName2, 2000); //每一秒启动一次
     GM_registerMenuCommand("关闭楼中楼真名显示计时器(不再新增真名,但已有真名保留)", stop);
 })();
 /*
