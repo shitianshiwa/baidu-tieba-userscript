@@ -8,5 +8,5 @@
 $('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜索'));//注释掉了
 document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);//发贴按时间排列注释掉了
 # 备注
-* 这里的有图片功能经常失效bug，引用功能只有贴子链接为http的才会有效
+* 这里的脚本有图片功能经常失效bug，引用功能只有贴子链接为http的才会有效
 
