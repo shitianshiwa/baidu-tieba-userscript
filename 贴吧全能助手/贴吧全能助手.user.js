@@ -32,6 +32,10 @@
 // @grant       GM_deleteValue
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
+
+/*
+有点击图片放大和引用楼层和楼中楼功能失效bug，图片点击放大偶尔可以用，引用楼层和楼中楼功能只有链接为http的贴子可以用
+*/
 //https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
 //百度贴吧按发帖时间（帖子ID）排序 by NULL
 //查看发帖 by 文科
@@ -3663,8 +3667,8 @@
                 "	/*楼层数标识*/",
                 "	",
                 "	position: absolute;",
-                "	top: 0;",
-                "	right: 0;",
+                "	top: 0px;",
+                "	right: 5px;",
                 "	display: block;",
                 "	background: rgba(0, 0, 0, .04);",
                 "	border-radius: 16px 0 0 16px;",
@@ -3686,8 +3690,8 @@
                 "	/*回复按钮*/",
                 "	",
                 "	position: absolute;",
-                "	top: 0;",
-                "	right: 0;",
+                "	top: 0px;",
+                "	right: 5px;",
                 "	display: inline-block;",
                 "	background: transparent !important;",
                 "	margin: 0 !important;",
