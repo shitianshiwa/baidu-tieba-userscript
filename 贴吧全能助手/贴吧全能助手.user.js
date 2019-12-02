@@ -3680,7 +3680,7 @@
                 ".d_post_content_firstfloor .p_tail > li:nth-last-of-type(2)>span {",
                 "	/*1楼标识*/",
                 "	",
-                "	padding-right: 6px !important;",
+                "	padding-right: 30px !important;",
                 "}",
                 ".p_reply {",
                 "	/*回复按钮*/",
