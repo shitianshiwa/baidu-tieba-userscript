@@ -1,5 +1,9 @@
+# 原作者的脚本
+- [Install From GitHub](https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js)
+- [Install From GreasyFork](https://greasyfork.org/zh-CN/scripts/383981)
 # 源项目
 * [Tieba_Blocked_Detect(贴吧贴子屏蔽检测)](https://github.com/FirefoxBar/userscript/tree/master/Tieba_Blocked_Detect)
+# 作者已修复bug，已使用版本1或版本2的，都推荐直接用作者的(屏蔽显示样式没有我的那么刺眼，如果仍需要的话，可以把这个"background: rgba(255, 0, 0, 0.05);"改成"background: rgba(255, 0, 0, 0.3);"版本3，不知道。。！)
 
 # 2019年12月4日，经简单观察，贴吧屏蔽似乎已经很弱了，大部分贴子最终都能显示出来。
 
