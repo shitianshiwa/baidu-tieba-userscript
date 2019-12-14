@@ -3,7 +3,7 @@
 - [Install From GreasyFork](https://greasyfork.org/zh-CN/scripts/383981)
 # 源项目
 * [Tieba_Blocked_Detect(贴吧贴子屏蔽检测)](https://github.com/FirefoxBar/userscript/tree/master/Tieba_Blocked_Detect)
-# 作者已修复bug，推荐直接用作者的(屏蔽显示样式没有我的那么刺眼，如果仍需要的话，可以把这个"background: rgba(255, 0, 0, 0.05);"改成"background: rgba(255, 0, 0, 0.3);")
+# 作者已修复bug，推荐直接用作者的(屏蔽显示样式没有我的那么刺眼，如果仍需要的话，可以把这个"background: rgba(255, 0, 0, 0.05);"改成"background: rgba(255, 0, 0, 0.3);"https://github.com/FirefoxBar/userscript/issues/20)
 # 源项目
 * [Tieba_Blocked_Detect(贴吧贴子屏蔽检测)](https://github.com/FirefoxBar/userscript/tree/master/Tieba_Blocked_Detect)
 # 安装
