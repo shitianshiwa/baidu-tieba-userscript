@@ -3390,7 +3390,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	flex: 1;",
                 "	width: 0 !important;",
                 "	padding: 0 !important;",
-                "	background: inherit !important;",
+                /*"	background: inherit !important;",*/
                 "	box-sizing: border-box;",
                 "}",
                 "/*楼层内容域*/",
