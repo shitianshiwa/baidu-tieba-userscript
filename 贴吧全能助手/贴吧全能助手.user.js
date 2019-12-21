@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0143beta)
+// @version      2.1(0.0144beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -34,6 +34,7 @@
 // ==/UserScript==
 
 /*
+在某些贴子，可能会缺失删除和举报按钮(2019-12-21已修复)
 有点击图片放大和引用楼层和楼中楼功能失效bug，图片点击放大偶尔可以用，引用楼层和楼中楼功能只有链接为http的贴子可以用
 http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http，但偶尔会跳转到https导致出错（仅在手机yandex浏览器见过这个问题） 
 */
@@ -3532,9 +3533,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".lzl_jb {",
                 "	display: inline-block !important;",
-                "	font-size: 0 !important;",
+                "	font-size:10px;",
                 "	position: relative;",
-                "	width: 22px;",
+                "	width: auto;",
                 "	height: 22px;",
                 "	vertical-align: top;",
                 "	margin-right: 4px;",
@@ -3544,10 +3545,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	transition-duration: .4s;",
                 "	transition-timing-function: ease;",
                 "}",
-                ".lzl_jb[style*=\"none\"] {",
+                /*".lzl_jb[style*=\"none\"] {",
                 "	opacity: 0;",
                 "	pointer-events: none;",
-                "}",
+                "}",*/
                 ".lzl_jb_in:before,",
                 ".j_jb_ele > a:before {",
 
@@ -3785,7 +3786,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	color: #666 !important;",
                 "}",
                 ".lzl_content_reply a {",
-                "	color: inherit !important;",
+                "   color: #666;",
+                /*"	color: inherit !important;",*/
+                "}",
+                ".lzl_content_reply a:hover {",
+                "	color:#2d64b3;",
                 "}",
                 ".lzl_li_pager_s {",
                 "	color: #666 !important;",
