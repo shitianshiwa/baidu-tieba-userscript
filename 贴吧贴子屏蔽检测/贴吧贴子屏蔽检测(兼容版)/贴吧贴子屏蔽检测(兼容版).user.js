@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.654
+// @version     测试(beta)0.6541
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -328,7 +328,7 @@ const detectBlocked0 = () => {
                     //alert(result);
                     //alert("460");
                 }
-                t4 = setInterval(tzaction, 10);
+                t4 = setInterval(tzaction, 10); //主题贴检测延迟
             });
         }
     }
@@ -385,7 +385,7 @@ const detectBlocked = () => {
                 }
             });
         countx2 = index2;
-        t3 = setInterval(lcaction, 10);
+        t3 = setInterval(lcaction, 10); //楼层检测延迟
 
         function lcaction() {
             //alert("2333");
@@ -426,7 +426,7 @@ const detectBlocked = () => {
                         //alert(result);
                         //alert("460");
                     }
-                    t3 = setInterval(lcaction, 10);
+                    t3 = setInterval(lcaction, 10); //楼层检测延迟
                 });
             }
         }
@@ -629,9 +629,9 @@ const init2 = () => {
 };
 const init3 = () => {
     let tempx = $("div.miaocsss2");
-    if (sessionStorage.getItem("miaox2") != null && sessionStorage.getItem("miaoy2") != null) {
-        tempx[0].style.left = sessionStorage.getItem("miaox2") - 70 + "px"; //设置left数值
-        tempx[0].style.top = sessionStorage.getItem("miaoy2") - 150 + "px"; //设置top数值
+    if (localStorage.getItem("miaox2") != null && localStorage.getItem("miaoy2") != null) {
+        tempx[0].style.left = localStorage.getItem("miaox2") - 70 + "px"; //设置left数值
+        tempx[0].style.top = localStorage.getItem("miaoy2") - 150 + "px"; //设置top数值
     }
     //注册显示UI移动事件事件1
     tempx.mousedown(function(event) {
@@ -652,8 +652,8 @@ const init3 = () => {
                 let tempx = $("div.miaocsss2");
                 tempx[0].style.left = event.x - 70 + "px"; //设置left数值
                 tempx[0].style.top = event.y - 150 + "px"; //设置top数值
-                sessionStorage.setItem("miaox2", event.x); //储存显示UI的X坐标
-                sessionStorage.setItem("miaoy2", event.y); //储存显示UI的Y坐标
+                localStorage.setItem("miaox2", event.x); //储存显示UI的X坐标
+                localStorage.setItem("miaoy2", event.y); //储存显示UI的Y坐标
                 //console.log(event.x);
             }
         })
