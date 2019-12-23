@@ -6301,7 +6301,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     "	width: 980px !important;",
                     "}",
                     ".tbui_aside_float_bar {",
-                    "	margin-left: calc(980px / 2) !important;",
+                    "	margin-left: calc(985px / 2) !important;",
                     "}",
                     ".core_title_absolute_bright {",
                     "	width: calc(980px + 58px) !important;",
