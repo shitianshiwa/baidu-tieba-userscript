@@ -7386,7 +7386,7 @@ display:none !important;
 */
                             }).extract()).appendTo(document.head);
 
-                        // 只保留 [看帖、图片、精品、视频] 四个选项
+                        // 只保留 [看帖、图片、精品、视频] 四个选项，贴吧有一个空白的选项 j_tbnav_tab_a
                         //$('.j_tbnav_tab').filter(function(i) { return i > 3; }).remove();
 
                         // 执行三次, 确保分隔符会消失
