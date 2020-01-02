@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0146beta)
+// @version      2.1(0.0147beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -35,7 +35,7 @@
 
 /*
 在某些贴子，可能会缺失删除和举报按钮(2019-12-21已修复)
-有点击图片放大和引用楼层和楼中楼功能失效bug，图片点击放大偶尔可以用，引用楼层和楼中楼功能只有链接为http的贴子可以用
+有点击图片放大和引用楼层和楼中楼功能失效bug（仅在旧版贴吧有效，这种贴吧是http链接），图片点击放大偶尔可以用，引用楼层和楼中楼功能只有链接为http的贴子可以用
 http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http，但偶尔会跳转到https导致出错（仅在手机yandex浏览器见过这个问题） 
 */
 //https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
@@ -7387,7 +7387,7 @@ display:none !important;
                             }).extract()).appendTo(document.head);
 
                         // 只保留 [看帖、图片、精品、视频] 四个选项
-                        $('.j_tbnav_tab').filter(function(i) { return i > 3; }).remove();
+                        //$('.j_tbnav_tab').filter(function(i) { return i > 3; }).remove();
 
                         // 执行三次, 确保分隔符会消失
                         for (var i = 3; i--;) {
@@ -8199,7 +8199,7 @@ display:none !important;
                         _hide('.save_face_bg');
                     }
                 },
-                "rm_img_view": {
+                /*"rm_img_view": {
                     name: '看图模式屏蔽',
                     desc: '还原旧版贴吧点图看大图功能',
                     flag: __type_floor,
@@ -8224,7 +8224,7 @@ display:none !important;
                     _proc: function(floorType, args) {
                         this.rmImg(args._main);
                     }
-                },
+                },*/
                 "save_face": {
                     name: '挽尊卡隐藏',
                     desc: '屏蔽挽尊卡，留下一个横条提示。',
@@ -8574,7 +8574,7 @@ a.jx, .ptr	{ cursor: pointer		}
         };
     })();
     //百度贴吧图片点击放大 by lliwhx
-    (function(window) {
+    /*(function(window) {
         "use strict";
         //CSS
         var parentElement = document.getElementById("j_p_postlist");
@@ -8926,7 +8926,7 @@ a.jx, .ptr	{ cursor: pointer		}
         run();
 
         addMutationObserver('#j_p_postlist', run);
-    })();
+    })();*/
     //查看发帖 by 文科
     window.addEventListener('DOMContentLoaded', function() {
         var $ = unsafeWindow.$;
