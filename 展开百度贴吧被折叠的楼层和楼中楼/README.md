@@ -1,5 +1,5 @@
 # 安装
-- [Install From GitHub]()
+- [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E8%A2%AB%E6%8A%98%E5%8F%A0%E7%9A%84%E6%A5%BC%E5%B1%82%E5%92%8C%E6%A5%BC%E4%B8%AD%E6%A5%BC/%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E8%A2%AB%E6%8A%98%E5%8F%A0%E7%9A%84%E6%A5%BC%E5%B1%82%E5%92%8C%E6%A5%BC%E4%B8%AD%E6%A5%BC.user.js)
 # 简介
 参考
 [贴吧回复修正](https://greasyfork.org/scripts/375218-%E8%B4%B4%E5%90%A7%E5%9B%9E%E5%A4%8D%E4%BF%AE%E6%AD%A3) 
