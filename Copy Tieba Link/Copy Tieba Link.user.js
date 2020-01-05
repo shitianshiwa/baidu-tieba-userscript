@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01)
+// @version      1.1(0.011)
 // @description  复制贴吧的贴子标题与链接
 // @match        *://tieba.baidu.com/*
 // @include      *://tieba.baidu.com/*
@@ -18,6 +18,7 @@ var setting = {
     author: true,
     with_at: false,
     link: true,
+    neirong: true,
     split: "\n",
     tips: true,
     tips_time: 5
@@ -26,6 +27,7 @@ var setting = {
 // 是否复制作者（复制楼中楼时则为楼中楼作者），默认为 false
 // 若复制作者，则是否需要添加 @，默认为 true
 // 是否复制链接，默认为 true
+// 是否楼中楼的内容，默认为true
 // 分隔符，默认为换行符 \n
 // 是否显示提示信息，默认为 true
 // 提示显示时间，默认为 5（秒）
@@ -40,7 +42,9 @@ function copyLink() {
     var textGroup = [];
     var text;
     var parent = this.parentElement;
-    //console.log(parent.parentNode.parentNode);
+    //console.log(parent.parentNode.children[2].innerHTML);
+    //console.log(parent.parentNode.children[2].children[0].innerHTML);
+    //console.log(parent.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode);
     if (this.dataset.linkText) text = this.dataset.linkText;
     else {
         switch (this.dataset.anchorType) {
@@ -61,14 +65,17 @@ function copyLink() {
                 if (setting.link) textGroup.push(linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id);
                 break;
             case '3': // 贴子楼中楼获取链接
-                //获取楼层数 兼容http和https的贴子
+                //获取楼层pid、楼层数 兼容http和https的贴子
                 var floorData0 = parent.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("data-field") || parent.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("data-field");
+
                 //获取用户名和回复贴spid
                 var floorData1 = JSON.parse(floorData0.replace(/'/g, '"')); //JSON.parse必须用"才行，例如：{"XXX":"XXXX"}
-                var floorData2 = JSON.parse(parent.parentNode.parentNode.getAttribute("data-field").replace(/'/g, '"')); //JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
-                var floorData3 = JSON.parse(parent.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("data-field").replace(/'/g, '"')); //楼层pid
+
+                var floorData2 = JSON.parse(parent.parentNode.parentNode.getAttribute("data-field").replace(/'/g, '"')); //spid JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
+                var floorData3 = JSON.parse(floorData0.replace(/'/g, '"')); //楼层pid
                 if (setting.title) textGroup.push(unsafeWindow.PageData.thread.title + ' #' + floorData1.floor_num + ' 楼中楼');
                 if (setting.author) textGroup.push((setting.with_at ? '回复人:@' : '回复人:') + floorData2.user_name + ' ');
+                if (setting.neirong) textGroup.push(parent.parentNode.children[2].innerHTML);
                 if (setting.link) textGroup.push(linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid);
                 //贴吧自带的楼中楼回复定位只能定到楼层那里，楼中楼的回复具体位置要自己去找
                 //console.log(parent.parentNode.parentNode.parentNode);
@@ -114,7 +121,7 @@ function catchLinkTarget(event) {
     if (classList.contains('threadlist_title')) { //贴吧主题贴列表
         curAnchor.setAttribute('data-anchor-type', '0');
         target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
-    } else if (classList.contains('core_title_btns') && document.querySelectorAll("ul.core_title_btns>a.tieba-link-anchor")[0] == null) { // $("ul.core_title_btns>a.tieba-link-anchor")[0]
+    } else if (classList.contains('core_title_btns') && document.querySelectorAll("a.tieba-link-anchor")[0] == null) { // $("ul.core_title_btns>a.tieba-link-anchor")[0]
         curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
         target.appendChild(curAnchor);
     } else if (classList.contains('core_reply_tail')) { //core_title
