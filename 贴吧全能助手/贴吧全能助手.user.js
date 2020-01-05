@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0147beta)
+// @version      2.1(0.0148beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -34,9 +34,11 @@
 // ==/UserScript==
 
 /*
+
+贴吧超级会员会导致楼层用户名字和楼中楼头像显示错误(已修复)
 在某些贴子，可能会缺失删除和举报按钮(2019-12-21已修复)
 有点击图片放大和引用楼层和楼中楼功能失效bug（仅在旧版贴吧有效，这种贴吧是http链接），图片点击放大偶尔可以用，引用楼层和楼中楼功能只有链接为http的贴子可以用
-http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http，但偶尔会跳转到https导致出错（仅在手机yandex浏览器见过这个问题） 
+http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http，但偶尔会跳转到https导致出错（仅在手机yandex浏览器见过这个问题）
 */
 //https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
 //百度贴吧按发帖时间（帖子ID）排序 by NULL
@@ -209,7 +211,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".suggestion_list >li[data-field*=\"operation_title\"],.suggestion_list >li[data-field*=\"operation_item\"],.bdfengyun,/*搜索悬浮窗-大伙正在聊*/",
                 ".suggestion_list >li[data-field*=\"relation_game_title\"],.suggestion_list >li[data-field*=\"game_item\"],/*搜索悬浮窗-相关游戏*/",
                 ".tbui_fbar_square {",
-                "	display: block !important;",
+                //"	display: block !important;",
                 "}",
                 /*让贴吧热议榜可以显示出来，同时改变背景颜色*/
                 "div.topic_list_box {",
@@ -3461,6 +3463,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "",
                 ".post-tail-wrap {",
                 "	position: static !important;",
+                "   width: auto ",
                 "}",
                 ".core_reply_tail > *,",
                 ".core_reply_tail > * > * {",
@@ -3519,7 +3522,12 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	",
                 "	font-size: 0 !important;",
                 "	position: relative;",
-                "	width: 20px;",
+                "	width: 45px;",
+                "   height:13px;",
+                "}",
+                ".complaint{",
+                "   top: 6px;   ",
+                "   width:0px;",
                 "}",
                 ".j_jb_ele:only-child {",
                 "	margin: 0 !important;",
@@ -4117,7 +4125,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	background: none !important;",
                 "	width: auto !important;",
                 "	height: auto !important;",
-                "	color: #bbb !important;",
+                "	color: #999 !important;",
                 "	font-size: 20px;",
                 "	cursor: pointer;",
                 "	transition-property: color,opacity;",
@@ -4130,7 +4138,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".user-hide-post-down:hover,",
                 ".user-hide-post-up:hover {",
-                "	color: #999 !important;",
+                "	color: #f00 !important;",
                 "}",
                 ".user-hide-post-down:before,",
                 ".user-hide-post-up:before {",
@@ -4611,7 +4619,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	margin: 0 !important;",
                 "	padding: 0 !important;",
                 "	margin-right: 10px !important;",
-                "	width: 65px !important;",
+                "   min-width:65px;",
+                "	width: auto !important;",
                 "	height: 66px !important;",
                 "	border-radius: 0 0 20px 20px;",
                 "	background: transparent;",
@@ -6672,7 +6681,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     "	border: none !important;",
                     "	position: relative;",
                     "}",
-                    ".footer{",
+                    "#footer{", //".footer{",
+                    "   margin:auto;",
                     "	margin-bottom: 20px !important;",
                     "}",
                     "#content{",
@@ -7091,6 +7101,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     "	left: 0 !important;",
                     "}"
                 ].join("\n");
+                //管用户头像栏的 http://tieba.baidu.com/i/i/*
             }
         }
         if (typeof GM_addStyle != "undefined") {
@@ -8371,10 +8382,12 @@ display:none !important;
                     if (_m.length) {
                         _callMenu(_m);
                     } else {
-                        ma.observe($('.u_setting')[0], {
-                            childList: true,
-                            subtree: true
-                        });
+                        try {
+                            ma.observe($('.u_setting')[0], {
+                                childList: true,
+                                subtree: true
+                            });
+                        } catch (error) {}
                     }
                 }, 1500);
             }, '捕捉设定');
@@ -8994,6 +9007,28 @@ a.jx, .ptr	{ cursor: pointer		}
             //document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);//出错了，且没什么用
         }, 500);
     })();
+    setTimeout(() => { //为右上角的浮动按钮添加头像
+        let userimg = "";
+        let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+        if (localStorage.getItem("userimg") != null) {
+            userimg = localStorage.getItem("userimg");
+        } else {
+            temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+            //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
+            localStorage.setItem("userimg", temp.src)
+            userimg = temp.src;
+        }
+        if ($("img.u_username_avatar")[0] == null) {
+            $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
+        }
+        //console.log(userimg);
+        //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
+    }, 3000);
+    if (window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) {
+        $("#main_aside").remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
+        //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
+    }
+
 })();
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
