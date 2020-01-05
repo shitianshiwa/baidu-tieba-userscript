@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.6541
+// @version     测试(beta)0.6542
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -26,8 +26,8 @@ $.post("/f/user/json_userinfo","",function(o){localStorage.setItem("userid",o.da
 //2019-11-18修复无法检测贴子里的楼层bug，因为以前测试时一直使用贴吧广告清理脚本（直接删掉广告标签），导致长期未发现这个bug
 'use strict';
 var $ = window.jQuery;
-const threadCache = {};
-const replyCache = {};
+let threadCache = {};
+let replyCache = {};
 var t1, t2, t3, t4, t7; //计时器`
 var useridx = "",
     t5, t6;
@@ -198,11 +198,6 @@ const getLzlBlocked = (tid, pid, spid) => request(getReplyUrl(tid, pid))
  */
 const getTriggerStyle = (username) => {
     //const escapedUsername = getEscapeString(username).replace(/\\/g, '\\\\');
-    if (username == null) {
-        alert("楼中楼检测无效");
-        return;
-        //console.log("楼中楼检测无效");
-    }
     return `
 /* 使用 animation 监测 DOM 变化 */
 @-webkit-keyframes __tieba_blocked_detect__ {}
@@ -310,7 +305,7 @@ const detectBlocked0 = () => {
         let checker;
         const tid = TID1[tizi12[index1]];
         //console.log(TID1[tizi2[index1]]);
-        if (threadCache[tid]) {
+        if (threadCache[tid] !== undefined) {
             checker = threadCache[tid];
         } else {
             checker = getThreadBlocked(tid).then(result => {
@@ -404,7 +399,7 @@ const detectBlocked = () => {
                 // 新回复可能没有 pid
                 return;
             }
-            if (replyCache[pid]) {
+            if (replyCache[pid] !== undefined) {
                 checker = replyCache[pid];
             } else {
                 checker = getReplyBlocked(tid, pid).then(result => {
@@ -475,7 +470,7 @@ const detectBlocked2 = (event) => {
             // 新回复没有 spid
             return;
         }
-        if (replyCache[spid]) {
+        if (replyCache[spid] !== undefined) {
             checker = replyCache[spid];
         } else {
             checker = getLzlBlocked(tid, pid, spid).then(result => {
@@ -508,6 +503,11 @@ const detectBlocked2 = (event) => {
  * @param {string} username - 用户名
  */
 const initStyle = (username) => {
+    if (username == null) {
+        //console.log("楼中楼检测无效");
+        alert("楼中楼检测无效");
+        return;
+    }
     const style = document.createElement('style');
     style.textContent = getTriggerStyle(username);
     document.head.appendChild(style);
@@ -574,7 +574,7 @@ const saveCache = (key) => {
     } else if (key === 'reply') {
         sessionStorage.setItem('tieba-blocked-cache-reply', JSON.stringify(replyCache));
     }
-}
+};
 
 /**
  * 初始化执行
@@ -582,8 +582,8 @@ const saveCache = (key) => {
  */
 const init = () => {
     clearTimeout(t5);
-    sessionStorage.removeItem("miaouserid");
-    if (getIsLogin()) {
+    if (getUserid != 0 && getUserid != "") {
+        //alert("6666");
         try {
             useridx = $("a.u_username_wrap")[0].href.split("id=")[1].split("&")[0];
         } catch (error) {
@@ -602,7 +602,9 @@ const init = () => {
                     }
                 }, "json"); //参考了贴吧自己的使用方式，电脑浏览器网页开发者工具可见。
         }
+        return;
     }
+    sessionStorage.removeItem("miaouserid");
 };
 const init2 = () => {
     if (t4 != null) {
