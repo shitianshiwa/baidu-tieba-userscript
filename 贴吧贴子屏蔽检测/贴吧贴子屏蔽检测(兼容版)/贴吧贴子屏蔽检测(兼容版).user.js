@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.6542
+// @version     测试(beta)0.6543
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -291,14 +291,14 @@ const detectBlocked0 = () => {
             }
         });
     countx1 = index1;
-    t4 = setInterval(tzaction, 10);
+    t4 = setInterval(tzaction, 200);
 
     function tzaction() {
-        clearInterval(t4);
         $("#miaocount1").html("1.剩余检测贴子数：" + index1 + "/" + countx1);
         if (index1 > 0) {
             index1--;
         } else {
+            clearInterval(t4);
             tzaction2();
             return;
         }
@@ -323,7 +323,7 @@ const detectBlocked0 = () => {
                     //alert(result);
                     //alert("460");
                 }
-                t4 = setInterval(tzaction, 10); //主题贴检测延迟
+                //t4 = setInterval(tzaction, 10); //主题贴检测延迟
             });
         }
     }
@@ -380,15 +380,15 @@ const detectBlocked = () => {
                 }
             });
         countx2 = index2;
-        t3 = setInterval(lcaction, 10); //楼层检测延迟
+        t3 = setInterval(lcaction, 200); //楼层检测延迟
 
         function lcaction() {
             //alert("2333");
-            clearInterval(t3);
             $("#miaocount2").html("2.剩余检测楼层数：" + index2 + "/" + countx2);
             if (index2 > 0) {
                 index2--;
             } else {
+                clearInterval(t3);
                 tzaction3();
                 return;
             }
@@ -421,7 +421,7 @@ const detectBlocked = () => {
                         //alert(result);
                         //alert("460");
                     }
-                    t3 = setInterval(lcaction, 10); //楼层检测延迟
+                    //t3 = setInterval(lcaction, 10); //楼层检测延迟
                 });
             }
         }
