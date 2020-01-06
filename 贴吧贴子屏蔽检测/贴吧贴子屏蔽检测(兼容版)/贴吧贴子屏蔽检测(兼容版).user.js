@@ -291,7 +291,7 @@ const detectBlocked0 = () => {
             }
         });
     countx1 = index1;
-    t4 = setInterval(tzaction, 200);
+    t4 = setInterval(tzaction, 100);
 
     function tzaction() {
         $("#miaocount1").html("1.剩余检测贴子数：" + index1 + "/" + countx1);
@@ -380,7 +380,7 @@ const detectBlocked = () => {
                 }
             });
         countx2 = index2;
-        t3 = setInterval(lcaction, 200); //楼层检测延迟
+        t3 = setInterval(lcaction, 100); //楼层检测延迟
 
         function lcaction() {
             //alert("2333");
