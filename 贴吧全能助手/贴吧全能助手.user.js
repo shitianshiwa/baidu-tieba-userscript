@@ -44,6 +44,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 //百度贴吧按发帖时间（帖子ID）排序 by NULL
 //查看发帖 by 文科
 //百度贴吧图片点击放大 by lliwhx
+//百度贴吧：不登录即可看贴 by VA
+//梦姬贴吧助手 by jixun
 //备份1547行
 //发现一个bug，电脑端贴吧主题贴列表网页右边的"大家都在搜"（class="search_back_box")和"贴吧热议榜"（class="topic_list_box"）在网页拉到底时会向class中自动添加"search-back-fixed"和"topic-search-back-fixed",这个会导致发主题贴编辑器右边冒出一个"大家都在搜"，暂时用计时器定时删除新加的class来解决这个问题
 /*
@@ -8089,7 +8091,7 @@ display:none !important;
 
                 },
                 "quote": {
-                    name: '引用楼层',
+                    name: '引用楼层(仅旧版PC贴吧有效)',
                     desc: '引用某一层的内容',
                     flag: __type_floor,
                     _proc: function(floorType, args) {
@@ -8142,7 +8144,7 @@ display:none !important;
                     }
                 },
                 "quote_lzl": {
-                    name: '楼中楼帖子引用',
+                    name: '楼中楼帖子引用(仅旧版PC贴吧有效)',
                     desc: '引用楼中楼的回复',
                     flag: __type_lzl,
                     _proc: function(floorType, args) {
