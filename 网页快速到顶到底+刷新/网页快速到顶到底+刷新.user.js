@@ -14,10 +14,10 @@
 2.有些网页会报错，暂没方法解决
 */
 (function() {
+    'use strict';
     var b1 = false,
         b2 = false,
         b3 = 0; //解决按键点击动作与移动按钮动作之间的冲突
-    'use strict';
     const css1 = `
 /*按钮样式*/
 .miaocssxx
