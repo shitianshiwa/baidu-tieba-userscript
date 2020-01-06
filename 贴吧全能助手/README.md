@@ -10,4 +10,5 @@ $('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜
 document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);//发贴按时间排列注释掉了
 # 备注
 * 这里的脚本有图片功能经常失效bug，引用功能只有贴子链接为http的才会有效
+* 有些贴吧账号PC端贴吧有夜间模式可选，这个会导致样式显示不正常
 
