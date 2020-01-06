@@ -8093,10 +8093,14 @@ display:none !important;
                     desc: '引用某一层的内容',
                     flag: __type_floor,
                     _proc: function(floorType, args) {
-                        var $quote = $('<li>').addClass('pad-left').append(
+                        var $quote = $('<li>').addClass('pad-left').append( //<li>
                             $('<a>').text('#引用').addClass('jx')
                             .data('jx', 'quote').data('floor', args.floorNum)
                         ).prependTo($('.p_tail', args._main));
+                        /*var $quote2 = $('<li>').addClass('pad-left').append(//<li>
+                            $('<a>').text('#引用').addClass('jx')
+                            .data('jx', 'quote').data('floor', args.floorNum)
+                        ).prependTo($('.core_reply_tail ', args._main));*/
                     },
                     _click: function($ele, $eve) {
                         var $floor = $ele.parents('.l_post');
