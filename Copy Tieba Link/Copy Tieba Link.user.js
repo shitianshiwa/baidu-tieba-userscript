@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.012)
+// @version      1.1(0.013)
 // @description  复制贴吧的贴子标题与链接
 // @match        *://tieba.baidu.com/*
 // @include      *://tieba.baidu.com/*
@@ -131,7 +131,8 @@ function catchLinkTarget(event) {
 
     if (classList.contains('threadlist_title')) { //贴吧主题贴列表
         curAnchor.setAttribute('data-anchor-type', '0');
-        target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
+        target.appendChild(curAnchor);
+        //target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
     } else if (classList.contains('core_title_btns') && target.querySelectorAll(".tieba-link-anchor").length == 0) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
         curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
         target.appendChild(curAnchor);
@@ -213,7 +214,8 @@ bottom: -75px;
 }
 
 .tieba-link-anchor {
-display: none;
+display: inline-block;
+//display: none;
 color: #f74d4a !important;
 cursor: pointer;
 float: right;
@@ -223,7 +225,7 @@ float: right;
 .l_post:hover .tieba-link-anchor,
 .core_title:hover .tieba-link-anchor,
 .tieba-link-anchor:hover {
-display: inline-block;
+//display: inline-block;
 }
 
 .lzl_content_reply,
