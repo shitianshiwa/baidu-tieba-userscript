@@ -678,5 +678,5 @@ const init3 = () => {
             }
             });*/
 };
-t5 = setTimeout(init, 1000); //延迟1s，否则网页里取不到用户id
+t5 = setTimeout(init, 5000); //延迟1s，否则网页里取不到用户id
 //init();
