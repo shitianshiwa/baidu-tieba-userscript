@@ -9009,13 +9009,13 @@ a.jx, .ptr	{ cursor: pointer		}
         }, 500);
         setTimeout(() => {
             var a = document.createElement('a');
-            a.textContent = '按发帖时间排序';
+            a.textContent = '按发帖时间排序(贴子ID)';
             a.setAttribute('style', 'color:red !important');
             a.setAttribute('href', 'javascript:;');
             a.addEventListener('click', e => {
                 sortById();
             }, false);
-            //document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);//出错了，且没什么用
+            document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);
         }, 500);
     })();
     // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能

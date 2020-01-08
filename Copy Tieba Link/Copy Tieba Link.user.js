@@ -129,7 +129,7 @@ function catchLinkTarget(event) {
     var curAnchor = linkAnchor.cloneNode(true);
     curAnchor.addEventListener('click', copyLink);
 
-    if (classList.contains('threadlist_title')) { //贴吧主题贴列表
+    if (classList.contains('threadlist_title') && target.querySelectorAll(".tieba-link-anchor").length == 0) { //贴吧主题贴列表
         curAnchor.setAttribute('data-anchor-type', '0');
         target.appendChild(curAnchor);
         //target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
@@ -137,7 +137,7 @@ function catchLinkTarget(event) {
         curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
         target.appendChild(curAnchor);
         //console.log(target.querySelectorAll(".tieba-link-anchor"));
-    } else if (classList.contains('core_reply_tail')) { //core_title
+    } else if (classList.contains('core_reply_tail') && target.querySelectorAll(".tieba-link-anchor").length == 0) { //core_title
         curAnchor.setAttribute('data-anchor-type', '2'); //楼层
         target.appendChild(curAnchor);
     } else if (classList.contains('lzl_content_reply') && target.querySelectorAll(".tieba-link-anchor").length == 0) { //threadlist_title 楼中楼 && document.querySelectorAll(".lzl_content_reply>a.tieba-link-anchor")[0] == null
