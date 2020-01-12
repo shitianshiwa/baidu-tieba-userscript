@@ -9004,7 +9004,7 @@ a.jx, .ptr	{ cursor: pointer		}
         }, 500);
         setTimeout(() => {
             var a = document.createElement('a');
-            a.textContent = '按发帖时间排序(贴子ID)(只能刷新网页还原)';
+            a.textContent = '按发帖时间排序(贴子ID)';
             a.setAttribute('style', 'color:red !important;');
             a.setAttribute('href', 'javascript:;');
             var paixun = false
