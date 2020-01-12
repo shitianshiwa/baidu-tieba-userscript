@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0150beta)
+// @version      2.1(0.0151beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -7125,11 +7125,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             }
         }
     }
-    //让https://tieba.baidu.com/i/*链接强制跳转到http
-    /*if (window.location.href.search("https://tieba.baidu.com/i/i/") != -1) {
-        let temp = window.location.href.split("/i/i/")[1];
-        window.location.replace("http://tieba.baidu.com/i/i/" + temp);
-    }*/
     //百度贴吧：不登录即可看贴 by VA
     unsafeWindow.Object.freeze = null;
     document.addEventListener('DOMContentLoaded', function(event) {
@@ -9009,14 +9004,26 @@ a.jx, .ptr	{ cursor: pointer		}
         }, 500);
         setTimeout(() => {
             var a = document.createElement('a');
-            a.textContent = '按发帖时间排序(贴子ID)';
-            a.setAttribute('style', 'color:red !important');
+            a.textContent = '按发帖时间排序(贴子ID)(只能刷新网页还原)';
+            a.setAttribute('style', 'color:red !important;');
             a.setAttribute('href', 'javascript:;');
+            var paixun = false
             a.addEventListener('click', e => {
-                sortById();
+                let i = 0;
+                let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
+                    if (i <= document.body.scrollHeight && paixun == false) {
+                        window.scrollTo(0, i);
+                        i += 300;
+                    } else {
+                        clearInterval(t);
+                        paixun = true;
+                        sortById();
+                        window.scrollTo(0, 0);
+                    }
+                }, 100);
             }, false);
             document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);
-        }, 500);
+        }, 5000);
     })();
     // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
     var getIsLogin2 = unsafeWindow.PageData.user.id;
@@ -9054,6 +9061,12 @@ a.jx, .ptr	{ cursor: pointer		}
             $("#main_aside").remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
             //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
         }
+        setTimeout(() => { //把https链接转到http，因为我的收藏页面并不支持https
+            if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
+                let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
+                $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
+            }
+        }, 5000);
     } else {
         localStorage.removeItem("userimg");
     }
