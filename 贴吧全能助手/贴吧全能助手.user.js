@@ -9010,20 +9010,22 @@ a.jx, .ptr	{ cursor: pointer		}
             var paixun = false
             a.addEventListener('click', e => {
                 let i = 0;
-                let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
-                    if (i <= document.body.scrollHeight && paixun == false) {
-                        window.scrollTo(0, i);
-                        i += 300;
-                    } else {
-                        clearInterval(t);
-                        paixun = true;
-                        sortById();
-                        window.scrollTo(0, 0);
-                    }
-                }, 100);
+                if (paixun == false) {
+                    let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
+                        if (i <= document.body.scrollHeight) {
+                            window.scrollTo(0, i);
+                            i += 300;
+                        } else {
+                            clearInterval(t);
+                            paixun = true;
+                            sortById();
+                            window.scrollTo(0, 0);
+                        }
+                    }, 100);
+                }
             }, false);
             document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);
-        }, 5000);
+        }, 3000);
     })();
     // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
     var getIsLogin2 = unsafeWindow.PageData.user.id;
