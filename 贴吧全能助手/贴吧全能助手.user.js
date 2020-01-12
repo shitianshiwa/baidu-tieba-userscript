@@ -9031,12 +9031,12 @@ a.jx, .ptr	{ cursor: pointer		}
     var getIsLogin2 = unsafeWindow.PageData.user.id;
     if (getIsLogin2 != 0 && getIsLogin2 != "") {
         var jishu = 0;
-        var t = setInterval(() => { //为右上角的浮动按钮添加头像
+        let t = setInterval(() => { //为右上角的浮动按钮添加头像
             if (jishu < 20) {
                 //console.log("test");
                 let userimg = "";
                 let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-                if (localStorage.getItem("userimg") != null) {
+                if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
                     userimg = localStorage.getItem("userimg");
                 } else {
                     temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
