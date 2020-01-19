@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.6543
+// @version     测试(beta)0.6544
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -18,6 +18,7 @@ console.log(o.data.user_portrait.split("?")[0]);
 $.post("/f/user/json_userinfo","",function(o){localStorage.setItem("userid",o.data.user_portrait.split("?")[0]);},"json");
                             $.post("/dc/common/tbs","",function(o){localStorage.setItem("usertbs",o.tbs);},"json");//获取用户tbs口令号并储存在localStorage中，待使用
 */
+//新bug，第一次打开无法为所有楼层添加屏蔽样式,原因是发生了异步问题
 //可能支持无用户名的贴吧账号（楼中楼未完全验证过）
 //修改为只在各个贴吧的主题列表和主题贴内运行
 //发主题贴或回贴后，屏蔽样式会消失，刷新贴吧即可
@@ -292,6 +293,7 @@ const detectBlocked0 = () => {
         });
     countx1 = index1;
     t4 = setInterval(tzaction, 100);
+    var t8 = null;
 
     function tzaction() {
         $("#miaocount1").html("1.剩余检测贴子数：" + index1 + "/" + countx1);
@@ -299,7 +301,7 @@ const detectBlocked0 = () => {
             index1--;
         } else {
             clearInterval(t4);
-            tzaction2();
+            t8 = setTimeout(tzaction2, 1000); //需要等待异步操作全部完成才行，但如果网络不好仍会出现屏蔽判断失误
             return;
         }
         let checker;
@@ -329,12 +331,12 @@ const detectBlocked0 = () => {
     }
 
     function tzaction2() {
+        clearInterval(t8);
         $(".tb_icon_author").each(
             function() {
                 const tid = $(this).parents('li.j_thread_list').attr('data-tid'); //子节点找父节点
                 //console.log(tid);
                 if (tizi1[tid] == true) {
-
                     $(this).parents('li.j_thread_list')[0].classList.add("__tieba_blocked__"); //子节点找父节点
                     countx6++;
                 }
@@ -380,7 +382,9 @@ const detectBlocked = () => {
                 }
             });
         countx2 = index2;
+        //console.log(index2);
         t3 = setInterval(lcaction, 100); //楼层检测延迟
+        var t9 = null;
 
         function lcaction() {
             //alert("2333");
@@ -389,19 +393,23 @@ const detectBlocked = () => {
                 index2--;
             } else {
                 clearInterval(t3);
-                tzaction3();
+                t9 = setTimeout(tzaction3, 1000); //需要等待异步操作全部完成才行，但如果网络不好仍会出现屏蔽判断失误
                 return;
             }
+            //console.log(index2);
             const tid = window.PageData.thread.thread_id;
             const pid = tizi22[index2]
+                //console.log(pid);
             let checker;
             if (!pid) {
                 // 新回复可能没有 pid
                 return;
             }
             if (replyCache[pid] !== undefined) {
+                //console.log("1");
                 checker = replyCache[pid];
             } else {
+                //console.log("2");
                 checker = getReplyBlocked(tid, pid).then(result => {
                     //console.log("233");
                     replyCache[pid] = result;
@@ -410,12 +418,14 @@ const detectBlocked = () => {
                     return result;
                 });
             }
+            //console.log(checker);
             if (checker) {
                 Promise.resolve(checker).then(result => {
                     if (result) {
                         tizi24[pid] = true;
                         countx4++;
                         countx6++;
+                        //console.log("x"+tizi24[pid]);
                         //tizi2[index2][0].classList.add("__tieba_blocked__");
                         //console.log(index2);
                         //alert(result);
@@ -427,10 +437,11 @@ const detectBlocked = () => {
         }
 
         function tzaction3() {
+            clearInterval(t9);
             $("div.l_post").each(
                 function() {
                     const pid = $(this).attr('data-pid') || '';
-                    //console.log(pid);
+                    //console.log(tizi24[pid]);
                     if (tizi24[pid] == true) {
                         $(this)[0].classList.add("__tieba_blocked__");
                     }
