@@ -5,7 +5,7 @@
 // @namespace   http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul
 // @include     http*://tieba.baidu.com/f?*
 // @include     http*://tieba.baidu.com/p/*
-// @version     3.2(0.001)
+// @version     3.2(0.002)
 // @description     贴吧图片拖放和粘贴上传
 // @grant GM_xmlhttpRequest
 // @grant unsafeWindow
@@ -248,7 +248,7 @@ function uploader(dataURL, isPaste, oldImage) //第一次尝试模板
                 var picWater = mes.info.pic_water;
                 var e = "";
                 //var e=mes.pic_water;//getEscapeString(username).replace(/\\/g, '\\\\');
-                if (window.location.href.split(":")[0] == "https" || window.location.href.search("tieba.baidu.com/f") != -1) {
+                if (window.location.href.split(":")[0] == "https" || (window.location.href.search("tieba.baidu.com/f") != -1 && window.location.href.search("kw=") != -1)) {
                     e = 'http://tiebapic.baidu.com/forum/pic/item/' + picId + '.jpg'; //图片地址
                 } else {
                     e = 'http://imgsrc.baidu.com/forum/pic/item/' + picId + '.jpg'; //图片地址
