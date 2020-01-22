@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         显示贴吧用户名(beta)
 // @namespace    http://tampermonkey.net/
-// @version      0.24
+// @version      0.241
 // @description  显示主题贴列表,楼层,楼中楼的贴吧用户名，仅支持电脑端贴吧
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -11,8 +11,10 @@
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
 //发现不兼容的贴子链接 https://tieba.baidu.com/f?kz=xxxxxxxx  是远古贴吧的贴子链接？
-
-
+//不支持@ID(显示null)，不支持一行多个@ID(仅第一个@ID会显示null)
+//发现@ID的标签内自带用户名
+//https://tieba.baidu.com/p/6398901138?pn=23#128976299213l 楼中楼二楼出错
+//对这种贴子链接无效 http://tieba.baidu.com/f?ct=335675392&tn=baiduPostBrowser&z=3474414995&sc=61869965725#61869965725
 (function() {
     'use strict';
     var $ = unsafeWindow.jQuery; // @grant        不能为none，否则不能用
@@ -26,7 +28,7 @@
     {
         //alert(hrefs.indexOf("tab=album"));
         try {
-            if (hrefs.split("?")[0].split("/")[3] != "f" || hrefs.indexOf("tab=album") != -1) //解决非主题列表和贴吧图片区报错
+            if (hrefs.split("?")[0].split("/")[3] != "f" || hrefs.search("ct=") != -1 || hrefs.indexOf("tab=album") != -1) //解决非主题列表和贴吧图片区报错
             {
                 return;
             }
