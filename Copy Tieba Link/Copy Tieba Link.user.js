@@ -56,13 +56,13 @@ function copyLink() {
         switch (this.dataset.anchorType) {
             case '0': // 贴吧主题贴列表获取贴子链接
                 if (setting.title) textGroup.push("标题: " + parent.getElementsByClassName('j_th_tit')[0].getAttribute('title'));
-                if (setting.author) textGroup.push((setting.with_at ? '楼主:@' : '楼主:') + JSON.parse(parent.nextElementSibling.getElementsByClassName('j_user_card')[0].getAttribute("data-field")).un + ' ');
+                if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + JSON.parse(parent.nextElementSibling.getElementsByClassName('j_user_card')[0].getAttribute("data-field")).un + ' ');
                 //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
                 if (setting.link) textGroup.push("链接：" + parent.getElementsByClassName('j_th_tit')[0].href);
                 break;
             case '1': // 贴子内页获取贴子链接
                 if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title);
-                if (setting.author) textGroup.push((setting.with_at ? '楼主:@' : '楼主:') + unsafeWindow.PageData.thread.author + ' ');
+                if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + unsafeWindow.PageData.thread.author + ' ');
                 if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id);
                 break;
             case '2': // 贴子内页获取楼层链接
@@ -71,7 +71,7 @@ function copyLink() {
 
                 var floorData = JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
                 if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData.content.post_no);
-                if (setting.author) textGroup.push((setting.with_at ? '层主:@' : '层主:') + floorData.author.user_name + ' ');
+                if (setting.author) textGroup.push((setting.with_at ? '层主: @' : '层主: ') + floorData.author.user_name + ' ');
                 if (setting.neirong_l) textGroup.push("内容: " + floorData00.innerHTML);
                 if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id);
                 break;
@@ -85,7 +85,7 @@ function copyLink() {
                 var floorData2 = JSON.parse(parent.parentNode.parentNode.getAttribute("data-field").replace(/'/g, '"')); //spid JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
                 var floorData3 = JSON.parse(floorData0.replace(/'/g, '"')); //楼层pid
                 if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData1.floor_num + ' 楼中楼');
-                if (setting.author) textGroup.push((setting.with_at ? '回复人:@' : '回复人:') + floorData2.user_name + ' ');
+                if (setting.author) textGroup.push((setting.with_at ? '回复人: @' : '回复人: ') + floorData2.user_name + ' ');
                 if (setting.neirong_lzl) textGroup.push("内容: " + parent.parentNode.children[2].innerHTML);
                 if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid);
                 //贴吧自带的楼中楼回复定位只能定到楼层那里，楼中楼的回复具体位置要自己去找

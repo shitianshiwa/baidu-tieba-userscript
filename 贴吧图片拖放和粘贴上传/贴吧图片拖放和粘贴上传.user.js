@@ -5,7 +5,7 @@
 // @namespace   http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul
 // @include     http*://tieba.baidu.com/f?*
 // @include     http*://tieba.baidu.com/p/*
-// @version     3.2(0.002)
+// @version     3.2(0.003)
 // @description     贴吧图片拖放和粘贴上传
 // @grant GM_xmlhttpRequest
 // @grant unsafeWindow
@@ -46,9 +46,7 @@ if (document.getElementById(editorId)) //检测是否存在这个元素
         if (document.getElementById(editorId)) {
             observer.disconnect(); //停止监听
             init();
-
         }
-
     })
     var config = { attributes: true, childList: true, characterData: true };
     observer.observe(target, config);
@@ -139,8 +137,6 @@ function pasteImg() {
         imgs[i].src = 'data:image/gif;base64,R0lGODlhEAAQAOUdAOvr69HR0cHBwby8vOzs7PHx8ff397W1tbOzs+Xl5ebm5vDw8PPz88PDw7e3t+3t7dvb2+7u7vX19eTk5OPj4+rq6tbW1unp6bu7u+fn5+jo6N/f3+/v7/7+/ra2ttXV1f39/fz8/Li4uMXFxfb29vLy8vr6+sLCwtPT0/j4+PT09MDAwL+/v7m5ubS0tM7OzsrKytra2tTU1MfHx+Li4tDQ0M/Pz9nZ2b6+vgAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFMAA5ACwAAAAAEAAQAAAGg8CcMAcICAY5QsEwHBYPCMQhl6guGM5GNOqgVhMPbA6y5Xq/kZwkN3Fsu98EJcdYKCo5i7kKwCorVRd4GAg5GVgAfBpxaRtsZwkaiwpfD0NxkYl8QngARF8AdhmeDwl4pngUCQsVHDl2m2iveDkXcZ6YTgS3kAS0RKWxVQ+/TqydrE1BACH5BAkwADkALAAAAAAQABAAAAZ+wJwwJ1kQIgNBgDMcdh6KRILgQSAOn46TIJVSrdZGSMjpeqtgREAoYWi6BFF6xCAJS6ZyYhEIUwxNQgYkFxwBByh2gU0kKRVHi4sgOQuRTRJtJgwSBJElihwMQioqGmw5gEMLKk2AEkSBq4ElQmNNoYG2OVpDuE6Lrzmfp0NBACH5BAUwADkALAAAAAAQABAAAAaFwJwwJ1kQCDlCwTAcMh6KhDQnVSwYTkJ1un1gc5wtdxsh5iqaLbVKyVEWigq4ugZgTyiA9CK/JHIZWCsICCxpVWV/EzkHhAgth1UPQ4OOLXpScmebFA6ELHAZclBycXIULi8VZXCZawplFG05flWlakIVWravCgSaZ1CuksBDFQsAcsfFQQAh+QQJMAA5ACwAAAAAEAAQAAAGQcCccEgsGo/IpHLJzDGaOcKCCUgkAEuFNaFRbq1dJCxX2WKRCFdMmJiiEQjRp1BJwu8y5R3RWNsRBx9+SSsxgzlBACH5BAkwADkALAAAAAAQABAAAAaJwJwwJ1kQCDlCwTAcMh6KhDQnVSwYTkJ1un1gc5wtdxsh5iqaLbVKyTEWigq4ugZglRXpRX5J5DJYAFIAaVVlfhNrURqFVQ9DYhqCgzkzCGdnVQBwGRU0LQiXCRUAORQJCwAcOTChoYplBXIKLq6vUXRCCQ22olUEcroJB66KD8FNCjUrlxWpTUEAIfkEBTAAOQAsAAAAABAAEAAABobAnDAnWRAIOULBMBwyHoqENCdVLBhOQnW6fWBznC13G8nZchXNllql5Bg2xA1cZQOwShwCMdDkLgk5GVgAUgAie3syVDkTbFIaiIkIJ0NiGnp7HiNonRVVAHEuFjlQFVQVAI0JCzYjrKCPZQWnf1unYkMVWrFbBLVoUIaPD8C6CwCnAMhNQQA7';
         new uploader(src, true, imgs[i]).init();
     }
-
-
 }
 
 function uploader(dataURL, isPaste, oldImage) //第一次尝试模板
@@ -155,30 +151,32 @@ function uploader(dataURL, isPaste, oldImage) //第一次尝试模板
         {
             var now = this;
             var div = document.createElement('DIV'); //父节点
-            div.style.cssText = "background:rgba(33,33,33,0.8);width:200px;height;40px;border:1px solid red;border:2px solid gray;border-radius:10px;margin:5px;padding:5px;"
+            div.style.cssText = "background:rgba(33,33,33,0.8);width:200px;height;40px;border:1px solid red;border:2px solid gray;border-radius:10px;margin:5px;padding:5px;color:#f00"
             var img = document.createElement('img');
             img.src = this.dataURL;
             img.style.cssText = 'height:auto;width:auto;max-width:200px;max-height:40px;';
             var bar = document.createElement('progress');
             bar.style.cssText = 'width:180px;height:15px;display:position:absolute;';
             div.appendChild(img);
+            div.append("点击可取消上传");
             div.appendChild(document.createElement('hr'));
             div.appendChild(bar);
             preview.appendChild(div);
             this.progressBar = bar;
             /*var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'http://tieba.baidu.com/dc/common/imgtbs?t=' + new Date().getTime(), false);
-            xhr.onload = function ()
-            {
-                var res=JSON.parse(xhr.responseText);
-                var tbs = res.data.tbs;
-                now.upload(tbs);
-            }
-            xhr.send();*/
-            GM_xmlhttpRequest({
+                xhr.open('GET', 'http://tieba.baidu.com/dc/common/imgtbs?t=' + new Date().getTime(), false);
+                xhr.onload = function ()
+                {
+                    var res=JSON.parse(xhr.responseText);
+                    var tbs = res.data.tbs;
+                    now.upload(tbs);
+                }
+                xhr.send();*/
+            var xhr1 = GM_xmlhttpRequest({
                 synchronous: false,
                 method: 'GET',
                 url: 'http://tieba.baidu.com/dc/common/imgtbs?t=' + new Date().getTime(),
+                timeout: 10000,
                 onload: function(d) //可以正常运行至此
                     {
                         //alert(JSON.parse(d.responseText).data.tbs);
@@ -186,13 +184,22 @@ function uploader(dataURL, isPaste, oldImage) //第一次尝试模板
                         let tbs = res.data.tbs;
                         now.upload(tbs);
                     },
-                onerror: function(e) {
-                    alert("error:" + e);
+                ontimeout: function() //超时终止
+                    {
+                        xhr1.abort();
+                        unsafeWindow.alert("上传图片失败");
+                        unsafeWindow.$(bar.parentNode).slideUp('slow'); //动画效果
+                        bar.parentNode.removeChild(bar); //移除预览框
+                        return;
+                    },
+                onerror: function() {
+                    unsafeWindow.alert("上传图片出错");
                 }
             });
         };
     this.upload = function(tbs) {
         //到这步是正常的
+        let bar = this.progressBar;
         var now = this;
         var blob = dataUrlToBlob(this.dataURL);
         var data = new FormData();
@@ -203,11 +210,14 @@ function uploader(dataURL, isPaste, oldImage) //第一次尝试模板
         //上传模块
         //http://upload.tieba.baidu.com/upload/pic?tbs=xxxxxx&fid=xxxxxx
         //http://upload.tieba.baidu.com/upload/pic?is_wm=1
-        GM_xmlhttpRequest({
+        //GM.xmlHttpRequest-GreaseSpot Wiki
+        //https://wiki.greasespot.net/GM.xmlHttpRequest
+        var xhr2 = GM_xmlhttpRequest({
             synchronous: false,
             method: 'POST',
             url: 'http://upload.tieba.baidu.com/upload/pic?is_wm=1',
             data: data,
+            timeout: 30000, //毫秒 30s
             onprogress: function(e) //处理进度条
                 {
 
@@ -222,13 +232,32 @@ function uploader(dataURL, isPaste, oldImage) //第一次尝试模板
             onload: function(d) //可以正常运行至此
                 {
                     now.onload(d);
-                }
+                },
+            ontimeout: function() //超时终止
+                {
+                    xhr2.abort();
+                    unsafeWindow.alert("上传图片超时");
+                    unsafeWindow.$(bar.parentNode).slideUp('slow'); //动画效果
+                    bar.parentNode.removeChild(bar); //移除预览框
+                    return;
+                },
+            onerror: function() {
+                unsafeWindow.alert("上传图片出错");
+                unsafeWindow.$(bar.parentNode).slideUp('slow'); //动画效果
+                bar.parentNode.removeChild(bar); //移除预览框
+                return;
+            }
         });
+        this.progressBar.parentNode.addEventListener('click', function(e) {
+            xhr2.abort();
+            unsafeWindow.$(bar.parentNode).slideUp('slow'); //动画效果
+            bar.parentNode.removeChild(bar); //移除预览框
+        }, true);
     }
     this.onload = function(res) //下载完毕处理。
         {
+            let bar = this.progressBar;
             var mes = null;
-            var bar = this.progressBar;
             try {
                 mes = JSON.parse(res.responseText);
                 //console.log(res.responseText);
