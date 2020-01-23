@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.6545
+// @version     测试(beta)0.6546
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -312,7 +312,7 @@ const detectBlocked0 = () => {
         } else {
             checker = getThreadBlocked(tid).then(result => {
                 threadCache[tid] = result;
-                saveCache('thread');
+                //saveCache('thread');
                 return result;
             });
         }
@@ -413,7 +413,7 @@ const detectBlocked = () => {
                 checker = getReplyBlocked(tid, pid).then(result => {
                     //console.log("233");
                     replyCache[pid] = result;
-                    saveCache('reply');
+                    //saveCache('reply');
                     //alert(result)
                     return result;
                 });
@@ -486,7 +486,7 @@ const detectBlocked2 = (event) => {
         } else {
             checker = getLzlBlocked(tid, pid, spid).then(result => {
                 replyCache[spid] = result;
-                saveCache('reply');
+                //saveCache('reply');
                 return result;
             });
         }
@@ -624,7 +624,7 @@ const init2 = () => {
     }
     var getUsername2 = useridx || sessionStorage.getItem("miaouserid") || ""; //两种获取用户id，先取网页里的id，取不到就用网页api取，仍取不到就不能运行
     const username = (getUsername2.split("?t=")[0]) || null; //没登陆贴吧就是返回null，null就是没有作用
-    loadCache();
+    //loadCache();
     initStyle(username);
     initListener();
     t1 = setTimeout(detectBlocked0, 1000); //主题贴列表
