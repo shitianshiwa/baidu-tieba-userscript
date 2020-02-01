@@ -30,13 +30,13 @@ const editorId = 'ueditor_replace'; //发帖框ID
 const parentId = 'tb_rich_poster_container'; //父节点监听
 var editor = null; //初始化发贴框
 var preview = null; //进度预览
-if (!unsafeWindow.FlashImageLoader) //flash上传还是必须的
+/*if (!unsafeWindow.FlashImageLoader) //flash上传还是必须的
 {
     var sc = document.createElement('script');
     sc.id = 'flashUpload';
     sc.setAttribute('src', '//static.tieba.baidu.com/tb/static-frs/component/sign_shai/flash_image_loader.js');
     document.body.appendChild(sc);
-};
+};*/
 if (document.getElementById(editorId)) //检测是否存在这个元素
 {
     init();
