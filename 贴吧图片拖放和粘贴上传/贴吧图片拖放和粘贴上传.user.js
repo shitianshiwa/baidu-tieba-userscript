@@ -55,7 +55,7 @@ if (document.getElementById(editorId)) //检测是否存在这个元素
 function init() //初始化，添加事件
 {
     editor = document.getElementById(editorId);
-    editor.addEventListener('paste', function(e) //添加事件处理   粘贴图片可能无效，因为的浏览器为了安全考虑不允许直接访问本地路径
+    /*editor.addEventListener('paste', function(e) //添加事件处理   粘贴图片可能无效，因为的浏览器为了安全考虑不允许直接访问本地路径
         {
             var data = e.clipboardData.getData('text/unicode');
             //console.log(event.clipboardData.getData('text/unicode'));
@@ -66,7 +66,7 @@ function init() //初始化，添加事件
                 pasteImg()
             }, 200); //给图片解码留出时间
             //
-        }, true);
+        }, true);*/
     //添加拖入拖出时的效果处理
     document.body.addEventListener('dragenter', function(e) {
         e.preventDefault();
