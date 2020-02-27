@@ -9040,10 +9040,10 @@ a.jx, .ptr	{ cursor: pointer		}
         let t = setInterval(() => { //为右上角的浮动按钮添加头像
             if (jishu < 20) {
                 //console.log($("div.edui-icon-bold")[0]);
-                if ($("div.edui-icon-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
+                if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
                     //console.log($("div.edui-icon-bold")[0]);
                     suo = true;
-                    $("div.edui-icon-bold")[0].style = "display:block;"
+                    $("div.edui-btn-bold")[0].style = "display:block;"
                     $("div.edui-btn-red")[0].style = "display:block;"
                 }
                 let userimg = "";
