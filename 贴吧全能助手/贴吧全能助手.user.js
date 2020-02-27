@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0154beta)
+// @version      2.1(0.0155beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -9036,9 +9036,16 @@ a.jx, .ptr	{ cursor: pointer		}
     var getIsLogin2 = unsafeWindow.PageData.user.id;
     if (getIsLogin2 != 0 && getIsLogin2 != "") {
         var jishu = 0;
+        let suo = false;
         let t = setInterval(() => { //为右上角的浮动按钮添加头像
             if (jishu < 20) {
-                //console.log("test");
+                //console.log($("div.edui-icon-bold")[0]);
+                if ($("div.edui-icon-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
+                    //console.log($("div.edui-icon-bold")[0]);
+                    suo = true;
+                    $("div.edui-icon-bold")[0].style = "display:block;"
+                    $("div.edui-btn-red")[0].style = "display:block;"
+                }
                 let userimg = "";
                 let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
                 if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
