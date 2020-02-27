@@ -9043,7 +9043,7 @@ a.jx, .ptr	{ cursor: pointer		}
                 if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
                     //console.log($("div.edui-icon-bold")[0]);
                     suo = true;
-                    $("div.edui-btn-bold")[0].style = "display:block;"
+                    $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
                     $("div.edui-btn-red")[0].style = "display:block;"
                 }
                 let userimg = "";
