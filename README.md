@@ -41,7 +41,7 @@
 * [Bilibili Live Danmaku Filter](https://greasyfork.org/zh-CN/scripts/386759-bilibili-live-danmaku-filter) 使用一个简单的定时器把弹幕按照给定的正则表达式过滤一遍
 * [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) 强大的哔哩哔哩增强脚本
 * [Bilibili CC字幕工具](https://greasyfork.org/zh-CN/scripts/378513-bilibili-cc%E5%AD%97%E5%B9%95%E5%B7%A5%E5%85%B7) 加载本地字幕/下载CC字幕，旧版播放器可启用CC字幕
-* [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace) 对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey，欢迎star和fork。
+* [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace) 对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey ，欢迎star和fork。
 * [Pixiv 增强](https://greasyfork.org/zh-CN/scripts/34153-pixiv-plus)
 * [允许推特内YouTube视频全屏](https://greasyfork.org/zh-CN/scripts/375464-allow-youtube-videos-in-twitter-to-fullscreen) 使推特中嵌入的YouTube视频可以全屏
 * [这TM还叫贴吧？](https://greasyfork.org/ja/scripts/23127-%E8%BF%99tm%E8%BF%98%E5%8F%AB%E8%B4%B4%E5%90%A7) 去除PC贴吧帖子列表会自动播放的视频
