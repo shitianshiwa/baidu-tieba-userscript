@@ -39,7 +39,7 @@
 * [Copy all links](https://github.com/FirefoxBar/userscript/tree/master/Copy_all_links)
 * [bilibili-旧播放页](https://greasyfork.org/ja/scripts/394296-bilibili-%E6%97%A7%E6%92%AD%E6%94%BE%E9%A1%B5)
 * [Bilibili Live Danmaku Filter](https://greasyfork.org/zh-CN/scripts/386759-bilibili-live-danmaku-filter) 使用一个简单的定时器把弹幕按照给定的正则表达式过滤一遍
-* [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) 强大的哔哩哔哩增强脚本
+* [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) 强大的哔哩哔哩增强脚本: 下载视频, 音乐, 封面, 弹幕 / 简化直播间, 评论区, 首页 / 自定义顶栏, 删除广告, 夜间模式 / 触屏设备支持
 * [Bilibili CC字幕工具](https://greasyfork.org/zh-CN/scripts/378513-bilibili-cc%E5%AD%97%E5%B9%95%E5%B7%A5%E5%85%B7) 加载本地字幕/下载CC字幕，旧版播放器可启用CC字幕
 * [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace) 对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey ，欢迎star和fork。
 * [Pixiv 增强](https://greasyfork.org/zh-CN/scripts/34153-pixiv-plus)
