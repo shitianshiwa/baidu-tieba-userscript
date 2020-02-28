@@ -152,7 +152,6 @@ z-index: 1005;
     }
     GM_registerMenuCommand("恢复默认位置", reset);
 })();
-
 /*
         $("body").append('<div class="miaocsss"></div>');
         $("div.miaocsss").append('<input type="button" id="miaoupdatex" class="miaocssxx" value="刷新  "/><br/><input type="button" id="miaotopx" class="miaocssxx" value="到顶↑"/><br/><input type="button"  id="miaobottomx" class="miaocssxx" value="到底↓"/>');
