@@ -67,7 +67,7 @@ z-index: 1005;
             temp1.style.left = mouseX + "px"; //设置left数值
             temp1.style.top = mouseY + "px"; //设置top数值
         } else {
-            temp1.style.left = window.innerWidth * 0.90 + "px";
+            temp1.style.left = window.innerWidth * 0.945 + "px";
             temp1.style.bottom = "30px";
         }
         for (let i = 0; i <= 3; i++) {
