@@ -5,12 +5,13 @@
 // @namespace   http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul
 // @include     http*://tieba.baidu.com/f?*
 // @include     http*://tieba.baidu.com/p/*
-// @version     3.2(0.003)
+// @version     3.2(0.0031)
 // @description     贴吧图片拖放和粘贴上传
 // @grant GM_xmlhttpRequest
 // @grant unsafeWindow
 // @grant GM_addStyle
 // @grant GM_log
+// @grant        GM_registerMenuCommand
 // ==/UserScript==
 /*
 https://greasyfork.org/en/scripts/633-pasteanddragimageintotiebaeditor
@@ -30,6 +31,8 @@ const editorId = 'ueditor_replace'; //发帖框ID
 const parentId = 'tb_rich_poster_container'; //父节点监听
 var editor = null; //初始化发贴框
 var preview = null; //进度预览
+sessionStorage.setItem("cishu", 1);
+var xianzhi = 10;
 /*if (!unsafeWindow.FlashImageLoader) //flash上传还是必须的
 {
     var sc = document.createElement('script');
@@ -95,7 +98,7 @@ function addProgressBar() {
     var container = document.querySelector('.old_style_wrapper');
     var div = document.createElement('div');
     div.id = 'progressBar';
-    div.style.cssText = 'position:absolute;right:20px;top:45px;width:200px;height:280px;';
+    div.style.cssText = 'position:absolute;right:20px;top:45px;width:auto;height:auto;';
     container.appendChild(div);
     preview = div;
 }
@@ -122,7 +125,7 @@ function dragHandle(evt) //处理拖放
     }
 }
 
-function pasteImg() {
+/*function pasteImg() {
     var imgs = document.querySelectorAll('#ueditor_replace img');
     for (let i = 0; i < imgs.length; i++) {
         if (imgs[i].hasAttribute('uploading') || imgs[i].src.indexOf('data:image') != 0) {
@@ -137,10 +140,19 @@ function pasteImg() {
         imgs[i].src = 'data:image/gif;base64,R0lGODlhEAAQAOUdAOvr69HR0cHBwby8vOzs7PHx8ff397W1tbOzs+Xl5ebm5vDw8PPz88PDw7e3t+3t7dvb2+7u7vX19eTk5OPj4+rq6tbW1unp6bu7u+fn5+jo6N/f3+/v7/7+/ra2ttXV1f39/fz8/Li4uMXFxfb29vLy8vr6+sLCwtPT0/j4+PT09MDAwL+/v7m5ubS0tM7OzsrKytra2tTU1MfHx+Li4tDQ0M/Pz9nZ2b6+vgAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFMAA5ACwAAAAAEAAQAAAGg8CcMAcICAY5QsEwHBYPCMQhl6guGM5GNOqgVhMPbA6y5Xq/kZwkN3Fsu98EJcdYKCo5i7kKwCorVRd4GAg5GVgAfBpxaRtsZwkaiwpfD0NxkYl8QngARF8AdhmeDwl4pngUCQsVHDl2m2iveDkXcZ6YTgS3kAS0RKWxVQ+/TqydrE1BACH5BAkwADkALAAAAAAQABAAAAZ+wJwwJ1kQIgNBgDMcdh6KRILgQSAOn46TIJVSrdZGSMjpeqtgREAoYWi6BFF6xCAJS6ZyYhEIUwxNQgYkFxwBByh2gU0kKRVHi4sgOQuRTRJtJgwSBJElihwMQioqGmw5gEMLKk2AEkSBq4ElQmNNoYG2OVpDuE6Lrzmfp0NBACH5BAUwADkALAAAAAAQABAAAAaFwJwwJ1kQCDlCwTAcMh6KhDQnVSwYTkJ1un1gc5wtdxsh5iqaLbVKyVEWigq4ugZgTyiA9CK/JHIZWCsICCxpVWV/EzkHhAgth1UPQ4OOLXpScmebFA6ELHAZclBycXIULi8VZXCZawplFG05flWlakIVWravCgSaZ1CuksBDFQsAcsfFQQAh+QQJMAA5ACwAAAAAEAAQAAAGQcCccEgsGo/IpHLJzDGaOcKCCUgkAEuFNaFRbq1dJCxX2WKRCFdMmJiiEQjRp1BJwu8y5R3RWNsRBx9+SSsxgzlBACH5BAkwADkALAAAAAAQABAAAAaJwJwwJ1kQCDlCwTAcMh6KhDQnVSwYTkJ1un1gc5wtdxsh5iqaLbVKyTEWigq4ugZglRXpRX5J5DJYAFIAaVVlfhNrURqFVQ9DYhqCgzkzCGdnVQBwGRU0LQiXCRUAORQJCwAcOTChoYplBXIKLq6vUXRCCQ22olUEcroJB66KD8FNCjUrlxWpTUEAIfkEBTAAOQAsAAAAABAAEAAABobAnDAnWRAIOULBMBwyHoqENCdVLBhOQnW6fWBznC13G8nZchXNllql5Bg2xA1cZQOwShwCMdDkLgk5GVgAUgAie3syVDkTbFIaiIkIJ0NiGnp7HiNonRVVAHEuFjlQFVQVAI0JCzYjrKCPZQWnf1unYkMVWrFbBLVoUIaPD8C6CwCnAMhNQQA7';
         new uploader(src, true, imgs[i]).init();
     }
-}
+}*/
 
 function uploader(dataURL, isPaste, oldImage) //第一次尝试模板
 {
+    let temp = sessionStorage.getItem("cishu");
+    if (temp > xianzhi) {
+        alert("百度贴吧不支持超过10张图片");
+        this.init = () => {};
+        return false;
+    }
+    temp++;
+    sessionStorage.setItem("cishu", temp)
+    console.log(temp);
     this.dataURL = dataURL;
     this.isPaste = isPaste;
     this.oldImage = oldImage;
@@ -332,6 +344,12 @@ function dataUrlToBlob(dataurl) {
 function buildBlob(parts) {
     return new Blob(parts);
 }
+
+function resetx() {
+    sessionStorage.setItem("cishu", 1);
+    alert("已重置！");
+}
+GM_registerMenuCommand("重置限制", resetx); // @grant        GM_registerMenuCommand
 /*
 //static.tieba.baidu.com/tb/static-frs/component/sign_shai/flash_image_loader.js
 _.Module.define({path:"frs/component/SignShai/FlashImageLoader",sub:{flashPath:"https://gsp0.baidu.com/5aAHeD3nKhI2p27j8IqW0jdnxx1xbK/tb/static-frs/component/sign_shai/Base64ImageLoader.swf?v=1.0",flashObj:null,isReady:!1,options:null,initial:function(o){try{this.options=$.extend({},o)}catch(e){throw"undefined"!=typeof alog&&alog("exception.fire","catch",{msg:e.message||e.description,path:"frs:component/sign_shai/flash_image_loader.js",method:"",ln:14}),e}},_createFlash:function(){var o=this;if(!this.flashObj){var e=$('<div id="flash_img_loader" style="line-height: 0; font-size: 0px;"></div>');e.appendTo("body"),this.flashObj=new $.swf(this.flashPath,{container:e,width:1,height:1,params:{quality:"high",allowScriptAccess:"always",wMode:"transparent",swLiveConnect:!0,menu:!1},callBacks:{completeHandler:function(e){o._completeHandler(e)},errorHandler:function(e){o._errorHandler(e)},isReady:function(){return o._isReady()},flashReady:function(){o._flashReady()},uploadBase64Complete:function(e){o._uploadBase64Complete(e)},uploadBase64Error:function(){o._uploadBase64Error()}}})}},_completeHandler:function(o){"onComplete"in this.options&&"function"==typeof this.options.onComplete&&this.options.onComplete(o),this.trigger("loadComplete",o)},_errorHandler:function(o){"onError"in this.options&&"function"==typeof this.options.onError&&this.options.onError(o),this.trigger("loadError")},_isReady:function(){return!0},_flashReady:function(){this.isReady=!0,"onFlashReady"in this.options&&"function"==typeof this.options.onFlashReady&&this.options.onFlashReady(),this.trigger("flashReady")},_uploadBase64Complete:function(o){this.trigger("uploadComplete",o)},_uploadBase64Error:function(){this.trigger("uploadError")},_remote:function(){var o=this,e=arguments;this._createFlash(),this.isReady?o.flashObj.remote.apply(o.flashObj,e):this.bind("flashReady",function(){o.flashObj.remote.apply(o.flashObj,e)})},load:function(o){this._remote("loadImage",o)},uploadBase64:function(o,e,t){this._remote("uploadBase64",o,e,t)}}}),_.Module.use("frs/component/SignShai/FlashImageLoader",null,function(o){window.FlashImageLoader=o});
