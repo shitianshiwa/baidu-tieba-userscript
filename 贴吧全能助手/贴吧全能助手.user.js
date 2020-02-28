@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0155beta)
+// @version      2.1(0.0156beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -213,12 +213,12 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".suggestion_list >li[data-field*=\"operation_title\"],.suggestion_list >li[data-field*=\"operation_item\"],.bdfengyun,/*搜索悬浮窗-大伙正在聊*/",
                 ".suggestion_list >li[data-field*=\"relation_game_title\"],.suggestion_list >li[data-field*=\"game_item\"],/*搜索悬浮窗-相关游戏*/",
                 ".tbui_fbar_square {",
-                //"	display: block !important;",
+                //"	display:block !important;",
                 "}",
                 /*让贴吧热议榜可以显示出来，同时改变背景颜色*/
-                "div.topic_list_box {",
+                /*"div.topic_list_box {",
                 "   background: #fdfdfd;",
-                "}",
+                "}",*/
                 "  ",
                 "",
                 "/*楼层气泡*/",
@@ -521,8 +521,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".plat_picbox img,",
                 ".card_head_img{",
-                "	width: 150px !important;",
-                "	height: 150px !important;",
+                //"width: 150px !important;",
+                //"height: 150px !important;",
                 "}",
                 "div[class*=\"_theme2\"] .plat_picbox img,",
                 "div[class*=\"_theme2\"] .card_head_img{",
@@ -2453,6 +2453,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".search_form form{",
                 "	margin: 0;",
+                "   margin-left: 0px!important;",
                 "}",
                 "",
                 ".search_bright{",
@@ -3248,6 +3249,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	/*楼层作者栏*/",
                 "	width: 180px !important;",
                 "	padding: 20px 0 !important;",
+                "   background-color:#ffffff",
                 "}",
                 ".l_post_bright:before {",
                 "	/*作者层背景*/",
@@ -3258,7 +3260,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	position: absolute;",
                 "	height: 100%;",
                 "	width: 180px;",
-                "	background: rgba(0, 0, 0, .01);",
+                /*"	background: rgba(0, 0, 0, .01);",*/
                 "	border-right: 1px solid rgba(0,0,0,.1) !important;",
                 "	box-sizing: border-box;",
                 "}",
@@ -5328,7 +5330,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	border-top: none !important;",
                 "	position: fixed;",
                 //"	left: 50% !important;",
-                "	bottom: 10vh !important;",
+                "	bottom: 0px !important;",
                 "}",
                 ".tbui_aside_fbar_button {",
                 "	box-sizing: content-box;",
@@ -6315,6 +6317,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     "}",
                     ".tbui_aside_float_bar {",
                     "	margin-left: calc(985px / 2) !important;",
+                    /*"	margin-left: 600px !important;",*/
                     "}",
                     ".core_title_absolute_bright {",
                     "	width: calc(980px + 58px) !important;",
@@ -6488,7 +6491,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     "/*帖子内页调整*/",
                     "",
                     ".tbui_aside_float_bar {",
-                    "	margin-bottom: 12vh;",
+                    "	margin-bottom: 0px;",
                     "}",
                     "",
                     "#container {",
@@ -7333,6 +7336,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             // 右侧
                             '#encourage_entry',
                             '.platform_aside_tieba_partner',
+                            '.search_back_box',
+                            '.topic_list_box',
 
                             // 客户端发贴 x 倍经验
                             '.tb_poster_placeholder',
@@ -9001,12 +9006,12 @@ a.jx, .ptr	{ cursor: pointer		}
                 parentNode.appendChild(thread2.thread);
             }
         }
-        setInterval(() => {
-            try {
-                $("div.search_back_box")[0].classList.remove("search-back-fixed");
-                $("div.topic_list_box")[0].classList.remove("topic-search-back-fixed");
-            } catch (error) { /*alert(error);*/ }
-        }, 500);
+        //setInterval(() => {
+        //    try {
+        //        $("div.search_back_box")[0].classList.remove("search-back-fixed");
+        //        $("div.topic_list_box")[0].classList.remove("topic-search-back-fixed");
+        //    } catch (error) { /*alert(error);*/ }
+        //}, 500);
         setTimeout(() => {
             var a = document.createElement('a');
             a.textContent = '按发帖时间排序(贴子ID)';
@@ -9040,12 +9045,12 @@ a.jx, .ptr	{ cursor: pointer		}
         let t = setInterval(() => { //为右上角的浮动按钮添加头像
             if (jishu < 20) {
                 //console.log($("div.edui-icon-bold")[0]);
-                if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
+                /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
                     //console.log($("div.edui-icon-bold")[0]);
                     suo = true;
                     $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
                     $("div.edui-btn-red")[0].style = "display:block;"
-                }
+                }*/
                 let userimg = "";
                 let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
                 if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
