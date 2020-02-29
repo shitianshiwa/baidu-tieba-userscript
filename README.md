@@ -32,7 +32,7 @@
 * [TiebaSuperBawu(贴吧超级吧务)](https://github.com/52fisher/TiebaSuperBawu)
 
 # 正在使用的部分脚本
-* [搜索引擎跳转-文科版](https://greasyfork.org/en/scripts/2739-%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E8%B7%B3%E8%BD%AC-%E6%96%87%E7%A7%91%E7%89%88)
+* [搜索引擎跳转-文科版](https://github.com/shitianshiwa/search_engineJump/raw/master/search_engineJump.user.js)
 * [Tieba百度贴吧楼中楼(回复楼)的楼主标识](https://greasyfork.org/en/scripts/26316-tieba%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E6%A5%BC%E4%B8%AD%E6%A5%BC-%E5%9B%9E%E5%A4%8D%E6%A5%BC-%E7%9A%84%E6%A5%BC%E4%B8%BB%E6%A0%87%E8%AF%86)
 * [贴吧查水表](https://greasyfork.org/en/scripts/32933-%E8%B4%B4%E5%90%A7%E6%9F%A5%E6%B0%B4%E8%A1%A8)
 * [批量下载贴吧原图](https://greasyfork.org/en/scripts/30307-%E6%89%B9%E9%87%8F%E4%B8%8B%E8%BD%BD%E8%B4%B4%E5%90%A7%E5%8E%9F%E5%9B%BE)
