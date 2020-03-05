@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.0131)
+// @version      1.1(0.0132)
 // @description  复制贴吧的贴子标题与链接
 // @match        *://tieba.baidu.com/*
 // @include      *://tieba.baidu.com/*
