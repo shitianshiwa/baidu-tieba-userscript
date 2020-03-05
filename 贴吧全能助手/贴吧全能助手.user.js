@@ -7,7 +7,7 @@
 // @include      http*://tieba.baidu.com/*
 // @exclude      http*://tieba.baidu.com/f/fdir*
 // @exclude      http*://tieba.baidu.com/f/search*
-// @run-at       document-idle
+// @run-at       document-body
 ///document-body,document-idle
 /// jQuery 留一份自己用
 // @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
