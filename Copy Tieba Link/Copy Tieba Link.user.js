@@ -12,7 +12,7 @@
 // @namespace    http://ext.ccloli.com
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
-
+//document-start
 var setting = {
     title: true,
     author: true,
@@ -215,7 +215,6 @@ bottom: -75px;
 
 .tieba-link-anchor {
 display: inline-block;
-//display: none;
 color: #f74d4a !important;
 cursor: pointer;
 float: right;
@@ -225,7 +224,7 @@ float: right;
 .l_post:hover .tieba-link-anchor,
 .core_title:hover .tieba-link-anchor,
 .tieba-link-anchor:hover {
-//display: inline-block;
+
 }
 
 .lzl_content_reply,

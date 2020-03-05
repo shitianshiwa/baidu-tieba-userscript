@@ -7,8 +7,8 @@
 // @include      http*://tieba.baidu.com/*
 // @exclude      http*://tieba.baidu.com/f/fdir*
 // @exclude      http*://tieba.baidu.com/f/search*
-// @run-at       document-idle
-///document-body
+// @run-at       document-body
+///document-body,document-idle
 /// jQuery 留一份自己用
 // @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
 // @require     http://cdn.staticfile.org/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js
@@ -68,6 +68,13 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 (function() {
     //var $ = window.jQuery;
     //TieBa - Maverick
+    var baiban = document.createElement("div");
+    baiban.setAttribute("style", "width: 9999px;height: 9999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
+    document.body.appendChild(baiban);
+    var baiban2 = setTimeout(() => {
+        clearTimeout(baiban2);
+        baiban.remove();
+    }, 1000);
     if (!GM_getValue("jinyongtiebameihua")) {
         var css = "";
         if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
@@ -7115,24 +7122,27 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 //管用户头像栏的 http://tieba.baidu.com/i/i/*
             }
         }
-        if (typeof GM_addStyle != "undefined") {
-            GM_addStyle(css);
-        } else if (typeof PRO_addStyle != "undefined") {
-            PRO_addStyle(css); //有警告
-        } else if (typeof addStyle != "undefined") {
-            addStyle(css); //有警告
-        } else {
-            var node = document.createElement("style");
-            node.type = "text/css";
-            node.appendChild(document.createTextNode(css));
-            var heads = document.getElementsByTagName("head");
-            if (heads.length > 0) {
-                heads[0].appendChild(node);
+        var baiban3 = setTimeout(() => {
+            clearTimeout(baiban3);
+            if (typeof GM_addStyle != "undefined") {
+                GM_addStyle(css);
+            } else if (typeof PRO_addStyle != "undefined") {
+                PRO_addStyle(css); //有警告
+            } else if (typeof addStyle != "undefined") {
+                addStyle(css); //有警告
             } else {
-                // no head yet, stick it whereever
-                document.documentElement.appendChild(node);
+                var node = document.createElement("style");
+                node.type = "text/css";
+                node.appendChild(document.createTextNode(css));
+                var heads = document.getElementsByTagName("head");
+                if (heads.length > 0) {
+                    heads[0].appendChild(node);
+                } else {
+                    // no head yet, stick it whereever
+                    document.documentElement.appendChild(node);
+                }
             }
-        }
+        }, 1000);
     }
     //百度贴吧：不登录即可看贴 by VA
     unsafeWindow.Object.freeze = null;
@@ -9121,7 +9131,6 @@ a.jx, .ptr	{ cursor: pointer		}
     } else {
         localStorage.removeItem("userimg");
     }
-
 })();
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
