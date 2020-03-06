@@ -69,7 +69,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     //var $ = window.jQuery;
     //TieBa - Maverick
     var baiban = document.createElement("div");
-    baiban.setAttribute("style", "width:9999px;height: 9999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
+    baiban.setAttribute("style", "width:9999px;height: 99999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
     baiban.setAttribute("class", "baiban");
     document.body.appendChild(baiban);
     var baiban2 = setTimeout(() => {
