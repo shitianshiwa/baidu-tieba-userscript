@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0159beta)
+// @version      2.1(0.0160beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -9132,6 +9132,12 @@ a.jx, .ptr	{ cursor: pointer		}
     } else {
         localStorage.removeItem("userimg");
     }
+
+    function resetx() {
+        localStorage.removeItem("userimg"); //一个用户退出登录后，再用其他账户登录会残留上一个用户的贴吧头像
+        alert("已删除贴吧用户头像缓存！");
+    }
+    GM_registerMenuCommand("删除贴吧用户头像缓存", resetx); // @grant        GM_registerMenuCommand
 })();
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
