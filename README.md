@@ -46,3 +46,12 @@
 * [允许推特内YouTube视频全屏](https://greasyfork.org/zh-CN/scripts/375464-allow-youtube-videos-in-twitter-to-fullscreen) 使推特中嵌入的YouTube视频可以全屏
 * [这TM还叫贴吧？](https://greasyfork.org/ja/scripts/23127-%E8%BF%99tm%E8%BF%98%E5%8F%AB%E8%B4%B4%E5%90%A7) 去除PC贴吧帖子列表会自动播放的视频
 * [Search-By-Image](https://github.com/shitianshiwa/Search-By-Image/raw/%E4%BF%AE%E6%94%B9%E7%89%88/search-by-image.user.js) 一个以图搜图的脚本。通过该脚本，你可以快速地搜索图片。https://github.com/shitianshiwa/Search-By-Image
+* [AC-baidu:重定向优化百度搜狗谷歌搜索_去广告_favicon_双列](https://greasyfork.org/zh-CN/scripts/14178-ac-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E6%90%9C%E7%B4%A2-%E5%8E%BB%E5%B9%BF%E5%91%8A-favicon-%E5%8F%8C%E5%88%97)1.繞過百度、搜狗、谷歌、好搜搜索結果中的自己的跳轉鏈接，直接訪問原始網頁-反正都能看懂 2.新增拦截百度百家号的无用推广数据-支持其他站点 3.去除百度的多余广告 4添加Favicon显示 5.页面CSS 6.添加计数 7.开关选择以上功能
+* [bilibili merged flv+mp4+ass+enhance](https://greasyfork.org/ja/scripts/372516-bilibili-merged-flv-mp4-ass-enhance)bilibili/哔哩哔哩:超清FLV下载,FLV合并,原生MP4下载,弹幕ASS下载,CC字幕转码ASS下载,AAC音频下载,MKV打包,播放体验增强,原生appsecret,不借助其他网站
+* [BilibiliCover - 获取并显示B站视频封面](https://greasyfork.org/ja/scripts/33411-bilibilicover-%E8%8E%B7%E5%8F%96%E5%B9%B6%E6%98%BE%E7%A4%BAb%E7%AB%99%E8%A7%86%E9%A2%91%E5%B0%81%E9%9D%A2)获取并显示B站视频封面
+* [BiliBili全屏弹幕发送(回车)](https://greasyfork.org/ja/scripts/384604-bilibili%E5%85%A8%E5%B1%8F%E5%BC%B9%E5%B9%95%E5%8F%91%E9%80%81-%E5%9B%9E%E8%BD%A6)在B站看视频的时候全屏状态下默认是不能发送弹幕的，这个脚本的功能就是在全屏状态下回车键弹出发送弹幕的sendbar~
+* [BiliBili直播间解除字数限制](https://greasyfork.org/ja/scripts/37976-bilibili%E7%9B%B4%E6%92%AD%E9%97%B4%E8%A7%A3%E9%99%A4%E5%AD%97%E6%95%B0%E9%99%90%E5%88%B6)直播间解除字数限制，自动分条发送
+* [Dark++](https://greasyfork.org/ja/scripts/376268-dark)CSS 实现夜间模式; 代码是从贴吧抄的, 嗯 ... over; 由于该实现本质上是覆盖一层, 可能会有未知问题出现: 如 sortTable.js 拖拽无效
+* [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace)对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey，欢迎star和fork。
+* [Manga Loader](https://greasyfork.org/zh-CN/scripts/692-manga-loader)Support for over 70 sites! Loads manga chapter into one page in a long strip format, supports switching chapters, minimal script with no dependencies, easy to implement new sites, loads quickly and works on mobile devices through bookmarklet
+* [浏览器自动翻页插件（baidu、google、bing）](https://greasyfork.org/ja/scripts/381099-%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E7%BF%BB%E9%A1%B5%E6%8F%92%E4%BB%B6-baidu-google-bing)这是一个帮助你高效使用搜索引擎的插件，使用这个插件可以在搜索引擎中快速向前、向后翻页。
