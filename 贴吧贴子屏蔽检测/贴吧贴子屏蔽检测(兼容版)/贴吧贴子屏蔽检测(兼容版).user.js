@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.6546
+// @version     测试(beta)0.6547
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -215,7 +215,9 @@ const getTriggerStyle = (username) => {
 -moz-animation: __tieba_blocked_detect__;
 animation: __tieba_blocked_detect__;
 }
-
+.__tieba_blocked__.l_post::before {
+font-size: 0px;
+}
 /* 被屏蔽样式 */
 .__tieba_blocked__,
 .__tieba_blocked__ .d_post_content_main {
