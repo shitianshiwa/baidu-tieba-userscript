@@ -45,4 +45,4 @@
 * [Pixiv 增强](https://greasyfork.org/zh-CN/scripts/34153-pixiv-plus)
 * [允许推特内YouTube视频全屏](https://greasyfork.org/zh-CN/scripts/375464-allow-youtube-videos-in-twitter-to-fullscreen) 使推特中嵌入的YouTube视频可以全屏
 * [这TM还叫贴吧？](https://greasyfork.org/ja/scripts/23127-%E8%BF%99tm%E8%BF%98%E5%8F%AB%E8%B4%B4%E5%90%A7) 去除PC贴吧帖子列表会自动播放的视频
-* [Search-By-Image](https://github.com/shitianshiwa/Search-By-Image/raw/%E4%BF%AE%E6%94%B9%E7%89%88/search-by-image.user.js) 一个以图搜图的脚本。通过该脚本，你可以快速地搜索图片。
+* [Search-By-Image](https://github.com/shitianshiwa/Search-By-Image/raw/%E4%BF%AE%E6%94%B9%E7%89%88/search-by-image.user.js) 一个以图搜图的脚本。通过该脚本，你可以快速地搜索图片。https://github.com/shitianshiwa/Search-By-Image
