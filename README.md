@@ -55,3 +55,13 @@
 * [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace)对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey，欢迎star和fork。
 * [Manga Loader](https://greasyfork.org/zh-CN/scripts/692-manga-loader)Support for over 70 sites! Loads manga chapter into one page in a long strip format, supports switching chapters, minimal script with no dependencies, easy to implement new sites, loads quickly and works on mobile devices through bookmarklet
 * [浏览器自动翻页插件（baidu、google、bing）](https://greasyfork.org/ja/scripts/381099-%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E7%BF%BB%E9%A1%B5%E6%8F%92%E4%BB%B6-baidu-google-bing)这是一个帮助你高效使用搜索引擎的插件，使用这个插件可以在搜索引擎中快速向前、向后翻页。
+* [HTML5视频截图器](https://greasyfork.org/zh-CN/scripts/370819-html5%E8%A7%86%E9%A2%91%E6%88%AA%E5%9B%BE%E5%99%A8)基于HTML5的简单任意原生视频截图，可控制快进/逐帧/视频调速，支持自定义快捷键
+* [bilibili弹幕定位](https://greasyfork.org/zh-CN/scripts/31933-bilibili%E5%BC%B9%E5%B9%95%E5%AE%9A%E4%BD%8D)在进度条上定位弹幕
+* [Bilibili上下弹幕变字幕](https://greasyfork.org/zh-CN/scripts/35205-bilibili%E4%B8%8A%E4%B8%8B%E5%BC%B9%E5%B9%95%E5%8F%98%E5%AD%97%E5%B9%95)用于突出显示B站的顶部弹幕与底部弹幕，使其呈现Youtube字幕的效果。适用于一些有字幕弹幕的生肉视频。
+* [直播流获取](https://greasyfork.org/zh-CN/scripts/396824-%E7%9B%B4%E6%92%AD%E6%B5%81%E8%8E%B7%E5%8F%96)bilibili 获取直播流
+* [哔哩哔哩规避敏感词](https://greasyfork.org/zh-CN/scripts/31447-%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E8%A7%84%E9%81%BF%E6%95%8F%E6%84%9F%E8%AF%8D)规避 bilibili 敏感词
+* [哔哩哔哩 - 网页上传小视频](https://greasyfork.org/zh-CN/scripts/39431-%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9-%E7%BD%91%E9%A1%B5%E4%B8%8A%E4%BC%A0%E5%B0%8F%E8%A7%86%E9%A2%91)网页直传小视频，谁要下你的辣鸡app啊
+* [哔哩哔哩(B站|Bilibili)收藏夹Fix](https://greasyfork.org/zh-CN/scripts/383143-%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9-b%E7%AB%99-bilibili-%E6%94%B6%E8%97%8F%E5%A4%B9fix)修复 哔哩哔哩(www.bilibili.com) 失效的收藏。（可查看av号、简介、标题、封面）
+* [百度贴吧不可能会跳转！](https://greasyfork.org/zh-CN/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC)去除贴吧帖子里链接的跳转
+* [自动展开百度贴吧帖子的图片](https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87)自动展开百度贴吧帖子的图片，方便浏览图片帖
+* [search engine jump for academic](https://greasyfork.org/zh-CN/scripts/2765-search-engine-jump-for-academic)方便的在各个引擎之间跳转(学术版)
