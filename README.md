@@ -32,36 +32,41 @@
 * [TiebaSuperBawu(贴吧超级吧务)](https://github.com/52fisher/TiebaSuperBawu)
 
 # 正在使用的部分脚本
-* [搜索引擎跳转-文科版](https://github.com/shitianshiwa/search_engineJump/raw/master/search_engineJump.user.js)
+## 贴吧
 * [Tieba百度贴吧楼中楼(回复楼)的楼主标识](https://greasyfork.org/en/scripts/26316-tieba%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E6%A5%BC%E4%B8%AD%E6%A5%BC-%E5%9B%9E%E5%A4%8D%E6%A5%BC-%E7%9A%84%E6%A5%BC%E4%B8%BB%E6%A0%87%E8%AF%86)
 * [贴吧查水表](https://greasyfork.org/en/scripts/32933-%E8%B4%B4%E5%90%A7%E6%9F%A5%E6%B0%B4%E8%A1%A8)
 * [批量下载贴吧原图](https://greasyfork.org/en/scripts/30307-%E6%89%B9%E9%87%8F%E4%B8%8B%E8%BD%BD%E8%B4%B4%E5%90%A7%E5%8E%9F%E5%9B%BE)
-* [Copy all links](https://github.com/FirefoxBar/userscript/tree/master/Copy_all_links)
+* [这TM还叫贴吧？](https://greasyfork.org/ja/scripts/23127-%E8%BF%99tm%E8%BF%98%E5%8F%AB%E8%B4%B4%E5%90%A7) 去除PC贴吧帖子列表会自动播放的视频
+* [百度贴吧不可能会跳转！](https://greasyfork.org/zh-CN/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC)去除贴吧帖子里链接的跳转
+* [自动展开百度贴吧帖子的图片](https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87)自动展开百度贴吧帖子的图片，方便浏览图片帖
+## 搜索
+* [搜索引擎跳转-文科版](https://github.com/shitianshiwa/search_engineJump/raw/master/search_engineJump.user.js)
+* [Search-By-Image](https://github.com/shitianshiwa/Search-By-Image/raw/%E4%BF%AE%E6%94%B9%E7%89%88/search-by-image.user.js) 一个以图搜图的脚本。通过该脚本，你可以快速地搜索图片。https://github.com/shitianshiwa/Search-By-Image
+* [AC-baidu:重定向优化百度搜狗谷歌搜索_去广告_favicon_双列](https://greasyfork.org/zh-CN/scripts/14178-ac-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E6%90%9C%E7%B4%A2-%E5%8E%BB%E5%B9%BF%E5%91%8A-favicon-%E5%8F%8C%E5%88%97)1.繞過百度、搜狗、谷歌、好搜搜索結果中的自己的跳轉鏈接，直接訪問原始網頁-反正都能看懂 2.新增拦截百度百家号的无用推广数据-支持其他站点 3.去除百度的多余广告 4添加Favicon显示 5.页面CSS 6.添加计数 7.开关选择以上功能
+* [浏览器自动翻页插件（baidu、google、bing）](https://greasyfork.org/ja/scripts/381099-%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E7%BF%BB%E9%A1%B5%E6%8F%92%E4%BB%B6-baidu-google-bing)这是一个帮助你高效使用搜索引擎的插件，使用这个插件可以在搜索引擎中快速向前、向后翻页。
+* [search engine jump for academic](https://greasyfork.org/zh-CN/scripts/2765-search-engine-jump-for-academic)方便的在各个引擎之间跳转(学术版)
+## Pixiv
+* [Pixiv 增强](https://greasyfork.org/zh-CN/scripts/34153-pixiv-plus)
+## bilibili
 * [bilibili-旧播放页](https://greasyfork.org/ja/scripts/394296-bilibili-%E6%97%A7%E6%92%AD%E6%94%BE%E9%A1%B5)
 * [Bilibili Live Danmaku Filter](https://greasyfork.org/zh-CN/scripts/386759-bilibili-live-danmaku-filter) 使用一个简单的定时器把弹幕按照给定的正则表达式过滤一遍
 * [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) 强大的哔哩哔哩增强脚本: 下载视频, 音乐, 封面, 弹幕 / 简化直播间, 评论区, 首页 / 自定义顶栏, 删除广告, 夜间模式 / 触屏设备支持
 * [Bilibili CC字幕工具](https://greasyfork.org/zh-CN/scripts/378513-bilibili-cc%E5%AD%97%E5%B9%95%E5%B7%A5%E5%85%B7) 加载本地字幕/下载CC字幕，旧版播放器可启用CC字幕
-* [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace) 对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey ，欢迎star和fork。
-* [Pixiv 增强](https://greasyfork.org/zh-CN/scripts/34153-pixiv-plus)
-* [允许推特内YouTube视频全屏](https://greasyfork.org/zh-CN/scripts/375464-allow-youtube-videos-in-twitter-to-fullscreen) 使推特中嵌入的YouTube视频可以全屏
-* [这TM还叫贴吧？](https://greasyfork.org/ja/scripts/23127-%E8%BF%99tm%E8%BF%98%E5%8F%AB%E8%B4%B4%E5%90%A7) 去除PC贴吧帖子列表会自动播放的视频
-* [Search-By-Image](https://github.com/shitianshiwa/Search-By-Image/raw/%E4%BF%AE%E6%94%B9%E7%89%88/search-by-image.user.js) 一个以图搜图的脚本。通过该脚本，你可以快速地搜索图片。https://github.com/shitianshiwa/Search-By-Image
-* [AC-baidu:重定向优化百度搜狗谷歌搜索_去广告_favicon_双列](https://greasyfork.org/zh-CN/scripts/14178-ac-baidu-%E9%87%8D%E5%AE%9A%E5%90%91%E4%BC%98%E5%8C%96%E7%99%BE%E5%BA%A6%E6%90%9C%E7%8B%97%E8%B0%B7%E6%AD%8C%E6%90%9C%E7%B4%A2-%E5%8E%BB%E5%B9%BF%E5%91%8A-favicon-%E5%8F%8C%E5%88%97)1.繞過百度、搜狗、谷歌、好搜搜索結果中的自己的跳轉鏈接，直接訪問原始網頁-反正都能看懂 2.新增拦截百度百家号的无用推广数据-支持其他站点 3.去除百度的多余广告 4添加Favicon显示 5.页面CSS 6.添加计数 7.开关选择以上功能
 * [bilibili merged flv+mp4+ass+enhance](https://greasyfork.org/ja/scripts/372516-bilibili-merged-flv-mp4-ass-enhance)bilibili/哔哩哔哩:超清FLV下载,FLV合并,原生MP4下载,弹幕ASS下载,CC字幕转码ASS下载,AAC音频下载,MKV打包,播放体验增强,原生appsecret,不借助其他网站
 * [BilibiliCover - 获取并显示B站视频封面](https://greasyfork.org/ja/scripts/33411-bilibilicover-%E8%8E%B7%E5%8F%96%E5%B9%B6%E6%98%BE%E7%A4%BAb%E7%AB%99%E8%A7%86%E9%A2%91%E5%B0%81%E9%9D%A2)获取并显示B站视频封面
 * [BiliBili全屏弹幕发送(回车)](https://greasyfork.org/ja/scripts/384604-bilibili%E5%85%A8%E5%B1%8F%E5%BC%B9%E5%B9%95%E5%8F%91%E9%80%81-%E5%9B%9E%E8%BD%A6)在B站看视频的时候全屏状态下默认是不能发送弹幕的，这个脚本的功能就是在全屏状态下回车键弹出发送弹幕的sendbar~
 * [BiliBili直播间解除字数限制](https://greasyfork.org/ja/scripts/37976-bilibili%E7%9B%B4%E6%92%AD%E9%97%B4%E8%A7%A3%E9%99%A4%E5%AD%97%E6%95%B0%E9%99%90%E5%88%B6)直播间解除字数限制，自动分条发送
-* [Dark++](https://greasyfork.org/ja/scripts/376268-dark)CSS 实现夜间模式; 代码是从贴吧抄的, 嗯 ... over; 由于该实现本质上是覆盖一层, 可能会有未知问题出现: 如 sortTable.js 拖拽无效
-* [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace)对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey，欢迎star和fork。
-* [Manga Loader](https://greasyfork.org/zh-CN/scripts/692-manga-loader)Support for over 70 sites! Loads manga chapter into one page in a long strip format, supports switching chapters, minimal script with no dependencies, easy to implement new sites, loads quickly and works on mobile devices through bookmarklet
-* [浏览器自动翻页插件（baidu、google、bing）](https://greasyfork.org/ja/scripts/381099-%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E7%BF%BB%E9%A1%B5%E6%8F%92%E4%BB%B6-baidu-google-bing)这是一个帮助你高效使用搜索引擎的插件，使用这个插件可以在搜索引擎中快速向前、向后翻页。
-* [HTML5视频截图器](https://greasyfork.org/zh-CN/scripts/370819-html5%E8%A7%86%E9%A2%91%E6%88%AA%E5%9B%BE%E5%99%A8)基于HTML5的简单任意原生视频截图，可控制快进/逐帧/视频调速，支持自定义快捷键
 * [bilibili弹幕定位](https://greasyfork.org/zh-CN/scripts/31933-bilibili%E5%BC%B9%E5%B9%95%E5%AE%9A%E4%BD%8D)在进度条上定位弹幕
 * [Bilibili上下弹幕变字幕](https://greasyfork.org/zh-CN/scripts/35205-bilibili%E4%B8%8A%E4%B8%8B%E5%BC%B9%E5%B9%95%E5%8F%98%E5%AD%97%E5%B9%95)用于突出显示B站的顶部弹幕与底部弹幕，使其呈现Youtube字幕的效果。适用于一些有字幕弹幕的生肉视频。
 * [直播流获取](https://greasyfork.org/zh-CN/scripts/396824-%E7%9B%B4%E6%92%AD%E6%B5%81%E8%8E%B7%E5%8F%96)bilibili 获取直播流
 * [哔哩哔哩规避敏感词](https://greasyfork.org/zh-CN/scripts/31447-%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E8%A7%84%E9%81%BF%E6%95%8F%E6%84%9F%E8%AF%8D)规避 bilibili 敏感词
 * [哔哩哔哩 - 网页上传小视频](https://greasyfork.org/zh-CN/scripts/39431-%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9-%E7%BD%91%E9%A1%B5%E4%B8%8A%E4%BC%A0%E5%B0%8F%E8%A7%86%E9%A2%91)网页直传小视频，谁要下你的辣鸡app啊
 * [哔哩哔哩(B站|Bilibili)收藏夹Fix](https://greasyfork.org/zh-CN/scripts/383143-%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9-b%E7%AB%99-bilibili-%E6%94%B6%E8%97%8F%E5%A4%B9fix)修复 哔哩哔哩(www.bilibili.com) 失效的收藏。（可查看av号、简介、标题、封面）
-* [百度贴吧不可能会跳转！](https://greasyfork.org/zh-CN/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC)去除贴吧帖子里链接的跳转
-* [自动展开百度贴吧帖子的图片](https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87)自动展开百度贴吧帖子的图片，方便浏览图片帖
-* [search engine jump for academic](https://greasyfork.org/zh-CN/scripts/2765-search-engine-jump-for-academic)方便的在各个引擎之间跳转(学术版)
+## 网页漫画观看
+* [Manga Loader](https://greasyfork.org/zh-CN/scripts/692-manga-loader)Support for over 70 sites! Loads manga chapter into one page in a long strip format, supports switching chapters, minimal script with no dependencies, easy to implement new sites, loads quickly and works on mobile devices through bookmarklet
+## 其它
+* [Copy all links](https://github.com/FirefoxBar/userscript/tree/master/Copy_all_links)
+* [HTML5视频截图器](https://greasyfork.org/zh-CN/scripts/370819-html5%E8%A7%86%E9%A2%91%E6%88%AA%E5%9B%BE%E5%99%A8)基于HTML5的简单任意原生视频截图，可控制快进/逐帧/视频调速，支持自定义快捷键
+* [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace)对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey，欢迎star和fork。
+* [Dark++](https://greasyfork.org/ja/scripts/376268-dark)CSS 实现夜间模式; 代码是从贴吧抄的, 嗯 ... over; 由于该实现本质上是覆盖一层, 可能会有未知问题出现: 如 sortTable.js 拖拽无效
+* [允许推特内YouTube视频全屏](https://greasyfork.org/zh-CN/scripts/375464-allow-youtube-videos-in-twitter-to-fullscreen) 使推特中嵌入的YouTube视频可以全屏
