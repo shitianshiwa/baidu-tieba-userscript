@@ -103,7 +103,8 @@ function copyLink() {
                 if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData1.floor_num + ' 楼中楼 ');
                 if (setting.author) textGroup.push(((floorData2.user_name == unsafeWindow.PageData.thread.author && floorData2.user_name != "" && floorData2.user_name != "null") || floorData2.portrait == louzhu2 ? (setting.with_at ? '楼主: @' : '楼主: ') : (setting.with_at ? '回复人: @' : '回复人: ')) + (floorData2.user_name != "" && floorData2.user_name != "null" ? floorData2.user_name : floorData2.portrait) + ' ');
                 //应该不会有用户名是null的吧？
-                if (setting.neirong_lzl) textGroup.push("内容: " + parent.parentNode.children[2].innerHTML + " ");
+                if (setting.neirong_lzl) textGroup.push("内容: " + (parent.parentNode.children[2].getAttribute("class") == "lzl_content_main" ? parent.parentNode.children[2].innerHTML : parent.parentNode.children[3].innerHTML) + " ");
+                //console.log(parent.parentNode.children[3].getAttribute("class"));
                 if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid + " ");
                 if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                 //贴吧自带的楼中楼回复定位只能定到楼层那里，楼中楼的回复具体位置要自己去找
