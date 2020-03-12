@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.0132)
+// @version      1.1(0.0133)
 // @description  复制贴吧的贴子标题与链接
 // @match        *://tieba.baidu.com/*
 // @include      *://tieba.baidu.com/*
 // @author       864907600cc
 // @icon         https://secure.gravatar.com/avatar/147834caf9ccb0a66b2505c753747867
-// @run-at       document-start
+// @run-at       document-idle
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
 // @namespace    http://ext.ccloli.com
@@ -17,6 +17,7 @@ var setting = {
     title: true,
     author: true,
     with_at: false,
+    tiebaming: true,
     link: true,
     neirong_l: true,
     neirong_lzl: true,
@@ -38,7 +39,14 @@ linkAnchor.className = 'tieba-link-anchor';
 linkAnchor.textContent = '[复制链接]';
 
 var linkPath = 'http://tieba.baidu.com/p/';
-
+var tieba = PageData.forum.name;
+var louzhu1 = $("div.l_post").children("div.d_author").children("div.louzhubiaoshi_wrap")[0]; //获取楼主的portrait，这个在我的贴吧链接可直接找到(id=xxxxxxxx)
+var louzhu2;
+if (louzhu1 != undefined) {
+    louzhu2 = JSON.parse(louzhu1.parentNode.parentNode.getAttribute("data-field").replace(/'/g, '"')).author.portrait.split("?")[0];
+} else {
+    louzhu2 = "";
+}
 
 function copyLink() {
     var textGroup = [];
@@ -55,39 +63,49 @@ function copyLink() {
     else {
         switch (this.dataset.anchorType) {
             case '0': // 贴吧主题贴列表获取贴子链接
-                if (setting.title) textGroup.push("标题: " + parent.getElementsByClassName('j_th_tit')[0].getAttribute('title'));
-                if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + JSON.parse(parent.nextElementSibling.getElementsByClassName('j_user_card')[0].getAttribute("data-field")).un + ' ');
+                var temp = JSON.parse(parent.nextElementSibling.getElementsByClassName('j_user_card')[0].getAttribute("data-field"));
+                if (setting.title) textGroup.push("标题: " + parent.getElementsByClassName('j_th_tit')[0].getAttribute('title') + " ");
+                if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + (temp.un != "" && temp.un != "null" ? temp.un : temp.id) + ' ');
                 //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
-                if (setting.link) textGroup.push("链接：" + parent.getElementsByClassName('j_th_tit')[0].href);
+                if (setting.link) textGroup.push("链接：" + parent.getElementsByClassName('j_th_tit')[0].href + " ");
+                if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                 break;
             case '1': // 贴子内页获取贴子链接
-                if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title);
-                if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + unsafeWindow.PageData.thread.author + ' ');
-                if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id);
+                //console.log($("div.l_post").children("div.d_author").children("div.louzhubiaoshi_wrap")[0]);
+                //console.log(JSON.parse($("div.l_post").children("div.d_author").children("div.louzhubiaoshi_wrap")[0].parentNode.parentNode.getAttribute("data-field").replace(/'/g, '"')).author.portrait.split("?")[0]);
+
+                if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + " ");
+                if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + (unsafeWindow.PageData.thread.author != "" ? unsafeWindow.PageData.thread.author : louzhu2) + ' '); //portrait
+                if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + " ");
+                if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                 break;
             case '2': // 贴子内页获取楼层链接
                 //获取楼层的内容
                 var floorData00 = parent.parentNode.parentNode.children[0].children[1].children[1] || parent.parentNode.parentNode.children[0].children[3].children[1] || parent.parentNode.parentNode.parentNode.children[1].children[0].children[3].children[1];
-
                 var floorData = JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
-                if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData.content.post_no);
-                if (setting.author) textGroup.push((setting.with_at ? '层主: @' : '层主: ') + floorData.author.user_name + ' ');
-                if (setting.neirong_l) textGroup.push("内容: " + floorData00.innerHTML);
-                if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id);
+                var floorData02 = parent.parentNode.parentNode.parentNode.children[0].children[0].getAttribute("class");
+                //console.log(parent.parentNode.parentNode.parentNode.children[0].children[0].getAttribute("class"))判断是不是楼主
+                if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData.content.post_no + " ");
+                if (setting.author) textGroup.push((floorData.content.post_no == 1 || floorData02 == "louzhubiaoshi_wrap" ? (setting.with_at ? '楼主: @' : '楼主: ') : (setting.with_at ? '层主: @' : '层主: ')) + (floorData.author.user_name != "" && floorData.author.user_name != "null" ? floorData.author.user_name : floorData.author.portrait) + ' ');
+                if (setting.neirong_l) textGroup.push("内容: " + floorData00.innerHTML + " ");
+                if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id + " ");
+                if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                 break;
             case '3': // 贴子楼中楼获取链接
                 //获取楼层pid、楼层数 兼容http和https的贴子
                 var floorData0 = parent.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("data-field") || parent.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("data-field");
-
                 //获取用户名和回复贴spid
+
                 var floorData1 = JSON.parse(floorData0.replace(/'/g, '"')); //JSON.parse必须用"才行，例如：{"XXX":"XXXX"}
 
                 var floorData2 = JSON.parse(parent.parentNode.parentNode.getAttribute("data-field").replace(/'/g, '"')); //spid JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
                 var floorData3 = JSON.parse(floorData0.replace(/'/g, '"')); //楼层pid
-                if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData1.floor_num + ' 楼中楼');
-                if (setting.author) textGroup.push((setting.with_at ? '回复人: @' : '回复人: ') + floorData2.user_name + ' ');
-                if (setting.neirong_lzl) textGroup.push("内容: " + parent.parentNode.children[2].innerHTML);
-                if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid);
+                if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData1.floor_num + ' 楼中楼 ');
+                if (setting.author) textGroup.push(((floorData2.user_name == unsafeWindow.PageData.thread.author && floorData2.user_name != "" && floorData2.user_name != "null") || floorData2.portrait == louzhu2 ? (setting.with_at ? '楼主: @' : '楼主: ') : (setting.with_at ? '回复人: @' : '回复人: ')) + (floorData2.user_name != "" && floorData2.user_name != "null" ? floorData2.user_name : floorData2.portrait) + ' ');
+                //应该不会有用户名是null的吧？
+                if (setting.neirong_lzl) textGroup.push("内容: " + parent.parentNode.children[2].innerHTML + " ");
+                if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid + " ");
+                if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                 //贴吧自带的楼中楼回复定位只能定到楼层那里，楼中楼的回复具体位置要自己去找
                 //console.log(parent.parentNode.parentNode.parentNode);
                 //console.log(parent.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode);
@@ -104,7 +122,7 @@ function copyLink() {
     }
 
     GM_setClipboard(text);
-    if (setting.tips) showTips('以下内容已复制到剪贴板：\n\n' + text);
+    if (setting.tips) showTips('以下内容已复制到剪贴板：\n' + text);
 }
 
 function showTips(text) {
