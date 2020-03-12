@@ -65,7 +65,7 @@
 ## 网页漫画观看
 * [Manga Loader](https://greasyfork.org/zh-CN/scripts/692-manga-loader)Support for over 70 sites! Loads manga chapter into one page in a long strip format, supports switching chapters, minimal script with no dependencies, easy to implement new sites, loads quickly and works on mobile devices through bookmarklet
 ## 其它
-* [Copy all links](https://github.com/FirefoxBar/userscript/tree/master/Copy_all_links)
+* [Copy all links](https://github.com/FirefoxBar/userscript/tree/master/Copy_all_links) 复制网页内所有链接
 * [HTML5视频截图器](https://greasyfork.org/zh-CN/scripts/370819-html5%E8%A7%86%E9%A2%91%E6%88%AA%E5%9B%BE%E5%99%A8)基于HTML5的简单任意原生视频截图，可控制快进/逐帧/视频调速，支持自定义快捷键
 * [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace)对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey，欢迎star和fork。
 * [Dark++](https://greasyfork.org/ja/scripts/376268-dark)CSS 实现夜间模式; 代码是从贴吧抄的, 嗯 ... over; 由于该实现本质上是覆盖一层, 可能会有未知问题出现: 如 sortTable.js 拖拽无效
