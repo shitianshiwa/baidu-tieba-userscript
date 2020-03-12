@@ -2,6 +2,7 @@
 [github](https://github.com/shitianshiwa/baidu-tieba-userscript)<br/>
 测试（beta）
 需要：支持扩展的浏览器，例如谷歌，yandex，火狐等；扩展：Tampermonkey脚本管理器; http://tampermonkey.net/<br/>https://github.com/Tampermonkey/tampermonkey<br/>
+其中一个bug(控制菜单无限添加选项)，https://github.com/Tampermonkey/tampermonkey/issues/801 <br/>
 通过github安装脚本可能需要代理才能装上<br/>
 是javascript脚本
 # 安装
