@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         显示贴吧用户名(beta)
 // @namespace    http://tampermonkey.net/
-// @version      0.241
+// @version      0.242
 // @description  显示主题贴列表,楼层,楼中楼的贴吧用户名，仅支持电脑端贴吧
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -28,7 +28,7 @@
     {
         //alert(hrefs.indexOf("tab=album"));
         try {
-            if (hrefs.split("?")[0].split("/")[3] != "f" || hrefs.search("ct=") != -1 || hrefs.indexOf("tab=album") != -1) //解决非主题列表和贴吧图片区报错
+            if (hrefs.split("?")[0].split("/")[3] != "f" || hrefs.search("ct=") != -1 || hrefs.indexOf("tab=album") != -1 || hrefs.indexOf("f?kz=") != -1) //解决非主题列表和贴吧图片区报错
             {
                 return;
             }
@@ -58,7 +58,7 @@
         //alert("66666666");
         try {
             //alert(hrefs.split("/")[3])
-            if (hrefs.split("/")[3] != "p") {
+            if (hrefs.split("/")[3] != "p" && hrefs.indexOf("f?kz=") == -1) {
                 return;
             }
             if ($("a.p_author_name.j_user_card").parents('li.d_name').children('p.p_author_name')[0] != null) //楼层列表最后一个贴子
@@ -98,7 +98,7 @@
             //$('div.lzl_cnt').children('a.at')[0]//第一个
             //$('div.lzl_cnt').children('a.at').attr('username')
             //alert(hrefs.split("/")[3])
-            if (hrefs.split("/")[3] != "p") {
+            if (hrefs.split("/")[3] != "p" && hrefs.indexOf("f?kz=") == -1) {
                 return;
             }
             $("div.lzl_cnt").each(function() //楼中楼xx:

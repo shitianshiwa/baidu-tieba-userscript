@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         展开百度贴吧被折叠的楼层和楼中楼
 // @namespace    shitianshiwa
-// @version      0.01
+// @version      0.011
 // @description  还原被折叠隐藏的楼层、楼中楼，附带自动展开楼中楼的查看更多
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
+// @include      http*://tieba.baidu.com/f?kz=*
 // @icon         https://avatars3.githubusercontent.com/u/54750485
 // @grant        none
 // @run-at       document-idle
