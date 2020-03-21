@@ -5,11 +5,13 @@
 * [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B.user.js)
 # 由于贴吧的图片链接有变动，所以点击图片放大功能失效-2019-12-29 (现在贴吧存在两种大图链接：tiebapic.baidu.com/forum/pic/item/+XXXX.jpg和imgsrc.baidu.com/forum/pic/item/+XXXX.jpg)
 # 修改
+* 支持显示用户头像，然而如果切换到其它贴吧号会残留上一个用户的头像，暂时在脚本管理器那里加了清除头像按钮来更新新头像
 * 注释或删除了一些功能（让会员置顶按钮可以显示，修改了一些变量名字，增加了一些｛｝,修改了主题贴列表的发贴人名和回贴人名，回贴时间样式，修改了样式里的一些链接（把http改成https）等）
 $('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜索'));//注释掉了
-document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);//发贴按时间排列注释掉了
 * 并入了[自动展开百度贴吧帖子的图片](https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87)自动展开百度贴吧帖子的图片，方便浏览图片帖
+* 未完。。。
 # 备注
-* 这里的脚本有图片功能经常失效bug，引用功能只有贴子链接为http的才会有效
+* 已关闭所有图片功能，因为很不稳定容易失效，引用功能只有贴子链接为http的才会有效
 * 有些贴吧账号PC端贴吧有夜间模式可选，这个会导致样式显示不正常
+* 在tieba.baidu.com/i/i/fans这个页面有显示bug
 
