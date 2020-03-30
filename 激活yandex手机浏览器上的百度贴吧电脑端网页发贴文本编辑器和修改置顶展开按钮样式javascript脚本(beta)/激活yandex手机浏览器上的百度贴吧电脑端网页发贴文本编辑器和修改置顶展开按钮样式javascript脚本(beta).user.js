@@ -15,49 +15,41 @@
 
 (function() {
     'use strict';
-    var $ = unsafeWindow.jQuery;// @grant        不能为none，否则不能用
+    var $ = unsafeWindow.jQuery; // @grant        不能为none，否则不能用
     //var $ = window.jQuery;
     //捕捉class用.，id对象用#?,$=document.getElementById?
     //alert("233");
     var t1;
     //注释：null 表示无值，而 undefined 表示一个未声明的变量，或已声明但没有赋值的变量，或一个并不存在的对象属性。
-    function fixyandextieba()
-    {
+    function fixyandextieba() {
         clearTimeout(t1);
         //alert("233");
         //激活发贴文本编辑器
-        var c='<input type="text" name="" value="点击激活文本编辑器" style="width:110px;font-weight:bold;"/>';//文本框
+        var c = '<input type="text" name="" value="点击激活文本编辑器" style="width:110px;font-weight:bold;"/>'; //文本框
         //改变置顶展开按钮样式
-        var cc1="display: none; position: absolute; left: 0px; z-index: 399;"//z-index元素图层高度？absolute相对定位
-        var cc2="display: block; position: absolute; left: 0px; z-index: 399;"
-        try
-        {
-            let a=$(".old_style_wrapper");
-            let b = document.getElementById("thread_top_folder");//找到展开置顶按钮div，和$(".old_style_wrapper")功能一样用来搜索定位div
-            if(a[0]!=null)
-            {
-                $(".old_style_wrapper").append(c);//搜索<div class="old_style_wrapper">添加文本框
+        var cc1 = "display: none; position: absolute; left: 0px; z-index: 399;" //z-index元素图层高度？absolute相对定位
+        var cc2 = "display: block; position: absolute; left: 0px; z-index: 399;"
+        try {
+            let a = $(".old_style_wrapper");
+            let b = document.getElementById("thread_top_folder"); //找到展开置顶按钮div，和$(".old_style_wrapper")功能一样用来搜索定位div
+            if (a[0] != null) {
+                $(".old_style_wrapper").append(c); //搜索<div class="old_style_wrapper">添加文本框
             }
             //alert(b);
-            if(b!=null)
-            {
+            if (b != null) {
                 //alert(b.style.display);
-                if(b.style.display=="")//如果原来没有点折叠用none不显示，点了折叠用block显示按钮
+                if (b.style.display == "") //如果原来没有点折叠用none不显示，点了折叠用block显示按钮
                 {
-                    b.style.cssText=cc1;//改变样式
-                }
-                else
-                {
-                    b.style.cssText=cc2;
+                    b.style.cssText = cc1; //改变样式
+                } else {
+                    b.style.cssText = cc2;
                 }
             }
-        }
-        catch(error)
-        {
+        } catch (error) {
             alert(error);
         }
     }
-    t1=setTimeout(()=>{fixyandextieba();},2000);//延迟2s工作
+    t1 = setTimeout(() => { fixyandextieba(); }, 2000); //延迟2s工作
 })();
 /*
 一、js获取子节点的方式
