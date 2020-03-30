@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0165beta)
+// @version      2.1(0.0166beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -3008,7 +3008,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".sys_notify_last .unread-num,",
                 ".sys_notify_last .unread_num {",
-                "	left: 25px !important;",
+                //"	left: 25px !important;",
                 "}",
                 ".u_ddl_con li a:hover .unread-num,",
                 ".u_ddl_con li a:hover .unread_num {",
@@ -6626,6 +6626,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     "}",
                     ".fix-for-ie8{",
                     "	display: none !important;",
+                    "}",
+                    //解决返回顶部按钮显示错位问题
+                    ".tbui_aside_float_bar {",
+                    "	margin-left: 90% !important;",
+                    /*"	margin-left: 600px !important;",*/
                     "}"
                 ].join("\n");
             }
@@ -7154,12 +7159,12 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         }, 1000);
     }
     //百度贴吧：不登录即可看贴 by VA
-    unsafeWindow.Object.freeze = null;
-    document.addEventListener('DOMContentLoaded', function(event) {
-        try {
-            unsafeWindow.PageData.user.is_login = 1;
-        } catch (error) {}
-    }, true);
+    //unsafeWindow.Object.freeze = null;
+    //document.addEventListener('DOMContentLoaded', function(event) {
+    // try {
+    //     unsafeWindow.PageData.user.is_login = 1;
+    // } catch (error) {}
+    // }, true);
     //梦姬贴吧助手 by jixun
     (function() {
         var w = unsafeWindow,
@@ -9062,9 +9067,11 @@ a.jx, .ptr	{ cursor: pointer		}
     })();
     // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
     var getIsLogin2 = unsafeWindow.PageData.user.id;
-    if (getIsLogin2 != 0 && getIsLogin2 != "") {
-        var jishu = 0;
-        let suo = false;
+    if (localStorage.getItem("userid") == null) {
+        localStorage.setItem("userid", getIsLogin2)
+    }
+    if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid")) {
+        let jishu = 0;
         let t = setInterval(() => { //为右上角的浮动按钮添加头像
             if (jishu < 20) {
                 //console.log($("div.edui-icon-bold")[0]);
@@ -9091,16 +9098,10 @@ a.jx, .ptr	{ cursor: pointer		}
                         clearInterval(t);
                     }
                 }
-                //
-                $('div.replace_tip').click()
-                    /*
-                    by tency
-                    https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
-                    自动展开百度贴吧帖子的图片
-                    自动展开百度贴吧帖子的图片，方便浏览图片帖
-                    version    0.2
-                    copyright  2014+, LYY
-                    */
+                if (window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) {
+                    $("#main_aside").remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
+                    //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
+                }
                 jishu++;
             } else {
                 clearInterval(t);
@@ -9109,55 +9110,69 @@ a.jx, .ptr	{ cursor: pointer		}
             //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
         }, 1000);
 
-        if (window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) {
-            $("#main_aside").remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
-            //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
-        }
-        setTimeout(() => { //把https链接转到http，因为我的收藏页面并不支持https
-            if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
-                let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
-                $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
-            }
-            let i = 0;
-            let temp = $("div.u_ddl_con>div>ul>li>a"); //a.j_cleardata,u_notify_item
-            if (temp.length > 0) {
-                if (temp.length > 0) {
-                    //console.log(temp);
-                    //console.log(temp.length);
-                    //console.log(temp[2]);
-                    for (i = 0; i < temp.length; i++) {
-                        temp[i].style = "white-space:normal;";
-                    }
-                }
-            }
-            temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
-            if (temp.length > 0) {
-                if (temp.length > 0) {
-                    for (i = 0; i < temp.length; i++) {
-                        temp[i].style = "white-space:normal;";
-                    }
-                }
-            }
-            temp = $("ul.sys_notify_last>li>a"); //a.j_cleardata,u_notify_item
-            if (temp.length > 0) {
-                if (temp.length > 0) {
-                    for (i = 0; i < temp.length; i++) {
-                        temp[i].style = "white-space:normal;";
-                    }
-                }
-            }
-            temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
-            if (temp.length > 0) {
-                if (temp.length > 0) {
-                    for (i = 0; i < temp.length; i++) {
-                        temp[i].style = "position: relative;display: block;top: -20px;right: 10px;";
-                    }
-                }
-            }
-        }, 5000);
     } else {
         localStorage.removeItem("userimg");
+        localStorage.removeItem("userid");
+
+        //百度贴吧：不登录即可看贴 by VA
+        try {
+            unsafeWindow.PageData.user.is_login = 1;
+        } catch (error) {}
     }
+    let jishu = 0;
+    let t = setInterval(() => { //为右上角的浮动按钮添加头像
+        if (jishu < 20) {
+            $('div.replace_tip').click()
+                /*
+                by tency
+                https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
+                自动展开百度贴吧帖子的图片
+                自动展开百度贴吧帖子的图片，方便浏览图片帖
+                version    0.2
+                copyright  2014+, LYY
+                */
+            jishu++;
+        } else {
+            clearInterval(t);
+        }
+        //console.log(userimg);
+        //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
+    }, 1000);
+
+    setTimeout(() => { //把https链接转到http，因为我的收藏页面并不支持https
+        if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
+            let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
+            $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
+        }
+        let i = 0;
+        let temp = $("div.u_ddl_con>div>ul>li>a"); //a.j_cleardata,u_notify_item
+        if (temp.length > 0) {
+            //console.log(temp);
+            //console.log(temp.length);
+            //console.log(temp[2]);
+            for (i = 0; i < temp.length; i++) {
+                temp[i].style = "white-space:normal;";
+            }
+        }
+        temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
+        if (temp.length > 0) {
+            for (i = 0; i < temp.length; i++) {
+                temp[i].style = "white-space:normal;";
+            }
+        }
+        temp = $("ul.sys_notify_last>li>a"); //a.j_cleardata,u_notify_item
+        if (temp.length > 0) {
+            for (i = 0; i < temp.length; i++) {
+                temp[i].style = "white-space:normal;";
+            }
+        }
+        temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
+        if (temp.length > 0) {
+            for (i = 0; i < temp.length; i++) {
+                temp[i].style = "position: relative;display: block;top: -20px;right: 10px;";
+            }
+        }
+    }, 5000);
 
     function resetx() {
         localStorage.removeItem("userimg"); //一个用户退出登录后，再用其他账户登录会残留上一个用户的贴吧头像
