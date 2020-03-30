@@ -1,9 +1,15 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.0133)
+// @version      1.1(0.01331)
 // @description  复制贴吧的贴子标题与链接
-// @match        *://tieba.baidu.com/*
-// @include      *://tieba.baidu.com/*
+// @include      http*://tieba.baidu.com/f?kw=*
+// @include      http*://tieba.baidu.com/f/good?kw=*
+// @include      http*://tieba.baidu.com/p/*
+// @include      http*://tieba.baidu.com/f?kz=*
+// @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=album
+// @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=video
+// @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group
+// @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=tuan
 // @author       864907600cc
 // @icon         https://secure.gravatar.com/avatar/147834caf9ccb0a66b2505c753747867
 // @run-at       document-idle
@@ -12,6 +18,7 @@
 // @namespace    http://ext.ccloli.com
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 // ==/UserScript==
+//出错的贴子 https://tieba.baidu.com/p/6573007689 【求助咨询】申请从速开启vtuber吧的吧主申请
 //document-start
 var setting = {
     title: true,
