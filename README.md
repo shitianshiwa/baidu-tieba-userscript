@@ -1,10 +1,10 @@
 # baidu-tieba-userscript
 [github](https://github.com/shitianshiwa/baidu-tieba-userscript)<br/>
 测试（beta）
-需要：支持扩展的浏览器，例如谷歌，yandex，火狐等；扩展：Tampermonkey脚本管理器; http://tampermonkey.net/<br/>https://github.com/Tampermonkey/tampermonkey<br/>
-其中一个bug(控制菜单无限添加选项)，https://github.com/Tampermonkey/tampermonkey/issues/801 <br/>
-通过github安装脚本可能需要代理才能装上<br/>
 是javascript脚本
+需要：支持扩展的浏览器，例如谷歌，yandex，火狐等；扩展：Tampermonkey脚本管理器; http://tampermonkey.net/<br/>https://github.com/Tampermonkey/tampermonkey<br/>
+提示：tampermonkey的一个bug(控制菜单无限添加选项)，https://github.com/Tampermonkey/tampermonkey/issues/801 装新版本4.10可以解决<br/>
+通过github安装脚本可能需要代理才能装上<br/>
 # 安装
 - [激活yandex手机浏览器上的百度贴吧电脑端网页发贴文本编辑器和修改置顶展开按钮样式javascript脚本(beta)](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E4%BF%AE%E5%A4%8D%E7%94%B5%E8%84%91%E7%AB%AF%E8%B4%B4%E5%90%A7%E4%B8%BB%E9%A2%98%E8%B4%B4%E5%86%85%E7%9A%84%E6%A5%BC%E5%B1%82%E5%88%97%E8%A1%A8%2C%E8%AE%A9%E6%A5%BC%E4%B8%AD%E6%A5%BC%E5%92%8C%E5%90%A7%E5%8F%8B%E5%A4%B4%E5%83%8F%E5%8F%AF%E4%BB%A5%E6%AD%A3%E5%B8%B8%E5%8A%A0%E8%BD%BD(beta)/%E4%BF%AE%E5%A4%8D%E7%94%B5%E8%84%91%E7%AB%AF%E8%B4%B4%E5%90%A7%E4%B8%BB%E9%A2%98%E8%B4%B4%E5%86%85%E7%9A%84%E6%A5%BC%E5%B1%82%E5%88%97%E8%A1%A8%2C%E8%AE%A9%E6%A5%BC%E4%B8%AD%E6%A5%BC%E5%92%8C%E5%90%A7%E5%8F%8B%E5%A4%B4%E5%83%8F%E5%8F%AF%E4%BB%A5%E6%AD%A3%E5%B8%B8%E5%8A%A0%E8%BD%BD(beta).user.js)
 - [删除自己的贴子,封禁可用(beta)](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E5%88%A0%E9%99%A4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B4%B4%E5%AD%90%2C%E5%B0%81%E7%A6%81%E5%8F%AF%E7%94%A8(beta)/%E5%88%A0%E9%99%A4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B4%B4%E5%AD%90%2C%E5%B0%81%E7%A6%81%E5%8F%AF%E7%94%A8(beta).user.js)
