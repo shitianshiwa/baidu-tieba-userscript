@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0166beta)
+// @version      2.1(0.0167beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -66,16 +66,15 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
 */
 (function() {
-    //var $ = window.jQuery;
-    //TieBa - Maverick
-    var baiban = document.createElement("div");
-    baiban.setAttribute("style", "width:9999px;height: 99999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
-    baiban.setAttribute("class", "baiban");
-    document.body.appendChild(baiban);
-    var baiban2 = setTimeout(() => {
-        clearTimeout(baiban2);
-        $("div.baiban").remove();
-    }, 1000);
+    //var $ = window.jQuery; //TieBa - Maverick
+    //var baiban = document.createElement("div");
+    //baiban.setAttribute("class", "baiban");
+    //baiban.setAttribute("style", "width:9999px;height: 99999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
+    //document.body.appendChild(baiban);
+    //var baiban2 = setTimeout(() => {
+    //    clearTimeout(baiban2);
+    //    $("div.baiban").remove();
+    // }, 1000);
     if (!GM_getValue("jinyongtiebameihua")) {
         var css = "";
         if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
@@ -7136,27 +7135,24 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 //管用户头像栏的 http://tieba.baidu.com/i/i/*
             }
         }
-        var baiban3 = setTimeout(() => {
-            clearTimeout(baiban3);
-            if (typeof GM_addStyle != "undefined") {
-                GM_addStyle(css);
-            } else if (typeof PRO_addStyle != "undefined") {
-                PRO_addStyle(css); //有警告
-            } else if (typeof addStyle != "undefined") {
-                addStyle(css); //有警告
+        if (typeof GM_addStyle != "undefined") {
+            GM_addStyle(css);
+        } else if (typeof PRO_addStyle != "undefined") {
+            PRO_addStyle(css); //有警告
+        } else if (typeof addStyle != "undefined") {
+            addStyle(css); //有警告
+        } else {
+            var node = document.createElement("style");
+            node.type = "text/css";
+            node.appendChild(document.createTextNode(css));
+            var heads = document.getElementsByTagName("head");
+            if (heads.length > 0) {
+                heads[0].appendChild(node);
             } else {
-                var node = document.createElement("style");
-                node.type = "text/css";
-                node.appendChild(document.createTextNode(css));
-                var heads = document.getElementsByTagName("head");
-                if (heads.length > 0) {
-                    heads[0].appendChild(node);
-                } else {
-                    // no head yet, stick it whereever
-                    document.documentElement.appendChild(node);
-                }
+                // no head yet, stick it whereever
+                document.documentElement.appendChild(node);
             }
-        }, 1000);
+        }
     }
     //百度贴吧：不登录即可看贴 by VA
     //unsafeWindow.Object.freeze = null;
@@ -9131,6 +9127,34 @@ a.jx, .ptr	{ cursor: pointer		}
                 version    0.2
                 copyright  2014+, LYY
                 */
+            let i = 0;
+            let temp = $("div.u_ddl_con>div>ul>li>a"); //a.j_cleardata,u_notify_item
+            if (temp.length > 0) {
+                //console.log(temp);
+                //console.log(temp.length);
+                //console.log(temp[2]);
+                for (i = 0; i < temp.length; i++) {
+                    if (temp[i].getAttribute("style") == null) {
+                        temp[i].style = "white-space:normal;";
+                    }
+                }
+            }
+            temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
+            if (temp.length > 0) {
+                for (i = 0; i < temp.length; i++) {
+                    if (temp[i].getAttribute("style") == null) {
+                        temp[i].style = "white-space:normal;";
+                    }
+                }
+            }
+            temp = $("ul.sys_notify_last>li>a"); //a.j_cleardata,u_notify_item
+            if (temp.length > 0) {
+                for (i = 0; i < temp.length; i++) {
+                    if (temp[i].getAttribute("style") == null) {
+                        temp[i].style = "white-space:normal;";
+                    }
+                }
+            }
             jishu++;
         } else {
             clearInterval(t);
@@ -9138,38 +9162,36 @@ a.jx, .ptr	{ cursor: pointer		}
         //console.log(userimg);
         //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
     }, 1000);
-
-    setTimeout(() => { //把https链接转到http，因为我的收藏页面并不支持https
+    setTimeout(() => {
+        //把https链接转到http，因为我的收藏页面并不支持https
         if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
             let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
             $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
         }
+
         let i = 0;
-        let temp = $("div.u_ddl_con>div>ul>li>a"); //a.j_cleardata,u_notify_item
-        if (temp.length > 0) {
-            //console.log(temp);
-            //console.log(temp.length);
-            //console.log(temp[2]);
-            for (i = 0; i < temp.length; i++) {
-                temp[i].style = "white-space:normal;";
-            }
-        }
-        temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
-        if (temp.length > 0) {
-            for (i = 0; i < temp.length; i++) {
-                temp[i].style = "white-space:normal;";
-            }
-        }
-        temp = $("ul.sys_notify_last>li>a"); //a.j_cleardata,u_notify_item
-        if (temp.length > 0) {
-            for (i = 0; i < temp.length; i++) {
-                temp[i].style = "white-space:normal;";
-            }
-        }
         temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
         if (temp.length > 0) {
             for (i = 0; i < temp.length; i++) {
                 temp[i].style = "position: relative;display: block;top: -20px;right: 10px;";
+            }
+        }
+        temp = $(".icon-good"); //显示精品贴，精华贴标识
+        if (temp.length > 0) {
+            for (i = 0; i < temp.length; i++) {
+                temp[i].style = "background-color: #FF6666;";
+            }
+        }
+        temp = $(".icon-top"); //显示置顶标识
+        if (temp.length > 0) {
+            for (i = 0; i < temp.length; i++) {
+                temp[i].style = "background:none;background-color: #4285F5;";
+            }
+        }
+        temp = $(".icon-member-top"); //显示会员置顶标识
+        if (temp.length > 0) {
+            for (i = 0; i < temp.length; i++) {
+                temp[i].style = "background:none;background-color: #FFCC26;";
             }
         }
     }, 5000);
