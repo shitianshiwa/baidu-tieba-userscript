@@ -3,9 +3,13 @@
 // @author    527836355
 // @id     pasteAndDragImageIntoTiebaEditor
 // @namespace   http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul
-// @include     http*://tieba.baidu.com/f?*
-// @include     http*://tieba.baidu.com/p/*
-// @version     3.2(0.0031)
+// @include      http*://tieba.baidu.com/f?kw=*
+// @include      http*://tieba.baidu.com/p/*
+// @include      http*://tieba.baidu.com/f?kz=*
+// @include      http*://tieba.baidu.com/f?ie=utf-8&kw=*
+// @exclude      http*://tieba.baidu.com/f/good?kw=*
+// @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=*
+// @version     3.2(0.0032)
 // @description     贴吧图片拖放和粘贴上传
 // @grant GM_xmlhttpRequest
 // @grant unsafeWindow
