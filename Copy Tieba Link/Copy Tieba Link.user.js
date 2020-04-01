@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01332)
+// @version      1.1(0.01333)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -52,7 +52,12 @@ var tieba = PageData.forum.name;
 var louzhu1 = $("div.l_post").children("div.d_author").children("div.louzhubiaoshi_wrap")[0]; //获取楼主的portrait，这个在我的贴吧链接可直接找到(id=xxxxxxxx)
 var louzhu2;
 if (louzhu1 != undefined) {
-    louzhu2 = JSON.parse(louzhu1.parentNode.parentNode.getAttribute("data-field").replace(/'/g, '"')).author.portrait.split("?")[0];
+    try {
+        louzhu2 = JSON.parse(louzhu1.parentNode.parentNode.getAttribute("data-field") /*.replace(/'/g, '"')*/ ).author.portrait.split("?")[0]; //把这里的'换成"会导致json转换失败 onclick=\"Stats.sendRequest('fr=tb0_forum&st_mod=pb&st_value=atlink');\"
+    } catch (err) {
+        console.log("变量louzhu2位置报错:" + err);
+        louzhu2 = "";
+    }
 } else {
     louzhu2 = "";
 }
