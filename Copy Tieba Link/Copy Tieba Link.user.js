@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01331)
+// @version      1.1(0.01332)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?kz=*
+// @include      http*://tieba.baidu.com/f?ie=utf-8&kw=*
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=album
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=video
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group
