@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01333)
+// @version      1.1(0.01334)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -48,7 +48,7 @@ linkAnchor.className = 'tieba-link-anchor';
 linkAnchor.textContent = '[复制链接]';
 
 var linkPath = 'http://tieba.baidu.com/p/';
-var tieba = PageData.forum.name;
+var tieba = PageData.forum.name || PageData.forum.forum_name; //获取贴吧名
 var louzhu1 = $("div.l_post").children("div.d_author").children("div.louzhubiaoshi_wrap")[0]; //获取楼主的portrait，这个在我的贴吧链接可直接找到(id=xxxxxxxx)
 var louzhu2;
 if (louzhu1 != undefined) {
