@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0167beta)
+// @version      2.1(0.0168beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
 // @exclude      http*://tieba.baidu.com/f/fdir*
 // @exclude      http*://tieba.baidu.com/f/search*
+// @exclude      http*://tieba.baidu.com/f/center/*
 // @run-at       document-body
 ///document-body,document-idle
 /// jQuery 留一份自己用
@@ -34,7 +35,7 @@
 // ==/UserScript==
 
 /*
-
+//http://tieba.baidu.com/f/center/createtb 创建贴吧
 贴吧超级会员会导致楼层用户名字和楼中楼头像显示错误(已修复)
 在某些贴子，可能会缺失删除和举报按钮(2019-12-21已修复)
 有点击图片放大和引用楼层和楼中楼功能失效bug（仅在旧版贴吧有效，这种贴吧是http链接），图片点击放大偶尔可以用，引用楼层和楼中楼功能只有链接为http的贴子可以用
@@ -6335,7 +6336,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     "	width: 980px !important;",
                     "}",
                     ".tbui_aside_float_bar {",
-                    "	margin-left: calc(985px / 2) !important;",
+                    "	margin-left: 90% !important;",
+                    //"	margin-left: calc(985px / 2) !important;",
                     /*"	margin-left: 600px !important;",*/
                     "}",
                     ".core_title_absolute_bright {",
@@ -9062,10 +9064,11 @@ a.jx, .ptr	{ cursor: pointer		}
         }, 3000);
     })();
     // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
-    var getIsLogin2 = unsafeWindow.PageData.user.id;
+    var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
     if (localStorage.getItem("userid") == null) {
         localStorage.setItem("userid", getIsLogin2)
     }
+    //console.log(getIsLogin2)
     if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid")) {
         let jishu = 0;
         let t = setInterval(() => { //为右上角的浮动按钮添加头像
@@ -9084,6 +9087,7 @@ a.jx, .ptr	{ cursor: pointer		}
                 } else {
                     temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
                     //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
+                    //console.log(temp.src)
                     localStorage.setItem("userimg", temp.src)
                     userimg = temp.src;
                 }
