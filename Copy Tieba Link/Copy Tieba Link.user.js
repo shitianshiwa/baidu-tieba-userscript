@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01334)
+// @version      1.1(0.01335)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -97,7 +97,8 @@ function copyLink() {
                 //获取楼层的内容
                 var floorData00 = parent.parentNode.parentNode.children[0].children[1].children[1] || parent.parentNode.parentNode.children[0].children[3].children[1] || parent.parentNode.parentNode.parentNode.children[1].children[0].children[3].children[1];
                 var floorData = JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
-                var floorData02 = parent.parentNode.parentNode.parentNode.children[0].children[0].getAttribute("class");
+                //console.log(parent.parentNode.parentNode.parentNode.children[1])
+                var floorData02 = (parent.parentNode.parentNode.parentNode.children[0].children[0] || parent.parentNode.parentNode.parentNode.children[1].children[0]).getAttribute("class");
                 //console.log(parent.parentNode.parentNode.parentNode.children[0].children[0].getAttribute("class"))判断是不是楼主
                 if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData.content.post_no + " ");
                 if (setting.author) textGroup.push((floorData.content.post_no == 1 || floorData02 == "louzhubiaoshi_wrap" ? (setting.with_at ? '楼主: @' : '楼主: ') : (setting.with_at ? '层主: @' : '层主: ')) + (floorData.author.user_name != "" && floorData.author.user_name != "null" ? floorData.author.user_name : floorData.author.portrait) + ' ');
