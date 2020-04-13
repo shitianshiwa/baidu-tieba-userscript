@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.0169beta)
+// @version      2.1(0.01691beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -9125,7 +9125,7 @@ a.jx, .ptr	{ cursor: pointer		}
     }
     let jishu = 0;
     let t = setInterval(() => {
-        if (jishu < 20) {
+        if (jishu < 60) {
             $('div.replace_tip').click()
                 /*
                     by tency
@@ -9184,7 +9184,7 @@ a.jx, .ptr	{ cursor: pointer		}
         }
         //console.log(userimg);
         //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
-    }, 1000);
+    }, 2000);
     setTimeout(() => {
         //把https链接转到http，因为我的收藏页面并不支持https
         if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
@@ -9218,7 +9218,7 @@ a.jx, .ptr	{ cursor: pointer		}
             }
         }
         $("ul.tbui_aside_float_bar")[0].style = "margin-left: 86% !important;left:unset;"; //解决右侧工具栏消失bug
-        $(".meihua")[0].style = "color:red !important;font-weight:bold;"; //贴吧美化开关按钮文字样式
+        $(".meihua")[0].style = "color:red !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
     }, 5000);
 
     function resetx() {
