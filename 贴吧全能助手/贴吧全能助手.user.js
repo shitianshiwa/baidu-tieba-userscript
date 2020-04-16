@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.01691beta)
+// @version      2.1(0.01692beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -169,7 +169,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".aside_region.celebrity,",
                 ".j-placeholder-pay-member,",
                 ".icon-crown-super-non,",
-                ".sign_tip_sbox_1key,",
+                //".sign_tip_sbox_1key,",贴吧右上角的一键签到
                 ".p-post-forbid-speech,",
                 "/*超级会员各种提示*/",
                 ".poster_success .success-foot-tip,",
@@ -9199,6 +9199,7 @@ a.jx, .ptr	{ cursor: pointer		}
                 temp[i].style = "position: relative;display: block;top: -20px;right: 10px;";
             }
         }
+        //备忘,还有招募图标不显示
         temp = $(".icon-good"); //显示精品贴，精华贴标识
         if (temp.length > 0) {
             for (i = 0; i < temp.length; i++) {
@@ -9217,7 +9218,8 @@ a.jx, .ptr	{ cursor: pointer		}
                 temp[i].style = "background:none;background-color: #FFCC26;";
             }
         }
-        $("ul.tbui_aside_float_bar")[0].style = "margin-left: 86% !important;left:unset;"; //解决右侧工具栏消失bug
+        //$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
+        //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
         $(".meihua")[0].style = "color:red !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
     }, 5000);
 
