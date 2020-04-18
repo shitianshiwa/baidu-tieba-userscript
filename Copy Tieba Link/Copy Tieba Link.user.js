@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01335)
+// @version      1.1(0.01336)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -77,12 +77,24 @@ function copyLink() {
     else {
         switch (this.dataset.anchorType) {
             case '0': // 贴吧主题贴列表获取贴子链接
-                var temp = JSON.parse(parent.nextElementSibling.getElementsByClassName('j_user_card')[0].getAttribute("data-field"));
-                if (setting.title) textGroup.push("标题: " + parent.getElementsByClassName('j_th_tit')[0].getAttribute('title') + " ");
-                if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + (temp.un != "" && temp.un != "null" ? temp.un : temp.id) + ' ');
-                //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
-                if (setting.link) textGroup.push("链接：" + parent.getElementsByClassName('j_th_tit')[0].href + " ");
-                if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
+                var temp1 = parent.nextElementSibling.getElementsByClassName('j_user_card')[0];
+                if (temp1 != null) {
+                    let temp2 = JSON.parse(temp1.getAttribute("data-field"));
+                    if (setting.title) textGroup.push("标题: " + parent.getElementsByClassName('j_th_tit')[0].getAttribute('title') + " ");
+                    if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + (temp2.un != "" && temp2.un != "null" ? temp2.un : temp2.id) + ' ');
+                    //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
+                    if (setting.link) textGroup.push("链接：" + parent.getElementsByClassName('j_th_tit')[0].href + " ");
+                    if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
+                } else {
+                    //console.log("https:"+parent.children[1].children[1].getAttribute('href'));//话题贴链接
+                    //console.log(parent.children[1].children[1].getAttribute('title'));//话题贴标题
+                    //console.log(parent.children[2].children[0].getAttribute('href').split("un=")[1].split("&")[0]);//话题贴作者
+                    if (setting.title) textGroup.push("今日话题: " + parent.children[1].children[1].getAttribute('title') + " "); //话题贴标题
+                    if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + parent.children[2].children[0].getAttribute('href').split("un=")[1].split("&")[0] + ' '); //话题贴作者
+                    //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
+                    if (setting.link) textGroup.push("链接：" + "https:" + parent.children[1].children[1].getAttribute('href') + " "); //话题贴链接
+                    if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
+                }
                 break;
             case '1': // 贴子内页获取贴子链接
                 //console.log($("div.l_post").children("div.d_author").children("div.louzhubiaoshi_wrap")[0]);
@@ -167,9 +179,9 @@ function catchLinkTarget(event) {
     var curAnchor = linkAnchor.cloneNode(true);
     curAnchor.addEventListener('click', copyLink);
 
-    if (classList.contains('threadlist_title') && target.querySelectorAll(".tieba-link-anchor").length == 0) { //贴吧主题贴列表
+    if ((classList.contains('threadlist_title') || classList.contains('listTitleCnt')) && target.querySelectorAll(".tieba-link-anchor").length == 0) { //贴吧主题贴列表
         curAnchor.setAttribute('data-anchor-type', '0');
-        target.appendChild(curAnchor);
+        target.appendChild(curAnchor); //添加"复制链接"按钮
         //target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
     } else if (classList.contains('core_title_btns') && target.querySelectorAll(".tieba-link-anchor").length == 0) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
         curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
@@ -268,7 +280,8 @@ float: right;
 .lzl_content_reply,
 .core_reply_tail,
 .core_title_btns,
-.threadlist_title
+.threadlist_title,
+.listTitleCnt
 {
 -webkit-animation: tiebaLinkTarget;
 -moz-animation: tiebaLinkTarget;
