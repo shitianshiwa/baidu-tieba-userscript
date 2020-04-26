@@ -233,7 +233,7 @@ font-weight:bold;
     }
 
     GM_registerMenuCommand("一键签到", HH);
-    //GM_registerMenuCommand("慢速自动签到(获取贴吧名，逐个自动签到)", HH2);//一段时间内有签到数量限制，超过一定数量后有需要输入验证码
+    //GM_registerMenuCommand("慢速自动签到(获取贴吧名，逐个自动签到)", HH2);//不可用。因为单位时间内有签到数量限制，超过一定数量后需要输入验证码
     GM_registerMenuCommand("报错后重启", resetx); // @grant        GM_registerMenuCommand
     //http://tieba.baidu.com/mo/q-----1-1-0----/sign?tbs=xxxxx&fid=xxxxxx&kw=xxxxx  wap贴吧签到可能能绕开系统验证码处罚
 
