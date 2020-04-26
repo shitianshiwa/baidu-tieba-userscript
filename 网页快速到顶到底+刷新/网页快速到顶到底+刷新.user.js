@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         网页快速到顶到底+刷新
 // @namespace    http://tampermonkey.net/
-// @version      测试(beta)0.61
+// @version      测试(beta)0.62
 // @description  网页快速到顶到底+刷新(大概没什么用吧)。部分网站存在两个body，会导致出现两条按钮列表的bug，暂没方法解决(例如：广告。。！)
 // @author       shitianshiwa
 // @include      http*://*
@@ -41,6 +41,7 @@ border: 2px solid #3e89fa;
 /*固定到网页右边*/
 .miaocsss
 {
+/*margin-left: 50%;*/
 width:60px;
 height:120px;
 position: fixed;
@@ -133,10 +134,14 @@ z-index: 1005;
         temp2[3].addEventListener('click', () => {
             window.scrollTo(0, document.body.scrollHeight); //到底 document.documentElement.scrollTop获取滚动条高度
         })
-        var temp3 = document.body;
-        if (temp3 != null) {
-            temp3.appendChild(temp1);
-        }
+        setTimeout(() => {
+            var temp3 = document.body; //尝试解决某些网页会出现多个按钮的bug
+            //console.log(temp3.getElementsByTagName("iframe").length)
+            if (temp3 != null && temp3.getElementsByTagName("iframe").length > 0) {
+                temp3.appendChild(temp1);
+            }
+        }, 1000);
+
     } catch (error) {
         //alert(error);
     }
@@ -145,6 +150,10 @@ z-index: 1005;
         try {
             sessionStorage.removeItem("miaox");
             sessionStorage.removeItem("miaoy");
+            let temp = document.getElementsByClassName("miaocsss") //新增点击“重置按钮位置"按钮不刷新网页即可归位
+                //console.log(temp)
+            temp[0].style.left = window.innerWidth * 0.940 + "px";
+            temp[0].style.bottom = "30px";
             alert("已恢复默认位置！");
         } catch (error) {
             alert(error);
