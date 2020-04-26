@@ -1,16 +1,18 @@
 // ==UserScript==
 // @name         网页快速到顶到底+刷新
 // @namespace    http://tampermonkey.net/
-// @version      测试(beta)0.62
+// @version      测试(beta)0.63
 // @description  网页快速到顶到底+刷新(大概没什么用吧)。部分网站存在两个body，会导致出现两条按钮列表的bug，暂没方法解决(例如：广告。。！)
 // @author       shitianshiwa
 // @include      http*://*
 // @grant        GM_registerMenuCommand
-// @run-at       document-idle
+// @run-at       document-body
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
+// @noframes
 // ==/UserScript==
 /*
-1.部分网站存在两个body，会导致出现两条按钮列表的bug，暂没方法解决(例如：广告。。！)
+https://www.tampermonkey.net/documentation.php?version=4.10.6112&ext=gcal
+1.部分网站存在两个body，会导致出现两条按钮列表的bug，暂没方法解决(例如：广告。。！),用脚本管理器的// @noframes 解决
 2.有些网页会报错，暂没方法解决
 */
 (function() {
@@ -18,6 +20,10 @@
     var b1 = false,
         b2 = false,
         b3 = 0; //解决按键点击动作与移动按钮动作之间的冲突
+    var width = 0 //document.body.offsetLeft;
+    var height = 0; //document.body.offsetHeight;
+    var width2 = window.innerWidth
+    var height2 = window.innerHeight;
     const css1 = `
 /*按钮样式*/
 .miaocssxx
@@ -49,6 +55,20 @@ left:0px;
 z-index: 1005;
 }
 `;
+
+    function windowResizeEvent(callback) { //https://www.runoob.com/jsref/event-onresize.html onresize 事件
+        window.onresize = function() {
+            var target = this;
+            if (target.resizeFlag) {
+                clearTimeout(target.resizeFlag);
+            }
+
+            target.resizeFlag = setTimeout(function() {
+                callback();
+                target.resizeFlag = null;
+            }, 100);
+        }
+    }
     var s1 = new Array("", "miaoupdatex", "miaotopx", "miaobottomx");
     var s2 = new Array("隐藏↑  ", "刷新  ", "到顶↑", "到底↓");
     var temp2 = new Array();
@@ -71,6 +91,8 @@ z-index: 1005;
             temp1.style.left = window.innerWidth * 0.940 + "px";
             temp1.style.bottom = "30px";
         }
+        width = temp1.style.left;
+        height = temp1.style.top;
         for (let i = 0; i <= 3; i++) {
             temp2[i] = document.createElement("input"); //创建节点<input/>
             temp2[i].setAttribute('type', 'button');
@@ -121,6 +143,8 @@ z-index: 1005;
                         temp1.style.top = event.y - 15 + "px"; //设置top数值
                         sessionStorage.setItem("miaox", event.x - 30);
                         sessionStorage.setItem("miaoy", event.y - 15);
+                        width = temp1.style.left;
+                        height = temp1.style.top;
                     }
                 })
             })
@@ -132,19 +156,30 @@ z-index: 1005;
             window.scrollTo(0, 0); //到顶
         })
         temp2[3].addEventListener('click', () => {
-            window.scrollTo(0, document.body.scrollHeight); //到底 document.documentElement.scrollTop获取滚动条高度
-        })
-        setTimeout(() => {
-            var temp3 = document.body; //尝试解决某些网页会出现多个按钮的bug
-            //console.log(temp3.getElementsByTagName("iframe").length)
-            if (temp3 != null && temp3.getElementsByTagName("iframe").length > 0) {
-                temp3.appendChild(temp1);
-            }
-        }, 1000);
-
+                window.scrollTo(0, document.body.scrollHeight); //到底 document.documentElement.scrollTop获取滚动条高度
+            })
+            //console.log("start")
+            //document.body可以同时代表多个内嵌网页标签
+        document.body.appendChild(temp1);
     } catch (error) {
         //alert(error);
     }
+    windowResizeEvent(() => {
+        //console.log("233");
+
+        if (width2 == window.innerWidth && height2 == window.innerHeight) {
+            let temp = document.getElementsByClassName("miaocsss")
+                //console.log(temp[0].style.left+(width-document.body.offsetLeft));
+                //console.log(temp[0].style.top+(height-document.body.offsetHeight));
+            temp[0].style.left = width + "px"; //设置left数值
+            temp[0].style.top = height + "px"; //设置top数值
+        } else {
+            //还不支持自适应缩放网页
+            //let temp = document.getElementsByClassName("miaocsss")
+            //temp[0].style.left = width-(width2-window.innerWidth) + "px"; //设置left数值
+            //temp[0].style.top = height-(height2-window.innerHeight) + "px";//设置top数值
+        }
+    });
 
     function reset() {
         try {
@@ -154,6 +189,7 @@ z-index: 1005;
                 //console.log(temp)
             temp[0].style.left = window.innerWidth * 0.940 + "px";
             temp[0].style.bottom = "30px";
+            temp[0].style.top = "unset";
             alert("已恢复默认位置！");
         } catch (error) {
             alert(error);
