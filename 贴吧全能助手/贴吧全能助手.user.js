@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.01692beta)
+// @version      2.1(0.01693beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转，按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -224,21 +224,25 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".tbui_fbar_square {",
                 //"	display:block !important;",
                 "}",
-                /*让贴吧热议榜可以显示出来，同时改变背景颜色*/
+                /*让贴吧热议榜可以显示出来，同时改变背景颜色。贴吧的主题贴列表没有热议榜，贴子有热议榜没空间显示。。！*/
                 /*"div.topic_list_box {",
                 "   background: #fdfdfd;",
                 "}",*/
                 "  ",
                 "",
-                "/*楼层气泡*/",
-                ".post_bubble_top,.post_bubble_bottom{",
-                "    display: none !important;",
+                ".p_reply_first{", //让一楼的回复按钮看起来更好看点？
+                "right:9px !important;",
                 "}",
-                ".post_bubble_middle{",
+                "",
+                "/*楼层气泡*/", //也给显示吧？
+                ".post_bubble_top,.post_bubble_bottom{",
+                //"    display: none !important;",
+                "}",
+                /*".post_bubble_middle{",//注释掉，让楼层气泡里的文字背景不变白色
                 "    background: none !important;",
                 "    padding: 0 !important;",
                 "    width: 100% !important;",
-                "}",
+                "}",*/
                 "/*标题输入框文字对齐方式*/",
                 ".poster_body .editor_title,",
                 ".poster_body .tbui_placeholder,",
@@ -2907,6 +2911,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".u_ddl_con ul.sys_notify_last {",
                 "	padding-top: 0 !important;",
                 "}",
+                ".u_ddl_con li a,#u_notify_item li a,ul.sys_notify_last li a{", //解决右上角的浮动按钮文字超出按钮问题
+                "   white-space:normal !important;",
+                "}",
+                "",
                 ".u_ddl_con li {",
                 "	margin-top: 10px;",
                 "	padding: 0 !important;",
@@ -3716,7 +3724,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".d_post_content_firstfloor .post-tail-wrap > span.tail-info:nth-last-of-type(2),",
                 ".d_post_content_firstfloor .p_tail > li:nth-last-of-type(2)>span {",
                 "	/*1楼标识*/",
-                "	",
+                "	width:50px;",
                 "	padding-right: 30px !important;",
                 "}",
                 ".p_reply {",
@@ -4240,8 +4248,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	position: relative;",
                 "	margin: 0 !important;",
                 "	padding: 0 !important;",
-                "	-moz-user-select: none;",
-                "	-webkit-user-select: none;",
+                //"	-moz-user-select: none;",//不让人选择文字
+                //"	-webkit-user-select: none;",
                 "	height: 45px !important;",
                 "	background: rgba(0,0,0,.02) !important;",
                 "	border-bottom: 1px solid rgba(0,0,0,.1) !important;",
@@ -4731,7 +4739,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".core_title_btns>.quick_reply:before {",
                 "	content: \"\\e24c\";",
                 "}",
-                "/*帖子内页底侧浮层*/",
+                "/*帖子内页底侧浮层*/", //这个是靠贴吧自带的样式变化触发的
                 "",
                 ".core_title_absolute_bright {",
                 "	display: block !important;",
@@ -5118,6 +5126,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	box-sizing: border-box;",
                 "	height: 80px !important;",
                 "	width: 50% !important;",
+                "   max-width: 660px;", //尝试解决超宽屏的情况下，工具栏会过长bug
                 "	background: none !important;",
                 "	border: none !important;",
                 "	padding: 0 !important;",
@@ -7320,7 +7329,46 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     flag: 0,
                     def: false,
                     _init: function() {
-                        $('#j_core_title_wrap').remove();
+                        //core_title_wrap_bright clearfix  没底工具栏时 
+                        //core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright 有底工具栏时
+                        var yiyingcang = false;
+                        window.addEventListener("scroll", function() {
+                            let temp = $('#j_core_title_wrap'); //主体框架
+                            //core_title_bg 背景框
+                            //core_title_txt 标题
+                            //core_title_btns display: none !important; 按钮
+                            //p_thread thread_theme_5 页码，页数
+                            if (temp[0] != null) {
+                                //console.log(temp[0].style[0]);
+                                if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright") {
+                                    if (yiyingcang == false) {
+                                        yiyingcang = true;
+                                        //temp[0].style = "display:none !important;";//会产生滚动迟滞卡顿+无法滚动到底
+                                        $('.core_title_bg')[0].style = "display:none !important;";
+                                        $('.core_title_txt')[0].style = "display:none !important;";
+                                        $('.core_title_btns')[0].style = "display: none !important;";
+                                        $('#thread_theme_5')[0].style = "display:none !important;";
+                                    }
+                                } else {
+                                    if (yiyingcang == true) {
+                                        yiyingcang = false
+                                            //temp[0].style = "";
+                                        $('.core_title_bg')[0].style = "display:block !important;";
+                                        $('.core_title_txt')[0].style = "display:block !important;";
+                                        $('.core_title_btns')[0].style = "display:block !important;";
+                                        $('#thread_theme_5')[0].style = "display:block !important;";
+                                    }
+                                }
+                            }
+                            console.log($('#j_core_title_wrap')[0].className);
+                        }, false);
+                        /*
+                    版权声明：本文为CSDN博主「养只猫」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+                原文链接：https://blog.csdn.net/qq_40816649/java/article/details/86512538
+                    */
+                        //$('#j_core_title_wrap').remove(); //core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright
+                        //$('#j_core_title_wrap')[0].style = "position: unset !important";
+                        //$('#j_core_title_wrap')[0].className = "core_title_wrap_bright clearfix"; //这样关闭下工具栏不影响贴子顶的标题、收藏和回复
                     }
                 },
                 "ads_hide": {
@@ -8126,18 +8174,22 @@ display:none !important;
 
                 },
                 "quote": {
-                    name: '引用楼层(仅旧版PC贴吧有效)',
+                    name: '引用楼层(仅旧版PC贴吧有效,例如火狐吧)',
                     desc: '引用某一层的内容',
                     flag: __type_floor,
                     _proc: function(floorType, args) {
+                        //console.log("233333333333");
                         var $quote = $('<li>').addClass('pad-left').append( //<li>
                             $('<a>').text('#引用').addClass('jx')
                             .data('jx', 'quote').data('floor', args.floorNum)
                         ).prependTo($('.p_tail', args._main));
-                        /*var $quote2 = $('<li>').addClass('pad-left').append(//<li>
-                            $('<a>').text('#引用').addClass('jx')
-                            .data('jx', 'quote').data('floor', args.floorNum)
-                        ).prependTo($('.core_reply_tail ', args._main));*/
+                        /*setTimeout(() => {
+                            console.log(args);
+                            var $quote2 = $('.post-tail-wrap').append($('<div>').addClass('pad-left').append( //<li>
+                                $('<a>').text('#引用').addClass('jx')
+                                .data('jx', 'quote').data('floor', "666")
+                            ));
+                        }, 5000);*/
                     },
                     _click: function($ele, $eve) {
                         var $floor = $ele.parents('.l_post');
@@ -8179,7 +8231,7 @@ display:none !important;
                     }
                 },
                 "quote_lzl": {
-                    name: '楼中楼帖子引用(仅旧版PC贴吧有效)',
+                    name: '楼中楼帖子引用(仅旧版PC贴吧有效,例如火狐吧)',
                     desc: '引用楼中楼的回复',
                     flag: __type_lzl,
                     _proc: function(floorType, args) {
@@ -8628,7 +8680,8 @@ a.jx, .ptr	{ cursor: pointer		}
         };
     })();
     //百度贴吧图片点击放大 by lliwhx
-    /*(function(window) {
+    //原版的点击图片进入图片列表看图，有一定概率能看到被隐藏的楼层，该楼层需要有图片，如果有文字也会部分显示出来
+    (function(window) {
         "use strict";
         //CSS
         var parentElement = document.getElementById("j_p_postlist");
@@ -8657,8 +8710,15 @@ a.jx, .ptr	{ cursor: pointer		}
                         if (!imageSrc) return false;
                         image = doc.createElement("img");
                         image.classList.add("Tie_enlargeImage");
-                        image.src = protocol + "//imgsrc.baidu.com/forum/pic/item/" + imageSrc[1];
+                        //修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
+                        image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
                         image.onerror = function() {
+                            if (protocol === "https:") {
+                                log("图片请求", "https转向http");
+                                protocol = "http:";
+                                this.src = "http://tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
+                            }
+                            elss
                             if (protocol === "https:") {
                                 log("图片请求", "https转向http");
                                 protocol = "http:";
@@ -8980,7 +9040,7 @@ a.jx, .ptr	{ cursor: pointer		}
         run();
 
         addMutationObserver('#j_p_postlist', run);
-    })();*/
+    })();
     //查看发帖 by 文科
     window.addEventListener('DOMContentLoaded', function() {
         var $ = unsafeWindow.$;
@@ -9006,6 +9066,20 @@ a.jx, .ptr	{ cursor: pointer		}
         })();
     }, false);
     //百度贴吧按发帖时间（帖子ID）排序 by NULL
+    var backupshunxu = new Array();
+    setTimeout(() => {
+        var parentNodex = document.getElementById('thread_list');
+        if (parentNodex != null) {
+            var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)');
+            for (let i = 0; i < threadsx.length; i++) {
+                //console.log(threadsx[i]);
+                backupshunxu.push(threadsx[i]);
+            }
+        }
+    }, 3000);
+
+    var yipaixun = false;
+    var yipaixun2 = false;
     (function() {
         if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
 
@@ -9014,24 +9088,44 @@ a.jx, .ptr	{ cursor: pointer		}
             if (parentNode == null) {
                 return;
             }
-            var threads = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
-            var threadArray = [];
-            for (var thread of threads) {
-                try {
-                    threadArray.push({
-                        id: JSON.parse(thread.getAttribute('data-field')).id,
-                        thread: thread
-                    });
-                    //parentNode.removeChild(thread);
-                } catch (e) {
-                    console.log(e);
+            if (yipaixun == false) {
+                $(".fatieshijianpaixu").html("还原为按回复时间顺序")
+                yipaixun = true;
+                var threads = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
+                var threadArray = [];
+                for (var thread of threads) {
+                    try {
+                        threadArray.push({
+                            id: JSON.parse(thread.getAttribute('data-field')).id,
+                            thread: thread
+                        });
+                        //parentNode.removeChild(thread);
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
-            }
-            threadArray.sort((a, b) => {
-                return b.id - a.id;
-            });
-            for (var thread2 of threadArray) {
-                parentNode.appendChild(thread2.thread);
+                threadArray.sort((a, b) => {
+                    return b.id - a.id;
+                });
+                for (var thread2 of threadArray) {
+                    parentNode.appendChild(thread2.thread);
+                }
+            } else {
+                $(".fatieshijianpaixu").html("按发帖时间排序(贴子ID)")
+                yipaixun = false;
+                //console.log("666");
+                var threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
+                for (var thread of threads3) {
+                    try {
+                        parentNode.removeChild(thread);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                for (let i = 0; i < backupshunxu.length; i++) {
+                    //console.log("2333")
+                    parentNode.appendChild(backupshunxu[i]);
+                }
             }
         }
         //setInterval(() => {
@@ -9043,23 +9137,30 @@ a.jx, .ptr	{ cursor: pointer		}
         setTimeout(() => {
             var a = document.createElement('a');
             a.textContent = '按发帖时间排序(贴子ID)';
+            a.setAttribute('class', 'fatieshijianpaixu');
             a.setAttribute('style', 'color:red !important;');
             a.setAttribute('href', 'javascript:;');
             var paixun = false
-            a.addEventListener('click', e => {
-                let i = 0;
-                if (paixun == false) {
-                    let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
-                        if (i <= document.body.scrollHeight) {
-                            window.scrollTo(0, i);
-                            i += 300;
-                        } else {
-                            clearInterval(t);
-                            paixun = true;
-                            sortById();
-                            window.scrollTo(0, 0);
-                        }
-                    }, 100);
+            a.addEventListener('click', e => { //必须先自动滚动网页，预览所有图片后，才能保证图片都能显示出来 
+                if (yipaixun2 == false) {
+                    yipaixun2 = true;
+                    let i = 0;
+                    if (paixun == false) {
+                        paixun = true;
+                        let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
+                            if (i <= document.body.scrollHeight) {
+                                window.scrollTo(0, i);
+                                i += 300;
+                            } else {
+                                clearInterval(t);
+                                paixun = false;
+                                sortById();
+                                window.scrollTo(0, 0);
+                            }
+                        }, 100);
+                    }
+                } else {
+                    sortById();
                 }
             }, false);
             document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);
@@ -9137,8 +9238,14 @@ a.jx, .ptr	{ cursor: pointer		}
                     */
             let i = 0;
             if (!GM_getValue("jinyongtiebameihua") /*贴吧美化后*/ ) {
-                //以下为尝试解决右上角的浮动按钮文字超出按钮问题
-                let temp = $(".u_ddl_con li a"); //a.j_cleardata,u_notify_item
+                //以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
+                //u_username_wrap
+                //u_news_wrap
+                //u_setting_wrap
+                /*document.querySelector("a.u_username_wrap").addEventListener("mouseover", () => {
+                    console.log("1");
+                });*/
+                /*let temp = $(".u_ddl_con li a"); //a.j_cleardata,u_notify_item
                 if (temp.length > 0) {
                     //console.log(temp);
                     //console.log(temp.length);
@@ -9149,7 +9256,7 @@ a.jx, .ptr	{ cursor: pointer		}
                         }
                     }
                 }
-                temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
+                let temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
                 if (temp.length > 0) {
                     for (i = 0; i < temp.length; i++) {
                         if (temp[i].getAttribute("style") == null) {
@@ -9164,7 +9271,7 @@ a.jx, .ptr	{ cursor: pointer		}
                             temp[i].style = "white-space:normal;";
                         }
                     }
-                }
+                }*/
             } else {
                 let temp = $(".u_menu_item"); //尝试解决旧版贴吧右上角选项按钮显示偏前
                 if (temp.length > 0) {
@@ -9191,6 +9298,7 @@ a.jx, .ptr	{ cursor: pointer		}
             let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
             $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
         }
+        $(".u_tb_profile>a").attr("href", "http://tieba.baidu.com/i/i/profile"); //修复贴吧设置按钮无效bug
 
         let i = 0;
         let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
@@ -9220,6 +9328,7 @@ a.jx, .ptr	{ cursor: pointer		}
         }
         //$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
         //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
+        $(".p_reply_first").html("回复楼主");
         $(".meihua")[0].style = "color:red !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
     }, 5000);
 
@@ -9232,3 +9341,30 @@ a.jx, .ptr	{ cursor: pointer		}
 })();
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
+/*https://www.jb51.net/article/147217.htm
+    js监听html页面的上下滚动事件方法
+    var scrollFunc = function(e) {
+            e = e || window.event;
+            if (e.wheelDelta) { //第一步：先判断浏览器IE，谷歌滑轮事件
+                if (e.wheelDelta > 0) { //当滑轮向上滚动时
+                    console.log("滑轮向上滚动");
+                }
+                if (e.wheelDelta < 0) { //当滑轮向下滚动时
+                    console.log("滑轮向下滚动");
+                }
+            } else if (e.detail) { //Firefox滑轮事件
+                if (e.detail > 0) { //当滑轮向上滚动时
+                    console.log("滑轮向上滚动");
+                }
+                if (e.detail < 0) { //当滑轮向下滚动时
+                    console.log("滑轮向下滚动");
+                }
+            }
+        }
+        //给页面绑定滑轮滚动事件
+    if (document.addEventListener) { //firefox
+        document.addEventListener('DOMMouseScroll', scrollFunc, false);
+    }
+    //滚动滑轮触发scrollFunc方法 //ie 谷歌
+    window.onmousewheel = document.onmousewheel = scrollFunc;
+*/
