@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.01693beta)
+// @version      2.1(0.016931beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -7329,7 +7329,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     flag: 0,
                     def: false,
                     _init: function() {
-                        //core_title_wrap_bright clearfix  没底工具栏时 
+                        //core_title_wrap_bright clearfix  没底工具栏时
                         //core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright 有底工具栏时
                         var yiyingcang = false;
                         window.addEventListener("scroll", function() {
@@ -8303,7 +8303,7 @@ display:none !important;
                         _hide('.save_face_bg');
                     }
                 },
-                /*"rm_img_view": {
+                "rm_img_view": {
                     name: '看图模式屏蔽',
                     desc: '还原旧版贴吧点图看大图功能',
                     flag: __type_floor,
@@ -8328,7 +8328,7 @@ display:none !important;
                     _proc: function(floorType, args) {
                         this.rmImg(args._main);
                     }
-                },*/
+                },
                 "save_face": {
                     name: '挽尊卡隐藏',
                     desc: '屏蔽挽尊卡，留下一个横条提示。',
@@ -9141,7 +9141,7 @@ a.jx, .ptr	{ cursor: pointer		}
             a.setAttribute('style', 'color:red !important;');
             a.setAttribute('href', 'javascript:;');
             var paixun = false
-            a.addEventListener('click', e => { //必须先自动滚动网页，预览所有图片后，才能保证图片都能显示出来 
+            a.addEventListener('click', e => { //必须先自动滚动网页，预览所有图片后，才能保证图片都能显示出来
                 if (yipaixun2 == false) {
                     yipaixun2 = true;
                     let i = 0;
