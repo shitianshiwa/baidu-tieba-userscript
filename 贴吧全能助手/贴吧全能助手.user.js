@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016931beta)
+// @version      2.1(0.016932beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -77,10 +77,17 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         clearTimeout(baiban2);
         $("div.baiban").remove();
     }, 1000);*/
+    var tupianfangda = true; //贴吧图片放大
     if (!GM_getValue("jinyongtiebameihua")) {
         var css = "";
         if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
             css += [
+                ".zhankaichangtupian{",
+                "height:auto;",
+                "}",
+                ".zhankaichangtupian2{",
+                "display:none;",
+                "}",
                 "/*",
                 "——WebFonts——",
                 "Google Fonts: https://www.google.com/fonts",
@@ -4802,6 +4809,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	font-size: 12px !important;",
                 "	letter-spacing: 2px;",
                 "	text-indent: 2px;",
+                "   left: unset !important;", //贴子内标题栏的功能按钮 给旧版贴吧用的，例如火狐吧 解决下工具栏文本右偏
                 "}",
                 "/*fix bug*/",
                 ".quick_reply{",
@@ -4834,6 +4842,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".core_title_absolute_bright .core_title_btns #lzonly_cntn:before {",
                 "	font-size: 36px !important;",
+                "}",
+                ".core_title_btns>li>a,.core_title_btns>li>*{", //贴子内标题栏的功能按钮 给旧版贴吧用的，例如火狐吧
+                "   left: 5px;",
                 "}",
                 "/*收藏成功提示框*/",
                 "",
@@ -5551,7 +5562,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	line-height: 100px;",
                 "}",
                 "/*帖子标题标识*/",
-                ".threadlist_title i{",
+                ".threadlist_title i:not(.icon-bazhurecruit){",
                 "	flex: 0 0 auto;",
                 "	background-image: none !important;",
                 "	display: inline-block !important;",
@@ -5738,7 +5749,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".threadlist_title img[src*=\"membertop_icon.png\"],",
                 ".threadlist_title .icon-member-top {",
-                "	background-color: #FFCC26",
+                "	background-color: #FFCC26 !important",
                 "}",
                 "",
                 ".threadlist_title .icon-member-top:after {",
@@ -5747,7 +5758,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".threadlist_title .icon-top{",
                 "   background:none;",
-                "   background-color: #4285F5;",
+                "   background-color: #4285F5 !important;",
                 "}",
                 ".threadlist_title .icon-member-top:before,",
                 ".threadlist_title .icon-top:before{",
@@ -5787,7 +5798,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "",
                 ".threadlist_title img[src*=\"jing.gif\"],",
                 ".threadlist_title .icon-good{",
-                "	background-color: #FF6666",
+                "	background-color: #FF6666 !important",
                 "}",
                 ".threadlist_title .icon-good:before{",
                 "	content: \"\\e838\";",
@@ -7484,7 +7495,14 @@ display:none !important;
 
                         // 只保留 [看帖、图片、精品、视频] 四个选项，贴吧有一个空白的选项 j_tbnav_tab_a
                         //$('.j_tbnav_tab').filter(function(i) { return i > 3; }).remove();
-
+                        let temp = $('.j_tbnav_tab_a');
+                        for (let i = 0; i < temp.length; i++) {
+                            //console.log(temp[i].innerHTML);
+                            //console.log(temp[i].parentNode);
+                            if (temp[i].innerHTML == "" || temp[i].innerHTML == "玩乐" || temp[i].innerHTML == "游戏" /* || temp[i].innerHTML == undefined*占位的*/ ) {
+                                temp[i].parentNode.style = "display:none;";
+                            }
+                        }
                         // 执行三次, 确保分隔符会消失
                         for (var i = 3; i--;) {
                             setTimeout(function() {
@@ -8234,7 +8252,13 @@ display:none !important;
                     name: '楼中楼帖子引用(仅旧版PC贴吧有效,例如火狐吧)',
                     desc: '引用楼中楼的回复',
                     flag: __type_lzl,
-                    _proc: function(floorType, args) {
+                    _init: function() { //新旧版贴吧都生效
+                        tupianfangda = true;
+                        //console.log("123")
+                        //_css.append('.jx_no_overflow { max-width: 100%; }');
+                        //this.rmImg(document);
+                    },
+                    _proc: function(floorType, args) { //仅旧版贴吧生效
                         $('<a>').text('引用').addClass('jx d_tail')
                             .insertBefore($('.lzl_time', args._main))
                             .after($('<span>').addClass('d_tail').text(' | '))
@@ -8303,9 +8327,39 @@ display:none !important;
                         _hide('.save_face_bg');
                     }
                 },
-                "rm_img_view": {
+                "rm_img_view1": {
                     name: '看图模式屏蔽',
-                    desc: '还原旧版贴吧点图看大图功能',
+                    desc: '还原为旧版贴吧点图看大图功能',
+                    flag: __type_floor,
+                    def: false,
+                    rmImg: function($root) {
+                        $('img.BDE_Image', $root).each(function() {
+                            var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
+                            if (!m) return;
+                            var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
+                            $('<a>')
+                                .attr('href', imgLink)
+                                .attr('target', '_blank')
+                                .append($('<img>').attr('src', imgLink).addClass('jx_no_overflow'))
+                                .insertAfter(this);
+                            $(this).remove();
+                        });
+                    },
+                    _init: function() { //新旧版贴吧都生效
+                        tupianfangda = false;
+                        //console.log("123")
+                        //_css.append('.jx_no_overflow { max-width: 100%; }');
+                        //this.rmImg(document);
+                    },
+                    _proc: function(floorType, args) { //仅旧版贴吧生效
+                        tupianfangda = false;
+                        //console.log("456")
+                        //this.rmImg(args._main);
+                    }
+                },
+                "rm_img_view2": {
+                    name: '看图模式切换',
+                    desc: '切换为贴吧点图看大图功能',
                     flag: __type_floor,
                     def: false,
                     rmImg: function($root) {
@@ -8322,11 +8376,17 @@ display:none !important;
                         });
                     },
                     _init: function() {
-                        _css.append('.jx_no_overflow { max-width: 100%; }');
-                        this.rmImg(document);
+                        if (tupianfangda == true) {
+                            _css.append('.jx_no_overflow { max-width: 100%; }');
+                            this.rmImg(document);
+                        }
+
                     },
                     _proc: function(floorType, args) {
-                        this.rmImg(args._main);
+                        if (tupianfangda == true) {
+                            this.rmImg(args._main);
+
+                        }
                     }
                 },
                 "save_face": {
@@ -8681,313 +8741,319 @@ a.jx, .ptr	{ cursor: pointer		}
     })();
     //百度贴吧图片点击放大 by lliwhx
     //原版的点击图片进入图片列表看图，有一定概率能看到被隐藏的楼层，该楼层需要有图片，如果有文字也会部分显示出来
-    (function(window) {
-        "use strict";
-        //CSS
-        var parentElement = document.getElementById("j_p_postlist");
-        if (!parentElement) return;
-        GM_addStyle(".BDE_Image,.j_user_sign{cursor:alias;}#Tie_enlargeImage_parentDIV{position:fixed;z-index:1005;top:0;left:0;}.Tie_enlargeImage{position:absolute;box-shadow:1px 1px 10px #000;cursor:move;}.Tie_enlargeImage:hover{z-index:1006;}#Tie_setValue_DIV{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);}.Tie_definedDIV{position:absolute;z-index:10000;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);}.Tie_definedDIV_title{border-bottom:1px solid #f2f2f5;line-height:40px;font-size:15px;font-weight:700;padding:0 0 0 15px;}.Tie_definedDIV_point{padding:20px 40px;}.Tie_definedDIV_groupSubtitle{font-weight:bold;}.Tie_definedDIV_configItem{line-height:30px;margin:0 20px}.Tie_definedDIV_configItem select{margin:0.5em}.Tie_definedDIV_configItem br+label{margin-left:3em}.Tie_definedDIV_configItem input{vertical-align:middle;margin-right:0.5em}#Tie_debugConfig{margin:0.5em}.Tie_debugConfig_icon{position:relative;display:inline-block;top:4px;width:16px;height:16px;background-position:-350px -100px;background-image:url('https://img.t.sinajs.cn/t6/style/images/common/icon.png');background-repeat:no-repeat;}.Tie_bubble_DIV{position:absolute;visibility:hidden;max-width:280px;top:20%}.Tie_definedDIV_configItem label:hover+.Tie_bubble_DIV{visibility:visible}.Tie_bubble_content{position:relative;background:#fff;padding:6px 13px 6px 16px;border:1px solid #ccc;border-radius:3px;}.Tie_bubble_mainTxt{line-height:18px;}.Tie_bubble_bor{position:absolute;overflow:hidden;bottom:-14px;line-height:14px;}.Tie_bubble_line{border-color:#ccc transparent transparent transparent;}.Tie_bubble_br{margin:-1px 0 0 -14px;border-color:#fff transparent transparent transparent;}.Tie_bubble_bor i,.Tie_bubble_bor em{display:inline-block;width:0;height:0;border-width:7px;border-style:solid;vertical-align:top;overflow:hidden;}.Tie_definedDIV_SaveBtn{background-color:#f2f2f5;text-align:center;padding:10px 0;}.Tie_SaveBtn_a{background:#ff8140;color:#fff;font-size:15px;display:inline-block;padding:0 15px;line-height:35px;border-radius:3px;}.Tie_SaveBtn_a:hover{background:#f7671d}");
-        //数据缓存
-        var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function() {},
-            mouseWheel = /Firefox/.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel",
-            protocol = window.location.protocol || "https",
-            doc = window.document,
-            docHeight = doc.documentElement.clientHeight - 6,
-            docWidth = doc.documentElement.clientWidth - 6,
-            definedEvent = GM_getValue("definedEvent", "click,click,1,0,1").split(","),
-            repairDefinedEvent = GM_getValue("repairDefinedEvent", false),
-            imageEvent = {
-                init: function(e) { //主事件
-                    var target = e.target,
-                        image, imageSrc;
-                    if (e.button === 0 && (target.className === "BDE_Image" || target.className === "j_user_sign")) {
-                        log("图片创建", "开始");
-                        imageSrc = target.src.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/);
-                        log("图片地址获取", function() {
-                            if (imageSrc) return "成功";
-                            else return "失败";
-                        }, target.src);
-                        if (!imageSrc) return false;
-                        image = doc.createElement("img");
-                        image.classList.add("Tie_enlargeImage");
-                        //修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
-                        image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
-                        image.onerror = function() {
-                            if (protocol === "https:") {
-                                log("图片请求", "https转向http");
-                                protocol = "http:";
-                                this.src = "http://tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
+    setTimeout(() => {
+        if (tupianfangda == true) {
+            (function(window) {
+                "use strict";
+                //CSS
+                var parentElement = document.getElementById("j_p_postlist");
+                if (!parentElement) return;
+                GM_addStyle(".BDE_Image,.j_user_sign{cursor:alias;}#Tie_enlargeImage_parentDIV{position:fixed;z-index:1005;top:0;left:0;}.Tie_enlargeImage{position:absolute;box-shadow:1px 1px 10px #000;cursor:move;}.Tie_enlargeImage:hover{z-index:1006;}#Tie_setValue_DIV{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);}.Tie_definedDIV{position:absolute;z-index:10000;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);}.Tie_definedDIV_title{border-bottom:1px solid #f2f2f5;line-height:40px;font-size:15px;font-weight:700;padding:0 0 0 15px;}.Tie_definedDIV_point{padding:20px 40px;}.Tie_definedDIV_groupSubtitle{font-weight:bold;}.Tie_definedDIV_configItem{line-height:30px;margin:0 20px}.Tie_definedDIV_configItem select{margin:0.5em}.Tie_definedDIV_configItem br+label{margin-left:3em}.Tie_definedDIV_configItem input{vertical-align:middle;margin-right:0.5em}#Tie_debugConfig{margin:0.5em}.Tie_debugConfig_icon{position:relative;display:inline-block;top:4px;width:16px;height:16px;background-position:-350px -100px;background-image:url('https://img.t.sinajs.cn/t6/style/images/common/icon.png');background-repeat:no-repeat;}.Tie_bubble_DIV{position:absolute;visibility:hidden;max-width:280px;top:20%}.Tie_definedDIV_configItem label:hover+.Tie_bubble_DIV{visibility:visible}.Tie_bubble_content{position:relative;background:#fff;padding:6px 13px 6px 16px;border:1px solid #ccc;border-radius:3px;}.Tie_bubble_mainTxt{line-height:18px;}.Tie_bubble_bor{position:absolute;overflow:hidden;bottom:-14px;line-height:14px;}.Tie_bubble_line{border-color:#ccc transparent transparent transparent;}.Tie_bubble_br{margin:-1px 0 0 -14px;border-color:#fff transparent transparent transparent;}.Tie_bubble_bor i,.Tie_bubble_bor em{display:inline-block;width:0;height:0;border-width:7px;border-style:solid;vertical-align:top;overflow:hidden;}.Tie_definedDIV_SaveBtn{background-color:#f2f2f5;text-align:center;padding:10px 0;}.Tie_SaveBtn_a{background:#ff8140;color:#fff;font-size:15px;display:inline-block;padding:0 15px;line-height:35px;border-radius:3px;}.Tie_SaveBtn_a:hover{background:#f7671d}");
+                //数据缓存
+                var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function() {},
+                    mouseWheel = /Firefox/.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel",
+                    protocol = window.location.protocol || "https",
+                    doc = window.document,
+                    docHeight = doc.documentElement.clientHeight - 6,
+                    docWidth = doc.documentElement.clientWidth - 6,
+                    definedEvent = GM_getValue("definedEvent", "click,click,1,0,1").split(","),
+                    repairDefinedEvent = GM_getValue("repairDefinedEvent", false),
+                    imageEvent = {
+                        init: function(e) { //主事件
+                            var target = e.target,
+                                image, imageSrc;
+                            if (e.button === 0 && (target.className === "BDE_Image" || target.className === "j_user_sign")) {
+                                log("图片创建", "开始");
+                                imageSrc = target.src.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/);
+                                log("图片地址获取", function() {
+                                    if (imageSrc) return "成功";
+                                    else return "失败";
+                                }, target.src);
+                                if (!imageSrc) return false;
+                                image = doc.createElement("img");
+                                image.classList.add("Tie_enlargeImage");
+                                //修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
+                                image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
+                                image.onerror = function() {
+                                    if (protocol === "https:") {
+                                        log("图片请求", "https转向http");
+                                        protocol = "http:";
+                                        this.src = "http://tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
+                                    }
+                                    elss
+                                    if (protocol === "https:") {
+                                        log("图片请求", "https转向http");
+                                        protocol = "http:";
+                                        this.src = "http://imgsrc.baidu.com/forum/pic/item/" + imageSrc[1];
+                                    } else {
+                                        this.onerror = null;
+                                        this.onload = null;
+                                        imageSrc = null;
+                                        log("图片请求", "失败");
+                                        alert("图片获取失败\n\n如多次获取失败\n请在设置里勾选“调试脚本”打印脚本日志并截图反馈给作者，以便更好的解决问题");
+                                    }
+                                };
+                                image.onload = function() {
+                                    log("图片创建", "进行中");
+                                    var target = this,
+                                        width = target.width,
+                                        height = target.height,
+                                        Wboolean = width > docWidth,
+                                        Hboolean = height > docHeight,
+                                        X = 6,
+                                        Y = 6;
+                                    target.onerror = null;
+                                    target.onload = null;
+                                    imageSrc = null;
+                                    if (Hboolean && !Wboolean) X = (docWidth - width) / 2;
+                                    else if (!Hboolean && !Wboolean) {
+                                        X = (docWidth - width) / 2;
+                                        Y = (docHeight - height) / 2;
+                                    } else if (!Hboolean && Wboolean) Y = (docHeight - height) / 2;
+                                    target.imageData = { width: width, height: height, X: X, Y: Y }; //缓存当前图片数据
+                                    target.style.transform = "translate(" + X + "px," + Y + "px)";
+                                    parentDIV.appendChild(target);
+                                    log("图片创建", function() {
+                                        target.id = Date.now();
+                                        if (doc.getElementById(target.id)) return "成功";
+                                        else return "失败";
+                                    }, target.imageData);
+                                };
+                                image = null;
                             }
-                            elss
-                            if (protocol === "https:") {
-                                log("图片请求", "https转向http");
-                                protocol = "http:";
-                                this.src = "http://imgsrc.baidu.com/forum/pic/item/" + imageSrc[1];
-                            } else {
-                                this.onerror = null;
-                                this.onload = null;
-                                imageSrc = null;
-                                log("图片请求", "失败");
-                                alert("图片获取失败\n\n如多次获取失败\n请在设置里勾选“调试脚本”打印脚本日志并截图反馈给作者，以便更好的解决问题");
+                        },
+                        StopPropagation: function(e) {
+                            if (e.button === 0 && e.target.className === "BDE_Image") {
+                                e.stopPropagation(); //阻止冒泡，阻止图片原事件
+                                log("阻止贴吧图片原事件", "已执行");
                             }
-                        };
-                        image.onload = function() {
-                            log("图片创建", "进行中");
-                            var target = this,
-                                width = target.width,
-                                height = target.height,
+                        },
+                        Down: function(e) {
+                            var target = e.target,
+                                imageData = target.imageData;
+                            imageTarget = target;
+                            log("鼠标down事件", function() { if (!target.id) target.id = Date.now(); return "开始"; });
+                            if (e.button !== 0) return false;
+                            e.preventDefault();
+                            e.stopPropagation();
+                            imageMouse = [e.clientX, e.clientY];
+                            imageCount = [imageData.X - imageMouse[0], imageData.Y - imageMouse[1], 6 - imageData.width, 6 - imageData.height]; //图片宽高的偏移量，图片左右边界预留量
+                            imageButton = true;
+                            doc.addEventListener("mousemove", imageEvent.Move);
+                            doc.addEventListener("mouseup", imageEvent.Up);
+                            log("鼠标down事件", "结束");
+                        },
+                        Move: function(e) {
+                            log("鼠标move事件", "开始");
+                            var target = imageTarget,
+                                X = e.clientX + imageCount[0],
+                                Y = e.clientY + imageCount[1];
+                            imageButton = false;
+                            log("鼠标move事件", "进行中", "X:" + X + "Y:" + Y);
+                            if (X < imageCount[2]) { //左边界
+                                target.style.transform = "translate(" + imageCount[2] + "px," + Y + "px)";
+                                return false;
+                            }
+                            if (X > docWidth) { //右边界
+                                target.style.transform = "translate(" + docWidth + "px," + Y + "px)";
+                                return false;
+                            }
+                            if (Y < imageCount[3]) { //上边界
+                                target.style.transform = "translate(" + X + "px," + imageCount[3] + "px)";
+                                return false;
+                            }
+                            if (Y > docHeight) { //下边界
+                                target.style.transform = "translate(" + X + "px," + docHeight + "px)";
+                                return false;
+                            }
+                            target.style.transform = "translate(" + X + "px," + Y + "px)";
+                            log("鼠标move事件", "结束", target.style.transform);
+                        },
+                        Up: function(e) {
+                            log("鼠标up事件", "开始");
+                            var target = imageTarget,
+                                RegEx;
+                            if (repairDefinedEvent && e.clientX - imageMouse[0] <= 1 && e.clientY - imageMouse[1] <= 1) { //尝试修复关闭图片功能
+                                log("尝试修复关闭图片功能", "已执行");
+                                imageButton = true;
+                            } else if (scriptDebug && !imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
+                                log("鼠标click事件判断", "\n一.操作时页面不在激活状态。请保证浏览器正在被操作，在执行一次\n二.关闭图片功能可能损坏，建议修复");
+                            }
+                            if (!imageButton) {
+                                RegEx = target.style.transform.match(/[-0-9.]+/g);
+                                target.imageData.X = parseFloat(RegEx[0]);
+                                target.imageData.Y = parseFloat(RegEx[1]);
+                            }
+                            imageTarget = null;
+                            imageMouse = null;
+                            imageCount = null;
+                            doc.removeEventListener("mousemove", imageEvent.Move);
+                            doc.removeEventListener("mouseup", imageEvent.Up);
+                            log("鼠标up事件", "结束", imageButton);
+                        },
+                        Close: function(e) {
+                            log("鼠标click事件", "开始");
+                            var target = e.target;
+                            if (imageButton) {
+                                imageButton = null;
+                                delete target.imageData;
+                                parentDIV.removeChild(target);
+                                log("鼠标click事件", function() {
+                                    if (!doc.getElementById(target.id)) return "成功";
+                                    else return "失败";
+                                });
+                            }
+                        },
+                        Wheel: function(e) {
+                            var target = e.target,
+                                imageData = target.imageData,
+                                wheelKey = definedEvent[3],
+                                width = imageData.width,
+                                height = imageData.height,
                                 Wboolean = width > docWidth,
                                 Hboolean = height > docHeight,
-                                X = 6,
-                                Y = 6;
-                            target.onerror = null;
-                            target.onload = null;
-                            imageSrc = null;
-                            if (Hboolean && !Wboolean) X = (docWidth - width) / 2;
-                            else if (!Hboolean && !Wboolean) {
-                                X = (docWidth - width) / 2;
-                                Y = (docHeight - height) / 2;
-                            } else if (!Hboolean && Wboolean) Y = (docHeight - height) / 2;
-                            target.imageData = { width: width, height: height, X: X, Y: Y }; //缓存当前图片数据
-                            target.style.transform = "translate(" + X + "px," + Y + "px)";
-                            parentDIV.appendChild(target);
-                            log("图片创建", function() {
-                                target.id = Date.now();
-                                if (doc.getElementById(target.id)) return "成功";
-                                else return "失败";
-                            }, target.imageData);
+                                wheelXY;
+                            log("鼠标wheel事件", "开始", imageData);
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (wheelKey !== "0") {
+                                if ((e.ctrlKey && wheelKey === "1") || (e.altKey && wheelKey === "2") || (e.shiftKey && wheelKey === "3")) { //判断图片缩放的组合键
+                                    log("鼠标wheel缩放事件", "开始");
+                                    var eX = e.clientX,
+                                        eY = e.clientY,
+                                        ratioX = (eX - imageData.X) / width,
+                                        ratioY = (eY - imageData.Y) / height,
+                                        wheelRatio = width + (e.wheelDelta || -e.detail * 40) * definedEvent[4];
+                                    imageData.width = wheelRatio < 150 ? 150 : wheelRatio;
+                                    imageData.height = imageData.width * height / width;
+                                    imageData.X = eX - (imageData.width * ratioX);
+                                    imageData.Y = eY - (imageData.height * ratioY);
+                                    log("鼠标wheel缩放事件", "进行中", imageData);
+                                    target.width = imageData.width;
+                                    target.style.transform = "translate(" + imageData.X + "px," + imageData.Y + "px)"; //基于鼠标位置的缩放
+                                    log("鼠标wheel缩放事件", "结束", target.style.transform);
+                                    return false;
+                                }
+                            }
+                            if (!Hboolean && !Wboolean) { log("鼠标wheel滚动事件", "图片小于窗口"); return false; }
+                            if (Hboolean) {
+                                wheelXY = imageData.Y + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
+                                if (wheelXY > 0 || wheelXY < docHeight - height) {
+                                    wheelXY = wheelXY > 0 ? 6 : docHeight - height;
+                                }
+                                imageData.Y = wheelXY;
+                                log("鼠标wheel垂直滚动事件", "进行中", wheelXY);
+                                target.style.transform = "translate(" + imageData.X + "px," + wheelXY + "px)";
+                                log("鼠标wheel垂直滚动事件", "结束", target.style.transform);
+                            } else if (Wboolean) {
+                                wheelXY = imageData.X + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
+                                if (wheelXY > 0 || wheelXY < docWidth - width) {
+                                    wheelXY = wheelXY > 0 ? 6 : docWidth - width;
+                                }
+                                imageData.X = wheelXY;
+                                log("鼠标wheel水平滚动事件", "进行中", wheelXY);
+                                target.style.transform = "translate(" + wheelXY + "px," + imageData.Y + "px)";
+                                log("鼠标wheel水平滚动事件", "结束", target.style.transform);
+                            }
+                        }
+                    };
+                //创建父DIV
+                var parentDIV = doc.createElement("div");
+                parentDIV.id = "Tie_enlargeImage_parentDIV";
+                doc.body.appendChild(parentDIV);
+                //事件委托
+                parentElement.addEventListener("click", imageEvent.StopPropagation, true);
+                parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
+                parentDIV.addEventListener("mousedown", imageEvent.Down);
+                parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
+                parentDIV.addEventListener(mouseWheel, imageEvent.Wheel);
+                //释放缓存
+                parentElement = null;
+                //自定义设置
+                var userEvent = {
+                    init: function() {
+                        this.create();
+                        this.Event();
+                    },
+                    create: function() {
+                        var definedDIV = doc.createElement("div"); //创建自定义DIV框架
+                        definedDIV.id = "Tie_setValue_DIV";
+                        definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>自定义设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select><br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
+                        doc.body.appendChild(definedDIV);
+                        definedDIV = null;
+                    },
+                    Event: function() {
+                        var definedDIV = doc.getElementById("Tie_setValue_DIV"),
+                            repairValue = doc.getElementById("Tie_repairValue"),
+                            debugConfig = doc.getElementById("Tie_debugConfig"),
+                            parentElement = doc.getElementById("j_p_postlist"),
+                            setValue = doc.getElementsByName("Tie_setValue"),
+                            oldDefinedEvent = definedEvent; //备份旧设置
+                        for (var i = 0; i < 5; i++) {
+                            setValue[i].value = oldDefinedEvent[i];
+                        }
+                        if (setValue[3].value === "0") setValue[4].style.visibility = "hidden";
+                        setValue[3].onchange = function() {
+                            setValue[4].style.visibility = this.value === "0" ? "hidden" : "visible";
                         };
-                        image = null;
+                        repairValue.checked = repairDefinedEvent;
+                        debugConfig.checked = scriptDebug;
+                        doc.getElementById("Tie_setValue_a").onclick = function() {
+                            definedEvent = [setValue[0].value, setValue[1].value, setValue[2].value, setValue[3].value, setValue[4].value];
+                            repairDefinedEvent = repairValue.checked;
+                            scriptDebug = debugConfig.checked;
+                            if (oldDefinedEvent[0] !== definedEvent[0]) {
+                                parentElement.removeEventListener(oldDefinedEvent[0], imageEvent.init, true);
+                                parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
+                            }
+                            if (oldDefinedEvent[1] !== definedEvent[1]) {
+                                parentDIV.removeEventListener(oldDefinedEvent[1], imageEvent.Close);
+                                parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
+                            }
+                            log = scriptDebug && function(text, types, data) { //脚本调试，日志
+                                if (typeof types === "function") {
+                                    types = types();
+                                }
+                                if (data === undefined) console.log(text, types);
+                                else console.log(text, types, data);
+                            } || function() {};
+                            log("自定义属性设置", "已执行", definedEvent + "," + repairDefinedEvent);
+                            this.onclick = null;
+                            setValue[3].onchange = null;
+                            doc.body.removeChild(definedDIV);
+                            GM_setValue("definedEvent", definedEvent.toString());
+                            GM_setValue("repairDefinedEvent", repairDefinedEvent);
+                            definedDIV = null;
+                            repairValue = null;
+                            debugConfig = null;
+                            parentElement = null;
+                            setValue = null;
+                            oldDefinedEvent = null;
+                        };
                     }
-                },
-                StopPropagation: function(e) {
-                    if (e.button === 0 && e.target.className === "BDE_Image") {
-                        e.stopPropagation(); //阻止冒泡，阻止图片原事件
-                        log("阻止贴吧图片原事件", "已执行");
-                    }
-                },
-                Down: function(e) {
-                    var target = e.target,
-                        imageData = target.imageData;
-                    imageTarget = target;
-                    log("鼠标down事件", function() { if (!target.id) target.id = Date.now(); return "开始"; });
-                    if (e.button !== 0) return false;
-                    e.preventDefault();
-                    e.stopPropagation();
-                    imageMouse = [e.clientX, e.clientY];
-                    imageCount = [imageData.X - imageMouse[0], imageData.Y - imageMouse[1], 6 - imageData.width, 6 - imageData.height]; //图片宽高的偏移量，图片左右边界预留量
-                    imageButton = true;
-                    doc.addEventListener("mousemove", imageEvent.Move);
-                    doc.addEventListener("mouseup", imageEvent.Up);
-                    log("鼠标down事件", "结束");
-                },
-                Move: function(e) {
-                    log("鼠标move事件", "开始");
-                    var target = imageTarget,
-                        X = e.clientX + imageCount[0],
-                        Y = e.clientY + imageCount[1];
-                    imageButton = false;
-                    log("鼠标move事件", "进行中", "X:" + X + "Y:" + Y);
-                    if (X < imageCount[2]) { //左边界
-                        target.style.transform = "translate(" + imageCount[2] + "px," + Y + "px)";
-                        return false;
-                    }
-                    if (X > docWidth) { //右边界
-                        target.style.transform = "translate(" + docWidth + "px," + Y + "px)";
-                        return false;
-                    }
-                    if (Y < imageCount[3]) { //上边界
-                        target.style.transform = "translate(" + X + "px," + imageCount[3] + "px)";
-                        return false;
-                    }
-                    if (Y > docHeight) { //下边界
-                        target.style.transform = "translate(" + X + "px," + docHeight + "px)";
-                        return false;
-                    }
-                    target.style.transform = "translate(" + X + "px," + Y + "px)";
-                    log("鼠标move事件", "结束", target.style.transform);
-                },
-                Up: function(e) {
-                    log("鼠标up事件", "开始");
-                    var target = imageTarget,
-                        RegEx;
-                    if (repairDefinedEvent && e.clientX - imageMouse[0] <= 1 && e.clientY - imageMouse[1] <= 1) { //尝试修复关闭图片功能
-                        log("尝试修复关闭图片功能", "已执行");
-                        imageButton = true;
-                    } else if (scriptDebug && !imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
-                        log("鼠标click事件判断", "\n一.操作时页面不在激活状态。请保证浏览器正在被操作，在执行一次\n二.关闭图片功能可能损坏，建议修复");
-                    }
-                    if (!imageButton) {
-                        RegEx = target.style.transform.match(/[-0-9.]+/g);
-                        target.imageData.X = parseFloat(RegEx[0]);
-                        target.imageData.Y = parseFloat(RegEx[1]);
-                    }
-                    imageTarget = null;
-                    imageMouse = null;
-                    imageCount = null;
-                    doc.removeEventListener("mousemove", imageEvent.Move);
-                    doc.removeEventListener("mouseup", imageEvent.Up);
-                    log("鼠标up事件", "结束", imageButton);
-                },
-                Close: function(e) {
-                    log("鼠标click事件", "开始");
-                    var target = e.target;
-                    if (imageButton) {
-                        imageButton = null;
-                        delete target.imageData;
-                        parentDIV.removeChild(target);
-                        log("鼠标click事件", function() {
-                            if (!doc.getElementById(target.id)) return "成功";
-                            else return "失败";
-                        });
-                    }
-                },
-                Wheel: function(e) {
-                    var target = e.target,
-                        imageData = target.imageData,
-                        wheelKey = definedEvent[3],
-                        width = imageData.width,
-                        height = imageData.height,
-                        Wboolean = width > docWidth,
-                        Hboolean = height > docHeight,
-                        wheelXY;
-                    log("鼠标wheel事件", "开始", imageData);
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (wheelKey !== "0") {
-                        if ((e.ctrlKey && wheelKey === "1") || (e.altKey && wheelKey === "2") || (e.shiftKey && wheelKey === "3")) { //判断图片缩放的组合键
-                            log("鼠标wheel缩放事件", "开始");
-                            var eX = e.clientX,
-                                eY = e.clientY,
-                                ratioX = (eX - imageData.X) / width,
-                                ratioY = (eY - imageData.Y) / height,
-                                wheelRatio = width + (e.wheelDelta || -e.detail * 40) * definedEvent[4];
-                            imageData.width = wheelRatio < 150 ? 150 : wheelRatio;
-                            imageData.height = imageData.width * height / width;
-                            imageData.X = eX - (imageData.width * ratioX);
-                            imageData.Y = eY - (imageData.height * ratioY);
-                            log("鼠标wheel缩放事件", "进行中", imageData);
-                            target.width = imageData.width;
-                            target.style.transform = "translate(" + imageData.X + "px," + imageData.Y + "px)"; //基于鼠标位置的缩放
-                            log("鼠标wheel缩放事件", "结束", target.style.transform);
-                            return false;
-                        }
-                    }
-                    if (!Hboolean && !Wboolean) { log("鼠标wheel滚动事件", "图片小于窗口"); return false; }
-                    if (Hboolean) {
-                        wheelXY = imageData.Y + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
-                        if (wheelXY > 0 || wheelXY < docHeight - height) {
-                            wheelXY = wheelXY > 0 ? 6 : docHeight - height;
-                        }
-                        imageData.Y = wheelXY;
-                        log("鼠标wheel垂直滚动事件", "进行中", wheelXY);
-                        target.style.transform = "translate(" + imageData.X + "px," + wheelXY + "px)";
-                        log("鼠标wheel垂直滚动事件", "结束", target.style.transform);
-                    } else if (Wboolean) {
-                        wheelXY = imageData.X + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
-                        if (wheelXY > 0 || wheelXY < docWidth - width) {
-                            wheelXY = wheelXY > 0 ? 6 : docWidth - width;
-                        }
-                        imageData.X = wheelXY;
-                        log("鼠标wheel水平滚动事件", "进行中", wheelXY);
-                        target.style.transform = "translate(" + wheelXY + "px," + imageData.Y + "px)";
-                        log("鼠标wheel水平滚动事件", "结束", target.style.transform);
-                    }
-                }
-            };
-        //创建父DIV
-        var parentDIV = doc.createElement("div");
-        parentDIV.id = "Tie_enlargeImage_parentDIV";
-        doc.body.appendChild(parentDIV);
-        //事件委托
-        parentElement.addEventListener("click", imageEvent.StopPropagation, true);
-        parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
-        parentDIV.addEventListener("mousedown", imageEvent.Down);
-        parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
-        parentDIV.addEventListener(mouseWheel, imageEvent.Wheel);
-        //释放缓存
-        parentElement = null;
-        //自定义设置
-        var userEvent = {
-            init: function() {
-                this.create();
-                this.Event();
-            },
-            create: function() {
-                var definedDIV = doc.createElement("div"); //创建自定义DIV框架
-                definedDIV.id = "Tie_setValue_DIV";
-                definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>自定义设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select><br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
-                doc.body.appendChild(definedDIV);
-                definedDIV = null;
-            },
-            Event: function() {
-                var definedDIV = doc.getElementById("Tie_setValue_DIV"),
-                    repairValue = doc.getElementById("Tie_repairValue"),
-                    debugConfig = doc.getElementById("Tie_debugConfig"),
-                    parentElement = doc.getElementById("j_p_postlist"),
-                    setValue = doc.getElementsByName("Tie_setValue"),
-                    oldDefinedEvent = definedEvent; //备份旧设置
-                for (var i = 0; i < 5; i++) {
-                    setValue[i].value = oldDefinedEvent[i];
-                }
-                if (setValue[3].value === "0") setValue[4].style.visibility = "hidden";
-                setValue[3].onchange = function() {
-                    setValue[4].style.visibility = this.value === "0" ? "hidden" : "visible";
                 };
-                repairValue.checked = repairDefinedEvent;
-                debugConfig.checked = scriptDebug;
-                doc.getElementById("Tie_setValue_a").onclick = function() {
-                    definedEvent = [setValue[0].value, setValue[1].value, setValue[2].value, setValue[3].value, setValue[4].value];
-                    repairDefinedEvent = repairValue.checked;
-                    scriptDebug = debugConfig.checked;
-                    if (oldDefinedEvent[0] !== definedEvent[0]) {
-                        parentElement.removeEventListener(oldDefinedEvent[0], imageEvent.init, true);
-                        parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
+                if (!GM_getValue("definedEvent")) {
+                    userEvent.init();
+                }
+                GM_registerMenuCommand("自定义设置", function() {
+                    if (!doc.getElementById("Tie_setValue_DIV")) {
+                        userEvent.init();
                     }
-                    if (oldDefinedEvent[1] !== definedEvent[1]) {
-                        parentDIV.removeEventListener(oldDefinedEvent[1], imageEvent.Close);
-                        parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
+                });
+                window.addEventListener("resize", function() {
+                    if (typeof winResize !== undefined) {
+                        clearTimeout(winResize);
                     }
-                    log = scriptDebug && function(text, types, data) { //脚本调试，日志
-                        if (typeof types === "function") {
-                            types = types();
-                        }
-                        if (data === undefined) console.log(text, types);
-                        else console.log(text, types, data);
-                    } || function() {};
-                    log("自定义属性设置", "已执行", definedEvent + "," + repairDefinedEvent);
-                    this.onclick = null;
-                    setValue[3].onchange = null;
-                    doc.body.removeChild(definedDIV);
-                    GM_setValue("definedEvent", definedEvent.toString());
-                    GM_setValue("repairDefinedEvent", repairDefinedEvent);
-                    definedDIV = null;
-                    repairValue = null;
-                    debugConfig = null;
-                    parentElement = null;
-                    setValue = null;
-                    oldDefinedEvent = null;
-                };
-            }
-        };
-        if (!GM_getValue("definedEvent")) {
-            userEvent.init();
+                    winResize = setTimeout(function() {
+                        docHeight = doc.documentElement.clientHeight - 6;
+                        docWidth = doc.documentElement.clientWidth - 6;
+                    }, 334);
+                });
+            })(window);
         }
-        GM_registerMenuCommand("自定义设置", function() {
-            if (!doc.getElementById("Tie_setValue_DIV")) {
-                userEvent.init();
-            }
-        });
-        window.addEventListener("resize", function() {
-            if (typeof winResize !== undefined) {
-                clearTimeout(winResize);
-            }
-            winResize = setTimeout(function() {
-                docHeight = doc.documentElement.clientHeight - 6;
-                docWidth = doc.documentElement.clientWidth - 6;
-            }, 334);
-        });
-    })(window);
+    }, 2000);
+
+
     (function() {
         var locationHref = location.href;
 
@@ -9227,8 +9293,14 @@ a.jx, .ptr	{ cursor: pointer		}
     let jishu = 0;
     let t = setInterval(() => {
         if (jishu < 60) {
-            $('div.replace_tip').click()
-                /*
+            //$("div.replace_div>div.replace_tip").click()
+            let temp = $("div.replace_div");
+            for (let i = 0; i < temp.length; i++) {
+                temp[i].classList.add("zhankaichangtupian");
+                //console.log(temp[i].children[1]);
+                temp[i].children[1].classList.add("zhankaichangtupian2");
+            }
+            /*
                     by tency
                     https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
                     自动展开百度贴吧帖子的图片
@@ -9237,6 +9309,7 @@ a.jx, .ptr	{ cursor: pointer		}
                     copyright  2014+, LYY
                     */
             let i = 0;
+            $(".u_tb_profile>a").attr("href", "http://tieba.baidu.com/i/i/profile"); //修复贴吧设置按钮无效bug
             if (!GM_getValue("jinyongtiebameihua") /*贴吧美化后*/ ) {
                 //以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
                 //u_username_wrap
@@ -9298,7 +9371,6 @@ a.jx, .ptr	{ cursor: pointer		}
             let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
             $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
         }
-        $(".u_tb_profile>a").attr("href", "http://tieba.baidu.com/i/i/profile"); //修复贴吧设置按钮无效bug
 
         let i = 0;
         let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
@@ -9308,7 +9380,7 @@ a.jx, .ptr	{ cursor: pointer		}
             }
         }
         //备忘,还有招募图标不显示
-        temp = $(".icon-good"); //显示精品贴，精华贴标识
+        /*temp = $(".icon-good"); //显示精品贴，精华贴标识
         if (temp.length > 0) {
             for (i = 0; i < temp.length; i++) {
                 temp[i].style = "background-color: #FF6666;";
@@ -9325,7 +9397,7 @@ a.jx, .ptr	{ cursor: pointer		}
             for (i = 0; i < temp.length; i++) {
                 temp[i].style = "background:none;background-color: #FFCC26;";
             }
-        }
+        }*/
         //$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
         //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
         $(".p_reply_first").html("回复楼主");
