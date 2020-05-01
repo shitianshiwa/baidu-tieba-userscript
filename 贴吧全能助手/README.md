@@ -16,4 +16,20 @@ $('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜
 * 已关闭所有图片功能，因为很不稳定容易失效，引用功能只有贴子链接为http的才会有效
 * 有些贴吧账号PC端贴吧有夜间模式可选，这个会导致样式显示不正常
 * 在tieba.baidu.com/i/i/fans这个页面有显示bug
+* 尝试兼容别人的"贴吧黑夜模式"样式https://userstyles.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles
+* 以下推荐用文本编辑器去查找在那里
+* tieba-maverick-2018样式还需要修改
+    threadlist_bright .threadlist_author {
+	float: none !important;
+	//display: flex;
+	width: 16% !important;
+	min-width: 155px;
+	padding-right: 20px;
+	white-space: nowrap;
+	//font-size: 0 !important;
+	overflow: visible !important;
+}
+* maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在样式脚本管理器里面改）
+	--m-href-color: hsl(0, 0%, 95%);
+	--m-href-visited: hsl(0, 0%, 60%);
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016932beta)
+// @version      2.1(0.016933beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -3254,6 +3254,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".l_post_bright {",
                 "	/*楼层*/",
+                "   background: none !important;",
                 "	border: none !important;",
                 "	border-bottom: 1px solid rgba(0,0,0,.1) !important;",
                 "	width: 100%!important;",
@@ -3261,7 +3262,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	box-sizing: border-box;",
                 "	display: flex;",
                 "	flex-wrap: wrap;",
-                "   color:#000;",
+                //"   color:#000;",
                 "",
                 "}",
                 ".l_post_bright.noborder_bottom,",
@@ -3273,7 +3274,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	/*楼层作者栏*/",
                 "	width: 180px !important;",
                 "	padding: 20px 0 !important;",
-                "   background-color:#ffffff",
+                //"   background-color:#ffffff",
                 "}",
                 ".__tieba_blocked__.l_post::before {",
                 "   content: '该楼层已被屏蔽';",
@@ -5749,7 +5750,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".threadlist_title img[src*=\"membertop_icon.png\"],",
                 ".threadlist_title .icon-member-top {",
-                "	background-color: #FFCC26 !important",
+                //"	background-color: #FFCC26 !important",
                 "}",
                 "",
                 ".threadlist_title .icon-member-top:after {",
@@ -5757,8 +5758,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	margin-left: -1px;",
                 "}",
                 ".threadlist_title .icon-top{",
-                "   background:none;",
-                "   background-color: #4285F5 !important;",
+                //"   background-color: #4285F5 !important;",
                 "}",
                 ".threadlist_title .icon-member-top:before,",
                 ".threadlist_title .icon-top:before{",
@@ -5798,7 +5798,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "",
                 ".threadlist_title img[src*=\"jing.gif\"],",
                 ".threadlist_title .icon-good{",
-                "	background-color: #FF6666 !important",
+                //"	background-color: #FF6666 !important",
                 "}",
                 ".threadlist_title .icon-good:before{",
                 "	content: \"\\e838\";",
@@ -6395,15 +6395,15 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     ".skin_2103 .app-header-wrapper,",
                     ".forum_content,",
                     ".head_content,",
-                    ".foot {",
-                    "	background: #FdFdFd !important;",
+                    ".foot{",
+                    "	background: #FdFdFd;//!important", //背景色
                     "}",
                     ".ibody .w750,",
                     "[id=\"pagelet_encourage-appforum/pagelet/head_top\"],",
                     "[id=\"pagelet_navigation/pagelet/navigation\"],",
                     "[id=\"pagelet_poster/pagelet/rich_poster\"]{",
                     "	/*遮盖阴影*/",
-                    "	background: #FdFdFd !important;",
+                    //"	background: #FdFdFd;", // !important;",
                     "	position: relative;",
                     "	z-index: 1;",
                     "}",
@@ -9144,7 +9144,7 @@ a.jx, .ptr	{ cursor: pointer		}
         }
     }, 3000);
 
-    var yipaixun = false;
+    var yipaixun = 0;
     var yipaixun2 = false;
     (function() {
         if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
@@ -9154,9 +9154,9 @@ a.jx, .ptr	{ cursor: pointer		}
             if (parentNode == null) {
                 return;
             }
-            if (yipaixun == false) {
-                $(".fatieshijianpaixu").html("还原为按回复时间顺序")
-                yipaixun = true;
+            if (yipaixun == 0) {
+                $(".fatieshijianpaixu").html("按回复时间倒序(当前为:发贴时间排序)")
+                yipaixun = 1;
                 var threads = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
                 var threadArray = [];
                 for (var thread of threads) {
@@ -9176,10 +9176,26 @@ a.jx, .ptr	{ cursor: pointer		}
                 for (var thread2 of threadArray) {
                     parentNode.appendChild(thread2.thread);
                 }
-            } else {
-                $(".fatieshijianpaixu").html("按发帖时间排序(贴子ID)")
-                yipaixun = false;
+            } else if (yipaixun == 1) {
+                $(".fatieshijianpaixu").html("按回复时间顺序(当前为:回复时间倒序)")
+                yipaixun = 2;
                 //console.log("666");
+                var threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
+                for (var thread of threads3) {
+                    try {
+                        parentNode.removeChild(thread);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                for (let i = backupshunxu.length - 1; i >= 0; i--) {
+                    //console.log("2333")
+                    parentNode.appendChild(backupshunxu[i]);
+                }
+            } else {
+                yipaixun = 0;
+                $(".fatieshijianpaixu").html("按发帖时间排序(当前为:回复时间顺序)")
+                    //console.log("666");
                 var threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
                 for (var thread of threads3) {
                     try {
@@ -9205,7 +9221,7 @@ a.jx, .ptr	{ cursor: pointer		}
             a.textContent = '按发帖时间排序(贴子ID)';
             a.setAttribute('class', 'fatieshijianpaixu');
             a.setAttribute('style', 'color:red !important;');
-            a.setAttribute('href', 'javascript:;');
+            //a.setAttribute('href', 'javascript:;');
             var paixun = false
             a.addEventListener('click', e => { //必须先自动滚动网页，预览所有图片后，才能保证图片都能显示出来
                 if (yipaixun2 == false) {
@@ -9376,11 +9392,11 @@ a.jx, .ptr	{ cursor: pointer		}
         let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
         if (temp.length > 0) {
             for (i = 0; i < temp.length; i++) {
-                temp[i].style = "position: relative;display: block;top: -20px;right: 10px;";
+                temp[i].style = "position: relative;display: block;/*top: -20px;right: 10px;*/width:60px;";
             }
         }
         //备忘,还有招募图标不显示
-        /*temp = $(".icon-good"); //显示精品贴，精华贴标识
+        temp = $(".icon-good"); //显示精品贴，精华贴标识
         if (temp.length > 0) {
             for (i = 0; i < temp.length; i++) {
                 temp[i].style = "background-color: #FF6666;";
@@ -9397,11 +9413,37 @@ a.jx, .ptr	{ cursor: pointer		}
             for (i = 0; i < temp.length; i++) {
                 temp[i].style = "background:none;background-color: #FFCC26;";
             }
-        }*/
+        }
         //$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
         //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
         $(".p_reply_first").html("回复楼主");
-        $(".meihua")[0].style = "color:red !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+        try {
+            /*
+            尝试兼容别人的"贴吧黑夜模式"样式https://userstyles.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles
+            以下推荐用文本编辑器去查找在那里
+            tieba-maverick-2018样式还需要修改
+            threadlist_bright .threadlist_author {
+	float: none !important;
+	//display: flex;
+	width: 16% !important;
+	min-width: 155px;
+	padding-right: 20px;
+	white-space: nowrap;
+	//font-size: 0 !important;
+	overflow: visible !important;
+}
+maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在样式脚本管理器里面改）
+	--m-href-color: hsl(0, 0%, 95%);
+	--m-href-visited: hsl(0, 0%, 60%);
+            */
+            $(".meihua")[0].style = "color:red !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+            //$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
+            let temp2 = $(".j_tbnav_tab>a");
+            temp2[temp2.length - 1].style = "width: 100px !important;color:unset !important;";
+            temp2[temp2.length - 2].style = "color:unset !important;";
+        } catch (err) {
+            console.log(err);
+        }
     }, 5000);
 
     function resetx() {
@@ -9409,7 +9451,13 @@ a.jx, .ptr	{ cursor: pointer		}
         alert("已删除贴吧用户头像缓存！");
         window.location.reload(); //刷新网页
     }
+
+    function closemeihua() {
+        GM_setValue("jinyongtiebameihua", GM_getValue("jinyongtiebameihua") ? false : true);
+        window.location.reload(); //刷新网页
+    }
     GM_registerMenuCommand("删除贴吧用户头像缓存", resetx); // @grant        GM_registerMenuCommand
+    GM_registerMenuCommand(GM_getValue("jinyongtiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
 })();
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
