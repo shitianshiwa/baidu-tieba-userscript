@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      测试(beta)0.351
+// @version      测试(beta)0.352
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
@@ -227,6 +227,7 @@ border: 1px solid #3e89fa;
                     }
                 }
             }
+            $("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;"; //兼容黑夜模式 https://userstyles.org/styles/161224/maverick-demo-styles
         } catch (error) {
             clearInterval(t2);
             alert(error + ",贴吧主页顶部显示楼层列表已停止运行_添加添加跳转文本框和确认按钮");
