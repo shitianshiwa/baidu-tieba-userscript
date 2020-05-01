@@ -227,7 +227,11 @@ border: 1px solid #3e89fa;
                     }
                 }
             }
-            $("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;"; //兼容黑夜模式 https://userstyles.org/styles/161224/maverick-demo-styles
+            let temp = $("#frs_list_pager")[0];
+            if (temp != null) {
+                temp.style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;"; //兼容黑夜模式 https://userstyles.org/styles/161224/maverick-demo-styles
+
+            }
         } catch (error) {
             clearInterval(t2);
             alert(error + ",贴吧主页顶部显示楼层列表已停止运行_添加添加跳转文本框和确认按钮");
