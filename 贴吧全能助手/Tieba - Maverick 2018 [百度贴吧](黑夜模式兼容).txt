@@ -2194,7 +2194,7 @@ body:not(.app_forum_body):not(.skin_2103) .head_top,.skin_2103 .app-header-wrapp
 .foot,
 .forum_foot{
 	border-radius: 0 0 var(--m-radius) var(--m-radius);
-//	background-color:#000 !important;
+	background-color:#000 !important;
 }
 
 .foot,
