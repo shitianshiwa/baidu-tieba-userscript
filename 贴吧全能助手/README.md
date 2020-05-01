@@ -30,6 +30,15 @@ $('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜
 	//font-size: 0 !important;
 	overflow: visible !important;
 }
+#footer {
+margin-bottom: 20px !important;
+background-color:#000 !important;
+}
+.forum_foot{
+border-radius: 0 0 var(--m-radius) var(--m-radius);
+background-color:#000 !important;
+}
+不修改以上两个，贴吧底部可能会有点亮
 * maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在样式脚本管理器里面改）
 	--m-href-color: hsl(0, 0%, 95%);
 	--m-href-visited: hsl(0, 0%, 60%);
