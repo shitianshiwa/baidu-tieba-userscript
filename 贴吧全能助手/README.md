@@ -17,6 +17,7 @@ $('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜
 * 有些贴吧账号PC端贴吧有夜间模式可选，这个会导致样式显示不正常
 * 在tieba.baidu.com/i/i/fans这个页面有显示bug
 * 尝试兼容别人的"贴吧黑夜模式"样式https://userstyles.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles
+* 要选择"夜间模式"才是基本全黑的，否则发主题帖的编辑器会有点亮。。！
 * 以下推荐用文本编辑器去查找在那里
 * tieba-maverick-2018样式还需要修改
     threadlist_bright .threadlist_author {
