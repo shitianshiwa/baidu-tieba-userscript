@@ -2242,7 +2242,6 @@ body:not(.app_forum_body):not(.skin_2103) .head_top,.skin_2103 .app-header-wrapp
 	border-top: none !important;
 	margin-bottom: 50px !important;
 }
-
 .head_content {
 	border-bottom: none !important;
 }
@@ -10891,6 +10890,7 @@ a{
 
 #footer {
 	margin-bottom: 20px !important;
+	background-color:#000 !important;
 }
 
 #content {
