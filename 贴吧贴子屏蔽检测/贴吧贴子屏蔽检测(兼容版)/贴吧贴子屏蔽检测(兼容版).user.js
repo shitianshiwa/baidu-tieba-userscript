@@ -18,6 +18,7 @@ console.log(o.data.user_portrait.split("?")[0]);
 $.post("/f/user/json_userinfo","",function(o){localStorage.setItem("userid",o.data.user_portrait.split("?")[0]);},"json");
                             $.post("/dc/common/tbs","",function(o){localStorage.setItem("usertbs",o.tbs);},"json");//获取用户tbs口令号并储存在localStorage中，待使用
 */
+//投票贴会被误判楼层被屏蔽 http://tieba.baidu.com/newvote/createvote?kw=贴吧名&ie=utf-8
 //新bug，第一次打开无法为所有楼层添加屏蔽样式,原因是发生了异步问题
 //可能支持无用户名的贴吧账号（楼中楼未完全验证过）
 //修改为只在各个贴吧的主题列表和主题贴内运行
