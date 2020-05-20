@@ -35,7 +35,8 @@
 // ==/UserScript==
 
 /*
-//发现贴子里的下工具栏的楼主功能无效，贴吧美化切换有显示bug
+屏蔽挽尊卡失效
+//发现贴子里的下工具栏的楼主功能无效，贴吧美化切换有显示bug(已修)
 //http://tieba.baidu.com/f/center/createtb 创建贴吧
 贴吧超级会员会导致楼层用户名字和楼中楼头像显示错误(已修复)
 在某些贴子，可能会缺失删除和举报按钮(2019-12-21已修复)
@@ -241,7 +242,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "right:9px !important;",
                 "}",
                 "",
-                "/*楼层气泡*/", //也给显示吧？
+                "/*楼层气泡*/", //也给显示吧？这个好像有用javascript定时器循环进行修改？
                 ".post_bubble_top,.post_bubble_bottom{",
                 //"    display: none !important;",
                 "}",
@@ -6396,7 +6397,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     ".forum_content,",
                     ".head_content,",
                     ".foot{",
-                    "	background: #FdFdFd;", //!important", //背景色
+                    "	background: #FdFdFd;", //!important", //背景色 有bug http://tieba.baidu.com/i/i/storethread
                     "}",
                     ".ibody .w750,",
                     "[id=\"pagelet_encourage-appforum/pagelet/head_top\"],",
@@ -8492,7 +8493,7 @@ display:none !important;
                     _run(function() {
                         var $menuItem = $('<li>'),
                             $menuLink = $('<a>').appendTo($menuItem).addClass('jx').text('助手设置');
-                        //$parent.find ('.u_tb_profile').before($menuItem);
+                        //$parent.find('.u_tb_profile').before($menuItem);
                         $parent.find('.u_tb_profile').parent().prepend($menuItem);
                         $menuLink.click(_menu);
                         var $menuItem2 = $('<li>'),
@@ -8500,6 +8501,7 @@ display:none !important;
                         $('.u_tb_profile').before($menuItem2);
                         if (!GM_getValue("jinyongtiebameihua")) {
                             var lis = $parent.find("ul>li");
+                            //console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
                             lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
                         }
                         $menuLink2.click(function() {
@@ -8969,7 +8971,7 @@ a.jx, .ptr	{ cursor: pointer		}
                 parentDIV.addEventListener(mouseWheel, imageEvent.Wheel);
                 //释放缓存
                 parentElement = null;
-                //自定义设置
+                //图片放大设置
                 var userEvent = {
                     init: function() {
                         this.create();
@@ -9017,7 +9019,7 @@ a.jx, .ptr	{ cursor: pointer		}
                                 if (data === undefined) console.log(text, types);
                                 else console.log(text, types, data);
                             } || function() {};
-                            log("自定义属性设置", "已执行", definedEvent + "," + repairDefinedEvent);
+                            log("图片放大设置", "已执行", definedEvent + "," + repairDefinedEvent);
                             this.onclick = null;
                             setValue[3].onchange = null;
                             doc.body.removeChild(definedDIV);
@@ -9035,7 +9037,7 @@ a.jx, .ptr	{ cursor: pointer		}
                 if (!GM_getValue("definedEvent")) {
                     userEvent.init();
                 }
-                GM_registerMenuCommand("自定义设置", function() {
+                GM_registerMenuCommand("图片放大设置", function() {
                     if (!doc.getElementById("Tie_setValue_DIV")) {
                         userEvent.init();
                     }
@@ -9326,6 +9328,31 @@ a.jx, .ptr	{ cursor: pointer		}
                     */
             let i = 0;
             $(".u_tb_profile>a").attr("href", "http://tieba.baidu.com/i/i/profile"); //修复贴吧设置按钮无效bug
+            let temp2 = $(".post_bubble_bottom");
+            if (temp2.length > 0) {
+                for (let i = 0; i < temp2.length; i++) {
+                    if (temp2[i].style["background-image"] == 'url("//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png")') //修复一个楼层背景气泡内部有白线
+                    {
+                        temp2[i].style = 'background:url(//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png) no-repeat -0px  -4px;height: 111px;'
+                    }
+                }
+            }
+            try {
+                if (window.location.href.split("?u=")[0] == "http://tieba.baidu.com/i/i/fans") {
+                    let temp3 = $(".user>.right") //显示移除粉丝选项
+                    for (let i = 0; i < temp3.length; i++) {
+                        //console.log(temp3[i].children[0]);
+                        if (temp3[i].children[0].children[2].style[0] != "padding:4px 0 0 14px;display:block") {
+                            //console.log(temp3[i].children[0]);
+
+                            temp3[i].children[0].children[2].style = "padding:4px 0 0 14px;display:block;"
+                        }
+                    }
+                }
+
+            } catch (err) {
+                console.log(err);
+            }
             if (!GM_getValue("jinyongtiebameihua") /*贴吧美化后*/ ) {
                 //以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
                 //u_username_wrap
