@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016934beta)
+// @version      2.1(0.016936beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
 // @exclude      http*://tieba.baidu.com/f/fdir*
 // @exclude      http*://tieba.baidu.com/f/search*
 // @exclude      http*://tieba.baidu.com/f/center/*
-// @run-at       document-body
+// @run-at       document-start
 ///document-body,document-idle
 /// jQuery 留一份自己用
 // @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
@@ -2861,7 +2861,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	display: none !important;",
                 "}",
                 ".u_news_wrap span {",
-                "	color: #f00 !important;",
+                "	color: #fff !important;",
                 "   font-weight: bold;",
                 "	display: block;",
                 "	background: #4879BD !important;",
@@ -3005,7 +3005,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".u_notity_bd .category_item .unread_num,",
                 ".u_notity_bd .category_item .unread-num{",
-                "	color: #f00;",
+                "	color: #999;",
                 "   font-weight: bold;",
                 "	background: #fff;",
                 "	display: block;",
@@ -3495,7 +3495,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	margin-right: 0 !important;",
                 "	position: relative !important;",
                 "	margin: 10px 0 !important;",
-                "	color: #000 !important;",
+                "	color: #999 !important;",
                 "	float: right;",
                 "	box-sizing: border-box;",
                 "}",
@@ -7554,8 +7554,67 @@ display:none !important;
                         $('<style>').text($ads + '{display: none !important}').appendTo('head');
                     }
                 },
-                "audio_download": {
-                    name: '贴吧语音下载',
+                "pingbi_loucengqipao": {
+                    name: '屏蔽楼层气泡',
+                    desc: '屏蔽楼层气泡',
+                    flag: __type_floor,
+                    _init: function() {
+                        let temp1 = $(".post_bubble_top");
+                        let temp2 = $(".post_bubble_middle");
+                        let temp3 = $(".post_bubble_bottom");
+                        let i = 0;
+                        for (i = 0; i < temp1.length; i++) {
+                            temp1[i].style = "backgrounde:none;";
+                        }
+                        for (i = 0; i < temp2.length; i++) {
+                            temp2[i].style = "backgrounde:none;";
+                        }
+                        for (i = 0; i < temp3.length; i++) {
+                            temp3[i].style = "backgrounde:none;";
+                        }
+                    },
+                    _proc: function(floorType, args) {
+                        //console.log("666666666666");
+                    }
+                },
+                "qiangdiaoxinxitishi": {
+                    name: '强调信息提示',
+                    desc: '强调信息提示',
+                    flag: __type_floor,
+                    _init: function() {
+                        let t = setTimeout(() => {
+                            clearTimeout(t);
+                            let temp1 = $(".u_news_wrap span");
+                            let temp2 = $(".u_notity_bd .category_item");
+                            let temp3 = $(".core_reply_tail");
+                            let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span");
+                            let temp5 = $("ul.sys_notify_last>li>a>span");
+                            let i = 0;
+                            $(".meihua")[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+                            for (i = 0; i < temp1.length; i++) {
+                                temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
+                            }
+                            for (i = 0; i < temp2.length; i++) {
+                                temp2[i].style["color"] = "#f00 !important;";
+                            }
+                            for (i = 0; i < temp3.length; i++) {
+                                temp3[i].style = "color:#000 !important;";
+                            }
+                            for (i = 0; i < temp4.length; i++) {
+                                temp4[i].style = "color:#f00 !important;";
+                            }
+                            for (i = 0; i < temp5.length; i++) {
+                                temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
+                            }
+                        }, 3000);
+
+                    },
+                    _proc: function(floorType, args) {
+                        //console.log("666666666666");
+                    }
+                },
+                /*"audio_download": {
+                    name: '贴吧语音下载(已无效)',
                     desc: '下载贴吧语音~ 啦啦啦~',
                     flag: __type_floor | __type_lzl,
                     _proc: function(floorType, args) {
@@ -7577,9 +7636,9 @@ display:none !important;
                             .append($('<span>').text('下载'))
                         ).after($('<br>'));
                     }
-                },
+                },*/
                 "block_post": {
-                    name: '贴吧贴子屏蔽',
+                    name: '贴吧贴子屏蔽(残废的)',
                     desc: '根据规则屏蔽指定贴子',
                     flag: __type_floor | __type_forum | __type_lzl,
 
@@ -8152,8 +8211,8 @@ display:none !important;
                         _hide('.icon_wrap');
                     }
                 },
-                "no_text_link": {
-                    name: '屏蔽帖子内文字推广链接',
+                /*"no_text_link": {
+                    name: '屏蔽帖子内文字推广链接(过时了)',
                     desc: '将帖子内的文字推广搜索链接替换为普通文本',
                     flag: __type_lzl | __type_floor,
                     _proc: function(floorType, args) {
@@ -8167,7 +8226,7 @@ display:none !important;
                             $(this).after(document.createTextNode(this.textContent));
                         }).remove();
                     }
-                },
+                },*/
                 "orange": {
                     name: '移除会员彩名',
                     desc: '全部变成变成默认链接颜色。',
@@ -8312,16 +8371,56 @@ display:none !important;
                         });
                     }
                 },
-                "rmImgFav": {
-                    name: '移除图片的收藏工具栏',
+                /*"rmImgFav": {
+                    name: '移除图片的收藏工具栏（已失效）',
                     desc: '鼠标悬浮图片时出现的工具栏。',
                     flag: 0,
                     _init: function() {
                         $('.fav-wrapper').remove();
                     }
+                },*/
+                "save_face": {
+                    name: '隐藏挽尊卡背景图片',
+                    desc: '隐藏挽尊卡背景图片',
+                    flag: __type_floor,
+                    _init: function() {
+                        /*
+                        标题: 出一个使用挽尊卡的教程吧
+                        链接：http://tieba.baidu.com/p/5889895156
+                        */
+                        //console.log("555555555555555555")
+                        //_css.append('.save_lz_face::before{content:attr(who) " 使用了挽尊卡"}');
+                        //console.log($('.save_face_post'));
+                        let temp = $('.save_face_post');
+                        //temp.before("隐藏挽尊卡图片");
+                        //console.log(temp.length)
+                        for (let i = 0; i < temp.length; i++) {
+                            //console.log(temp[i].style[0])
+                            //console.log(temp[i].children);
+                            temp[i].style = "background:none;margin-left:0px;color:rgba(204, 204, 204, 0.8) !important;";
+                            temp[i].children[3].style = "display:none;";
+                            temp[i].children[0].style = "top:unset;text-align:unset;font-weight:unset;";
+                            temp[i].children[1].style = "top:unset;text-align:unset;font-weight:unset;";
+                            temp[i].children[2].style = "top:unset;text-align:unset;font-weight:unset;";
+                            temp[i].children[0].children[0].style = "color:rgba(204, 204, 204, 0.8) !important;";
+                            temp[i].children[2].children[0].style = "color:rgba(204, 204, 204, 0.8) !important;";
+                            //temp[i].children[2].children[1].style = "color:rgba(204, 204, 204, 0.3) !important;";
+                        }
+                        //temp.remove();
+                    },
+                    _proc: function(floorType, args) { //chrome测试无效
+                        //console.log("44444444444444444")
+                        if ($('.save_face_post', args._main).size()) {
+                            // 发现挽尊卡
+                            $('<div>').addClass('floor-stripe save_lz_face')
+                                .attr('who', $('.p_author_name', args._main).text())
+                                .insertBefore(args._main);
+                            args._main.addClass('savedFace').hide();
+                        }
+                    }
                 },
                 "rmSaveFace": {
-                    name: '隐藏挽尊卡提示',
+                    name: '隐藏挽尊卡会员提示',
                     desc: '隐藏会员发帖的使用挽尊卡提示。',
                     flag: 0,
                     _init: function() {
@@ -8387,24 +8486,6 @@ display:none !important;
                         if (tupianfangda == true) {
                             this.rmImg(args._main);
 
-                        }
-                    }
-                },
-                "save_face": {
-                    name: '挽尊卡隐藏',
-                    desc: '屏蔽挽尊卡，留下一个横条提示。',
-                    flag: __type_floor,
-                    _init: function() {
-                        _css.append('.save_lz_face::before{content:attr(who) " 使用了挽尊卡"}');
-                    },
-                    _proc: function(floorType, args) {
-                        if ($('.save_face_post', args._main).size()) {
-                            // 发现挽尊卡
-                            $('<div>').addClass('floor-stripe save_lz_face')
-                                .attr('who', $('.p_author_name', args._main).text())
-                                .insertBefore(args._main);
-
-                            args._main.addClass('savedFace').hide();
                         }
                     }
                 }
@@ -8749,7 +8830,6 @@ a.jx, .ptr	{ cursor: pointer		}
                 "use strict";
                 //CSS
                 var parentElement = document.getElementById("j_p_postlist");
-                if (!parentElement) return;
                 GM_addStyle(".BDE_Image,.j_user_sign{cursor:alias;}#Tie_enlargeImage_parentDIV{position:fixed;z-index:1005;top:0;left:0;}.Tie_enlargeImage{position:absolute;box-shadow:1px 1px 10px #000;cursor:move;}.Tie_enlargeImage:hover{z-index:1006;}#Tie_setValue_DIV{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);}.Tie_definedDIV{position:absolute;z-index:10000;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);}.Tie_definedDIV_title{border-bottom:1px solid #f2f2f5;line-height:40px;font-size:15px;font-weight:700;padding:0 0 0 15px;}.Tie_definedDIV_point{padding:20px 40px;}.Tie_definedDIV_groupSubtitle{font-weight:bold;}.Tie_definedDIV_configItem{line-height:30px;margin:0 20px}.Tie_definedDIV_configItem select{margin:0.5em}.Tie_definedDIV_configItem br+label{margin-left:3em}.Tie_definedDIV_configItem input{vertical-align:middle;margin-right:0.5em}#Tie_debugConfig{margin:0.5em}.Tie_debugConfig_icon{position:relative;display:inline-block;top:4px;width:16px;height:16px;background-position:-350px -100px;background-image:url('https://img.t.sinajs.cn/t6/style/images/common/icon.png');background-repeat:no-repeat;}.Tie_bubble_DIV{position:absolute;visibility:hidden;max-width:280px;top:20%}.Tie_definedDIV_configItem label:hover+.Tie_bubble_DIV{visibility:visible}.Tie_bubble_content{position:relative;background:#fff;padding:6px 13px 6px 16px;border:1px solid #ccc;border-radius:3px;}.Tie_bubble_mainTxt{line-height:18px;}.Tie_bubble_bor{position:absolute;overflow:hidden;bottom:-14px;line-height:14px;}.Tie_bubble_line{border-color:#ccc transparent transparent transparent;}.Tie_bubble_br{margin:-1px 0 0 -14px;border-color:#fff transparent transparent transparent;}.Tie_bubble_bor i,.Tie_bubble_bor em{display:inline-block;width:0;height:0;border-width:7px;border-style:solid;vertical-align:top;overflow:hidden;}.Tie_definedDIV_SaveBtn{background-color:#f2f2f5;text-align:center;padding:10px 0;}.Tie_SaveBtn_a{background:#ff8140;color:#fff;font-size:15px;display:inline-block;padding:0 15px;line-height:35px;border-radius:3px;}.Tie_SaveBtn_a:hover{background:#f7671d}");
                 //数据缓存
                 var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function() {},
@@ -8959,18 +9039,6 @@ a.jx, .ptr	{ cursor: pointer		}
                             }
                         }
                     };
-                //创建父DIV
-                var parentDIV = doc.createElement("div");
-                parentDIV.id = "Tie_enlargeImage_parentDIV";
-                doc.body.appendChild(parentDIV);
-                //事件委托
-                parentElement.addEventListener("click", imageEvent.StopPropagation, true);
-                parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
-                parentDIV.addEventListener("mousedown", imageEvent.Down);
-                parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
-                parentDIV.addEventListener(mouseWheel, imageEvent.Wheel);
-                //释放缓存
-                parentElement = null;
                 //图片放大设置
                 var userEvent = {
                     init: function() {
@@ -8980,7 +9048,7 @@ a.jx, .ptr	{ cursor: pointer		}
                     create: function() {
                         var definedDIV = doc.createElement("div"); //创建自定义DIV框架
                         definedDIV.id = "Tie_setValue_DIV";
-                        definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>自定义设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select><br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
+                        definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>图片放大设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作(仅支持贴子内的楼层图片！)</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片，修改配置后刷新一下</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select>若条件允许，推荐选择双击以兼容鼠标移动图片<br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
                         doc.body.appendChild(definedDIV);
                         definedDIV = null;
                     },
@@ -9005,12 +9073,16 @@ a.jx, .ptr	{ cursor: pointer		}
                             repairDefinedEvent = repairValue.checked;
                             scriptDebug = debugConfig.checked;
                             if (oldDefinedEvent[0] !== definedEvent[0]) {
-                                parentElement.removeEventListener(oldDefinedEvent[0], imageEvent.init, true);
-                                parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
+                                if (!parentElement) {} else {
+                                    parentElement.removeEventListener(oldDefinedEvent[0], imageEvent.init, true);
+                                    parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
+                                }
                             }
                             if (oldDefinedEvent[1] !== definedEvent[1]) {
-                                parentDIV.removeEventListener(oldDefinedEvent[1], imageEvent.Close);
-                                parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
+                                if (!parentElement) {} else {
+                                    parentDIV.removeEventListener(oldDefinedEvent[1], imageEvent.Close);
+                                    parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
+                                }
                             }
                             log = scriptDebug && function(text, types, data) { //脚本调试，日志
                                 if (typeof types === "function") {
@@ -9034,14 +9106,30 @@ a.jx, .ptr	{ cursor: pointer		}
                         };
                     }
                 };
-                if (!GM_getValue("definedEvent")) {
-                    userEvent.init();
-                }
                 GM_registerMenuCommand("图片放大设置", function() {
                     if (!doc.getElementById("Tie_setValue_DIV")) {
                         userEvent.init();
                     }
                 });
+                if (!parentElement) {
+                    return;
+                }
+                //创建父DIV
+                var parentDIV = doc.createElement("div");
+                parentDIV.id = "Tie_enlargeImage_parentDIV";
+                doc.body.appendChild(parentDIV);
+                //事件委托
+                parentElement.addEventListener("click", imageEvent.StopPropagation, true);
+                parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
+                parentDIV.addEventListener("mousedown", imageEvent.Down);
+                parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
+                parentDIV.addEventListener(mouseWheel, imageEvent.Wheel);
+                //释放缓存
+                parentElement = null;
+
+                if (!GM_getValue("definedEvent")) {
+                    userEvent.init();
+                }
                 window.addEventListener("resize", function() {
                     if (typeof winResize !== undefined) {
                         clearTimeout(winResize);
@@ -9463,7 +9551,7 @@ maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在
 	--m-href-color: hsl(0, 0%, 95%);
 	--m-href-visited: hsl(0, 0%, 60%);
             */
-            $(".meihua")[0].style = "color:red !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+            //$(".meihua")[0].style = "color:#999 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
             //$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
             let temp2 = $(".j_tbnav_tab>a");
             temp2[temp2.length - 1].style = "width: 100px !important;color:unset !important;";
