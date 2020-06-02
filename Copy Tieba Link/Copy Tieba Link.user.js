@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01339)
+// @version      1.1(0.01340)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -212,7 +212,16 @@ async function copyLink() {
                 //console.log(floorData00.innerHTML.replace(/<a.*?">/g,"").replace(/<img.*?src=/g,"").replace(/<br>/g,"\n").replace(/" size.*?">/g,"").replace(/">/g," ").replace(/<\/a>/g,"").replace(/</g,"").replace(/"/g," "))
                 if (setting.title) textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData.content.post_no + " ");
                 if (setting.author) textGroup.push((floorData.content.post_no == 1 || floorData02 == "louzhubiaoshi_wrap" ? (setting.with_at ? '楼主: @' : '楼主: ') : (setting.with_at ? '层主: @' : '层主: ')) + (floorData.author.user_name != "" && floorData.author.user_name != "null" ? floorData.author.user_name : floorData.author.portrait) + ' ');
-                if (setting.neirong_l) textGroup.push("内容: " + floorData00.innerHTML.replace(/<a.*?">/g, "").replace(/<img.*?src=/g, "").replace(/<br>/g, "\n").replace(/" size.*?">/g, "").replace(/">/g, " ").replace(/<\/a>/g, "").replace(/"/g, " ") + " ");
+                if (setting.neirong_l) {
+                    //console.log(temp.replace(/<div class="replace_div.*?px;">/g,"").replace(/<div class="replace_tip.*?px;">/g,"").replace(/<img.*?src=/g,"").replace(/" size.*?">/g,"").replace(/<i class="icon-expand"><\/i>点击展开，查看完整图片<\/div><\/div>/g,"").replace(/<br>/g,"\n").replace(/"/g," ").replace(/<div class= post_bubble_top.*<div class= post_bubble_middle_inner/g,"").replace(/<\/div <\/div <div class= post_bubble_bottom.*<\/div>/g,"").replace(/>/g," "))
+                    let temp = floorData00.innerHTML.replace(/<div class="replace_div.*?px;">/g, "").replace(/<div class="replace_tip.*?px;">/g, "").replace(/<img.*?src=/g, "").replace(/" size.*?">/g, "").replace(/<i class="icon-expand"><\/i>点击展开，查看完整图片<\/div><\/div>/g, "").replace(/<br>/g, "\n").replace(/"/g, " ").replace(/<div class= post_bubble_top.*<div class= post_bubble_middle_inner/g, "").replace(/<\/div <\/div <div class= post_bubble_bottom.*<\/div>/g, "").replace(/>/g, " ");
+                    //console.log(temp.replace(/<div class= replace_tip.*>.*<\/div>/g,"").replace(/<div class= replace_div.*px;/g,"").replace(/<a.*?">/g,"").replace(/<img.*?src=/g,"").replace(/<br>/g,"\n").replace(/" size.*?">/g,"").replace(/">/g," ").replace(/<\/a>/g,"").replace(/</g,"").replace(/"/g," "))
+                    //console.log(temp.replace(/(http|https):\/\/tiebapic.baidu.com\/forum\/.*\/sign=.*\//g,"http://tiebapic.baidu.com/forum/pic/item/"))
+                    //console.log(temp.replace(/(http|https):\/\/imgsa.baidu.com\/forum\/.*\/sign=.*\//g,"http://imgsa.baidu.com/forum/pic/item/"))
+                    temp = temp.replace(/(http|https):\/\/tiebapic.baidu.com\/forum\/.*\/sign=.*\//g, "http://tiebapic.baidu.com/forum/pic/item/");
+                    temp = temp.replace(/(http|https):\/\/imgsa.baidu.com\/forum\/.*\/sign=.*\//g, "http://imgsa.baidu.com/forum/pic/item/");
+                    textGroup.push("内容: " + temp + " ");
+                }
                 if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id + " ");
                 if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                 if (setting.createtime) {
@@ -236,13 +245,15 @@ async function copyLink() {
                     let temp = (parent.parentNode.children[2].getAttribute("class") == "lzl_content_main" ? parent.parentNode.children[2].innerHTML /*贴吧超级会员的楼中楼*/ : parent.parentNode.children[1].innerHTML /*普通用户*/ );
                     temp = temp.replace(/<a.*?">/g, "").replace(/<img.*?src=/g, " ").replace(/<br>/g, "\n").replace(/">/g, " ").replace(/<\/a>/g, "").replace(/"/g, " ");
                     console.log(temp.replace(/<a.*?">/g, "").replace(/<img.*?src=/g, " ").replace(/<br>/g, "\n").replace(/">/g, " ").replace(/[</a>]/g, "").replace(/"/g, " "));
-                    textGroup.push("内容: " + temp + " ")
+                    //temp=temp.replace(/(http|https):\/\/tiebapic.baidu.com\/forum\/.*\/sign=.*\//g,"http://tiebapic.baidu.com/forum/pic/item/");
+                    //temp=temp.replace(/(http|https):\/\/imgsa.baidu.com\/forum\/.*\/sign=.*\//g,"http://imgsa.baidu.com/forum/pic/item/");
+                    textGroup.push("内容: " + temp + " ");
                 }
                 console.log(parent.parentNode.children[2]) //.children[3].getAttribute("class"));
                     /*
-                        普通的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li:nth-child(2) > div.lzl_cnt > span.lzl_content_main
-                        会员的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li.lzl_single_post.j_lzl_s_p.first_no_border > div.lzl_cnt > span.lzl_content_main
-                        */
+                            普通的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li:nth-child(2) > div.lzl_cnt > span.lzl_content_main
+                            会员的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li.lzl_single_post.j_lzl_s_p.first_no_border > div.lzl_cnt > span.lzl_content_main
+                            */
                 if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid + " ");
                 if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                 if (setting.createtime) {
