@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01340)
+// @version      1.1(0.01341)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -214,12 +214,14 @@ async function copyLink() {
                 if (setting.author) textGroup.push((floorData.content.post_no == 1 || floorData02 == "louzhubiaoshi_wrap" ? (setting.with_at ? '楼主: @' : '楼主: ') : (setting.with_at ? '层主: @' : '层主: ')) + (floorData.author.user_name != "" && floorData.author.user_name != "null" ? floorData.author.user_name : floorData.author.portrait) + ' ');
                 if (setting.neirong_l) {
                     //console.log(temp.replace(/<div class="replace_div.*?px;">/g,"").replace(/<div class="replace_tip.*?px;">/g,"").replace(/<img.*?src=/g,"").replace(/" size.*?">/g,"").replace(/<i class="icon-expand"><\/i>点击展开，查看完整图片<\/div><\/div>/g,"").replace(/<br>/g,"\n").replace(/"/g," ").replace(/<div class= post_bubble_top.*<div class= post_bubble_middle_inner/g,"").replace(/<\/div <\/div <div class= post_bubble_bottom.*<\/div>/g,"").replace(/>/g," "))
-                    let temp = floorData00.innerHTML.replace(/<div class="replace_div.*?px;">/g, "").replace(/<div class="replace_tip.*?px;">/g, "").replace(/<img.*?src=/g, "").replace(/" size.*?">/g, "").replace(/<i class="icon-expand"><\/i>点击展开，查看完整图片<\/div><\/div>/g, "").replace(/<br>/g, "\n").replace(/"/g, " ").replace(/<div class= post_bubble_top.*<div class= post_bubble_middle_inner/g, "").replace(/<\/div <\/div <div class= post_bubble_bottom.*<\/div>/g, "").replace(/>/g, " ");
+                    let temp = floorData00.innerHTML.replace(/<div class="replace_div.*?px;">/g, "").replace(/<div class="replace_tip.*?px;">/g, "").replace(/<img.*?src=/g, "").replace(/" size.*?">/g, "").replace(/<i class="icon-expand"><\/i>点击展开，查看完整图片<\/div><\/div>/g, "").replace(/<br>/g, "\n").replace(/"/g, " ").replace(/<div class= post_bubble_top.*<div class= post_bubble_middle_inner/g, "").replace(/<div class= post_bubble_bottom.*<\/div/g, "").replace(/<a.*?>|<a.*?">/g, "").replace(/<\/a>/g, " ").replace(/<\/div>/g, " ").replace(/<span class= edit_font_color/g, "").replace(/<\/span>/g, "").replace(/<strong>/g, "").replace(/<\/strong>/g, "").replace(/>/g, " ").replace(/\[url\]/g, "").replace(/\[\/url\]/g, "");
                     //console.log(temp.replace(/<div class= replace_tip.*>.*<\/div>/g,"").replace(/<div class= replace_div.*px;/g,"").replace(/<a.*?">/g,"").replace(/<img.*?src=/g,"").replace(/<br>/g,"\n").replace(/" size.*?">/g,"").replace(/">/g," ").replace(/<\/a>/g,"").replace(/</g,"").replace(/"/g," "))
                     //console.log(temp.replace(/(http|https):\/\/tiebapic.baidu.com\/forum\/.*\/sign=.*\//g,"http://tiebapic.baidu.com/forum/pic/item/"))
                     //console.log(temp.replace(/(http|https):\/\/imgsa.baidu.com\/forum\/.*\/sign=.*\//g,"http://imgsa.baidu.com/forum/pic/item/"))
                     temp = temp.replace(/(http|https):\/\/tiebapic.baidu.com\/forum\/.*\/sign=.*\//g, "http://tiebapic.baidu.com/forum/pic/item/");
                     temp = temp.replace(/(http|https):\/\/imgsa.baidu.com\/forum\/.*\/sign=.*\//g, "http://imgsa.baidu.com/forum/pic/item/");
+                    temp = temp.replace(/http/g, " http");
+                    temp = temp.replace(/https/g, " https");
                     textGroup.push("内容: " + temp + " ");
                 }
                 if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id + " ");
@@ -243,8 +245,10 @@ async function copyLink() {
                 //应该不会有用户名是null的吧？
                 if (setting.neirong_lzl) {
                     let temp = (parent.parentNode.children[2].getAttribute("class") == "lzl_content_main" ? parent.parentNode.children[2].innerHTML /*贴吧超级会员的楼中楼*/ : parent.parentNode.children[1].innerHTML /*普通用户*/ );
-                    temp = temp.replace(/<a.*?">/g, "").replace(/<img.*?src=/g, " ").replace(/<br>/g, "\n").replace(/">/g, " ").replace(/<\/a>/g, "").replace(/"/g, " ");
-                    console.log(temp.replace(/<a.*?">/g, "").replace(/<img.*?src=/g, " ").replace(/<br>/g, "\n").replace(/">/g, " ").replace(/[</a>]/g, "").replace(/"/g, " "));
+                    temp = temp.replace(/<a.*?">/g, "").replace(/<img.*?src=/g, " ").replace(/<br>/g, "\n").replace(/">/g, " ").replace(/<\/a>/g, "").replace(/"/g, " ").replace(/\[url\]/g, "").replace(/\[\/url\]/g, "");
+                    temp = temp.replace(/http/g, " http");
+                    temp = temp.replace(/https/g, " https");
+                    //console.log(temp.replace(/<a.*?">/g, "").replace(/<img.*?src=/g, " ").replace(/<br>/g, "\n").replace(/">/g, " ").replace(/[</a>]/g, "").replace(/"/g, " "));
                     //temp=temp.replace(/(http|https):\/\/tiebapic.baidu.com\/forum\/.*\/sign=.*\//g,"http://tiebapic.baidu.com/forum/pic/item/");
                     //temp=temp.replace(/(http|https):\/\/imgsa.baidu.com\/forum\/.*\/sign=.*\//g,"http://imgsa.baidu.com/forum/pic/item/");
                     textGroup.push("内容: " + temp + " ");
@@ -306,7 +310,7 @@ function catchLinkTarget(event) {
         curAnchor.setAttribute('data-anchor-type', '0');
         target.appendChild(curAnchor); //添加"复制链接"按钮
         //target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
-    } else if (classList.contains('thread_theme_5') && target.querySelectorAll(".tieba-link-anchor").length == 0) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
+    } else if (classList.contains('thread_theme_5') && target.parentNode.querySelectorAll(".tieba-link-anchor").length == 0) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
         curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
         //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
         if ($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //!= "pull-right"
