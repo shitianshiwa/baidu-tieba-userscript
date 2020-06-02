@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016936beta)
+// @version      2.1(0.016937beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -78,17 +78,14 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         clearTimeout(baiban2);
         $("div.baiban").remove();
     }, 1000);*/
+    console.log("jquery版本号：" + $.fn.jquery);
     var tupianfangda = true; //贴吧图片放大
+    var qiangdiaoxinxitishi = false; //强调信息提示
+    var pingbi_loucengqipao = false; //屏蔽楼层气泡
     if (!GM_getValue("jinyongtiebameihua")) {
         var css = "";
         if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
             css += [
-                ".zhankaichangtupian{",
-                "height:auto;",
-                "}",
-                ".zhankaichangtupian2{",
-                "display:none;",
-                "}",
                 "/*",
                 "——WebFonts——",
                 "Google Fonts: https://www.google.com/fonts",
@@ -105,7 +102,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	font-style: normal;",
                 "	font-weight: 400;",
                 "	src: url(https://fonts.gstatic.com/s/materialicons/v38/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format(\'woff2\'),",
-                "   url(http://onox.qiniudn.com/maverick/materialicons_safari_v38.woff) format(\'woff\');",
+                "   url(https://onox.qiniudn.com/maverick/materialicons_safari_v38.woff) format(\'woff\');",
                 "}",
                 "",
                 "body,",
@@ -1519,7 +1516,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	width: 100% !important;",
                 "	display: flex;",
                 "	padding: 0 !important;",
-                "	height:40px;",
+                //"	height:40px;",//主题贴列表的标题高度
                 "}",
                 ".threadlist_bright .threadlist_detail{",
                 "	width: 100% !important;",
@@ -1630,6 +1627,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".tb_icon_author_rely *{",
                 "	pointer-events: auto;",
                 "}",
+                ".tb_icon_author,",
+                ".tb_icon_author_rely{",
+                "   width:168px !important;", //主题贴列表的发贴人，回复人标签宽度
+                "}",
                 ".interview .threadListGroupCnt .listTitleCnt .listUser:before,",
                 ".frs_bright_preicon,",
                 ".tb_icon_author:before,",
@@ -1668,6 +1669,13 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	font-size: 12px;",
                 "   padding-right:20px;",
                 "}",
+                ".threadlist_reply_date{", //主题贴列表每个贴子的最后回复时间
+                "   top: 5px;",
+                "	position: absolute;",
+                "   padding-right:unset;",
+                "   width: 40px;",
+                "   right: 10px;",
+                "}",
                 ".frs_bright_preicon{",
                 "	position: absolute;",
                 "	left: 0;",
@@ -1676,11 +1684,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 ".frs_bright_preicon>*{",
                 "	margin: -2px 0 0 7px!important;",
                 "}",
-                ".frs_bright_icons{",
+                /*".frs_bright_icons{",//控制主题贴列表的用户标识位置
                 "	vertical-align: top !important;",
                 "	padding-left: 6px;",
                 "	padding-top: 2px;",
-                "}",
+                "}",*/
                 "/*帖子缩略图*/",
                 ".threadlist_bright .small_wrap,",
                 ".threadlist_bright .small_list{",
@@ -1834,12 +1842,12 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	background: #eee !important;",
                 "	border-radius: 15px 0 0 15px;",
                 "}",
-                ".icon_thread_hidden {",
+                ".icon_thread_hidden {", //折叠置顶贴`
                 "	position: absolute;",
                 "	top: 0;",
                 "	right: 0;",
                 "	z-index: 1;",
-                "	width: 0;",
+                "	width: 0 !important;",
                 "	height: 0;",
                 "	border-top: 24px solid rgba(0,0,0,.2);",
                 "	border-left: 24px solid transparent; ",
@@ -4305,6 +4313,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".itb_pager >*,",
                 ".pagination-default >*,",
+                ".pagination-default2 >*,", //支持贴吧主页顶部显示楼层列表脚本 https://greasyfork.org/zh-CN/scripts/398403-%E8%B4%B4%E5%90%A7%E4%B8%BB%E9%A1%B5%E9%A1%B6%E9%83%A8%E6%98%BE%E7%A4%BA%E6%A5%BC%E5%B1%82%E5%88%97%E8%A1%A8
                 ".pager >*,",
                 ".j_pager >*,",
                 ".pb_list_pager >* {",
@@ -4325,7 +4334,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	transition-duration: .5s;",
                 "	transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);",
                 "}",
+                ".pagination-default2{",
+                "color: #000 !important;",
+                "}",
                 ".pagination-default >.pagination-current,",
+                ".pagination-default2 >.pagination-current,",
                 ".pager > .cur,",
                 ".j_pager > .tP,",
                 ".pb_list_pager > .tP {",
@@ -4335,6 +4348,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "}",
                 ".itb_pager >a:hover,",
                 ".pagination-default >a:hover,",
+                ".pagination-default2 >a:hover,",
                 ".pager >a:hover,",
                 ".j_pager >a:hover,",
                 ".pb_list_pager >a:hover {",
@@ -4685,7 +4699,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	transition-property: transform !important;",
                 "	transition-duration: .2s !important;",
                 "	transition-timing-function: ease !important;",
+                "   left:unset !important;", //兼容 Copy Tieba Link https://github.com/shitianshiwa/baidu-tieba-userscript/ 复制链接按钮
                 "	",
+                "}",
+                ".core_title_absolute_bright .core_title_btns > *{", //兼容 Copy Tieba Link https://github.com/shitianshiwa/baidu-tieba-userscript/ 复制链接按钮
+                "   top: 50% !important;",
                 "}",
                 ".core_title_btns>*:hover {",
                 "	transition-property: transform, background, box-shadow !important;",
@@ -5322,6 +5340,12 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 "	/*印记栏为空不显示*/",
                 "	",
                 "	display: none !important;",
+                "}",
+                ".frs_bright_icons{",
+                "	/*主题贴列表的印记栏*/",
+                "	right: 10px !important;",
+                "   position: absolute;",
+                "   width: 60px;",
                 "}",
                 "/*话题贴回复框控件域*/",
                 "",
@@ -7350,11 +7374,15 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             //core_title_txt 标题
                             //core_title_btns display: none !important; 按钮
                             //p_thread thread_theme_5 页码，页数
-                            if (temp[0] != null) {
+                            if (temp[0] != null) { //慢速上下移动网页时，偶尔有工具栏闪烁问题
                                 //console.log(temp[0].style[0]);
-                                if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright") {
+                                if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" || temp[0].className == "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
+
                                     if (yiyingcang == false) {
-                                        yiyingcang = true;
+                                        let t = setTimeout(() => {
+                                            clearTimeout(t);
+                                            yiyingcang = true;
+                                        }, 1000);
                                         //temp[0].style = "display:none !important;";//会产生滚动迟滞卡顿+无法滚动到底
                                         $('.core_title_bg')[0].style = "display:none !important;";
                                         $('.core_title_txt')[0].style = "display:none !important;";
@@ -7363,8 +7391,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                     }
                                 } else {
                                     if (yiyingcang == true) {
-                                        yiyingcang = false
-                                            //temp[0].style = "";
+                                        let t = setTimeout(() => {
+                                            clearTimeout(t);
+                                            yiyingcang = false;
+                                        }, 1000);
+                                        //temp[0].style = "";
                                         $('.core_title_bg')[0].style = "display:block !important;";
                                         $('.core_title_txt')[0].style = "display:block !important;";
                                         $('.core_title_btns')[0].style = "display:block !important;";
@@ -7372,7 +7403,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                     }
                                 }
                             }
-                            console.log($('#j_core_title_wrap')[0].className);
+                            //console.log($('#j_core_title_wrap')[0].className);
                         }, false);
                         /*
                     版权声明：本文为CSDN博主「养只猫」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
@@ -7559,6 +7590,7 @@ display:none !important;
                     desc: '屏蔽楼层气泡',
                     flag: __type_floor,
                     _init: function() {
+                        pingbi_loucengqipao = true;
                         let temp1 = $(".post_bubble_top");
                         let temp2 = $(".post_bubble_middle");
                         let temp3 = $(".post_bubble_bottom");
@@ -7567,7 +7599,7 @@ display:none !important;
                             temp1[i].style = "backgrounde:none;";
                         }
                         for (i = 0; i < temp2.length; i++) {
-                            temp2[i].style = "backgrounde:none;";
+                            temp2[i].style = "backgrounde:none;padding:unset;";
                         }
                         for (i = 0; i < temp3.length; i++) {
                             temp3[i].style = "backgrounde:none;";
@@ -7582,32 +7614,51 @@ display:none !important;
                     desc: '强调信息提示',
                     flag: __type_floor,
                     _init: function() {
-                        let t = setTimeout(() => {
-                            clearTimeout(t);
-                            let temp1 = $(".u_news_wrap span");
-                            let temp2 = $(".u_notity_bd .category_item");
-                            let temp3 = $(".core_reply_tail");
-                            let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span");
-                            let temp5 = $("ul.sys_notify_last>li>a>span");
-                            let i = 0;
-                            $(".meihua")[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
-                            for (i = 0; i < temp1.length; i++) {
-                                temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
-                            }
-                            for (i = 0; i < temp2.length; i++) {
-                                temp2[i].style["color"] = "#f00 !important;";
-                            }
-                            for (i = 0; i < temp3.length; i++) {
-                                temp3[i].style = "color:#000 !important;";
-                            }
-                            for (i = 0; i < temp4.length; i++) {
-                                temp4[i].style = "color:#f00 !important;";
-                            }
-                            for (i = 0; i < temp5.length; i++) {
-                                temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
-                            }
-                        }, 3000);
+                        qiangdiaoxinxitishi = true;
+                        let ii = 0;
+                        try {
+                            let t = setInterval(() => {
+                                let temp1 = $(".u_news_wrap span"); //浮动按钮
+                                let temp2 = $(".u_notity_bd .category_item"); //浮动按钮
+                                let temp3 = $(".core_reply_tail"); //楼层信息
+                                let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span"); //浮动按钮
+                                let temp5 = $("ul.sys_notify_last>li>a>span"); //浮动按钮
+                                let temp6 = $(".meihua"); //美化开关
+                                if (ii <= 59) {
+                                    ii++;
+                                } else {
+                                    clearInterval(t);
+                                }
+                                if (temp6[0] != null) {
+                                    temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
 
+                                }
+                                if (temp3[0] != null) {
+                                    for (i = 0; i < temp3.length; i++) {
+                                        temp3[i].style = "color:#000 !important;";
+                                    }
+                                }
+                                if (temp1[0] != null && temp2[0] != null && temp4[0] != null && temp5[0] != null) {
+                                    clearInterval(t);
+                                    let i = 0;
+                                    for (i = 0; i < temp1.length; i++) {
+                                        temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
+                                    }
+                                    for (i = 0; i < temp2.length; i++) {
+                                        temp2[i].style["color"] = "#f00 !important;";
+                                    }
+
+                                    for (i = 0; i < temp4.length; i++) {
+                                        temp4[i].style = "color:#f00 !important;";
+                                    }
+                                    for (i = 0; i < temp5.length; i++) {
+                                        temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
+                                    }
+                                }
+                            }, 1000);
+                        } catch (err) {
+                            console.log("强调信息提示:" + err);
+                        }
                     },
                     _proc: function(floorType, args) {
                         //console.log("666666666666");
@@ -8203,8 +8254,8 @@ display:none !important;
                     }
                 },
                 "icon_hide": {
-                    name: '隐藏用户图标',
-                    desc: '将用户名下方、右方的图标集藏起来。',
+                    name: '隐藏用户印记',
+                    desc: '将用户名下方、右方的印记集藏起来。',
                     def: false,
                     flag: ~0,
                     _init: function() {
@@ -8535,7 +8586,7 @@ display:none !important;
                     var $tpl = $(Mustache.render($template, $view)); //有警告
 
                     var $wndConfig = $.dialog.open($tpl, {
-                        title: '贴吧助手 - 配置窗口 (刷新后生效)',
+                        title: '贴吧助手 - 配置窗口 <span style="color:#f00;">(警告！储存后会自动刷新！)</span>',
                         height: 200
                     });
 
@@ -8553,6 +8604,7 @@ display:none !important;
                         });
                         $conf.set('modules', newStatus);
                         $wndConfig.close();
+                        window.location.reload();
                     });
                     $('#jx_close', $tpl).click($wndConfig.close.bind($wndConfig));
                 }, '助手设定界面');
@@ -8822,6 +8874,7 @@ a.jx, .ptr	{ cursor: pointer		}
             }
         };
     })();
+
     //百度贴吧图片点击放大 by lliwhx
     //原版的点击图片进入图片列表看图，有一定概率能看到被隐藏的楼层，该楼层需要有图片，如果有文字也会部分显示出来
     setTimeout(() => {
@@ -9143,8 +9196,7 @@ a.jx, .ptr	{ cursor: pointer		}
         }
     }, 2000);
 
-
-    (function() {
+    (function() { //疑惑？
         var locationHref = location.href;
 
         function decode(url, target) {
@@ -9197,6 +9249,7 @@ a.jx, .ptr	{ cursor: pointer		}
 
         addMutationObserver('#j_p_postlist', run);
     })();
+
     //查看发帖 by 文科
     window.addEventListener('DOMContentLoaded', function() {
         var $ = unsafeWindow.$;
@@ -9221,6 +9274,7 @@ a.jx, .ptr	{ cursor: pointer		}
             });
         })();
     }, false);
+
     //百度贴吧按发帖时间（帖子ID）排序 by NULL
     var backupshunxu = new Array();
     setTimeout(() => {
@@ -9338,44 +9392,146 @@ a.jx, .ptr	{ cursor: pointer		}
             document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);
         }, 3000);
     })();
-    // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
-    var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
-    if (localStorage.getItem("userid") == null) {
-        localStorage.setItem("userid", getIsLogin2)
-    }
-    //console.log(getIsLogin2)
-    if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("jinyongtiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
-        let jishu = 0;
-        let t = setInterval(() => { //为右上角的浮动按钮添加头像
-            if (jishu < 20) {
-                //console.log($("div.edui-icon-bold")[0]);
-                /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
+
+    (function() {
+        // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
+        var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
+        if (localStorage.getItem("userid") == null) {
+            localStorage.setItem("userid", getIsLogin2)
+        }
+        //console.log(getIsLogin2)
+        if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("jinyongtiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
+            let jishu = 0;
+            let t = setInterval(() => { //为右上角的浮动按钮添加头像
+                if (jishu < 20) {
                     //console.log($("div.edui-icon-bold")[0]);
-                    suo = true;
-                    $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
-                    $("div.edui-btn-red")[0].style = "display:block;"
-                }*/
-                let userimg = "";
-                let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-                if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
-                    userimg = localStorage.getItem("userimg");
+                    /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
+                        //console.log($("div.edui-icon-bold")[0]);
+                        suo = true;
+                        $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
+                        $("div.edui-btn-red")[0].style = "display:block;"
+                    }*/
+                    let userimg = "";
+                    let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+                    if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
+                        userimg = localStorage.getItem("userimg");
+                    } else {
+                        temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+                        //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
+                        //console.log(temp.src)
+                        localStorage.setItem("userimg", temp.src)
+                        userimg = temp.src;
+                    }
+                    //console.log(userimg);
+                    if (userimg != undefined && userimg != null && userimg != "") {
+                        if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
+                            $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
+                            clearInterval(t);
+                        }
+                    }
+                    if (window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) {
+                        $("#main_aside").remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
+                        //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
+                    }
+                    jishu++;
                 } else {
-                    temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-                    //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
-                    //console.log(temp.src)
-                    localStorage.setItem("userimg", temp.src)
-                    userimg = temp.src;
+                    clearInterval(t);
                 }
                 //console.log(userimg);
-                if (userimg != undefined && userimg != null && userimg != "") {
-                    if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
-                        $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
-                        clearInterval(t);
+                //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
+            }, 1000);
+
+        } else {
+            localStorage.removeItem("userimg");
+            localStorage.removeItem("userid");
+
+            //百度贴吧：不登录即可看贴 by VA
+            setTimeout(() => {
+                try {
+                    unsafeWindow.PageData.user.is_login = 1;
+                } catch (error) {}
+            }, 1000); //尝试延时1秒，解决退出账号后，贴子内没有登陆按钮bug
+        }
+    })();
+
+    (function() {
+        let jishu = 0;
+        let t = setInterval(() => {
+            if (jishu < 60) {
+                let i = 0;
+                $(".u_tb_profile>a").attr("href", "http://tieba.baidu.com/i/i/profile"); //修复贴吧设置按钮无效bug
+                let temp2 = $(".post_bubble_bottom");
+                if (temp2.length > 0) {
+                    for (let i = 0; i < temp2.length; i++) {
+                        if (temp2[i].style["background-image"] == 'url("//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png")') //修复一个楼层背景气泡内部有白线
+                        {
+                            temp2[i].style = 'background:url(//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png) no-repeat -0px  -4px;height: 111px;'
+                        }
                     }
                 }
-                if (window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) {
-                    $("#main_aside").remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
-                    //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
+                try {
+                    if (window.location.href.split("?u=")[0] == "http://tieba.baidu.com/i/i/fans") {
+                        let temp3 = $(".user>.right") //显示移除粉丝选项
+                        for (let i = 0; i < temp3.length; i++) {
+                            //console.log(temp3[i].children[0]);
+                            if (temp3[i].children[0].children[2].style[0] != "padding:4px 0 0 14px;display:block") {
+                                //console.log(temp3[i].children[0]);
+
+                                temp3[i].children[0].children[2].style = "padding:4px 0 0 14px;display:block;"
+                            }
+                        }
+                    }
+
+                } catch (err) {
+                    console.log(err);
+                }
+                if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                    //以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
+                    //u_username_wrap
+                    //u_news_wrap
+                    //u_setting_wrap
+                    /*document.querySelector("a.u_username_wrap").addEventListener("mouseover", () => {
+                        console.log("1");
+                    });*/
+                    /*let temp = $(".u_ddl_con li a"); //a.j_cleardata,u_notify_item
+                    if (temp.length > 0) {
+                        //console.log(temp);
+                        //console.log(temp.length);
+                        //console.log(temp[2]);
+                        for (i = 0; i < temp.length; i++) {
+                            if (temp[i].getAttribute("style") == null) {
+                                temp[i].style = "white-space:normal;";
+                            }
+                        }
+                    }
+                    let temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
+                    if (temp.length > 0) {
+                        for (i = 0; i < temp.length; i++) {
+                            if (temp[i].getAttribute("style") == null) {
+                                temp[i].style = "white-space:normal;";
+                            }
+                        }
+                    }
+                    temp = $("ul.sys_notify_last>li>a"); //a.j_cleardata,u_notify_item
+                    if (temp.length > 0) {
+                        for (i = 0; i < temp.length; i++) {
+                            if (temp[i].getAttribute("style") == null) {
+                                temp[i].style = "white-space:normal;";
+                            }
+                        }
+                    }*/
+                } else {
+                    let temp = $(".u_menu_item"); //尝试解决旧版贴吧右上角选项按钮显示偏前
+                    if (temp.length > 0) {
+                        //console.log(temp);
+                        //console.log(temp.length);
+                        //console.log(temp[2]);
+                        for (i = 0; i < temp.length; i++) {
+                            if (temp[i].getAttribute("style") == null) {
+                                temp[i].style = "padding: 4px 8px 7px;";
+                            }
+                        }
+                    }
                 }
                 jishu++;
             } else {
@@ -9383,196 +9539,305 @@ a.jx, .ptr	{ cursor: pointer		}
             }
             //console.log(userimg);
             //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
-        }, 1000);
-
-    } else {
-        localStorage.removeItem("userimg");
-        localStorage.removeItem("userid");
-
-        //百度贴吧：不登录即可看贴 by VA
+        }, 2000);
         setTimeout(() => {
-            try {
-                unsafeWindow.PageData.user.is_login = 1;
-            } catch (error) {}
-        }, 1000); //尝试延时1秒，解决退出账号后，贴子内没有登陆按钮bug
-    }
-    let jishu = 0;
-    let t = setInterval(() => {
-        if (jishu < 60) {
-            //$("div.replace_div>div.replace_tip").click()
-            let temp = $("div.replace_div");
-            for (let i = 0; i < temp.length; i++) {
-                temp[i].classList.add("zhankaichangtupian");
-                //console.log(temp[i].children[1]);
-                temp[i].children[1].classList.add("zhankaichangtupian2");
+            //把https链接转到http，因为我的收藏页面并不支持https
+            if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
+                let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
+                $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
             }
-            /*
-                    by tency
-                    https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
-                    自动展开百度贴吧帖子的图片
-                    自动展开百度贴吧帖子的图片，方便浏览图片帖
-                    version    0.2
-                    copyright  2014+, LYY
-                    */
+
             let i = 0;
-            $(".u_tb_profile>a").attr("href", "http://tieba.baidu.com/i/i/profile"); //修复贴吧设置按钮无效bug
-            let temp2 = $(".post_bubble_bottom");
-            if (temp2.length > 0) {
-                for (let i = 0; i < temp2.length; i++) {
-                    if (temp2[i].style["background-image"] == 'url("//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png")') //修复一个楼层背景气泡内部有白线
-                    {
-                        temp2[i].style = 'background:url(//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png) no-repeat -0px  -4px;height: 111px;'
+            //let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
+            //if (temp.length > 0) {
+            //    for (i = 0; i < temp.length; i++) {
+            //        temp[i].style = "position: relative;display: block;/*top: -20px;right: 10px;*/width:60px;";
+            //    }
+            //}
+            //备忘,还有招募图标显示(已修复)
+            if (!GM_getValue("jinyongtiebameihua")) { //贴吧美化
+                /*   temp = $(".icon-good"); //显示精品贴，精华贴标识
+                   if (temp.length > 0) {
+                       for (i = 0; i < temp.length; i++) {
+                           temp[i].style = "background-color: #FF6666;";
+                       }
+                   }
+                   temp = $(".icon-top"); //显示置顶标识
+                   if (temp.length > 0) {
+                       for (i = 0; i < temp.length; i++) {
+                           temp[i].style = "background:none;background-color: #4285F5;";
+                       }
+                   }
+                   temp = $(".icon-member-top"); //显示会员置顶标识
+                   if (temp.length > 0) {
+                       for (i = 0; i < temp.length; i++) {
+                           temp[i].style = "background:none;background-color: #FFCC26;";
+                       }
+                   }*/
+                //$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
+                //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
+                try {
+                    $(".p_reply_first").html("回复楼主");
+                    let temp = $("div.ibody");
+                    if (temp != null) {
+                        temp[0].style = "background:#fff;";
                     }
+                } catch (err) {
+                    console.log(err);
                 }
             }
             try {
-                if (window.location.href.split("?u=")[0] == "http://tieba.baidu.com/i/i/fans") {
-                    let temp3 = $(".user>.right") //显示移除粉丝选项
-                    for (let i = 0; i < temp3.length; i++) {
-                        //console.log(temp3[i].children[0]);
-                        if (temp3[i].children[0].children[2].style[0] != "padding:4px 0 0 14px;display:block") {
-                            //console.log(temp3[i].children[0]);
+                /*
+                尝试兼容别人的"贴吧黑夜模式"样式https://userstyles.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles
+                以下推荐用文本编辑器去查找在那里
+                tieba-maverick-2018样式还需要修改
+                threadlist_bright .threadlist_author {
+        float: none !important;
+        //display: flex;
+        width: 16% !important;
+        min-width: 155px;
+        padding-right: 20px;
+        white-space: nowrap;
+        //font-size: 0 !important;
+        overflow: visible !important;
+    }
+    maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在样式脚本管理器里面改）
+        --m-href-color: hsl(0, 0%, 95%);
+        --m-href-visited: hsl(0, 0%, 60%);
+                */
+                //$(".meihua")[0].style = "color:#999 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+                //$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
+                let temp2 = $(".j_tbnav_tab>a");
+                temp2[temp2.length - 1].style = "width: 100px !important;color:unset !important;";
+                temp2[temp2.length - 2].style = "color:unset !important;";
 
-                            temp3[i].children[0].children[2].style = "padding:4px 0 0 14px;display:block;"
-                        }
+                /*let temp6 = $("div.col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8
+                for (let i = 0; i < temp6.length; i++) {
+                    if (temp6[i].children.length == 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
+                    {
+                        continue;
                     }
-                }
+                    let temp7 = document.createElement("span");
+                    temp7.setAttribute('class', 'createtimecsss');
+                    if (temp6[i].parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6[i].parentNode.querySelectorAll(".icon-top")[0] == null) {
+                        temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
+                        temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
+                    } else {
+                        if (!GM_getValue("jinyongtiebameihua")  ) {//贴吧美化
+                            temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                            temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
+                        } else {
+                            temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                            temp6[i].children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
+                        }
 
+                    }
+                    //console.log(temp6[i].parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
+                    temp8 = temp6[i].parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
+                    //console.log(temp6[i].parentNode.querySelectorAll(".icon-member-top"))
+                    //console.log(temp6[i].parentNode.querySelectorAll(".icon-top"))
+                    if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
+                        temp8 = new Date().getFullYear().toString() + "-" + temp8
+                    }
+                    temp7.innerHTML = temp8;
+                    //console.log(temp8)
+                    temp6[i].children[0].before(temp7);
+                }*/
             } catch (err) {
                 console.log(err);
             }
-            if (!GM_getValue("jinyongtiebameihua") /*贴吧美化后*/ ) {
-                //以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
-                //u_username_wrap
-                //u_news_wrap
-                //u_setting_wrap
-                /*document.querySelector("a.u_username_wrap").addEventListener("mouseover", () => {
-                    console.log("1");
-                });*/
-                /*let temp = $(".u_ddl_con li a"); //a.j_cleardata,u_notify_item
-                if (temp.length > 0) {
-                    //console.log(temp);
-                    //console.log(temp.length);
-                    //console.log(temp[2]);
-                    for (i = 0; i < temp.length; i++) {
-                        if (temp[i].getAttribute("style") == null) {
-                            temp[i].style = "white-space:normal;";
-                        }
-                    }
-                }
-                let temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
-                if (temp.length > 0) {
-                    for (i = 0; i < temp.length; i++) {
-                        if (temp[i].getAttribute("style") == null) {
-                            temp[i].style = "white-space:normal;";
-                        }
-                    }
-                }
-                temp = $("ul.sys_notify_last>li>a"); //a.j_cleardata,u_notify_item
-                if (temp.length > 0) {
-                    for (i = 0; i < temp.length; i++) {
-                        if (temp[i].getAttribute("style") == null) {
-                            temp[i].style = "white-space:normal;";
-                        }
-                    }
-                }*/
-            } else {
-                let temp = $(".u_menu_item"); //尝试解决旧版贴吧右上角选项按钮显示偏前
-                if (temp.length > 0) {
-                    //console.log(temp);
-                    //console.log(temp.length);
-                    //console.log(temp[2]);
-                    for (i = 0; i < temp.length; i++) {
-                        if (temp[i].getAttribute("style") == null) {
-                            temp[i].style = "padding: 4px 8px 7px;";
-                        }
-                    }
-                }
+        }, 5000);
+    })();
+
+    (function() { //参考显示用户名和贴子屏蔽检测脚本 https://greasyfork.org/scripts/31207-%E8%B4%B4%E5%90%A7%E6%98%BE%E7%A4%BA%E7%9C%9F%E5%AE%9Eid https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
+        var tiebadongtai = "";
+        tiebadongtai = `
+            /* 使用 animation 监测 DOM 变化 */
+            @-webkit-keyframes __tieba_action__ {}
+            @-moz-keyframes __tieba_action__ {}
+            @keyframes __tieba_action__ {}
+            @keyframes tiebaaction {
+               from {
+                   clip: rect(1px, auto, auto, auto);
+               }
+               to {
+                   clip: rect(0px, auto, auto, auto);
+               }
             }
-            jishu++;
+            .j_thread_list,.l_post,.thread_theme_5{
+                animation-duration: 0.001 s;
+                animation-name: tiebaaction;
+            }
+            /* 主题贴 */
+            .j_thread_list,
+            /* 楼层 */
+            .l_post,.thread_theme_5{
+                -webkit-animation: __tieba_action__;
+                -moz-animation: __tieba_action__;
+                animation: __tieba_action__;
+            }
+            .zhankaichangtupian{
+                height:auto;
+            }
+           .zhankaichangtupian2{
+               display:none;
+            }
+        `;
+        if (typeof GM_addStyle != "undefined") {
+            GM_addStyle(tiebadongtai);
+        } else if (typeof PRO_addStyle != "undefined") {
+            PRO_addStyle(tiebadongtai); //有警告
+        } else if (typeof addStyle != "undefined") {
+            addStyle(tiebadongtai); //有警告
         } else {
-            clearInterval(t);
+            var node = document.createElement("style");
+            node.type = "text/css";
+            node.appendChild(document.createTextNode(tiebadongtai));
+            var heads = document.getElementsByTagName("head");
+            if (heads.length > 0) {
+                heads[0].appendChild(node);
+            } else {
+                // no head yet, stick it whereever
+                document.documentElement.appendChild(node);
+            }
         }
-        //console.log(userimg);
-        //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
-    }, 2000);
-    setTimeout(() => {
-        //把https链接转到http，因为我的收藏页面并不支持https
-        if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
-            let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
-            $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
+        const tieba_action = (event) => {
+            if (event.animationName !== '__tieba_action__') {
+                return;
+            }
+            const { target } = event;
+            const { classList } = target;
+            //let checker;
+            //console.log(target);
+            //console.log(classList.contains('j_thread_list'))
+            if (classList.contains('j_thread_list')) {
+                //console.log(target.querySelectorAll(".is_show_create_time")[0].innerHTML);
+                //console.log(target.querySelectorAll(".col2_left")[0]);
+                try {
+                    let temp6 = target.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8
+                    let temp9 = target.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
+                    let temp10 = target.querySelectorAll(".icon-top")[0]; //显示置顶标识
+                    let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
+                    //console.log(temp6)
+                    //console.log(temp9)
+                    //console.log(temp10)
+                    //console.log(temp11)
+                    //console.log(temp6.childNodes);
+                    if (temp6.querySelectorAll(".createtimecsss")[0] != null) {
+                        return false;
+                    }
+                    if (temp6.children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
+                    {
+                        let temp7 = document.createElement("span");
+                        temp7.setAttribute('class', 'createtimecsss');
+                        if (temp6.parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6.parentNode.querySelectorAll(".icon-top")[0] == null) {
+                            temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
+                            temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
+                        } else {
+                            if (!GM_getValue("jinyongtiebameihua") /*贴吧美化后*/ ) {
+                                temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                                temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
+                            } else {
+                                temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                                temp6.children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
+                            }
+                        }
+                        //console.log(temp6.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
+                        temp8 = target.querySelectorAll(".is_show_create_time")[0].innerHTML;
+                        //console.log(temp6.parentNode.querySelectorAll(".icon-member-top"))
+                        //console.log(temp6.parentNode.querySelectorAll(".icon-top"))
+                        if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
+                            temp8 = new Date().getFullYear().toString() + "-" + temp8
+                        }
+                        temp7.innerHTML = temp8;
+                        //console.log(temp8)
+                        temp6.children[0].before(temp7);
+                    }
+                    if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                        if (temp9 != null) {
+                            temp9.style = "background-color: #FF6666;";
+                        }
+                        if (temp10 != null) {
+                            temp10.style = "background:none;background-color: #4285F5;";
+                        }
+                        if (temp11 != null) {
+                            temp11.style = "background:none;background-color: #FFCC26;";
+                        }
+                    }
+                } catch (err) {
+                    console.log("j_thread_list:" + err);
+                }
+            }
+            if (classList.contains('l_post')) {
+                try {
+
+                } catch (err) {
+                    console.log("l_post:" + err)
+                }
+                //console.log(target.querySelectorAll(".is_show_create_time")[0].innerHTML);
+                //console.log(target.querySelectorAll(".col2_left")[0]);
+                if (qiangdiaoxinxitishi == true) {
+                    let temp = target.querySelectorAll(".core_reply_tail")[0];
+                    //console.log(temp)
+                    temp.style = "color:#000 !important;"; //强调信息显示
+                }
+                if (pingbi_loucengqipao == true) {
+                    let temp1 = target.querySelectorAll(".post_bubble_top")[0];
+                    let temp2 = target.querySelectorAll(".post_bubble_middle")[0];
+                    let temp3 = target.querySelectorAll(".post_bubble_bottom")[0];
+                    temp1.style = "backgrounde:none;";
+                    temp2.style = "backgrounde:none;padding:unset;";
+                    temp3.style = "backgrounde:none;";
+                }
+
+            }
+            if (classList.contains('thread_theme_5')) { //贴子内只动态执行一次
+                //$("div.replace_div>div.replace_tip").click()
+                let t = setTimeout(() => { //要延时等图片加载完
+                    clearTimeout(t);
+                    let temp = $("div.replace_div");
+                    for (let i = 0; i < temp.length; i++) {
+                        temp[i].classList.add("zhankaichangtupian");
+                        //console.log(temp[i].children[1]);
+                        temp[i].children[1].classList.add("zhankaichangtupian2");
+                    }
+                }, 3000);
+
+                /*
+                        by tency
+                        https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
+                        自动展开百度贴吧帖子的图片
+                        自动展开百度贴吧帖子的图片，方便浏览图片帖
+                        version    0.2
+                        copyright  2014+, LYY
+                        */
+            }
+        }
+        const initListener = () => {
+            document.addEventListener('webkitAnimationStart', tieba_action, false);
+            document.addEventListener('MSAnimationStart', tieba_action, false);
+            document.addEventListener('animationstart', tieba_action, false);
+        };
+        initListener();
+    })();
+
+    (function() {
+        function resetx() {
+            localStorage.removeItem("userimg"); //一个用户退出登录后，再用其他账户登录会残留上一个用户的贴吧头像
+            alert("已删除贴吧用户头像缓存！");
+            window.location.reload(); //刷新网页
         }
 
-        let i = 0;
-        let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
-        if (temp.length > 0) {
-            for (i = 0; i < temp.length; i++) {
-                temp[i].style = "position: relative;display: block;/*top: -20px;right: 10px;*/width:60px;";
-            }
+        function closemeihua() {
+            GM_setValue("jinyongtiebameihua", GM_getValue("jinyongtiebameihua") ? false : true);
+            window.location.reload(); //刷新网页
         }
-        //备忘,还有招募图标不显示
-        temp = $(".icon-good"); //显示精品贴，精华贴标识
-        if (temp.length > 0) {
-            for (i = 0; i < temp.length; i++) {
-                temp[i].style = "background-color: #FF6666;";
-            }
-        }
-        temp = $(".icon-top"); //显示置顶标识
-        if (temp.length > 0) {
-            for (i = 0; i < temp.length; i++) {
-                temp[i].style = "background:none;background-color: #4285F5;";
-            }
-        }
-        temp = $(".icon-member-top"); //显示会员置顶标识
-        if (temp.length > 0) {
-            for (i = 0; i < temp.length; i++) {
-                temp[i].style = "background:none;background-color: #FFCC26;";
-            }
-        }
-        //$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
-        //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
-        $(".p_reply_first").html("回复楼主");
-        try {
-            /*
-            尝试兼容别人的"贴吧黑夜模式"样式https://userstyles.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles
-            以下推荐用文本编辑器去查找在那里
-            tieba-maverick-2018样式还需要修改
-            threadlist_bright .threadlist_author {
-	float: none !important;
-	//display: flex;
-	width: 16% !important;
-	min-width: 155px;
-	padding-right: 20px;
-	white-space: nowrap;
-	//font-size: 0 !important;
-	overflow: visible !important;
-}
-maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在样式脚本管理器里面改）
-	--m-href-color: hsl(0, 0%, 95%);
-	--m-href-visited: hsl(0, 0%, 60%);
-            */
-            //$(".meihua")[0].style = "color:#999 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
-            //$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
-            let temp2 = $(".j_tbnav_tab>a");
-            temp2[temp2.length - 1].style = "width: 100px !important;color:unset !important;";
-            temp2[temp2.length - 2].style = "color:unset !important;";
-        } catch (err) {
-            console.log(err);
-        }
-    }, 5000);
+        GM_registerMenuCommand("删除贴吧用户头像缓存", resetx); // @grant        GM_registerMenuCommand
+        GM_registerMenuCommand(GM_getValue("jinyongtiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
+    })();
 
-    function resetx() {
-        localStorage.removeItem("userimg"); //一个用户退出登录后，再用其他账户登录会残留上一个用户的贴吧头像
-        alert("已删除贴吧用户头像缓存！");
-        window.location.reload(); //刷新网页
-    }
 
-    function closemeihua() {
-        GM_setValue("jinyongtiebameihua", GM_getValue("jinyongtiebameihua") ? false : true);
-        window.location.reload(); //刷新网页
-    }
-    GM_registerMenuCommand("删除贴吧用户头像缓存", resetx); // @grant        GM_registerMenuCommand
-    GM_registerMenuCommand(GM_getValue("jinyongtiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
+
 })();
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
