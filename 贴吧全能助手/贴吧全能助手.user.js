@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016937beta)
+// @version      2.1(0.016938beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥
 // @include      http*://tieba.baidu.com/*
@@ -35,7 +35,8 @@
 // ==/UserScript==
 
 /*
-屏蔽挽尊卡失效
+贴吧只限吧务发言时，文字话题贴在主题贴列表回复有表情显示bug(已修)
+屏蔽挽尊卡失效(已修)
 //发现贴子里的下工具栏的楼主功能无效，贴吧美化切换有显示bug(已修)
 //http://tieba.baidu.com/f/center/createtb 创建贴吧
 贴吧超级会员会导致楼层用户名字和楼中楼头像显示错误(已修复)
@@ -7610,8 +7611,8 @@ display:none !important;
                     }
                 },
                 "qiangdiaoxinxitishi": {
-                    name: '强调信息提示',
-                    desc: '强调信息提示',
+                    name: '强调信息提示(对旧版贴吧基本没用)',
+                    desc: '强调信息提示(对旧版贴吧基本没用)',
                     flag: __type_floor,
                     _init: function() {
                         qiangdiaoxinxitishi = true;
@@ -9546,7 +9547,6 @@ a.jx, .ptr	{ cursor: pointer		}
                 let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
                 $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
             }
-
             let i = 0;
             //let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
             //if (temp.length > 0) {
@@ -9578,10 +9578,31 @@ a.jx, .ptr	{ cursor: pointer		}
                 //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
                 try {
                     $(".p_reply_first").html("回复楼主");
-                    let temp = $("div.ibody");
+                    let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
                     if (temp != null) {
                         temp[0].style = "background:#fff;";
                     }
+
+                } catch (err) {
+                    console.log(err);
+                }
+                try {
+                    console.log($(".listEditorCnt"));
+                    $(".listEditorCnt").click(() => {
+                        //console.log("2333");
+                        //let t=setTimeout(()=>{
+                        //console.log("450");
+                        //clearTimeout(t);
+                        let temp1 = $(".qp_interview_insertsmiley")[0]; //主题贴列表的话题贴回复框表情按钮修复
+                        if (temp1 != null) {
+                            temp1.style = "background:none !important;";
+                        }
+                        let temp2 = $(".j_banned_tip")[0];
+                        if (temp2 != null) {
+                            temp2.style = "top:0px;";
+                        }
+                        //},100);
+                    });
                 } catch (err) {
                     console.log(err);
                 }
@@ -9770,16 +9791,16 @@ a.jx, .ptr	{ cursor: pointer		}
             }
             if (classList.contains('l_post')) {
                 try {
-
+                    //console.log(target);
                 } catch (err) {
                     console.log("l_post:" + err)
                 }
                 //console.log(target.querySelectorAll(".is_show_create_time")[0].innerHTML);
                 //console.log(target.querySelectorAll(".col2_left")[0]);
                 if (qiangdiaoxinxitishi == true) {
-                    let temp = target.querySelectorAll(".core_reply_tail")[0];
-                    //console.log(temp)
-                    temp.style = "color:#000 !important;"; //强调信息显示
+                    //console.log(target.querySelectorAll(".core_reply_tail"))
+                    let temp = target.querySelectorAll(".core_reply_tail");
+                    temp.style = "color:#000 !important;"; //强调信息显示,对旧版贴吧基本没用
                 }
                 if (pingbi_loucengqipao == true) {
                     let temp1 = target.querySelectorAll(".post_bubble_top")[0];
