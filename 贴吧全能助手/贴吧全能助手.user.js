@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016938beta)
+// @version      2.1(0.016939beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
-// @author       忆世萧遥
+// @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
 // @exclude      http*://tieba.baidu.com/f/fdir*
 // @exclude      http*://tieba.baidu.com/f/search*
@@ -9325,8 +9325,8 @@ a.jx, .ptr	{ cursor: pointer		}
                 $(".fatieshijianpaixu").html("按回复时间顺序(当前为:回复时间倒序)")
                 yipaixun = 2;
                 //console.log("666");
-                var threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
-                for (var thread of threads3) {
+                let threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
+                for (let thread of threads3) {
                     try {
                         parentNode.removeChild(thread);
                     } catch (e) {
@@ -9341,8 +9341,8 @@ a.jx, .ptr	{ cursor: pointer		}
                 yipaixun = 0;
                 $(".fatieshijianpaixu").html("按发帖时间排序(当前为:回复时间顺序)")
                     //console.log("666");
-                var threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
-                for (var thread of threads3) {
+                let threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
+                for (let thread of threads3) {
                     try {
                         parentNode.removeChild(thread);
                     } catch (e) {
@@ -9577,9 +9577,8 @@ a.jx, .ptr	{ cursor: pointer		}
                 //$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
                 //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
                 try {
-                    $(".p_reply_first").html("回复楼主");
                     let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
-                    if (temp != null) {
+                    if (temp[0] != null) {
                         temp[0].style = "background:#fff;";
                     }
 
@@ -9587,22 +9586,25 @@ a.jx, .ptr	{ cursor: pointer		}
                     console.log(err);
                 }
                 try {
-                    console.log($(".listEditorCnt"));
-                    $(".listEditorCnt").click(() => {
-                        //console.log("2333");
-                        //let t=setTimeout(()=>{
-                        //console.log("450");
-                        //clearTimeout(t);
-                        let temp1 = $(".qp_interview_insertsmiley")[0]; //主题贴列表的话题贴回复框表情按钮修复
-                        if (temp1 != null) {
-                            temp1.style = "background:none !important;";
-                        }
-                        let temp2 = $(".j_banned_tip")[0];
-                        if (temp2 != null) {
-                            temp2.style = "top:0px;";
-                        }
-                        //},100);
-                    });
+                    //console.log($(".listEditorCnt"));
+                    if ($(".listEditorCnt")[0] != null) {
+                        $(".listEditorCnt").click(() => {
+                            //console.log("2333");
+                            //let t=setTimeout(()=>{
+                            //console.log("450");
+                            //clearTimeout(t);
+                            let temp1 = $(".qp_interview_insertsmiley")[0]; //主题贴列表的话题贴回复框表情按钮修复
+                            if (temp1 != null) {
+                                temp1.style = "background:none !important;";
+                            }
+                            let temp2 = $(".j_banned_tip")[0];
+                            if (temp2 != null) {
+                                temp2.style = "top:0px;";
+                            }
+                            //},100);
+                        });
+                    }
+
                 } catch (err) {
                     console.log(err);
                 }
@@ -9629,8 +9631,10 @@ a.jx, .ptr	{ cursor: pointer		}
                 //$(".meihua")[0].style = "color:#999 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
                 //$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
                 let temp2 = $(".j_tbnav_tab>a");
-                temp2[temp2.length - 1].style = "width: 100px !important;color:unset !important;";
-                temp2[temp2.length - 2].style = "color:unset !important;";
+                if (temp2.length > 0) {
+                    temp2[temp2.length - 1].style = "width: 100px !important;color:unset !important;";
+                    temp2[temp2.length - 2].style = "color:unset !important;";
+                }
 
                 /*let temp6 = $("div.col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8
                 for (let i = 0; i < temp6.length; i++) {
@@ -9685,14 +9689,19 @@ a.jx, .ptr	{ cursor: pointer		}
                    clip: rect(0px, auto, auto, auto);
                }
             }
-            .j_thread_list,.l_post,.thread_theme_5{
+            .j_thread_list,.l_post,.pager_theme_4,.thread_theme_5,.icon-member-top{
                 animation-duration: 0.001 s;
                 animation-name: tiebaaction;
             }
             /* 主题贴 */
             .j_thread_list,
             /* 楼层 */
-            .l_post,.thread_theme_5{
+            .l_post,
+            /*贴子内页*/
+            .pager_theme_4,
+            .thread_theme_5,
+            /*会员置顶图标*/
+            .icon-member-top{
                 -webkit-animation: __tieba_action__;
                 -moz-animation: __tieba_action__;
                 animation: __tieba_action__;
@@ -9723,22 +9732,51 @@ a.jx, .ptr	{ cursor: pointer		}
             }
         }
         const tieba_action = (event) => {
+            const { target } = event;
+            const { classList } = target;
+            //console.log(target);
+            if (classList.contains('core_reply_tail')) {
+                if (qiangdiaoxinxitishi == true) {
+                    //console.log(target.querySelectorAll(".core_reply_tail")[0])
+                    target.style = "color:#000 !important;"; //强调信息显示,对旧版贴吧基本没用
+                }
+                if (!GM_getValue("jinyongtiebameihua")) { //贴吧美化
+                    //console.log(target.querySelectorAll(".p_reply_first"));
+                    let temp1 = target.querySelectorAll(".p_reply_first");
+                    if (temp1[0] != null) {
+                        temp1[0].style = "font-size:unset !important;";
+                        //console.log(temp1[0].classList[1]);
+                        if (temp1[0].classList[0] == "p_reply_first") {
+                            temp1[0].style = "font-size:10px !important;";
+                            temp1[0].innerHTML = "回复";
+                        } else {
+                            temp1[0].innerHTML = "回复楼主";
+                        }
+                    }
+                }
+            }
             if (event.animationName !== '__tieba_action__') {
                 return;
             }
-            const { target } = event;
-            const { classList } = target;
+
             //let checker;
             //console.log(target);
             //console.log(classList.contains('j_thread_list'))
-            if (classList.contains('j_thread_list')) {
+            if (classList.contains('icon-member-top')) {
+                if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                    target.style = "background:none;background-color: #FFCC26;";
+                }
+            }
+            if (classList.contains("j_thread_list")) {
                 //console.log(target.querySelectorAll(".is_show_create_time")[0].innerHTML);
                 //console.log(target.querySelectorAll(".col2_left")[0]);
                 try {
+                    // console.log(target);
+
                     let temp6 = target.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8
                     let temp9 = target.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
                     let temp10 = target.querySelectorAll(".icon-top")[0]; //显示置顶标识
-                    let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
+                    //let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
                     //console.log(temp6)
                     //console.log(temp9)
                     //console.log(temp10)
@@ -9764,7 +9802,7 @@ a.jx, .ptr	{ cursor: pointer		}
                             }
                         }
                         //console.log(temp6.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
-                        temp8 = target.querySelectorAll(".is_show_create_time")[0].innerHTML;
+                        let temp8 = target.querySelectorAll(".is_show_create_time")[0].innerHTML;
                         //console.log(temp6.parentNode.querySelectorAll(".icon-member-top"))
                         //console.log(temp6.parentNode.querySelectorAll(".icon-top"))
                         if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
@@ -9781,9 +9819,9 @@ a.jx, .ptr	{ cursor: pointer		}
                         if (temp10 != null) {
                             temp10.style = "background:none;background-color: #4285F5;";
                         }
-                        if (temp11 != null) {
-                            temp11.style = "background:none;background-color: #FFCC26;";
-                        }
+                        // if (temp11 != null) {
+                        //     temp11.style = "background:none;background-color: #FFCC26;";
+                        // }
                     }
                 } catch (err) {
                     console.log("j_thread_list:" + err);
@@ -9797,11 +9835,6 @@ a.jx, .ptr	{ cursor: pointer		}
                 }
                 //console.log(target.querySelectorAll(".is_show_create_time")[0].innerHTML);
                 //console.log(target.querySelectorAll(".col2_left")[0]);
-                if (qiangdiaoxinxitishi == true) {
-                    //console.log(target.querySelectorAll(".core_reply_tail"))
-                    let temp = target.querySelectorAll(".core_reply_tail");
-                    temp.style = "color:#000 !important;"; //强调信息显示,对旧版贴吧基本没用
-                }
                 if (pingbi_loucengqipao == true) {
                     let temp1 = target.querySelectorAll(".post_bubble_top")[0];
                     let temp2 = target.querySelectorAll(".post_bubble_middle")[0];
@@ -9812,7 +9845,7 @@ a.jx, .ptr	{ cursor: pointer		}
                 }
 
             }
-            if (classList.contains('thread_theme_5')) { //贴子内只动态执行一次
+            if ((classList.contains('pager_theme_4') == true && classList.contains('thread_theme_5') == false) || classList.contains('thread_theme_5')) { //贴子内只动态执行一次 thread_theme_5只在第一次打开贴子时执行，pager_theme_4翻页执行
                 //$("div.replace_div>div.replace_tip").click()
                 let t = setTimeout(() => { //要延时等图片加载完
                     clearTimeout(t);
