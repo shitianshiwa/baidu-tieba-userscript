@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01344)
+// @version      1.1(0.01345)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -11,7 +11,8 @@
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=video
 /// @exclude     http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=tuan
-// @author       864907600cc,shitianshiwa
+// @author       864907600cc
+// @author       shitianshiwa
 // @icon         https://secure.gravatar.com/avatar/147834caf9ccb0a66b2505c753747867
 // @run-at       document-idle
 // @grant        GM_setClipboard
@@ -47,6 +48,7 @@ var setting = {
 // 若复制AT作者，则是否需要添加 @，默认为 true
 // 是否复制贴吧名，默认为 true
 // 是否复制链接，默认为 true
+// 是否复制主题贴列表里选择的贴子简介内容，默认为true
 // 是否复制楼层的内容，默认为true
 // 是否复制楼中楼的内容，默认为true
 // 是否复制发贴时间，默认为true
