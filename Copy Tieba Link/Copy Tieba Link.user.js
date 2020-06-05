@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01343)
+// @version      1.1(0.01344)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -9,7 +9,7 @@
 // @include      http*://tieba.baidu.com/f?ie=utf-8&kw=*
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=album
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=video
-/// @exclude     http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24 
+/// @exclude     http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=tuan
 // @author       864907600cc,shitianshiwa
 // @icon         https://secure.gravatar.com/avatar/147834caf9ccb0a66b2505c753747867
@@ -163,6 +163,12 @@ async function copyLink() {
                             //console.log(x1[0].innerHTML);
                             temp += "(语音)";
                         }
+                        let x01 = parent.parentNode.parentNode.querySelectorAll(".threadlist_video")[0];
+                        //console.log(x0)
+                        if (x01 != null) {
+                            //console.log(x1[0].innerHTML);
+                            temp += "(视频)";
+                        }
                         let x1 = parent.parentNode.parentNode.querySelectorAll("div.threadlist_abs");
                         if (x1[0] != null) {
                             //console.log(x1[0].innerHTML);
@@ -278,6 +284,7 @@ async function copyLink() {
                     temp = temp.replace(/https/g, " https"); //加个空格
                     temp = temp.replace(/<span class= txt  点击展开，查看完整图片/g, "");
                     temp = temp.replace(/<em class= expand/g, "");
+                    temp = temp.replace(/<div class= video_src_wrapper/g, "(视频贴)").replace(/<div class= video_src_wrap_main/g, "").replace(/<video style= width: .*px; height: .*px; background:.*;  src=/g, "").replace(/data-threadid=.*data-md5=.*controls=.*autoplay=/g, "").replace(/<\/video  <span class= apc_src_wrapper/g, "");
                     temp = temp.trim();
                     textGroup.push("内容: " + temp + " ");
                 }
@@ -332,9 +339,9 @@ async function copyLink() {
                 }
                 console.log(parent.parentNode.children[2]) //.children[3].getAttribute("class"));
                     /*
-                                普通的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li:nth-child(2) > div.lzl_cnt > span.lzl_content_main
-                                会员的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li.lzl_single_post.j_lzl_s_p.first_no_border > div.lzl_cnt > span.lzl_content_main
-                                */
+                                    普通的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li:nth-child(2) > div.lzl_cnt > span.lzl_content_main
+                                    会员的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li.lzl_single_post.j_lzl_s_p.first_no_border > div.lzl_cnt > span.lzl_content_main
+                                    */
                 if (setting.link) textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid + " ");
                 if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                 if (setting.createtime) {
@@ -384,17 +391,19 @@ function catchLinkTarget(event) {
         curAnchor.setAttribute('data-anchor-type', '0');
         target.appendChild(curAnchor); //添加"复制链接"按钮
         //target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
-    } else if (classList.contains('pager_theme_4') && target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
-        //console.log(target.parentNode.parentNode.parentNode.parentNode);
-        curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
-        //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
-        if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //动态翻页支持添加按钮
-            curAnchor.setAttribute('style', 'width:80px !important;'); //贴子内的标题
-        } else {
-            curAnchor.setAttribute('style', 'width:80px !important;position: absolute;left: 510px;top: 22px;'); //贴子内的标题
+    } else if (classList.contains('pager_theme_4') && target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0] != null) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
+        if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) {
+            //console.log(target.parentNode.parentNode.parentNode.parentNode);
+            curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
+            //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
+            if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //动态翻页支持添加按钮
+                curAnchor.setAttribute('style', 'width:80px !important;'); //贴子内的标题
+            } else {
+                curAnchor.setAttribute('style', 'width:80px !important;position: absolute;left: 510px;top: 22px;'); //贴子内的标题
+            }
+            target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor);
+            //console.log(target.querySelectorAll(".tieba-link-anchor"));
         }
-        target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor);
-        //console.log(target.querySelectorAll(".tieba-link-anchor"));
     } else if (classList.contains('thread_theme_5') && target.parentNode.querySelectorAll(".tieba-link-anchor").length == 0) { //首次进入网页加载
         curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
         //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
