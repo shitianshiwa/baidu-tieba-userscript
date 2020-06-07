@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.01345)
+// @version      1.1(0.013451)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -287,6 +287,7 @@ async function copyLink() {
                     temp = temp.replace(/<span class= txt  点击展开，查看完整图片/g, "");
                     temp = temp.replace(/<em class= expand/g, "");
                     temp = temp.replace(/<div class= video_src_wrapper/g, "(视频贴)").replace(/<div class= video_src_wrap_main/g, "").replace(/<video style= width: .*px; height: .*px; background:.*;  src=/g, "").replace(/data-threadid=.*data-md5=.*controls=.*autoplay=/g, "").replace(/<\/video  <span class= apc_src_wrapper/g, "");
+                    temp = temp.replace(/style=/g, "");
                     temp = temp.trim();
                     textGroup.push("内容: " + temp + " ");
                 }
