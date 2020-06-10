@@ -1,3 +1,45 @@
+2020-5-1 v2.1(0.016934beta)
+修复带错的背景样式
+2020-5-1 v2.1(0.016933beta)
+1. 增加按回复时间倒序看贴 https://greasyfork.org/zh-CN/forum/discussion/28797/x
+2. 增加不登陆也能切换贴吧美化的按钮（暂时解决方案） https://greasyfork.org/zh-CN/forum/discussion/75729/x
+3. 变动显示精品贴，精华贴标识的方法以兼容下面的"黑夜模式"样式
+4. 修改修复贴子内左侧贴吧用户栏背景的方法以兼容下面的"黑夜模式"样式
+5. （不需要黑夜模式的话，可以不装）尝试兼容别人写的"贴吧黑夜模式"样式 https://.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles 
+这个样式有安装顺序要求!
+https://greasyfork.org/zh-CN/forum/discussion/77243/x
+其实本脚本应该有用这个样式的旧版本，这次就修改兼容到能用吧！
+* 我用的是xStyle样式管理器 https://github.com/FirefoxBar/xStyle 不过由于长期没有更新，会有些问题。。！
+* 要选择"夜间模式"才是基本全黑的，否则发主题帖的编辑器会有点亮。。！
+* 这个推荐用文本编辑器去查找在那里
+* tieba-maverick-2018样式还需要修改
+    threadlist_bright .threadlist_author {
+	float: none !important;
+	//display: flex;
+	width: 16% !important;
+	min-width: 155px;
+	padding-right: 20px;
+	white-space: nowrap;
+	//font-size: 0 !important;
+	overflow: visible !important;
+}
+不修改主题帖列表就不显示发贴日期
+#footer {
+	margin-bottom: 20px !important;
+	background-color:#000 !important;
+}
+.forum_foot{
+	border-radius: 0 0 var(--m-radius) var(--m-radius);
+	background-color:#000 !important;
+}
+不修改以上两个，贴吧底部可能会有点亮
+<a href=https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B/Tieba%20-%20Maverick%202018%20%5B%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%5D(%E9%BB%91%E5%A4%9C%E6%A8%A1%E5%BC%8F%E5%85%BC%E5%AE%B9).txt
+>复制粘贴用</a>
+* maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在样式脚本管理器里面改）
+	--m-href-color: hsl(0, 0%, 95%);
+	--m-href-visited: hsl(0, 0%, 60%);
+不修改黑夜模式，主题贴列表的标题就是暗蓝色的
+6. 调整了一些代码
 2020-5-1 v2.1(0.016932beta)
 修bug
 1. 修复因自动展开长图代码导致影响发贴编辑器使用的bug(重要) https://greasyfork.org/zh-CN/forum/discussion/76623/x
