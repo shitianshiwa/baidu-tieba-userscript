@@ -34,6 +34,7 @@
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 /*
+http://tieba.baidu.com/i/* 这个域名内无法功能都不能正常运行，例如不能在网页内开关美化，设置功能等
 发现初音楼层气泡有显示问题
 贴吧只限吧务发言时，文字话题贴在主题贴列表回复有表情显示bug(已修)
 屏蔽挽尊卡失效(已修)
@@ -9795,9 +9796,11 @@ color: #999;
                 try {
                     let ii = 0;
                     let t = setInterval(() => {
-                            let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
-                            if (temp[0] != null) {
-                                temp[0].style = "background:#fff;";
+                            if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                                let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
+                                if (temp[0] != null) {
+                                    temp[0].style = "background:#fff;";
+                                }
                             }
                             if (GM_getValue("qiangdiaoxinxitishi") != null && GM_getValue("qiangdiaoxinxitishi") == true) {
                                 let temp6 = $(".meihua"); //美化开关
@@ -9955,7 +9958,7 @@ color: #999;
             }
             if (target.getAttribute('id') == "main_aside") { //显示移除粉丝按钮
                 //console.log(target);
-                if (window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) {
+                if ((window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) && !GM_getValue("jinyongtiebameihua")) {
                     target.remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
                     //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
                 }
