@@ -1,15 +1,16 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016940beta)
+// @version      2.1(0.016941beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
 // @exclude      http*://tieba.baidu.com/f/fdir*
 // @exclude      http*://tieba.baidu.com/f/search*
 // @exclude      http*://tieba.baidu.com/f/center/*
-// @run-at       document-start
-///document-body,document-idle
+// @run-at       document-body
+///document-start,document-idle;必须使用document-body，否则对多个浏览器的兼容性会下降
+///只测试了Google Chrome 75.0.3770.142（正式版本） （64 位）
 /// jQuery 留一份自己用
 // @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
 // @require     http://cdn.staticfile.org/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js
