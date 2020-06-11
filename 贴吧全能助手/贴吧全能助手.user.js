@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016943beta)
+// @version      2.1(0.016944beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -9575,10 +9575,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             */
                 //$(".meihua")[0].style = "color:#999 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
                 //$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
-                let temp2 = $(".j_tbnav_tab>a");
+                let temp2 = $(".j_tbnav_tab>a");//为了兼容这个吧？https://greasyfork.org/ja/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta 贴吧助手(屏蔽，排序) beta
                 if (temp2.length > 0) {
-                    temp2[temp2.length - 1].style = "width: 100px !important;color:unset !important;";
-                    temp2[temp2.length - 2].style = "color:unset !important;";
+                    temp2[temp2.length - 1].style = "width: 100px !important;color:#777 !important;";
+                    temp2[temp2.length - 2].style = "color:#777 !important;";
                 }
                 if (window.location.href.split("?")[0].split("/")[3] == "f") //如果是在某个贴吧的主题贴列表，就会删掉右边固定悬浮栏的分享按钮
                 {
