@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016941beta)
+// @version      2.1(0.016942beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -9371,53 +9371,46 @@ overflow-y: auto;
         }
         //console.log(getIsLogin2)
         if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("jinyongtiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
-            let jishu = 0;
-            let t = setInterval(() => { //为右上角的浮动按钮添加头像
-                if (jishu < 20) {
-                    //console.log($("div.edui-icon-bold")[0]);
-                    /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
-                        //console.log($("div.edui-icon-bold")[0]);
-                        suo = true;
-                        $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
-                        $("div.edui-btn-red")[0].style = "display:block;"
-                    }*/
-                    /* let userimg = "";
-                     let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-                     if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
-                         userimg = localStorage.getItem("userimg");
-                     } else {
-                         temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-                         //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
-                         //console.log(temp.src)
-                         localStorage.setItem("userimg", temp.src)
-                         userimg = temp.src;
-                     }
-                     //console.log(userimg);
-                     if (userimg != undefined && userimg != null && userimg != "") {
-                         if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
-                             $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
-                             clearInterval(t);
-                         }
-                     }*/
+            // let jishu = 0;
+            // let t = setInterval(() => { //为右上角的浮动按钮添加头像
+            // if (jishu < 20) {
+            //console.log($("div.edui-icon-bold")[0]);
+            /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
+                //console.log($("div.edui-icon-bold")[0]);
+                suo = true;
+                $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
+                $("div.edui-btn-red")[0].style = "display:block;"
+            }*/
+            /* let userimg = "";
+             let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+             if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
+                 userimg = localStorage.getItem("userimg");
+             } else {
+                 temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+                 //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
+                 //console.log(temp.src)
+                 localStorage.setItem("userimg", temp.src)
+                 userimg = temp.src;
+             }
+             //console.log(userimg);
+             if (userimg != undefined && userimg != null && userimg != "") {
+                 if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
+                     $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
+                     clearInterval(t);
+                 }
+             }*/
 
-                    jishu++;
-                } else {
-                    clearInterval(t);
-                }
-                //console.log(userimg);
-                //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
-            }, 1000);
+            //   jishu++;
+            //} else {
+            //     clearInterval(t);
+            // }
+            //console.log(userimg);
+            //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
+            //}, 1000);
 
         } else {
             localStorage.removeItem("userimg");
             localStorage.removeItem("userid");
-
-            //百度贴吧：不登录即可看贴 by VA
-            setTimeout(() => {
-                try {
-                    unsafeWindow.PageData.user.is_login = 1;
-                } catch (error) {}
-            }, 1000); //尝试延时1秒，解决退出账号后，贴子内没有登陆按钮bug,延时太长又会出现未实现不登录即可看贴的功能
         }
     })();
 
@@ -9609,13 +9602,13 @@ maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在
            clip: rect(0px, auto, auto, auto);
        }
     }
-    /*.j_thread_list,*/.threadlist_lz,.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside{
+    .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login{
         animation-duration: 0.001 s;
         animation-name: tiebaaction;
     }
     /* 主题贴 */
-    /*.j_thread_list,自己的贴子无法触发事件*/
-    .threadlist_lz,
+    .t_con,/*自己的贴子无法触发事件*/
+    /*.threadlist_lz,*/
     /* 楼层 */
     .l_post,
     /*贴子内页*/
@@ -9633,7 +9626,9 @@ maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在
    /*移除粉丝按钮*/
    .user>.right,
    /*删除某些页面会出现的错误头像*/
-   #main_aside{
+   #main_aside,
+   /*登陆按钮*/
+   .u_login{
         -webkit-animation: __tieba_action__;
         -moz-animation: __tieba_action__;
         animation: __tieba_action__;
@@ -9707,7 +9702,28 @@ color: #999;
             if (event.animationName !== '__tieba_action__') {
                 return;
             }
-
+            if (classList.contains('u_login')) {
+                console.log("未登陆");
+                unsafeWindow.PageData.user.is_login = 1;
+                //百度贴吧：不登录即可看贴 by VA
+                if (!GM_getValue("jinyongtiebameihua")) { //贴吧美化
+                    if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+                        if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
+                            let temp3 = $("div.userbar ")[0];
+                            let temp4 = $("ul.tbui_aside_float_bar")[0];
+                            yincangcebianlanx = true;
+                            $("#yincangcebianlan")[0].value = "<<";
+                            if (temp3 != null) {
+                                temp3.style = "display:none;";
+                            }
+                            if (temp4 != null) {
+                                temp4.style = "display:none;";
+                            }
+                            console.log("全局隐藏侧边栏");
+                        }
+                    }
+                }
+            }
             //let checker;
             //console.log(target);
             //console.log(classList.contains('j_thread_list'))
@@ -9842,14 +9858,12 @@ color: #999;
                     target.style = "background:none;background-color: #FFCC26;";
                 }
             }
-            if (classList.contains("threadlist_lz")) {
-                //console.log(target.querySelectorAll(".is_show_create_time")[0].innerHTML);
-                //console.log(target.querySelectorAll(".col2_left")[0]);
+            if (classList.contains("t_con")) {
                 try {
                     //console.log(target);
-                    let temp6 = target.parentNode.parentNode.parentNode.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8
-                    let temp9 = target.parentNode.parentNode.parentNode.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
-                    let temp10 = target.parentNode.parentNode.parentNode.querySelectorAll(".icon-top")[0]; //显示置顶标识
+                    let temp6 = target.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8
+                    let temp9 = target.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
+                    let temp10 = target.querySelectorAll(".icon-top")[0]; //显示置顶标识
                     //let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
                     //console.log(temp6)
                     //console.log(temp9)
@@ -9897,7 +9911,7 @@ color: #999;
                         // }
                     }
                 } catch (err) {
-                    console.log("j_thread_list:" + err);
+                    console.log("t_con:" + err);
                 }
             }
             if (classList.contains('l_post')) {
