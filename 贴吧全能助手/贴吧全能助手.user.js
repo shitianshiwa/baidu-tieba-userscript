@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016944beta)
+// @version      2.1(0.016945beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -90,7 +90,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     var pingbi_loucengqipao = false; //屏蔽楼层气泡
     var rmBottom = false; //移除工具栏
     var yincangcebianlanx = false;
-    if (!GM_getValue("jinyongtiebameihua")) {
+    if (!GM_getValue("tiebameihua")) {
         var css = "";
         if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
             css +=
@@ -5596,7 +5596,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	line-height: 100px;
                 }
                 /*帖子标题标识*/
-                .threadlist_title i:not(.icon-bazhurecruit){
+                .threadlist_title i:not(.icon-bazhurecruit):not(.icon-bazhupublicity/*排除吧主投票贴和公示贴*/){
                 	flex: 0 0 auto;
                 	background-image: none !important;
                 	display: inline-block !important;
@@ -7467,6 +7467,15 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             '#forum_recommend'
                         ].join(', ');
                         $($ads).remove();
+                        //https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
+                        //console.log(GM_getValue("tiebameihua"));
+                        //console.log(window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g));
+                        if (GM_getValue("tiebameihua")&& window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g) != -1 /*贴吧主页才执行*/ ) {
+                            let temp2 = $(".wrap1")[0];
+                            if (temp2 != null) {
+                                temp2.style = "background-image: none !important;";
+                            }
+                        }
                         $('<style>').text($ads + /* File: ads_hide.css */
                             (function() {
                                 /*
@@ -8601,15 +8610,15 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         $parent.find('.u_tb_profile').parent().prepend($menuItem);
                         $menuLink.click(_menu);
                         var $menuItem2 = $('<li>'),
-                            $menuLink2 = $('<a>').appendTo($menuItem2).addClass('jx meihua').text(GM_getValue("jinyongtiebameihua") ? '开启美化' : '关闭美化'); //'贴吧美化'
+                            $menuLink2 = $('<a>').appendTo($menuItem2).addClass('jx meihua').text(GM_getValue("tiebameihua") ? '开启美化' : '关闭美化'); //'贴吧美化'
                         $('.u_tb_profile').before($menuItem2);
-                        if (!GM_getValue("jinyongtiebameihua")) {
+                        if (!GM_getValue("tiebameihua")) {
                             var lis = $parent.find("ul>li");
                             //console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
                             lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
                         }
                         $menuLink2.click(function() {
-                            GM_setValue("jinyongtiebameihua", GM_getValue("jinyongtiebameihua") ? false : true);
+                            GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
                             location.reload();
                         });
                     }, '菜单召唤');
@@ -9373,7 +9382,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             localStorage.setItem("userid", getIsLogin2)
         }
         //console.log(getIsLogin2)
-        if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("jinyongtiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
+        if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("tiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
             // let jishu = 0;
             // let t = setInterval(() => { //为右上角的浮动按钮添加头像
             // if (jishu < 20) {
@@ -9432,7 +9441,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         }
                     }
                 }
-                if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                     //以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
                     //u_username_wrap
                     //u_news_wrap
@@ -9501,7 +9510,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             //    }
             //}
             //备忘,还有招募图标显示(已修复)
-            if (!GM_getValue("jinyongtiebameihua")) { //贴吧美化
+            if (!GM_getValue("tiebameihua")) { //贴吧美化
                 /*   temp = $(".icon-good"); //显示精品贴，精华贴标识
                    if (temp.length > 0) {
                        for (i = 0; i < temp.length; i++) {
@@ -9575,7 +9584,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             */
                 //$(".meihua")[0].style = "color:#999 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
                 //$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
-                let temp2 = $(".j_tbnav_tab>a");//为了兼容这个吧？https://greasyfork.org/ja/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta 贴吧助手(屏蔽，排序) beta
+                let temp2 = $(".j_tbnav_tab>a"); //为了兼容这个吧？https://greasyfork.org/ja/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta 贴吧助手(屏蔽，排序) beta
                 if (temp2.length > 0) {
                     temp2[temp2.length - 1].style = "width: 100px !important;color:#777 !important;";
                     temp2[temp2.length - 2].style = "color:#777 !important;";
@@ -9691,7 +9700,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     //console.log(target.querySelectorAll(".core_reply_tail")[0])
                     target.style = "color:#000 !important;"; //强调信息显示,对旧版贴吧基本没用
                 }
-                if (!GM_getValue("jinyongtiebameihua")) { //贴吧美化
+                if (!GM_getValue("tiebameihua")) { //贴吧美化
                     //console.log(target.querySelectorAll(".p_reply_first"));
                     let temp1 = target.querySelectorAll(".p_reply_first");
                     if (temp1[0] != null) {
@@ -9713,8 +9722,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 console.log("未登陆");
                 unsafeWindow.PageData.user.is_login = 1;
                 //百度贴吧：不登录即可看贴 by VA
-                if (!GM_getValue("jinyongtiebameihua")) { //贴吧美化
-                    if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+                if (!GM_getValue("tiebameihua")) { //贴吧美化
+                    if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
                         if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
                             let temp3 = $("div.userbar ")[0];
                             let temp4 = $("ul.tbui_aside_float_bar")[0];
@@ -9742,7 +9751,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     localStorage.setItem("userid", getIsLogin2)
                 }
                 //console.log(getIsLogin2)
-                if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("jinyongtiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
+                if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("tiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
                     //console.log($("div.edui-icon-bold")[0]);
                     /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
                         //console.log($("div.edui-icon-bold")[0]);
@@ -9820,7 +9829,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 try {
                     let ii = 0;
                     let t = setInterval(() => {
-                            if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                            if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                                 let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
                                 if (temp[0] != null) {
                                     temp[0].style = "background:#fff;";
@@ -9844,7 +9853,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 } catch (err) {
                     console.log("强调信息提示:" + err);
                 }
-                if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
                     if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
                         let temp3 = $("div.userbar ")[0];
                         let temp4 = $("ul.tbui_aside_float_bar")[0];
@@ -9861,7 +9870,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
             }
             if (classList.contains('icon-member-top')) {
-                if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                     target.style = "background:none;background-color: #FFCC26;";
                 }
             }
@@ -9887,7 +9896,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
                             temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
                         } else {
-                            if (!GM_getValue("jinyongtiebameihua") /*贴吧美化后*/ ) {
+                            if (!GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
                                 temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
                                 temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
                             } else {
@@ -9906,7 +9915,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         //console.log(temp8)
                         temp6.children[0].before(temp7);
                     }
-                    if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                    if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                         if (temp9 != null) {
                             temp9.style = "background-color: #FF6666;";
                         }
@@ -9949,7 +9958,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         //console.log(temp[i].children[1]);
                         temp[i].children[1].classList.add("zhankaichangtupian2");
                     }
-                    if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) {
+                    if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                         let temp2 = $("a.tieba-link-anchor");
                         for (let i2 = 0; i2 < temp2.length; i2++) {
                             if (temp2[i2].parentNode.className == "core_title_btns") {
@@ -9980,7 +9989,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }
             if (target.getAttribute('id') == "main_aside") { //显示移除粉丝按钮
                 //console.log(target);
-                if ((window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) && !GM_getValue("jinyongtiebameihua")) {
+                if ((window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) && !GM_getValue("tiebameihua")) {
                     target.remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
                     //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
                 }
@@ -10064,14 +10073,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         }
 
         function closemeihua() {
-            GM_setValue("jinyongtiebameihua", GM_getValue("jinyongtiebameihua") ? false : true);
+            GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
             window.location.reload(); //刷新网页
         }
         GM_registerMenuCommand("删除贴吧用户头像缓存", resetx); // @grant        GM_registerMenuCommand
-        GM_registerMenuCommand(GM_getValue("jinyongtiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
+        GM_registerMenuCommand(GM_getValue("tiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
     })();
     (function() {
-        if (!GM_getValue("jinyongtiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+        if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
             let temp = document.createElement("input"); //创建节点<input/>
             temp.setAttribute('type', 'button');
             temp.setAttribute('id', "yincangcebianlan");
