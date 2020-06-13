@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013451)
+// @version      1.1(0.013452)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -150,7 +150,7 @@ async function copyLink() {
                         temp3 = new Date().getFullYear().toString() + "-" + temp3 //2020-2-2
                     }
                     if (temp3.split(":").length == 2) {
-                        temp3 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDay() + " " + temp3 //2020-02-02 02:00
+                        temp3 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp3 //2020-02-02 02:00
                     }
                     if (setting.title) textGroup.push("标题: " + parent.getElementsByClassName('j_th_tit')[0].getAttribute('title') + " ");
                     if (setting.author) textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + (temp2.un != "" && temp2.un != "null" ? temp2.un : temp2.id) + ' ');
