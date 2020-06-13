@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013452)
+// @version      1.1(0.013453)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -200,6 +200,7 @@ async function copyLink() {
                             }
                         }
                         if (temp != "") {
+                            temp = temp.replace(/<span class="topic-tag".*?>/g, "").replace(/<\/span>/g, ""); //清理#XXX#话题插入
                             textGroup.push("内容: " + temp.trim() + " ");
                         }
                     }
