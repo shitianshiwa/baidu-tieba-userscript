@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013453)
+// @version      1.1(0.013454)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -254,7 +254,7 @@ async function copyLink() {
                         temp4 = new Date().getFullYear().toString() + "-" + temp4;
 
                     } else if (temp4.split(":").length == 2 && temp4.search("-") == -1) { //补上年月日  02:02
-                        temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDay() + " " + temp4 //2020-02-02 02:00
+                        temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
                     }
                     textGroup.push("发贴时间: " + temp4 + " ");
                 }
