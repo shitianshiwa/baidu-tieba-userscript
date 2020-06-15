@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013454)
+// @version      1.1(0.013455)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -391,7 +391,7 @@ function catchLinkTarget(event) {
     var classList = target.classList;
     var curAnchor = linkAnchor.cloneNode(true);
     curAnchor.addEventListener('click', copyLink);
-    if ((classList.contains('threadlist_title') || classList.contains('listTitleCnt')) && target.querySelectorAll(".tieba-link-anchor").length == 0 && target.querySelectorAll(".icon-bazhupublicity")[0] == null) { //贴吧主题贴列表
+    if ((classList.contains('threadlist_title') || classList.contains('listTitleCnt')) && target.querySelectorAll(".tieba-link-anchor").length == 0 && target.querySelectorAll(".icon-bazhupublicity")[0] == null && target.querySelectorAll(".icon-bazhurecruit")[0] == null) { //贴吧主题贴列表
         curAnchor.setAttribute('data-anchor-type', '0');
         target.appendChild(curAnchor); //添加"复制链接"按钮
         //target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
