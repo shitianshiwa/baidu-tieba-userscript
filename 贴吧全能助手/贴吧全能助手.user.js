@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016945beta)
+// @version      2.1(0.016946beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -35,6 +35,8 @@
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 /*
+修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
+有些时候隐藏侧边栏功能无法实现完全屏蔽效果
 http://tieba.baidu.com/i/* 这个域名内无法功能都不能正常运行，例如不能在网页内开关美化，设置功能等
 发现初音楼层气泡有显示问题
 贴吧只限吧务发言时，文字话题贴在主题贴列表回复有表情显示bug(已修)
@@ -114,7 +116,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                	src: url(https://fonts.gstatic.com/s/materialicons/v38/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format(\'woff2\'),
                   url(https://onox.qiniudn.com/maverick/materialicons_safari_v38.woff) format(\'woff\');
                }
-               
+
                body,
                .tb-ueditor-fullscreen .tb_rich_poster_container{
                	background-color: #F1F1F1 !important;
@@ -152,7 +154,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                	background-position: center;
                	background-image: url(https://ww2.sinaimg.cn/large/7bde02fbgw1f3yt89p0xej20xc064tae.jpg);
                }
-               
+
                /*替换吧头像*/
                div[class*=\"_theme2\"] img.card_head_img[src$=\"c1d719f7905298227221ab8bd6ca7bcb0b46d458.jpg\"],
                div[class*=\"_theme2\"] img.card_head_img[src$=\"199a87d6277f9e2fa0419bf01930e924b999f3e0.jpg\"],
@@ -177,7 +179,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                	background-position: center;
                	background-image: url(http://ww2.sinaimg.cn/mw690/7bde02fbgw1f4dg4jwknej2046046gly.jpg);
                }
-               
+
                /*贴吧会员相关项*/
                .u_member,
                #celebrity,
@@ -192,7 +194,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .quick-reply-desc {
                     display: none !important;
                 }
-                
+
                 #d_post_manage:hover #j_quick_thread>li:nth-of-type(1){
                     transition-delay: .0s;
                 }
@@ -211,26 +213,26 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 #d_post_manage:hover #j_quick_thread>li:nth-of-type(6){
                     transition-delay: .5s;
                 }
-                
+
               /*.tbui_fbar_share,右侧浮层-分享*/
               /*.tbui_fbar_favor,右侧浮层-爱逛的吧*/
               .tbui_fbar_props,/*右侧浮层-魔法道具*/
               .tbui_fbar_tsukkomi,/*右侧浮层-神来一句*/
               /*.search_main_fixed,搜索栏浮层,取消隐藏*/
-                
-                
-                
+
+
+
                 .edui-btn-toolbar .edui-btn-medal,/*编辑框贴吧特权按钮*/
                 .save_face_bg,.achievement_medal_section,.achievement_medal_wrapper,/*楼层挽尊按钮,徽章*/
                 .lzl_cnt .pre_icon_wrap,.p_postlist .pre_icon_wrap,/*帖子内页会员标识*/
                 .share_thread,/*一楼分享按钮*/
                 .post-foot-send-gift-btn,/*一楼送礼物按钮*/
-                
+
                 #selectsearch-icon,/*划词搜索*/
                 [id=\"pagelet_entertainment-game/pagelet/game_head_middle\"],/*部分游戏贴吧头部游戏域*/
-                
-                
-                
+
+
+
                 [id=\"pagelet_frs-aside/pagelet/hottopic\"],
                 .l_container .plat_head_v2_unmain_wrapper,/*认证吧帖子内页头部详细信息*/
                 .p_reply_first,.d_post_content_firstfloor .core_reply_tail .p_reply,/*屏蔽具有误导性的一楼内容下方回复按钮*/
@@ -243,12 +245,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 /*div.topic_list_box {
                    background: #fdfdfd;
                 }*/
-                  
+
                 /*让一楼的回复按钮看起来更好看点？*/
                 .p_reply_first{
                 right:9px !important;
                 }
-                
+
                 /*楼层气泡,也给显示吧*/
                 .post_bubble_top,.post_bubble_bottom{
                 /*    display: none !important;*/
@@ -297,14 +299,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_bright .j_thread_list:hover .vip_red,
                 .threadlist_bright .j_thread_list:hover .vip-red{
                     color: #f74d4a!important;
-                }           
-                
+                }
+
                 .threadlist_li_left, .j_threadlist_li_left {
                     align-items: center;
                 }
-                              
+
                 /*用户面板*/
-                
+
                 .u_xiu8,/*个人-我的秀场*/
                 .u_wallet,/*T逗账单*/
                 .u_tbmall,/*贴吧商城*/
@@ -317,9 +319,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .u_bdhome {
                 	display: none;
                 }
-                
+
                 /*用户面板-动画延迟*/
-                
+
                 .userbar>ul>li.u_username:hover~li:nth-of-type(2) {
                 	transition-delay: 0s;
                 }
@@ -347,7 +349,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .userbar>ul>li.u_news:hover~li {
                 	transition-delay: .05s;
                 }
-                
+
                 /*广告和无用功能*/
                 .tbui_fbar_bazhu,
                 .game-head-game-info-wrapper,
@@ -409,7 +411,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 #com_u9_head{
                 	display: none !important;
                 }
-                
+
                 .creativeplatform-wrap-word-repost-btn .btn-default,
                 #selectsearch-icon {
                 	font-size: 14px;
@@ -446,7 +448,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 #selectsearch-icon img {
                 	/*display:none或visibility:hiddend掉竟然会导致点击无效*/
-                	
+
                 	position: absolute;
                 	left: 0;
                 	top: 0;
@@ -456,7 +458,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	z-index: 99;
                 	opacity: 0;
                 }
-                
+
                 /*贴吧头部资料*/
                 .vertical_head_bg{
                 	background: none!important;
@@ -555,7 +557,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	width: 60px !important;
                 	height: 60px !important;
                 }
-                
+
                 .plat_title_h3,
                 .card_title_fname{
                 	text-transform: capitalize;
@@ -564,7 +566,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	color: #555 !important;
                 	text-decoration: none !important;
                 }
-                
+
                 .card_slogan{
                 	color: #555 !important;
                 }
@@ -583,7 +585,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	background-color: rgba(0,0,0,.06) !important;
                 	color: #999 !important;
                 	text-decoration: none !important;
-                	
+
                 	transition-property: background-color,color;
                 	transition-duration: .4s;
                 	transition-timing-function: ease;
@@ -656,7 +658,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	left: 1px;
                 	bottom: -18px;
                 }
-                
+
                 .plat_head_theme2 .plat_card_top {
                 	margin-top: 16px;
                 	margin-bottom: 24px;
@@ -771,7 +773,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	left: 18px !important;
                 	transform: translateX(-50%);
                 	opacity: 0;
-                	
+
                 	transition-property: opacity, transform;
                 	transition-duration: .5s;
                 	transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
@@ -793,7 +795,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .sign_month_lack_days:nth-of-type(2){
                 	display: none !important;
                 }
-                
+
                 .signstar_signed{
                 	background: #eee !important;
                 	color: #999 !important;
@@ -803,8 +805,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	content: \"\\e614\" !important;
                 	color: #ccc !important;
                 }
-                
-                
+
+
                 .sign_mod_bright .sign_succ1 {
                 	top: 90px;
                 	right: -12px;
@@ -812,7 +814,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .sign_tip_bd_arr {
                 	right: 57px;
                 }
-                
+
                 /*特殊吧头部*/
                 .plat_skin .wrap1,
                 .skin_2103 .wrap1,
@@ -906,7 +908,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .app_forum_body [id=\"pagelet_entertainment-game/pagelet/game_head_middle\"]{
                 	border-top: 4px solid #EAEAEA;
                 }
-                
+
                 /*头部指引*/
                 .top_content {
                 	background: none !important;
@@ -936,7 +938,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	font-size: 24px;
                 	display: inline-block;
                 	vertical-align: top;
-                	margin-right: -4px;  
+                	margin-right: -4px;
                 	padding-left: 4px;
                 }
                 .top_cont_toggle .toggleBtn {
@@ -967,8 +969,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .top_content_closed .toggleBtn:after{
                 	content: \'\\e313\';
                 }
-                
-                
+
+
                 /*导航重制*/
                 .forumInfo_nav_wrap,
                 .star_nav_wrap,
@@ -998,7 +1000,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	flex: 1;
                 	overflow: visible!important;
                 	display: flex;
-                
+
                 }
                 .star_class_nav,
                 .nav_list{
@@ -1125,7 +1127,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .nav_list>li .j_tbnav_tab_a[href*=\"tab=tuan\"]:before{
                 	content: \"\\e8cb\";
                 }
-                
+
                 .ihome_nav_list>li .nav_icon.nav_main:before{
                 	content: \"\\e88a\";
                 	font-size: 22px;
@@ -1183,7 +1185,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	content: \"按回复排序\";
                 	font-size: 12px;
                 }
-                
+
                 /*吧内搜索*/
                 .star_nav_btns_wrap,
                 .search_internal_wrap{
@@ -1248,7 +1250,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	font-size: 0 !important;
                 	position: relative;
                 }
-                
+
                 .search_internal_input,
                 .search_internal_btn{
                 	transition-property: background, border-bottom;
@@ -1341,7 +1343,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .aside_region {
                 	border-top: none !important;
                 }
-                
+
                 .region_bright {
                 	border-top: none !important;
                 	background: none;
@@ -1356,7 +1358,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .aside_album_good_bright{
                 	border-bottom: 1px solid rgba(0,0,0,.06);
                 }
-                
+
                 .aside_album_good_title>a[href],
                 .region_header .j_op a{
                 	display: inline !important;
@@ -1802,7 +1804,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	font-size: 16px;
                 	margin-left: 20px;
                 }
-                
+
                 .media_pic_control .tb_icon_fav{
                 	position: absolute;
                 	right: -20px !important;
@@ -1858,7 +1860,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	width: 0 !important;
                 	height: 0;
                 	border-top: 24px solid rgba(0,0,0,.2);
-                	border-left: 24px solid transparent; 
+                	border-left: 24px solid transparent;
                 	background: none !important;
                 	transition: border .4s ease;
                 }
@@ -1898,7 +1900,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .icon_top_folder:before {
                 	content:\"展开置顶\";
                 }
-                
+
                 .tb_rich_poster {
                 	margin-left: 20px;
                 }
@@ -1920,7 +1922,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	padding-bottom: 6px !important;
                 }
                 /*发帖编辑框*/
-                
+
                 .tb_rich_poster {
                 	margin: 0 20px !important;
                 }
@@ -1960,7 +1962,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .poster_head_text .post_head_btn_icon{
                 	display: none !important;
                 }
-                
+
                 .poster_head_text>a:before{
                 	display: inline-block;
                 	font-family: \'Material Icons\';
@@ -1987,7 +1989,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	color: #777 !important;
                 }
                 /*标题编辑域*/
-                
+
                 .title_container {
                 	width: 100% !important;
                 	margin: 0 !important;
@@ -2021,7 +2023,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	left: 0 !important;
                 }
                 /*标题前缀*/
-                
+
                 .pprefix-list {
                 	display: block !important;
                 	background: #f8f8f8;
@@ -2077,7 +2079,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	background-color: rgba(0,0,0,.12);
                 	text-shadow: none;
                 }
-                
+
                 .tb_poster_placeholder{
                 	position: absolute !important;
                 	left: 0 !important;
@@ -2086,13 +2088,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	padding: 0 15px !important;
                     box-sizing: border-box;
                 }
-                
+
                 .tb_poster_placeholder p{
                 	width: 100% !important;
                 }
-                
+
                 /*编辑框控件域*/
-                
+
                 .edui-toolbar {
                 	background: rgba(0, 0, 0, .08) !important;
                 	box-sizing: border-box;
@@ -2290,7 +2292,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	content: \"话题\";
                 }
                 /*付费可见编辑框*/
-                
+
                 .poster_body .paypost-fee-editor {
                 	margin: 0 !important;
                 	margin-top: 2px !important;
@@ -2411,7 +2413,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     margin-top: -1px;
                 }
                 /*编辑框底部面板*/
-                
+
                 .editor_bottom_panel {
                 	width: 100% !important;
                 	padding: 0 !important;
@@ -2482,9 +2484,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .post_success_exp {
                 	width: 48px !important;
                 }
-                
+
                 /*搜索栏*/
-                
+
                 .header_divider{
                 	border: none;
                 }
@@ -2492,7 +2494,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	margin: 0;
                    margin-left: 0px!important;
                 }
-                
+
                 .search_bright{
                 	height: auto !important;
                 	margin: 0 auto;
@@ -2501,7 +2503,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	padding-top: 20px !important;
                 	margin-bottom: 20px !important;
                 }
-                
+
                 .search_top,
                 .search_main_wrap{
                 	position: relative;
@@ -2566,7 +2568,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	display: flex;
                 	flex: 1;
                 }
-                
+
                 .search_ipt {
                 	flex: 1;
                 	font-family: inherit !important;
@@ -2684,7 +2686,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	transition-duration: .4s;
                 	transition-timing-function: ease;
                 }
-                
+
                 .search_main_fixed {
                 	position: fixed;
                 	padding: 8px 20px !important;
@@ -2712,7 +2714,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	display: block !important;/*取消隐藏*/
                 }
                 /*搜索推荐浮层*/
-                
+
                 .suggestion {
                 	margin: 0 !important;
                 	margin-left: 1px !important;
@@ -2938,7 +2940,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .u_ddl_con li a,#u_notify_item li a,ul.sys_notify_last li a{/*解决右上角的浮动按钮文字超出按钮问题*/
                    white-space:normal !important;
                 }
-                
+
                 .u_ddl_con li {
                 	margin-top: 10px;
                 	padding: 0 !important;
@@ -3255,9 +3257,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	transform: none !important;
                 	margin-top: 0 !important;
                 }
-                
+
                 /*帖子内页*/
-                
+
                 .pb_content {
                 	background: none !important;
                 	border: 0 !important;
@@ -3280,7 +3282,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	display: flex;
                 	flex-wrap: wrap;
                 /*  color:#000;*/
-                
+
                 }
                 .l_post_bright.noborder_bottom,
                 .l_post_bright:last-of-type{
@@ -3303,7 +3305,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .l_post_bright:before {
                 	/*作者层背景*/
-                	
+
                 	content: \"Design by Maverick\";
                 	font-size: 0;
                 	display: block;
@@ -3315,7 +3317,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	box-sizing: border-box;
                 }
                 /*楼主标识*/
-                
+
                 .louzhubiaoshi_wrap {
                 	border: none;
                 	position: relative;
@@ -3354,7 +3356,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	transform: scaleX(-1) translateY(-100%) translateY(-4px);
                 }
                 /*作者层头像域*/
-                
+
                 .p_author_face {
                 	background: rgba(0, 0, 0, .04) !important;
                 	border: none !important;
@@ -3374,18 +3376,18 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	height: 100%;
                 }
                 /*作者层ID域*/
-                
+
                 .d_author .d_name {
                 	font-size: 14px !important;
                 }
                 /*作者层印记域*/
-                
+
                 .d_author .d_pb_icons {
                 	background: rgba(255, 255, 255, .2) !important;
                 	border: 1px solid #eee !important;
                 }
                 /*作者层头衔域*/
-                
+
                 .d_badge_bright {
                 	background: rgba(0, 0, 0, .04) !important;
                 	border: none !important;
@@ -3452,13 +3454,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	box-sizing: border-box;
                 }
                 /*楼层内容域*/
-                
+
                 .p_content {
                 	padding: 20px !important;
                 }
                 .core_reply {
                 	/*楼层下方框架*/
-                	
+
                 	margin-right: 0 !important;
                 }
                 .core_reply:after {
@@ -3505,7 +3507,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	margin: 0 !important;
                 }
                 /*楼层信息域*/
-                
+
                 .core_reply_tail {
                 	width: 100% !important;
                 	margin-right: 0 !important;
@@ -3515,11 +3517,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	float: right;
                 	box-sizing: border-box;
                 }
-                
-                
+
+
                 .post-tail-wrap {
                 	position: static !important;
-                   width: auto 
+                   width: auto
                 }
                 .core_reply_tail > *,
                 .core_reply_tail > * > * {
@@ -3531,7 +3533,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .core_reply_tail > *:not(.p_reply) {
                 	/*楼层信息*/
-                	
+
                 	display: block;
                 	background: rgba(0, 0, 0, .04);
                 	padding: 0 !important;
@@ -3549,7 +3551,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .post-tail-wrap {
                 	/*消灭分割线*/
-                	
+
                 	font-size: 0 !important;
                 }
                 .post-tail-wrap > * {
@@ -3575,14 +3577,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .j_jb_ele {
                 	/*举报*/
-                	
+
                 	font-size: 0 !important;
                 	position: relative;
                 	width: 45px;
                    height:13px;
                 }
                 .complaint{
-                   top: 6px;   
+                   top: 6px;
                    width:0px;
                 }
                 .j_jb_ele:only-child {
@@ -3659,7 +3661,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	pointer-events: auto;
                 }
                 /*删除*/
-                
+
                 .p_post_del_my,
                 .p_post_del,
                 .p_post_ban {
@@ -3731,7 +3733,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .post-tail-wrap > span.tail-info:nth-last-of-type(2),
                 .p_tail > li:nth-last-of-type(2)>span {
                 	/*楼层数标识*/
-                	
+
                 	position: absolute;
                 	top: 0px;
                 	right: 5px;
@@ -3754,7 +3756,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .p_reply {
                 	/*回复按钮*/
-                	
+
                 	position: absolute;
                 	top: 0px;
                 	right: 5px;
@@ -3832,12 +3834,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .core_reply_border_top {
                 	/*楼中楼框架顶描边*/
-                	
+
                 	display: none !important;
                 }
                 .core_reply_content {
                 	/*楼中楼内容框架*/
-                	
+
                 	border: none !important;
                 }
                 .core_reply_border_bottom{
@@ -3866,7 +3868,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	background: rgba(0, 0, 0, .04) !important;
                 }
                 /*楼中楼MORE*/
-                
+
                 .lzl_more {
                 	display: inline-block;
                 	height: 30px !important;
@@ -3899,7 +3901,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .lzl_li_pager_s>.btn-sub {
                 	/*我也说一句按钮*/
-                	
+
                 	font-size: 0 !important;
                 	height: 30px !important;
                 	line-height: 30px !important;
@@ -3933,7 +3935,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	font-size: 14px;
                 }
                 /*楼中楼输入框框架*/
-                
+
                 .edui-container {
                 	width: 100% !important;
                 }
@@ -4000,7 +4002,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .lzl_editor_container .lzl_panel_wrapper {
                 	/*楼中楼控件域*/
-                	
+
                 	width: 100% !important;
                 }
                 /*发表按钮*/
@@ -4057,7 +4059,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	width: auto !important;
                 }
                 /*表情选择按钮*/
-                
+
                 .lzl_insertsmiley_holder,
                 .qp_insertsmiley_holder,
                 .interview .qp_interview_insertsmiley {
@@ -4092,7 +4094,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	text-indent: 2px;
                 }
                 /*楼中楼表情选框*/
-                
+
                 .lzl_edui_dialog_container {
                 	left: -390px !important;
                 	top: 34px !important;
@@ -4103,7 +4105,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .d_sign_split {
                 	/*签名档分割线*/
-                	
+
                 	height: 0 !important;
                 	padding: 0 !important;
                 	margin: 0 !important;
@@ -4150,7 +4152,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .core_title_wrap_bright {
                 	/*帖子标题*/
-                	
+
                 	top: 0 !important;
                 	border: none !important;
                 	overflow: visible !important;
@@ -4159,7 +4161,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	border-bottom: 1px solid rgba(0,0,0,.1) !important;
                 }
                 /*挽尊*/
-                
+
                 .save_face_bg {
                 	opacity: 0;
                 	top: -1px;
@@ -4172,7 +4174,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	opacity: 1;
                 }
                 /*隐藏用户*/
-                
+
                 .user-hide-post-down,
                 .user-hide-post-up {
                 	display: block !important;
@@ -4410,7 +4412,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	transition-duration: .5s;
                 	transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
                 }
-                
+
                 .p_thread input~button:after {
                 	content: \"\";
                 	position: absolute;
@@ -4472,7 +4474,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	border-radius: 0 20px 20px 0;
                 	animation-name: button_effect_right;
                 }
-                
+
                 .l_reply_num~.l_reply_num {
                 	position: relative;
                 	padding: 0 !important;
@@ -4642,7 +4644,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 2px 16px 6px rgba(0, 0, 0, 0.2) !important;
                 }
                 /*帖子内页-标题栏*/
-                
+
                 .core_title_bg {
                 	background: rgba(0,0,0,.01) !important;
                 	position: absolute;
@@ -4708,7 +4710,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	transition-duration: .2s !important;
                 	transition-timing-function: ease !important;
                    left:unset !important;/*兼容 Copy Tieba Link https://github.com/shitianshiwa/baidu-tieba-userscript/ 复制链接按钮*/
-                	
+
                 }
                 .core_title_absolute_bright .core_title_btns > *{/*兼容 Copy Tieba Link https://github.com/shitianshiwa/baidu-tieba-userscript/ 复制链接按钮*/
                    top: 50% !important;
@@ -4775,7 +4777,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	content: \"\\e24c\";
                 }
                 /*帖子内页底侧浮层,这个是靠贴吧自带的样式变化触发的*/
-                
+
                 .core_title_absolute_bright {
                 	display: block !important;
                 	z-index: 401 !important;
@@ -4875,7 +4877,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                    left: 5px;
                 }
                 /*收藏成功提示框*/
-                
+
                 .recommend_outtest_container {
                 	border: none !important;
                 	background-color: #4879BD !important;
@@ -5202,7 +5204,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	animation-timing-function: linear;
                 	animation-fill-mode: forwards;
                 }
-                
+
                 .thread_theme_bright_absolute .l_posts_num .pb_list_pager {
                 	background: none !important;
                 	margin: 0 !important;
@@ -5272,7 +5274,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	display: none !important;
                 }
                 /*右边栏分割线*/
-                
+
                 .forum_content .aside:before,
                 .right_bright:before,
                 .side:before,
@@ -5285,7 +5287,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	width: 0;
                 	border-left: 1px solid rgba(0,0,0,.1);
                 }
-                
+
                 /*keyframes*/
                 @keyframes eventoff_duration {
                 	from {
@@ -5323,9 +5325,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 		transform: translateX(0);
                 	}
                 }
-                
+
                 /*细节处理*/
-                
+
                 /*帖子内容图片宽度限制*/
                 .d_post_content .BDE_Image{
                 	height: auto !important;
@@ -5337,16 +5339,16 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	height: auto !important;
                 	max-width: 100% !important;
                 }
-                
+
                 /*占位符穿透*/
-                
+
                 .tbui_placeholder,
                 .tb_poster_placeholder {
                 	pointer-events: none;
                 }
                 .icon_wrap:empty {
                 	/*印记栏为空不显示*/
-                	
+
                 	display: none !important;
                 }
                 .frs_bright_icons{
@@ -5356,7 +5358,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                    width: 60px;
                 }
                 /*话题贴回复框控件域*/
-                
+
                 .qp_btn {
                 	width: 100% !important;
                 }
@@ -5366,37 +5368,37 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .thread_theme_bright_absolute .pb_list_pager:empty+.l_reply_num {
                 	/*帖子内页页数为1时增大功能栏项目间距*/
-                	
+
                 	margin-right: 20px !important;
                 }
-                
+
                 .core_reply {
                 	/*楼中楼的最小高度导致帖子内页滚动时跳动*/
-                	
+
                 	min-height: 0 !important;
                 }
                 .j_user_card {
                 	/*楼中楼回复后头像a标签高度出错*/
-                	
+
                 	display: inline-block;
                 	min-height: 100%;
                 }
                 .core_reply_content>ul>li:nth-of-type(1) {
                 	/*楼中楼回复后即使是一楼也会出现上描边*/
-                	
+
                 	border-top: none;
                 }
                 /*编辑快速回帖 输入框宽度问题*/
-                
+
                 #quick-reply-edit-wrapper .quick-reply-item {
                 	margin-right: 0 !important;
                 }
                 #quick-reply-edit-wrapper .quick-reply-item .quick-reply-delete-btn {
                 	right: 4px !important;
                 }
-                
+
                 /*右侧浮层*/
-                
+
                 .tbui_aside_float_bar {
                 	border-top: none !important;
                 	position: fixed;
@@ -5454,7 +5456,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	padding-top: 5px;
                 	padding-left: 7px;
                 }
-                
+
                 .tbui_fbar_top>a:after {
                 	content:\"\\e255\";
                 	font-size: 32px;
@@ -5542,7 +5544,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .tbui_fbar_top[style*=\"visible\"]{
                 	opacity: 1;
                 }
-                
+
                 .tbshare_popup_wrapper{
                 	position: fixed;
                 	width: inherit;
@@ -5679,27 +5681,27 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title .icon-game-feature-sports:after {
                 	content: \"体育竞速\";
                 }
-                
+
                 .threadlist_title .icon-game-feature-shooting:after {
                 	content: \"飞行射击\";
                 }
-                
+
                 .threadlist_title .icon-game-feature-network:after {
                 	content: \"网络游戏\";
                 }
-                
+
                 .threadlist_title .icon-game-feature-cosplay:after {
                 	content: \"角色扮演\";
                 }
-                
+
                 .threadlist_title .icon-game-feature-casual:after {
                 	content: \"休闲益智\";
                 }
-                
+
                 .threadlist_title .icon-game-feature-cards:after {
                 	content: \"卡片棋牌\";
                 }
-                
+
                 .threadlist_title .icon-game-feature-action:after {
                 	content: \"动作冒险\";
                 }
@@ -5709,35 +5711,35 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title .icon-game-type-web:after {
                 	content: \"网页游戏\";
                 }
-                
+
                 .threadlist_title .icon-game-type-mobile {
                 	background-color: #FF6666
                 }
                 .threadlist_title .icon-game-type-mobile:after {
                 	content: \"手机游戏\";
                 }
-                
+
                 .threadlist_title .icon-game-type-client {
                 	background-color: #FF6666
                 }
                 .threadlist_title .icon-game-type-client:after {
                 	content: \"客户端游戏\";
                 }
-                
+
                 .threadlist_title .icon-novel-reward {
                 	background-color: #FF6666
                 }
                 .threadlist_title .icon-novel-reward:after {
                 	content: \"捧场\";
                 }
-                
+
                 .threadlist_title .icon-zhengwen-book {
                 	background-color: #FF6666
                 }
                 .threadlist_title .icon-zhengwen-book:after {
                 	content: \"贴吧原创\";
                 }
-                
+
                 .threadlist_title .icon-fb-solved {
                 	background-color: #5DB772
                 }
@@ -5763,7 +5765,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	content: \"正在跟进\";
                    margin-left: -1px;
                 }
-                
+
                 .threadlist_title .icon-mass-response {
                 	background-color: #FF914D;
                 }
@@ -5776,7 +5778,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title .icon-guessing:after {
                 	content: \"拳王\";
                 }
-                
+
                 .threadlist_title .tb_tag_forward:after,
                 .threadlist_title .icon-repost:after {
                 	content: \"转帖\";
@@ -5785,7 +5787,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title .icon-member-top {
               /*	background-color: #FFCC26 !important;*/
                 }
-                
+
                 .threadlist_title .icon-member-top:after {
                 	content: \"会员置顶\";
                 	margin-left: -1px;
@@ -5803,7 +5805,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title img[src*=\"zding.gif\"]{
                 	background-position: 0 0;
                 }
-                
+
                 .threadlist_title img[src*=\"tpiao.gif\"],
                 .threadlist_title .icon-vote {
                 	background-color: #55D45D
@@ -5814,7 +5816,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title img[src*=\"tpiao.gif\"]{
                 	background-position: 0 -80px;
                 }
-                
+
                 .threadlist_title .icon-user-mask:before{
                 	content: \"\\e15d\";
                 	font-size: 16px;
@@ -5824,11 +5826,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	content: \"被屏蔽\";
                 	margin-left: 0;
                 }
-                
+
                 .threadlist_title .icon-activity:before{
                 	content: \"\\e153\";
                 }
-                
+
                 .threadlist_title img[src*=\"jing.gif\"],
                 .threadlist_title .icon-good{
               /*	background-color: #FF6666 !important;*/
@@ -5841,12 +5843,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title img[src*=\"jing.gif\"]{
                 	background-position: 0 -20px;
                 }
-                
+
                 .threadlist_title .icon-notice:before{
                 	content: \"\\e80b\";
                 	font-size: 18px;
                 }
-                
+
                 .threadlist_title img[src*=\"goodalbum.png\"],
                 .threadlist_title .icon-good-album{
                 	background-color: #FF6666;
@@ -5855,19 +5857,19 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	content: \"\\e3df\";
                 	font-size: 18px;
                 }
-                
+
                 .threadlist_title img[src*=\"goodalbum.png\"],
                 .threadlist_title img[src*=\"tupian.gif\"]{
                 	background-position: 0 -60px;
                 }
-                
+
                 .threadlist_title .icon-liveshow-promoter{
                 	background-color: #FFA825;
                 }
                 .threadlist_title .icon-liveshow-promoter:after{
                 	content:\"帝王贴\";
                 }
-                
+
                 .threadlist_title .icon-idisk {
                 	background-position: -254px -81px
                 }
@@ -5878,7 +5880,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title img[src*=\"idisk.gif\"]{
                 	background-position: 0 -100px;
                 }
-                
+
                 .threadlist_title img[src*=\"bakan.gif\"],
                 .threadlist_title .icon-bakan {
                 	background-color: #EAB021;
@@ -5890,7 +5892,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title img[src*=\"bakan.gif\"]{
                 	background-position: 0 -40px;
                 }
-                
+
                 .threadlist_title .icon-picture:before{
                 	content: \"\\e3df\";
                 	font-size: 18px;
@@ -5898,7 +5900,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title .icon_interview_picture:after{
                 	content:\"图片话题\";
                 }
-                
+
                 .threadlist_title .icon-zhaoji{
                 	background-color: #b77df0;
                 }
@@ -5911,7 +5913,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .threadlist_title .icon-userdefine-diamond-mall:after{
                 	content:\"夺宝\";
                 }
-                
+
                 /*吧详情页*/
                 .container_wrap .card_top_wrap{
                 	padding-bottom: 10px !important;
@@ -5923,7 +5925,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .container>.content{
                 	width: 1002px !important;
                 }
-                
+
                 /*帖子列表页话题*/
                 .interview .threadListGroupCnt{
                 	padding: 12px 0 !important;
@@ -5942,7 +5944,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	padding: 0 14px 0 10px !important;
                 	box-sizing: border-box;
                 	margin-top: -3px !important;
-                	
+
                 	background: none !important;
                 	overflow: hidden;
                 	height: 24px !important;
@@ -6016,7 +6018,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	border-radius: 4px;
                 	padding: 0 4px;
                 	vertical-align: top;
-                	
+
                 	flex: 0 0 auto;
                 	display: inline-block !important;
                 	width: auto !important;
@@ -6030,7 +6032,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .interview .threadListGroupCnt .listTitleCnt .listThreadTitle img[src*=\"interview_icon.gif\"]+a:first-of-type:before{
                 	content: \'访谈直播\';
                 }
-                
+
                /*还弹幕...真的笑,笑出声*/
                /*  .opui-barrage-setup {
                 	position: absolute;
@@ -6039,7 +6041,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	overflow: hidden;
                 	text-indent: 0;
                 	cursor: pointer;
-                	
+
                 	width: 24px;
                 	height: auto !important;
                 	border-radius: 0 6px 6px 0;
@@ -6065,13 +6067,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .opui-barrage-setup:after{
                 	content: \"展开弹幕\"
                 }*/
-                
+
                 .interview .threadListGroupCnt .mini{
                 	background: rgba(0, 0, 0, 0.04) !important;
                 	border: none !important;
                 	border-bottom: 4px solid rgba(0, 0, 0, .04) !important;
                 }
-                
+
                 .interview .threadListGroupCnt .mini .placeholder:before{
                 	position: absolute;
                 	right: 8px;
@@ -6089,10 +6091,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .interview .threadListGroupCnt .listItemCnt{
                 	background: none !important;
-                	border-top: 1px solid rgba(0, 0, 0, .04); 
+                	border-top: 1px solid rgba(0, 0, 0, .04);
                 }
                 .interview .threadListGroupCnt .listItemCnt:first-of-type{
-                	border-top: none; 
+                	border-top: none;
                 }
                 .interview .pInfoCnt .pReply,
                 .interview .pInfoCnt .pLogin,
@@ -6128,7 +6130,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	content:\'访谈内容\';
                 	color: #4879BD;
                 }
-                
+
                 .interview .threadListGroupCnt .listBtnCnt .slideBtn{
                 	border-radius: 6px 6px 0 0;
                 	border: 1px solid rgba(0,0,0,.1);
@@ -6447,7 +6449,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     	border-top: none !important;
                     	margin-bottom: 50px !important;
                     }
-                    
+
                     .head_content {
                     	border-bottom: none !important;
                     }
@@ -6514,19 +6516,19 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     .footer * {
                     	color: inherit !important;
                     }
-                    
+
                     /*全屏编辑框*/
                     .tb-ueditor-fullscreen [id=\"pagelet_poster/pagelet/rich_poster\"],
                     .tb-ueditor-fullscreen .tb_rich_poster_container{
                     	padding-top: 0 !important;
                     	z-index: 10000 !important
                     }
-                    
+
                     .tb-ueditor-fullscreen .poster_head,
                     .poster_clear_fullscreen{
                     	display: none !important;
                     }
-                    
+
                     .tb-ueditor-fullscreen #rich_ueditor_tpl{
                     	padding-top: 20px !important;
                     	width: 980px !important;
@@ -6536,11 +6538,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     	box-shadow: 0 0 20px 2px rgba(0, 0, 0, .1);
                     	border-radius: 0 0 20px 20px;
                     }
-                    
+
                     .tb-ueditor-fullscreen .edui-body-container{
                     	height: 60vh;
                     }
-                    
+
                     .fullscreen-word-limit{
                     	height: 40px !important;
                     	line-height: 40px !important;
@@ -6550,7 +6552,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)(/*|(?!/+home/+).*)$")).test(document.location.href)) {
                 css += `
                     /*个人主页以外的页面*/
-                    
+
                     .wrap1,
                     .wrap2 {
                     	background-color: transparent !important;
@@ -6563,11 +6565,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href)) {
                 css += `
                    /*帖子内页调整*/
-                   
+
                    .tbui_aside_float_bar {
                    	margin-bottom: 0px;
                    }
-                   
+
                    #container {
                    	margin-bottom: 80px !important;
                    }
@@ -6590,7 +6592,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+\\d+.*\\?(.*&)*see_lz=[1-9]+\\d*.*$")).test(document.location.href)) {
                 css += `
                     /*帖子内页-只看楼主*/
-                    
+
                     .core_title_btns #lzonly_cntn:before {
                     	content: \"\\e8f5\" !important;
                     	font-size: 30px !important;
@@ -6609,7 +6611,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 css += `
                     /*个人主页*/
                     /*迷之页面结构...无力吐槽....*/
-                    
+
                     body>.wrap1 {
                     	width: 980px;
                     	border-radius: 20px;
@@ -6709,7 +6711,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     	pointer-events: auto;
                     	float: none !important;
                     }
-                    
+
                     #spage-tbshare-container{
                     	display: none;
                     }
@@ -6853,7 +6855,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     	line-height: inherit;
                     	padding: 0 !important;
                     	display: inline !important;
-                    	
+
                     }
                     .sub_nav>ul>li a:hover,
                     .tab_content>li a:hover{
@@ -7169,7 +7171,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     	text-align: center;
                     	text-indent: -2px;
                     }
-                    
+
                     .itb_pager >*{
                     	margin-right: 4px !important;
                     }
@@ -7470,7 +7472,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         //https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
                         //console.log(GM_getValue("tiebameihua"));
                         //console.log(window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g));
-                        if (GM_getValue("tiebameihua")&& window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g) != -1 /*贴吧主页才执行*/ ) {
+                        if (GM_getValue("tiebameihua") && window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g) != -1 /*贴吧主页才执行*/ ) {
                             let temp2 = $(".wrap1")[0];
                             if (temp2 != null) {
                                 temp2.style = "background-image: none !important;";
@@ -7482,12 +7484,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     {
     display:none !important;
     }
-    
+
     #com_userbar_message {
     right: 30px !important;
     top: 28px !important;
     }
-    
+
     #com_userbar_message > .j_ui_triangle {
     left: 65px !important;
     }
@@ -7603,7 +7605,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                 }
                                 /*if (temp6[0] != null) {
                                         temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
-    
+
                                     }*/
                                 if (temp3[0] != null) {
                                     for (i = 0; i < temp3.length; i++) {
@@ -7619,7 +7621,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                         for (i = 0; i < temp2.length; i++) {
                                             temp2[i].style["color"] = "#f00 !important;";
                                         }
-    
+
                                         for (i = 0; i < temp4.length; i++) {
                                             temp4[i].style = "color:#f00 !important;";
                                         }
@@ -7643,10 +7645,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         _proc: function(floorType, args) {
                             var _player = $('.voice_player:not(.parsed)', args._main);
                             if (!_player.size()) return '找不到语音';
-    
+
                             var data = _player.parents('[data-field]').getField(),
                                 pid = data.spid || data.content.post_id;
-    
+
                             _player.addClass('parsed').after(
                                 $('<a>').addClass('ui_btn ui_btn_m')
                                 .attr({
@@ -7730,13 +7732,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     <option value="1" {{#tp_opa}}selected{{/tp_opa}}>透明</option>
     <option value="2" {{#tp_hide}}selected{{/tp_hide}}>隐藏</option>
     </select>
-    
+
     <label title="0 表示完全透明 (占位难看哦); 0~100"{{^tp_opa}} class="hide"{{/tp_opa}}>透明度
     <input type="number" id="jx_post_opa" class="text-center" value="{{opacity}}" style="width: 5em" />%
     </label>
     </p>
     <br />
-    
+
     <h3>内容屏蔽规则</h3>
     <ul id="jx_post_kword">
     {{#kword}}
@@ -7745,17 +7747,17 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     <option value="0" {{#tp_regex}}selected{{/tp_regex}}>正则</option>
     <option value="1" {{#tp_plain}}selected{{/tp_plain}}>文本</option>
     </select>
-    
+
     <span{{#tp_regex}} class="regex"{{/tp_regex}}><input class="jx_word" value="{{word}}" /></span><!--
     --><input class="jx_modifier{{^tp_regex}} hide{{/tp_regex}}" value="{{modi}}" />
-    
+
     [ <a class="ptr jx-rm-key" >删除</a> ]
     </li>
     {{/kword}}
     </ul>
     <p><a class="ui_btn ui_btn_m" data-btn="add"><span><em>添加</em></span></a></p>
     <br />
-    
+
     <h3>用户屏蔽列表</h3>
     <p>用户列表，一行一个</p>
     <!-- Hackish solution -->
@@ -7763,7 +7765,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     <textarea id="jx_post_user" row=5 style="width: 100%; padding: .2em">{{user}}</textarea>
     </div>
     <br />
-    
+
     <p class="text-center">
     <a class="ui_btn ui_btn_m" data-btn="save"><span><em>储存</em></span></a> &nbsp;
     <a class="ui_btn ui_btn_m" data-btn="close"><span><em>放弃</em></span></a>
@@ -7779,10 +7781,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     <option value="0" {{#tp_regex}}selected{{/tp_regex}}>正则</option>
     <option value="1" {{#tp_plain}}selected{{/tp_plain}}>文本</option>
     </select>
-    
+
     <span{{#tp_regex}} class="regex"{{/tp_regex}}><input class="jx_word" value="{{word}}" /></span><!--
     --><input class="jx_modifier{{^tp_regex}} hide{{/tp_regex}}" value="{{modi}}" />
-    
+
     [ <a class="ptr jx-rm-key" >删除</a> ]
     </li>
     */
@@ -8120,9 +8122,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                 /*
     <div class="jx_autoflow">
     <h2>3 天循环隐藏的列表</h2>
-    
+
     <p class="text-center">请注意: 封禁时间不会自动刷新, 请关闭后重新开启该对话框。</p>
-    
+
     <ol>
     {{#author}}
     <li data-name="{{name}}"><b>{{name}}</b>
@@ -8133,9 +8135,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     <br /><a class="ui_btn ui_btn_m" id="jx_add"><span><em>添加</em></span></a>
     </li>
     </ol>
-    
+
     <p class="hide" id="jx_hide_info"></p>
-    
+
     <div class="text-center">
     <a class="ui_btn ui_btn_m" id="jx_all"><span><em>全部封禁</em></span></a> &nbsp;
     <a class="ui_btn ui_btn_m" id="jx_close"><span><em>关闭</em></span></a>
@@ -8537,7 +8539,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     {{/modules}}
     </div>
     <br />
-    
+
     <!-- 按钮区 -->
     <div class="text-center">
     <a class="ui_btn ui_btn_m" id="jx_save"><span><em>储存</em></span></a> &nbsp;
@@ -8671,14 +8673,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     .pull-right	{ float: right			}
     a.jx, .ptr	{ cursor: pointer		}
     .pad-left	{ padding-left: 0.5em	}
-    
+
     .floor-stripe {
     background-image:
     linear-gradient(45deg,rgba(255,255,255,.15) 25%,
     transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,
     rgba(255,255,255,0.15) 75%,
     transparent 75%, transparent);
-    
+
     background-color: #d9534f;
     background-size: 40px 40px;
     text-align: center;
@@ -8687,23 +8689,23 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     text-shadow: #000 0 0 .5em;
     padding: .5em 0
     }
-    
+
     .hide { display: none }
     .text-red { color: red }
     .text-center { text-align: center }
     .text-disabled { color: #666; text-decoration: line-through }
-    
+
     .user-hide-post-action > a.jx-post-action {
     display: block;
     padding: 3px 5px 5px;
     cursor: pointer;
     color: #222;
     }
-    
+
     .user-hide-post-action a.jx-post-action:hover {
     background: #f2f2f2;
     }
-    
+
     .jx_autoflow {
     height: 100%;
     overflow-y: auto;
@@ -9342,7 +9344,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             var a = document.createElement('a');
             a.textContent = '按发贴时间排序(贴子ID)';
             a.setAttribute('class', 'fatieshijianpaixu');
-            a.setAttribute('style', 'color:#999 !important;');
+            a.setAttribute('style', 'color:#999 !important;position: absolute;left: 102%;width: 110px;top: 12px;height: 40px;cursor: -webkit-grab;');
             //a.setAttribute('href', 'javascript:;');
             var paixun = false
             a.addEventListener('click', e => { //必须先自动滚动网页，预览所有图片后，才能保证图片都能显示出来
@@ -9614,7 +9616,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                clip: rect(0px, auto, auto, auto);
            }
         }
-        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login{
+        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.core_title_txt,.tbui_aside_float_bar{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9640,7 +9642,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
        /*删除某些页面会出现的错误头像*/
        #main_aside,
        /*登陆按钮*/
-       .u_login{
+       .u_login,
+       /*贴子内页标题*/
+       .core_title_txt,
+       /*侧工具栏*/
+       .tbui_aside_float_bar{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
             animation: __tieba_action__;
@@ -9652,14 +9658,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
            display:none;
         }
        .yincangcebianlan{
-           width: 5px;
+           width: 2px;
     height: 20px;
     position: fixed;
     right: 0px;
     bottom: 200px;
     padding: 5px;
     z-index: 1005;
-    background-color: rgb(0,0,0,0.1);
+    background-color: rgb(0,0,0,0.05);
     border: none;
     color: #999;
        }
@@ -9718,6 +9724,15 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             if (event.animationName !== '__tieba_action__') {
                 return;
             }
+            /*贴子内页楼层列表*/
+            if (classList.contains('core_title_txt')) {
+                $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute");
+                /*
+                修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
+目标标签class p_thread thread_theme_5
+加个thread_theme_bright_absolute
+                */
+            }
             if (classList.contains('u_login')) {
                 console.log("未登陆");
                 unsafeWindow.PageData.user.is_login = 1;
@@ -9726,16 +9741,28 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
                         if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
                             let temp3 = $("div.userbar ")[0];
-                            let temp4 = $("ul.tbui_aside_float_bar")[0];
                             yincangcebianlanx = true;
                             $("#yincangcebianlan")[0].value = "<<";
                             if (temp3 != null) {
                                 temp3.style = "display:none;";
                             }
-                            if (temp4 != null) {
-                                temp4.style = "display:none;";
+                            console.log("全局隐藏侧边栏1");
+                        }
+                    }
+                }
+            }
+            /*侧工具栏*/
+            /*下半部分单独处理以避免偶尔隐藏失败*/
+            if (classList.contains('tbui_aside_float_bar')) {
+                if (!GM_getValue("tiebameihua")) { //贴吧美化
+                    if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+                        if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
+                            if (yincangcebianlanx == false) {
+                                yincangcebianlanx = true;
+                                $("#yincangcebianlan")[0].value = "<<";
                             }
-                            console.log("全局隐藏侧边栏");
+                            target.style = "display:none;";
+                            console.log("全局隐藏侧边栏2");
                         }
                     }
                 }
@@ -9856,16 +9883,16 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
                     if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
                         let temp3 = $("div.userbar ")[0];
-                        let temp4 = $("ul.tbui_aside_float_bar")[0];
+                        //let temp4 = $("ul.tbui_aside_float_bar")[0];
                         yincangcebianlanx = true;
                         $("#yincangcebianlan")[0].value = "<<";
                         if (temp3 != null) {
                             temp3.style = "display:none;";
                         }
-                        if (temp4 != null) {
+                        /*if (temp4 != null) {
                             temp4.style = "display:none;";
-                        }
-                        console.log("全局隐藏侧边栏");
+                        }*/
+                        console.log("全局隐藏侧边栏0");
                     }
                 }
             }
@@ -9948,6 +9975,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
 
             }
+            /*if (classList.contains('pager_theme_4')) {
+            }*/
             if (classList.contains('l_posts_num') || classList.contains('thread_theme_5')) { //贴子内只动态执行一次 thread_theme_5只在第一次打开贴子时执行，翻页执行 ||classList.contains('pager_theme_4')
                 //$("div.replace_div>div.replace_tip").click()
                 let t = setTimeout(() => { //要延时等图片加载完
@@ -9969,7 +9998,6 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         }
                     }
                 }, 3000);
-
                 /*
                         by tency
                         https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
@@ -10005,16 +10033,19 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             const { target } = e;
             const { classList } = target;
             //console.log(target);
-            if (rmBottom == true) {
-                let temp = $('#j_core_title_wrap'); //主体框架
-                if (temp[0] != null) {
+            let temp = $('#j_core_title_wrap'); //主体框架
+            if (temp[0] != null) {
+                if (rmBottom == true) {
                     if (classList.contains('l_thread_info') == true) {
                         $('.core_title_bg')[0].style = "display:none !important;";
                         $('.core_title_txt')[0].style = "display:none !important;";
                         $('.core_title_btns')[0].style = "display: none !important;";
                         $('#thread_theme_5')[0].style = "display:none !important;";
                     }
+                } else {
+
                 }
+
             }
         });
         var scrollY1 = window.scrollY;
@@ -10022,45 +10053,54 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             //const { target } = e;
             //const { classList } = target;
             //console.log(target);
-            if (rmBottom == true) { //隐藏下工具栏
-                let temp = $('#j_core_title_wrap'); //主体框架
-                //core_title_bg 背景框
-                //core_title_txt 标题
-                //core_title_btns display: none !important; 按钮
-                //p_thread thread_theme_5 页码，页数
-                if (temp[0] != null) { //慢速上下移动网页时，偶尔有工具栏闪烁问题
-                    //console.log(temp[0].style["top"]);
-                    if (window.scrollY - scrollY1 < 0) {
-                        //console.log("向上滚动");
-                        if (temp[0].className != "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" && temp[0].className != "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
-                            yingcang = false
-                        }
-                        //window.scrollTo(window.scrollY, window.scrollY+10);
+            let temp = $('#j_core_title_wrap'); //主体框架
+            //core_title_bg 背景框
+            //core_title_txt 标题
+            //core_title_btns display: none !important; 按钮
+            //p_thread thread_theme_5 页码，页数
+            if (temp[0] != null) { //慢速上下移动网页时，偶尔有工具栏闪烁问题
+                //console.log(temp[0].style["top"]);
+                if (window.scrollY - scrollY1 < 0) {
+                    //console.log("向上滚动");
+                    if (temp[0].className != "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" && temp[0].className != "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
+                        yingcang = false
                     }
-                    if (window.scrollY - scrollY1 > 0) { //当向下滚动时
-                        //console.log("向下滚动");
-                        if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" || temp[0].className == "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
-                            yingcang = true;
-                        }
+                    //window.scrollTo(window.scrollY, window.scrollY+10);
+                }
+                if (window.scrollY - scrollY1 > 0) { //当向下滚动时
+                    //console.log("向下滚动");
+                    if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" || temp[0].className == "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
+                        yingcang = true;
                     }
-                    //console.log(window.scrollY);
-                    if (yingcang == true) {
+                }
+                //console.log(window.scrollY);
+                if (yingcang == true) {
+                    if (rmBottom == true) { //隐藏下工具栏
                         $('.core_title_bg')[0].style = "display:none !important;";
                         $('.core_title_txt')[0].style = "display:none !important;";
                         $('.core_title_btns')[0].style = "display: none !important;";
                         $('#thread_theme_5')[0].style = "display:none !important;";
                         //temp[0].style = "display:none !important;";//会产生滚动迟滞卡顿+无法滚动到底
-
-                    } else {
+                    }
+                    $('#thread_theme_5')[0].classList.add("thread_theme_bright_absolute");
+                } else {
+                    if (rmBottom == true) { //隐藏下工具栏
                         $('.core_title_bg')[0].style = "display:block !important;";
                         $('.core_title_txt')[0].style = "display:block !important;";
                         $('.core_title_btns')[0].style = "display:block !important;";
                         $('#thread_theme_5')[0].style = "display:block !important;";
                     }
-                    scrollY1 = window.scrollY;
-                    //console.log($('#j_core_title_wrap')[0].className);
+                    $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
+                        /*
+                修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
+目标标签class p_thread thread_theme_5
+加个thread_theme_bright_absolute
+                */
                 }
+                scrollY1 = window.scrollY;
+                //console.log($('#j_core_title_wrap')[0].className);
             }
+
         });
         initListener();
     })();
