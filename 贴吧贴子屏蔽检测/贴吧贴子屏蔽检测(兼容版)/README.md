@@ -6,6 +6,7 @@
 * [修复电脑端贴吧主题贴内的楼层列表,让楼中楼和吧友头像可以正常加载(beta)](https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E4%BF%AE%E5%A4%8D%E7%94%B5%E8%84%91%E7%AB%AF%E8%B4%B4%E5%90%A7%E4%B8%BB%E9%A2%98%E8%B4%B4%E5%86%85%E7%9A%84%E6%A5%BC%E5%B1%82%E5%88%97%E8%A1%A8%2C%E8%AE%A9%E6%A5%BC%E4%B8%AD%E6%A5%BC%E5%92%8C%E5%90%A7%E5%8F%8B%E5%A4%B4%E5%83%8F%E5%8F%AF%E4%BB%A5%E6%AD%A3%E5%B8%B8%E5%8A%A0%E8%BD%BD(beta))
 * [贴吧贴子屏蔽检测(非官方修改1)](https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B/%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B(%E9%9D%9E%E5%AE%98%E6%96%B9%E4%BF%AE%E6%94%B91))]和[贴吧贴子屏蔽检测(非官方修改2)](https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B/%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B(%E9%9D%9E%E5%AE%98%E6%96%B9%E4%BF%AE%E6%94%B92))应该没有这个缺陷
 # 说明
+* 不支持投票贴内第一楼 http://tieba.baidu.com/newvote/createvote?kw=贴吧名&ie=utf-8
 * 测试中（重点）
 * 无用户名贴吧账号，后来补用户名，原本就有用户名的都可以运行
 * 修改为只在各个贴吧的主题列表和主题贴内运行
