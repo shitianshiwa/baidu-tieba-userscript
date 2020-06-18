@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016946beta)
+// @version      2.1(0.016947beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -33,6 +33,14 @@
 // @grant        GM_registerMenuCommand
 // @grant       GM_deleteValue
 // @grant       GM_xmlhttpRequest
+///https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B 贴吧全能助手 by 忆世萧遥
+///百度贴吧按发帖时间（帖子ID）排序 by NULL
+///查看发帖 by 文科
+///百度贴吧图片点击放大 by lliwhx
+///百度贴吧：不登录即可看贴 by VA
+///梦姬贴吧助手 by jixun
+///tieba_ui.js,Interval_Looper.js,gm2_port_v103.js by Jixun.Moe
+///https://userstyles.org/styles/124770/tieba-maverick-2018 TieBa - Maverick by Onox
 // ==/UserScript==
 /*
 修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
@@ -41,22 +49,14 @@ http://tieba.baidu.com/i/* 这个域名内无法功能都不能正常运行，�
 发现初音楼层气泡有显示问题
 贴吧只限吧务发言时，文字话题贴在主题贴列表回复有表情显示bug(已修)
 屏蔽挽尊卡失效(已修)
-//发现贴子里的下工具栏的楼主功能无效，贴吧美化切换有显示bug(已修)
-//http://tieba.baidu.com/f/center/createtb 创建贴吧
+发现贴子里的下工具栏的楼主功能无效，贴吧美化切换有显示bug(已修)
+http://tieba.baidu.com/f/center/createtb 创建贴吧
 贴吧超级会员会导致楼层用户名字和楼中楼头像显示错误(已修复)
 在某些贴子，可能会缺失删除和举报按钮(2019-12-21已修复)
 有点击图片放大和引用楼层和楼中楼功能失效bug（仅在旧版贴吧有效，这种贴吧是http链接），图片点击放大偶尔可以用，引用楼层和楼中楼功能只有链接为http的贴子可以用
 http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http，但偶尔会跳转到https导致出错（仅在手机yandex浏览器见过这个问题）
-*/
-//https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
-//百度贴吧按发帖时间（帖子ID）排序 by NULL
-//查看发帖 by 文科
-//百度贴吧图片点击放大 by lliwhx
-//百度贴吧：不登录即可看贴 by VA
-//梦姬贴吧助手 by jixun
-//备份1547行
-//发现一个bug，电脑端贴吧主题贴列表网页右边的"大家都在搜"（class="search_back_box")和"贴吧热议榜"（class="topic_list_box"）在网页拉到底时会向class中自动添加"search-back-fixed"和"topic-search-back-fixed",这个会导致发主题贴编辑器右边冒出一个"大家都在搜"，暂时用计时器定时删除新加的class来解决这个问题(现在是彻底删了，因为贴吧删掉了贴吧主页（不是首页）的贴吧热议榜)
-/*
+发现一个bug，电脑端贴吧主题贴列表网页右边的"大家都在搜"（class="search_back_box")和"贴吧热议榜"（class="topic_list_box"）在网页拉到底时会向class中自动添加"search-back-fixed"和"topic-search-back-fixed",这个会导致发主题贴编辑器右边冒出一个"大家都在搜"，暂时用计时器定时删除新加的class来解决这个问题(现在是彻底删了，因为贴吧删掉了贴吧主页（不是首页）的贴吧热议榜)
+
 .threadlist_bright .threadlist_author{
                 	float: none !important;
                 	display: flex;
@@ -67,14 +67,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	font-size: 0 !important;
                 	overflow: visible !important;
                 }
-75行
 url(http://onox.qiniudn.com/maverick/materialicons_safari_v16.woff) format(\'woff\');
-82行
 background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
-
 */
-(function() {
-    //var $ = window.jQuery;//TieBa - Maverick
+(function ($) {
+    //var $ = window.jQuery;
     /*var baiban = document.createElement("div");
     baiban.setAttribute("class "baiban");
     baiban.setAttribute("style "width:9999px;height: 99999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
@@ -91,7 +88,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     var tupianfangda = true; //贴吧图片放大
     var pingbi_loucengqipao = false; //屏蔽楼层气泡
     var rmBottom = false; //移除工具栏
-    var yincangcebianlanx = false;
+    var yincangcebianlanx = false; //隐藏侧边栏
+    var qiangdiaoxinxitishi = false; //强调信息显示
     if (!GM_getValue("tiebameihua")) {
         var css = "";
         if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
@@ -3023,7 +3021,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 .u_notity_bd .category_item .unread_num,
                 .u_notity_bd .category_item .unread-num{
-                	color: #999;
+                	color: #999 !important;
                    font-weight: bold;
                 	background: #fff;
                 	display: block;
@@ -7214,11 +7212,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     // } catch (error) {}
     // }, true);
     //梦姬贴吧助手 by jixun
-    (function() {
+    (function () {
         var w = unsafeWindow,
             _main;
-        jQuery(function($) { //有警告
-            var iv = setInterval(function() {
+        jQuery(function ($) { //有警告
+            var iv = setInterval(function () {
                 if (w.jQuery && w.PageData && w.PageData.tbs) {
                     clearInterval(iv);
                     console.log('PageData loaded.');
@@ -7231,7 +7229,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
                     w.PageData.games = unsafeObject([]); //有警告
                     //有警告
-                    unsafeExec(function() {
+                    unsafeExec(function () {
                         // 改进自 congxz6688 的 tieba_quote [#147]
                         // 节取自 寂寞的原子 的  悬浮窗脚本 [#116]
                         //2019-11-4 这个会贴吧会报错
@@ -7246,7 +7244,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
             }, 500);
 
-            setTimeout(function() {
+            setTimeout(function () {
                 // 15s later force kill waiting.
                 clearInterval(iv);
             }, 15000);
@@ -7261,7 +7259,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             __mod_enable = 1,
             __mod_disable = 2; //关掉模块
 
-        _main = function($, wPageData) {
+        _main = function ($, wPageData) {
             // 检查是否在贴吧
             if (!wPageData.forum) return;
             var isThread = !!wPageData.thread;
@@ -7271,18 +7269,18 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
             //// Function Helper
             Object.defineProperty(Function.prototype, 'extract', {
-                value: function() {
+                value: function () {
                     return this.toString().match(/\/\*([\s\S]+)\*\//)[1];
                 }
             });
 
-            var _function = function(foo, proto) {
+            var _function = function (foo, proto) {
                 foo.prototype = proto;
                 return foo;
             };
 
-            var $conf = new(_function(function() {}, {
-                get: function(m, def) {
+            var $conf = new(_function(function () {}, {
+                get: function (m, def) {
                     var val = GM_getValue(m, null);
                     if (!val) return def;
 
@@ -7292,22 +7290,22 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         return def;
                     }
                 },
-                set: function(m, val) {
+                set: function (m, val) {
                     return GM_setValue(m, JSON.stringify(val));
                 },
-                rm: function() {
+                rm: function () {
                     [].forEach.call(arguments, GM_deleteValue);
                 },
-                ls: function() {
+                ls: function () {
                     return GM_listValues();
                 }
             }))();
 
-            var _hide = function() {
+            var _hide = function () {
                 _cssH.prepend(Array.prototype.join.call(arguments, ',') + ',');
             };
 
-            var _run = function(foo, name) {
+            var _run = function (foo, name) {
                 // console.groupCollapsed ('[贴吧助手]: ' + (name || '[未知区段]'));
 
                 for (var args = [], i = 2, ret; i < arguments.length; i++) {
@@ -7328,7 +7326,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 return ret;
             };
 
-            $.fn.getField = function() {
+            $.fn.getField = function () {
                 // var $data = this.attr('data-field');
                 var $data = this.data('field');
 
@@ -7338,11 +7336,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 return $data;
             };
 
-            $.goToEditor = function() {
+            $.goToEditor = function () {
                 $('#ueditor_replace').focus();
                 $.scrollTo($('#tb_rich_poster_container'), 500);
             };
-            $.create = function(ele, cls, attr) {
+            $.create = function (ele, cls, attr) {
                 var r = $(document.createElement(ele));
 
                 if (cls) {
@@ -7354,10 +7352,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
                 return r;
             };
-            $.stamp = function() {
+            $.stamp = function () {
                 return +new Date();
             };
-            $.toDateStr = function(d) {
+            $.toDateStr = function (d) {
                 return d.toLocaleString();
             };
 
@@ -7367,7 +7365,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '移除美化贴吧时底部出现的工具栏。',
                     flag: 0,
                     def: false,
-                    _init: function() {
+                    _init: function () {
                         //core_title_wrap_bright clearfix  没底工具栏时
                         //core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright 有底工具栏时
                         rmBottom = true;
@@ -7385,7 +7383,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '屏蔽无用、广告内容',
                     flag: ~0,
                     def: true,
-                    _init: function() {
+                    _init: function () {
                         var $ads = [
                             // 贴吧推广
                             '.spreadad, .game_frs_step1, .BAIDU_CLB_AD, .dasense, .u9_head',
@@ -7479,7 +7477,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             }
                         }
                         $('<style>').text($ads + /* File: ads_hide.css */
-                            (function() {
+                            (function () {
                                 /*
     {
     display:none !important;
@@ -7508,9 +7506,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         }
                         // 执行三次, 确保分隔符会消失
                         for (var i = 3; i--;) {
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 $('.split_text').next('.split_text').remove();
-                                $('.split').filter(function() {
+                                $('.split').filter(function () {
                                     return this.nextElementSibling === null ||
                                         this.nextElementSibling.className == this.className ||
                                         !$(this.nextElementSibling).is(':visible');
@@ -7521,7 +7519,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         this.removePromoteThread();
                     },
 
-                    _proc: function(floorType, args) {
+                    _proc: function (floorType, args) {
                         if (floorType == __type_forum) {
                             if (args.thread.find('.threadlist_rep_num').text() == '推广') {
                                 args.thread.remove();
@@ -7529,7 +7527,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         }
                     },
 
-                    removePromoteThread: function() {
+                    removePromoteThread: function () {
                         // 清理帖子列表的推广
                         var it = document.evaluate('//*[@id="thread_list"]/li/div/div/div[text()="推广"]', document.body, null, XPathResult.ANY_TYPE, null);
                         var thread, threads = [];
@@ -7546,7 +7544,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '并不清楚到底会屏蔽多少东西）',
                     flag: ~0,
                     def: false,
-                    _init: function() {
+                    _init: function () {
                         var $ads = [
                             // 帖子列表顶部, 如直播贴
                             '#threadListGroupCnt'
@@ -7561,7 +7559,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '屏蔽楼层气泡',
                     flag: __type_floor,
                     def: false,
-                    _init: function() {
+                    _init: function () {
                         pingbi_loucengqipao = true;
                         let temp1 = $(".post_bubble_top");
                         let temp2 = $(".post_bubble_middle");
@@ -7577,7 +7575,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             temp3[i].style = "backgrounde:none;";
                         }
                     },
-                    _proc: function(floorType, args) {
+                    _proc: function (floorType, args) {
                         //console.log("666666666666");
                     }
                 },
@@ -7586,8 +7584,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '强调信息提示',
                     flag: __type_floor,
                     def: false,
-                    _init: function() {
-                        GM_setValue("qiangdiaoxinxitishi", true);
+                    _init: function () {
                         qiangdiaoxinxitishi = true;
                         let ii = 0;
                         try {
@@ -7634,7 +7631,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             console.log("强调信息提示:" + err);
                         }
                     },
-                    _proc: function(floorType, args) {
+                    _proc: function (floorType, args) {
                         //console.log("666666666666");
                     }
                 },
@@ -7669,7 +7666,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     def: false,
 
                     // 辅助函数
-                    _match_type: function(_M) {
+                    _match_type: function (_M) {
                         switch (_M) {
                             case this.__M_REGEX:
                                 return 'tp_regex';
@@ -7680,19 +7677,19 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         return 'undefined_' + _M;
                     },
                     // 辅助函数
-                    _range: function(old, min, max) {
+                    _range: function (old, min, max) {
                         return Math.min(Math.max(min, old), max);
                     },
 
                     // 初始化样式表
-                    _init: function() {
+                    _init: function () {
                         _css
                             .append('ul#jx_post_kword > li {margin-bottom: .2em}')
                             .append('.jx_word { padding: 0 .5em; width: 8em } span.regex::before, span.regex::after { content: "/"; color: #777 }')
                             .append('span.regex > .jx_word { border: 0; padding: 0 .2em }')
                             .append('.jx_modifier { width: 4em; border: 0; padding: 0 0 0 .2em }')
 
-                        .append('.jx_post_block_stripe::before{content: "共隐藏 " attr(hide-count) " 个数据"}');
+                            .append('.jx_post_block_stripe::before{content: "共隐藏 " attr(hide-count) " 个数据"}');
 
 
                         $.extend(this, {
@@ -7722,7 +7719,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         this._compileRegex();
 
                         this.$tplConfig = /* File: block_post.html */
-                            (function() {
+                            (function () {
                                 /*
     <div class="jx_autoflow">
     <h3>当匹配到时的操作</h3>
@@ -7774,7 +7771,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     */
                             }).extract();
                         this.$tplAddWord = /* File: block_post_kword.html */
-                            (function() {
+                            (function () {
                                 /*
     <li>
     <select class="jx_word_type">
@@ -7795,7 +7792,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     },
 
                     // 重构样式表
-                    _rebuildStyle: function() {
+                    _rebuildStyle: function () {
                         var sBuilder = '.jx_post_block_act {';
                         switch (this.config.onmatch) {
                             case this.__ACT_BAR:
@@ -7832,22 +7829,26 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         this.css.text(sBuilder);
                     },
                     // 编译正则匹配
-                    _compileRegex: function() {
+                    _compileRegex: function () {
                         var that = this;
-                        this.config.kword.forEach(function(e) {
+                        this.config.kword.forEach(function (e) {
                             try {
                                 if (e.type === that.__M_REGEX) {
                                     e.regex = new RegExp(e.word, e.modi);
                                 }
                             } catch (err) {
                                 console.error('编译正则表达式时出错!\n表达式: %s, 开关: %s', err.word, err.modi);
-                                err.regex = { test: function() { return false; } };
+                                err.regex = {
+                                    test: function () {
+                                        return false;
+                                    }
+                                };
                             }
                         });
                     },
 
                     // 配置窗口回调
-                    _conf: function() {
+                    _conf: function () {
                         var $view = $.extend(true, {}, this.config);
 
                         $view.tp_hide = $view.onmatch === this.__ACT_HIDE;
@@ -7868,18 +7869,18 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         });
 
                         var that = this;
-                        $tpl.on('click', 'a.jx-rm-key', function() {
+                        $tpl.on('click', 'a.jx-rm-key', function () {
                             // 移除那一行
                             $(this).parent().remove();
-                        }).on('change', '.jx_word_type', function() {
+                        }).on('change', '.jx_word_type', function () {
                             var isRegex = parseInt(this.value) === that.__M_REGEX;
 
                             var line = $(this).parent();
                             line.find('.jx_word').parent().toggleClass('regex', isRegex);
                             line.find('.jx_modifier').toggleClass('hide', !isRegex);
-                        }).on('change', '#jx_post_match', function() {
+                        }).on('change', '#jx_post_match', function () {
                             $('#jx_post_opa', $tpl).parent().toggleClass('hide', parseInt(this.value) !== that.__ACT_OPA);
-                        }).on('click', '.ui_btn', function() {
+                        }).on('click', '.ui_btn', function () {
                             switch ($(this).data('btn')) {
                                 case 'add':
                                     var $tplAdd = $(Mustache.render(that.$tplAddWord, {
@@ -7895,7 +7896,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                         kword: [],
                                         user: $('#jx_post_user', $tpl).val().split('\n')
                                     };
-                                    $('#jx_post_kword > li').each(function() {
+                                    $('#jx_post_kword > li').each(function () {
                                         var rule = $(this);
                                         newConf.kword.push({
                                             type: parseInt(rule.find('select').val()),
@@ -7918,7 +7919,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     },
 
                     // 标记贴子为隐藏
-                    _hit: function(floor) {
+                    _hit: function (floor) {
                         floor.addClass('jx_post_block_act');
 
                         if (floor.prev().is('script')) {
@@ -7939,11 +7940,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         }
                     },
 
-                    _getAuthor: function(f) {
+                    _getAuthor: function (f) {
                         return f.user_name || f.author_name || (f.author ? f.author.user_name : null);
                     },
 
-                    _proc: function(floorType, args) {
+                    _proc: function (floorType, args) {
                         // 首先检查用户名
                         if (this.config.user.indexOf(this._getAuthor(args._main.getField())) !== -1) {
                             this._hit(args._main);
@@ -7987,7 +7988,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     flag: __type_postact | __type_forum,
                     def: false,
 
-                    _findUser: function(name) {
+                    _findUser: function (name) {
                         if (0 === this.blockList.author.length) {
                             return -1;
                         }
@@ -8000,17 +8001,20 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
                         return -1;
                     },
-                    _userExist: function(user) {
+                    _userExist: function (user) {
                         return -1 !== this._findUser(user);
                     },
 
-                    _conf: function() {
+                    _conf: function () {
                         var that = this;
 
                         //有警告
                         var $tpl = $(Mustache.render(this.tplHideAuthor, {
-                            author: this.blockList.author.map(function(e, i) {
-                                return { name: e.name, time: e.time ? $.toDateStr(new Date(e.time)) : '尚未' };
+                            author: this.blockList.author.map(function (e, i) {
+                                return {
+                                    name: e.name,
+                                    time: e.time ? $.toDateStr(new Date(e.time)) : '尚未'
+                                };
                             })
                         }));
 
@@ -8021,7 +8025,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         });
 
                         var $inp = $('#jx_new_id', $tpl);
-                        var cbAddName = function() {
+                        var cbAddName = function () {
                             var user = $inp.val().trim();
                             that._updList();
 
@@ -8044,13 +8048,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
                         // 绑定事件
                         $('#jx_add', $tpl).click(cbAddName);
-                        $inp.keypress(function(e) {
+                        $inp.keypress(function (e) {
                             if (e.which === 13) {
                                 cbAddName();
                             }
                         });
                         $tpl
-                            .on('click', '.jx_man_hide, .jx_man_rm', function(e) {
+                            .on('click', '.jx_man_hide, .jx_man_rm', function (e) {
                                 var $l = $(e.target);
                                 if ($l.hasClass('text-disabled')) {
                                     return;
@@ -8063,7 +8067,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                 switch (true) {
                                     case $l.hasClass('jx_man_hide'):
                                         that.blockList.author[that._findUser($un)].time = $.stamp();
-                                        that._hide(function() {}, $un);
+                                        that._hide(function () {}, $un);
                                         break;
                                     case $l.hasClass('jx_man_rm'):
                                         that.blockList.author.splice(that._findUser($un), 1);
@@ -8074,19 +8078,22 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             });
 
                         $('#jx_close', $tpl).click($wndHideUser.close.bind($wndHideUser));
-                        $('#jx_all', $tpl).click(function() {
+                        $('#jx_all', $tpl).click(function () {
                             var hideStatus = $('#jx_hide_info', $tpl).show().text('正在初始化…');
 
-                            that.hideQueue.onProgress = function(i, t) {
-                                hideStatus.text(Mustache.render('正在隐藏 {{i}} / {{t}}... 请勿关闭该窗口!', { i: i, t: t })); //有警告
+                            that.hideQueue.onProgress = function (i, t) {
+                                hideStatus.text(Mustache.render('正在隐藏 {{i}} / {{t}}... 请勿关闭该窗口!', {
+                                    i: i,
+                                    t: t
+                                })); //有警告
                             };
-                            that.hideQueue.onComplete = function() {
+                            that.hideQueue.onComplete = function () {
                                 that.hideQueue.onProgress = that.hideQueue.onComplete = null;
                                 hideStatus.text('全部用户已成功隐藏!');
                             };
                             that.hideQueue.add.apply(
                                 that.hideQueue,
-                                Array.prototype.slice.call($('a.jx.jx_man_hide:not(.text-disabled)').addClass('text-disabled').map(function(i, e) {
+                                Array.prototype.slice.call($('a.jx.jx_man_hide:not(.text-disabled)').addClass('text-disabled').map(function (i, e) {
                                     return $(e).parent().data('name');
                                 }))
                             );
@@ -8094,7 +8101,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         return $tpl;
                     },
 
-                    _hide: function(cb, author) {
+                    _hide: function (cb, author) {
                         // 检查是否在列表
                         this._updList();
                         if (this._userExist(author)) {
@@ -8116,9 +8123,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         }).success(cb);
                     },
 
-                    _init: function() {
+                    _init: function () {
                         this.tplHideAuthor = /* File: hide_loops_config.html */
-                            (function() {
+                            (function () {
                                 /*
     <div class="jx_autoflow">
     <h2>3 天循环隐藏的列表</h2>
@@ -8146,7 +8153,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     */
                             }).extract();
                         this.tplNewLine = /* File: hide_loops_author.html */
-                            (function() {
+                            (function () {
                                 /*
     <li data-name="{{name}}"><b>{{name}}</b>
     [ 上次隐藏: <span class="text-red">{{time}}</span> | <a class="jx jx_man_hide">手动</a> | <a class="jx jx_man_rm">移除</a> ]</li>
@@ -8161,14 +8168,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         var t3Days = 3 * 24 * 60 * 60;
 
                         var that = this;
-                        this.blockList.author.forEach(function(e) {
+                        this.blockList.author.forEach(function (e) {
                             if (curTime - e.time > t3Days) {
                                 that.hideQueue.add(e.name);
                             }
                         });
                     },
 
-                    _updList: function() {
+                    _updList: function () {
                         this.blockList = $.extend({
                             author: [
                                 // 格式如下
@@ -8179,21 +8186,23 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             ]
                         }, $conf.get(this.id, {}));
                     },
-                    _saveList: function() {
+                    _saveList: function () {
                         $conf.set(this.id, this.blockList);
                     },
 
-                    _findNameAndHide: function(e) {
+                    _findNameAndHide: function (e) {
                         var floorData = $(e.target).parents('.lzl_single_post,.l_post')
                             .first().getField();
                         var author = floorData.user_name || floorData.author.user_name;
                         if (this._userExist(author)) { //有警告
                             $.dialog.alert(Mustache.render( /* File: hide_loops_already_in_list.html */
-                                (function() {
+                                (function () {
                                     /*
     用户 [<b>{{name}}</b>] 已存在于屏蔽列表!
     */
-                                }).extract(), { name: author }), {
+                                }).extract(), {
+                                    name: author
+                                }), {
                                 title: '3 天循环隐藏'
                             });
                             return;
@@ -8204,20 +8213,22 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             time: $.stamp()
                         });
                         this._saveList();
-                        this._hide(function(r) { //有警告
+                        this._hide(function (r) { //有警告
                             $.dialog.alert(Mustache.render( /* File: hide_loop_result.html */
-                                (function() {
+                                (function () {
                                     /*
     对 <b>{{name}}</b> 的隐藏处理结果: {{msg}}({{no}})
     */
                                 }).extract(),
-                                $.extend({ name: author }, r)), {
+                                $.extend({
+                                    name: author
+                                }, r)), {
                                 title: '3 天循环隐藏 (楼中楼无效)'
                             });
                         }, author);
                     },
 
-                    _menu: function(floorType, args) {
+                    _menu: function (floorType, args) {
                         var $act = $('.user-hide-post-action', args._main);
                         var $actHidePost = $.create('a', 'jx jx-post-action');
 
@@ -8235,7 +8246,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     flag: ~0,
                     def: false,
 
-                    _init: function() {
+                    _init: function () {
                         _hide('.icon_wrap');
                     }
                 },
@@ -8263,7 +8274,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
                     clsList: ['sign_highlight', 'vip_red', 'fiesta_member', 'fiesta_member_red', 'member_thread_title_frs', 'sign_highlight'],
 
-                    rmOrange: function(target) {
+                    rmOrange: function (target) {
                         var $target = $(target);
 
                         for (var i = 1; i < this.clsList.length; i++) {
@@ -8271,11 +8282,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         }
                     },
 
-                    _init: function() {
+                    _init: function () {
                         // 标题红名移除
                         this.rmOrange('body');
                     },
-                    _proc: function(floorType, args) {
+                    _proc: function (floorType, args) {
                         this.rmOrange(args._main);
                     }
 
@@ -8285,7 +8296,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '引用某一层的内容',
                     flag: __type_floor,
                     def: true,
-                    _proc: function(floorType, args) {
+                    _proc: function (floorType, args) {
                         //console.log("233333333333");
                         var $quote = $('<li>').addClass('pad-left').append( //<li>
                             $('<a>').text('#引用').addClass('jx')
@@ -8299,7 +8310,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             ));
                         }, 5000);*/
                     },
-                    _click: function($ele, $eve) {
+                    _click: function ($ele, $eve) {
                         var $floor = $ele.parents('.l_post');
                         var $editor = $('#ueditor_replace');
                         var $quote = $('<p>').appendTo($editor);
@@ -8310,7 +8321,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             .append('——————————')
                             .append('<br>');
 
-                        $('.j_d_post_content', $floor).contents().each(function(i, ele) {
+                        $('.j_d_post_content', $floor).contents().each(function (i, ele) {
                             if (ele.nodeType == 3) {
                                 if (ele.nodeValue.trim() !== '') {
                                     $quote.append(ele.nodeValue);
@@ -8343,19 +8354,19 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '引用楼中楼的回复',
                     flag: __type_lzl,
                     def: true,
-                    _init: function() { //新旧版贴吧都生效
+                    _init: function () { //新旧版贴吧都生效
                         tupianfangda = true;
                         //console.log("123")
                         //_css.append('.jx_no_overflow { max-width: 100%; }');
                         //this.rmImg(document);
                     },
-                    _proc: function(floorType, args) { //仅旧版贴吧生效
+                    _proc: function (floorType, args) { //仅旧版贴吧生效
                         $('<a>').text('引用').addClass('jx d_tail')
                             .insertBefore($('.lzl_time', args._main))
                             .after($('<span>').addClass('d_tail').text(' | '))
                             .data('jx', 'quote_lzl');
                     },
-                    _click: function($ele, $eve) {
+                    _click: function ($ele, $eve) {
                         var $editor = $('#ueditor_replace');
                         var $cnt = $ele.parents('.lzl_cnt');
                         $('<p>').appendTo($editor)
@@ -8373,9 +8384,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '将百度所谓安全链接改成直链。',
                     flag: __type_floor | __type_lzl,
                     def: false,
-                    _proc: function(floorType, args) {
+                    _proc: function (floorType, args) {
                         var $floor = $(args._main);
-                        $floor.find('a[href*="jump.bdimg.com/safecheck"]').each(function(i, ele) {
+                        $floor.find('a[href*="jump.bdimg.com/safecheck"]').each(function (i, ele) {
                             var $ele = $(ele),
                                 $url = $ele.text();
 
@@ -8393,7 +8404,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                         Referer: 'http://tieba.baidu.com/p/123456789',
                                         Range: 'bytes=0-0'
                                     },
-                                    onload: function(response) {
+                                    onload: function (response) {
                                         if (response.finalUrl.indexOf('http') === 0) {
                                             $ele.attr('href', response.finalUrl);
                                         }
@@ -8416,7 +8427,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '隐藏挽尊卡背景图片',
                     flag: __type_floor,
                     def: true,
-                    _init: function() {
+                    _init: function () {
                         /*
                         标题: 出一个使用挽尊卡的教程吧
                         链接：http://tieba.baidu.com/p/5889895156
@@ -8441,7 +8452,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         }
                         //temp.remove();
                     },
-                    _proc: function(floorType, args) { //chrome测试无效
+                    _proc: function (floorType, args) { //chrome测试无效
                         //console.log("44444444444444444")
                         if ($('.save_face_post', args._main).size()) {
                             // 发现挽尊卡
@@ -8456,7 +8467,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     name: '隐藏挽尊卡会员提示',
                     desc: '隐藏会员发帖的使用挽尊卡提示。',
                     flag: 0,
-                    _init: function() {
+                    _init: function () {
                         _hide('.save_face_bg');
                     }
                 },
@@ -8465,8 +8476,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '还原为旧版贴吧点图看大图功能',
                     flag: __type_floor,
                     def: false,
-                    rmImg: function($root) {
-                        $('img.BDE_Image', $root).each(function() {
+                    rmImg: function ($root) {
+                        $('img.BDE_Image', $root).each(function () {
                             var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
                             if (!m) return;
                             var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
@@ -8478,13 +8489,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             $(this).remove();
                         });
                     },
-                    _init: function() { //新旧版贴吧都生效
+                    _init: function () { //新旧版贴吧都生效
                         tupianfangda = false;
                         //console.log("123")
                         //_css.append('.jx_no_overflow { max-width: 100%; }');
                         //this.rmImg(document);
                     },
-                    _proc: function(floorType, args) { //仅旧版贴吧生效
+                    _proc: function (floorType, args) { //仅旧版贴吧生效
                         tupianfangda = false;
                         //console.log("456")
                         //this.rmImg(args._main);
@@ -8495,8 +8506,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     desc: '切换为贴吧点图看大图功能',
                     flag: __type_floor,
                     def: false,
-                    rmImg: function($root) {
-                        $('img.BDE_Image', $root).each(function() {
+                    rmImg: function ($root) {
+                        $('img.BDE_Image', $root).each(function () {
                             var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
                             if (!m) return;
                             var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
@@ -8508,14 +8519,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             $(this).remove();
                         });
                     },
-                    _init: function() {
+                    _init: function () {
                         if (tupianfangda == true) {
                             _css.append('.jx_no_overflow { max-width: 100%; }');
                             this.rmImg(document);
                         }
 
                     },
-                    _proc: function(floorType, args) {
+                    _proc: function (floorType, args) {
                         if (tupianfangda == true) {
                             this.rmImg(args._main);
 
@@ -8524,9 +8535,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
             };
 
-            var _menu = (function() {
+            var _menu = (function () {
                 var $template = /* File: main_config.html */
-                    (function() {
+                    (function () {
                         /*
     <div style="height: 100%; overflow-y: auto">
     <h2>启用的模组</h2>
@@ -8549,7 +8560,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     */
                     }).extract();
 
-                return _run.bind({}, function() {
+                return _run.bind({}, function () {
                     var $view = {
                         modules: []
                     };
@@ -8572,16 +8583,16 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         height: 200
                     });
 
-                    $('.jx_conf', $tpl).click(function() {
+                    $('.jx_conf', $tpl).click(function () {
                         var x = $(this).data('config');
                         if (lMods.hasOwnProperty(x)) {
                             _run(lMods[x]._conf.bind(lMods[x]), '模组配置 [' + lMods[x].name + ' (' + x + ')]');
                         }
                     });
 
-                    $('#jx_save', $tpl).click(function() {
+                    $('#jx_save', $tpl).click(function () {
                         var newStatus = {};
-                        $('#jx_conf_modules>label>input', $tpl).each(function(i, inp) {
+                        $('#jx_conf_modules>label>input', $tpl).each(function (i, inp) {
                             newStatus[$(inp).data('module')] = inp.checked ? __mod_enable : __mod_disable;
                         });
                         $conf.set('modules', newStatus);
@@ -8596,16 +8607,16 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             GM_registerMenuCommand('梦姬贴吧助手模块配置', _menu);
 
             if (unsafeWindow.__YUME_DEBUG__) {
-                GM_registerMenuCommand('打印模组配置', function() {
+                GM_registerMenuCommand('打印模组配置', function () {
                     console.info('梦姬模组配置: ');
                     console.info($conf.get('modules'));
                 });
             }
 
-            _run(function() {
-                var _callMenu = function($parent) {
+            _run(function () {
+                var _callMenu = function ($parent) {
                     console.info('成功捕捉到菜单元素，传递至回调…');
-                    _run(function() {
+                    _run(function () {
                         var $menuItem = $('<li>'),
                             $menuLink = $('<a>').appendTo($menuItem).addClass('jx').text('助手设置');
                         //$parent.find('.u_tb_profile').before($menuItem);
@@ -8619,19 +8630,22 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             //console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
                             lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
                         }
-                        $menuLink2.click(function() {
+                        $menuLink2.click(function () {
                             GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
                             location.reload();
                         });
                     }, '菜单召唤');
                 };
 
-                var ma = new MutationObserver(function($q) {
+                var ma = new MutationObserver(function ($q) {
                     try {
-                        $($q).each(function(i, $eve) {
-                            $($eve.addedNodes).each(function(i, $ele) {
+                        $($q).each(function (i, $eve) {
+                            $($eve.addedNodes).each(function (i, $ele) {
                                 if ($ele.nodeType != 3 && $ele.className == 'u_ddl') {
-                                    throw { ele: $($ele), name: 's' };
+                                    throw {
+                                        ele: $($ele),
+                                        name: 's'
+                                    };
                                 }
                             });
                         });
@@ -8647,7 +8661,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     }
                 });
 
-                setTimeout(function() {
+                setTimeout(function () {
                     var _m = $('.u_setting>.u_ddl');
                     if (_m.length) {
                         _callMenu(_m);
@@ -8665,10 +8679,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
             var lMods = {};
 
-            _run(function() {
+            _run(function () {
                 _css = $('<style>').appendTo(document.head);
                 _css.append( /* File: tieba.css */
-                    (function() {
+                    (function () {
                         /*
     .pull-right	{ float: right			}
     a.jx, .ptr	{ cursor: pointer		}
@@ -8719,7 +8733,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     case 0:
                         var $disabledMods = $conf.get('modules', []);
                         var $modsList = {};
-                        $disabledMods.forEach(function(e) {
+                        $disabledMods.forEach(function (e) {
                             $modsList[e] = __mod_disable;
                         });
                         $conf.set('modules', $modsList);
@@ -8730,7 +8744,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
                 var $mods = $conf.get('modules', {});
 
-                $.each(modules, function(mId, fMod) {
+                $.each(modules, function (mId, fMod) {
                     if ($mods[mId] == __mod_disable ||
                         (($mods[mId] == __mod_default || !$mods.hasOwnProperty(mId)) &&
                             fMod.def === false
@@ -8747,9 +8761,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 });
             }, 'Init. modules');
 
-            var _event = function(floorType, otherInfo, _proc) {
+            var _event = function (floorType, otherInfo, _proc) {
                 var fooCB = _proc || '_proc';
-                $.each(lMods, function(mId, m) {
+                $.each(lMods, function (mId, m) {
                     if (!m[fooCB] || !(m.flag & floorType)) {
                         return;
                     }
@@ -8757,7 +8771,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 });
             };
 
-            var _procLzlContainer = function(i, tailer) {
+            var _procLzlContainer = function (i, tailer) {
                 var $tailer = $(tailer),
                     _main = $tailer.parents('.l_post');
 
@@ -8776,7 +8790,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 return _main;
             };
 
-            var _procThreadList = function(i, threadlist) {
+            var _procThreadList = function (i, threadlist) {
                 var $thread = $(threadlist);
                 _event(__type_forum, {
                     _main: $thread,
@@ -8785,7 +8799,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 return $thread;
             };
 
-            var _procLzlPost = function(i, lzlPost) {
+            var _procLzlPost = function (i, lzlPost) {
                 var $lzl = $(lzlPost);
                 _event(__type_lzl, {
                     _main: $lzl,
@@ -8800,12 +8814,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             } else {
                 $('.j_thread_list').each(_run.bind({}, _procThreadList, '初始化贴吧页帖子搜索'));
             }
-            var mo = new MutationObserver(function(eve) {
-                _run(function() {
-                    $(eve).each(function(i, eve) {
+            var mo = new MutationObserver(function (eve) {
+                _run(function () {
+                    $(eve).each(function (i, eve) {
                         if (!eve.addedNodes.length) return;
 
-                        $(eve.addedNodes).each(function(i, ele) {
+                        $(eve.addedNodes).each(function (i, ele) {
                             // Text node.
                             if (ele.nodeType == 3) return;
 
@@ -8836,7 +8850,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }, '页面元素插入');
             });
 
-            $(document.body).on('click', '.jx', function(eve) {
+            $(document.body).on('click', '.jx', function (eve) {
                 var $eve = $(eve.target);
                 var $data = $eve.data('jx');
                 if (!$data || !lMods[$data] || !lMods[$data]._click) return;
@@ -8862,13 +8876,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     //推荐和这个脚本一起使用https://greasyfork.org/ja/scripts/24204-picviewer-ce
     setTimeout(() => {
         if (tupianfangda == true) {
-            (function(window) {
+            (function (window) {
                 "use strict";
                 //CSS
                 var parentElement = document.getElementById("j_p_postlist");
                 GM_addStyle(".BDE_Image,.j_user_sign{cursor:alias;}#Tie_enlargeImage_parentDIV{position:fixed;z-index:1005;top:0;left:0;}.Tie_enlargeImage{position:absolute;box-shadow:1px 1px 10px #000;cursor:move;}.Tie_enlargeImage:hover{z-index:1006;}#Tie_setValue_DIV{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);}.Tie_definedDIV{position:absolute;z-index:10000;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);}.Tie_definedDIV_title{border-bottom:1px solid #f2f2f5;line-height:40px;font-size:15px;font-weight:700;padding:0 0 0 15px;}.Tie_definedDIV_point{padding:20px 40px;}.Tie_definedDIV_groupSubtitle{font-weight:bold;}.Tie_definedDIV_configItem{line-height:30px;margin:0 20px}.Tie_definedDIV_configItem select{margin:0.5em}.Tie_definedDIV_configItem br+label{margin-left:3em}.Tie_definedDIV_configItem input{vertical-align:middle;margin-right:0.5em}#Tie_debugConfig{margin:0.5em}.Tie_debugConfig_icon{position:relative;display:inline-block;top:4px;width:16px;height:16px;background-position:-350px -100px;background-image:url('https://img.t.sinajs.cn/t6/style/images/common/icon.png');background-repeat:no-repeat;}.Tie_bubble_DIV{position:absolute;visibility:hidden;max-width:280px;top:20%}.Tie_definedDIV_configItem label:hover+.Tie_bubble_DIV{visibility:visible}.Tie_bubble_content{position:relative;background:#fff;padding:6px 13px 6px 16px;border:1px solid #ccc;border-radius:3px;}.Tie_bubble_mainTxt{line-height:18px;}.Tie_bubble_bor{position:absolute;overflow:hidden;bottom:-14px;line-height:14px;}.Tie_bubble_line{border-color:#ccc transparent transparent transparent;}.Tie_bubble_br{margin:-1px 0 0 -14px;border-color:#fff transparent transparent transparent;}.Tie_bubble_bor i,.Tie_bubble_bor em{display:inline-block;width:0;height:0;border-width:7px;border-style:solid;vertical-align:top;overflow:hidden;}.Tie_definedDIV_SaveBtn{background-color:#f2f2f5;text-align:center;padding:10px 0;}.Tie_SaveBtn_a{background:#ff8140;color:#fff;font-size:15px;display:inline-block;padding:0 15px;line-height:35px;border-radius:3px;}.Tie_SaveBtn_a:hover{background:#f7671d}");
                 //数据缓存
-                var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function() {},
+                var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function () {},
                     mouseWheel = /Firefox/.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel",
                     protocol = window.location.protocol || "https",
                     doc = window.document,
@@ -8877,13 +8891,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     definedEvent = GM_getValue("definedEvent", "click,click,1,0,1").split(","),
                     repairDefinedEvent = GM_getValue("repairDefinedEvent", false),
                     imageEvent = {
-                        init: function(e) { //主事件
+                        init: function (e) { //主事件
                             var target = e.target,
                                 image, imageSrc;
                             if (e.button === 0 && (target.className === "BDE_Image" || target.className === "j_user_sign")) {
                                 log("图片创建", "开始");
                                 imageSrc = target.src.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/);
-                                log("图片地址获取", function() {
+                                log("图片地址获取", function () {
                                     if (imageSrc) return "成功";
                                     else return "失败";
                                 }, target.src);
@@ -8892,7 +8906,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                 image.classList.add("Tie_enlargeImage");
                                 //修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
                                 image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
-                                image.onerror = function() {
+                                image.onerror = function () {
                                     if (protocol === "https:") {
                                         log("图片请求", "https转向http");
                                         protocol = "http:";
@@ -8911,7 +8925,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                         alert("图片获取失败\n\n如多次获取失败\n请在设置里勾选“调试脚本”打印脚本日志并截图反馈给作者，以便更好的解决问题");
                                     }
                                 };
-                                image.onload = function() {
+                                image.onload = function () {
                                     log("图片创建", "进行中");
                                     var target = this,
                                         width = target.width,
@@ -8928,10 +8942,15 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                         X = (docWidth - width) / 2;
                                         Y = (docHeight - height) / 2;
                                     } else if (!Hboolean && Wboolean) Y = (docHeight - height) / 2;
-                                    target.imageData = { width: width, height: height, X: X, Y: Y }; //缓存当前图片数据
+                                    target.imageData = {
+                                        width: width,
+                                        height: height,
+                                        X: X,
+                                        Y: Y
+                                    }; //缓存当前图片数据
                                     target.style.transform = "translate(" + X + "px," + Y + "px)";
                                     parentDIV.appendChild(target);
-                                    log("图片创建", function() {
+                                    log("图片创建", function () {
                                         target.id = Date.now();
                                         if (doc.getElementById(target.id)) return "成功";
                                         else return "失败";
@@ -8940,17 +8959,20 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                 image = null;
                             }
                         },
-                        StopPropagation: function(e) {
+                        StopPropagation: function (e) {
                             if (e.button === 0 && e.target.className === "BDE_Image") {
                                 e.stopPropagation(); //阻止冒泡，阻止图片原事件
                                 log("阻止贴吧图片原事件", "已执行");
                             }
                         },
-                        Down: function(e) {
+                        Down: function (e) {
                             var target = e.target,
                                 imageData = target.imageData;
                             imageTarget = target;
-                            log("鼠标down事件", function() { if (!target.id) target.id = Date.now(); return "开始"; });
+                            log("鼠标down事件", function () {
+                                if (!target.id) target.id = Date.now();
+                                return "开始";
+                            });
                             if (e.button !== 0) return false;
                             e.preventDefault();
                             e.stopPropagation();
@@ -8961,7 +8983,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             doc.addEventListener("mouseup", imageEvent.Up);
                             log("鼠标down事件", "结束");
                         },
-                        Move: function(e) {
+                        Move: function (e) {
                             log("鼠标move事件", "开始");
                             var target = imageTarget,
                                 X = e.clientX + imageCount[0],
@@ -8987,7 +9009,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             target.style.transform = "translate(" + X + "px," + Y + "px)";
                             log("鼠标move事件", "结束", target.style.transform);
                         },
-                        Up: function(e) {
+                        Up: function (e) {
                             log("鼠标up事件", "开始");
                             var target = imageTarget,
                                 RegEx;
@@ -9009,20 +9031,20 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             doc.removeEventListener("mouseup", imageEvent.Up);
                             log("鼠标up事件", "结束", imageButton);
                         },
-                        Close: function(e) {
+                        Close: function (e) {
                             log("鼠标click事件", "开始");
                             var target = e.target;
                             if (imageButton) {
                                 imageButton = null;
                                 delete target.imageData;
                                 parentDIV.removeChild(target);
-                                log("鼠标click事件", function() {
+                                log("鼠标click事件", function () {
                                     if (!doc.getElementById(target.id)) return "成功";
                                     else return "失败";
                                 });
                             }
                         },
-                        Wheel: function(e) {
+                        Wheel: function (e) {
                             var target = e.target,
                                 imageData = target.imageData,
                                 wheelKey = definedEvent[3],
@@ -9053,7 +9075,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                     return false;
                                 }
                             }
-                            if (!Hboolean && !Wboolean) { log("鼠标wheel滚动事件", "图片小于窗口"); return false; }
+                            if (!Hboolean && !Wboolean) {
+                                log("鼠标wheel滚动事件", "图片小于窗口");
+                                return false;
+                            }
                             if (Hboolean) {
                                 wheelXY = imageData.Y + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
                                 if (wheelXY > 0 || wheelXY < docHeight - height) {
@@ -9077,18 +9102,18 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     };
                 //图片放大设置
                 var userEvent = {
-                    init: function() {
+                    init: function () {
                         this.create();
                         this.Event();
                     },
-                    create: function() {
+                    create: function () {
                         var definedDIV = doc.createElement("div"); //创建自定义DIV框架
                         definedDIV.id = "Tie_setValue_DIV";
                         definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>图片放大设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作(仅支持贴子内的楼层图片！)</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片，修改配置后刷新一下</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select>若条件允许，推荐选择双击以兼容鼠标移动图片<br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
                         doc.body.appendChild(definedDIV);
                         definedDIV = null;
                     },
-                    Event: function() {
+                    Event: function () {
                         var definedDIV = doc.getElementById("Tie_setValue_DIV"),
                             repairValue = doc.getElementById("Tie_repairValue"),
                             debugConfig = doc.getElementById("Tie_debugConfig"),
@@ -9099,12 +9124,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             setValue[i].value = oldDefinedEvent[i];
                         }
                         if (setValue[3].value === "0") setValue[4].style.visibility = "hidden";
-                        setValue[3].onchange = function() {
+                        setValue[3].onchange = function () {
                             setValue[4].style.visibility = this.value === "0" ? "hidden" : "visible";
                         };
                         repairValue.checked = repairDefinedEvent;
                         debugConfig.checked = scriptDebug;
-                        doc.getElementById("Tie_setValue_a").onclick = function() {
+                        doc.getElementById("Tie_setValue_a").onclick = function () {
                             definedEvent = [setValue[0].value, setValue[1].value, setValue[2].value, setValue[3].value, setValue[4].value];
                             repairDefinedEvent = repairValue.checked;
                             scriptDebug = debugConfig.checked;
@@ -9120,13 +9145,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                     parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
                                 }
                             }
-                            log = scriptDebug && function(text, types, data) { //脚本调试，日志
+                            log = scriptDebug && function (text, types, data) { //脚本调试，日志
                                 if (typeof types === "function") {
                                     types = types();
                                 }
                                 if (data === undefined) console.log(text, types);
                                 else console.log(text, types, data);
-                            } || function() {};
+                            } || function () {};
                             log("图片放大设置", "已执行", definedEvent + "," + repairDefinedEvent);
                             this.onclick = null;
                             setValue[3].onchange = null;
@@ -9142,7 +9167,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         };
                     }
                 };
-                GM_registerMenuCommand("图片放大设置", function() {
+                GM_registerMenuCommand("图片放大设置", function () {
                     if (!doc.getElementById("Tie_setValue_DIV")) {
                         userEvent.init();
                     }
@@ -9166,11 +9191,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 if (!GM_getValue("definedEvent")) {
                     userEvent.init();
                 }
-                window.addEventListener("resize", function() {
+                window.addEventListener("resize", function () {
                     if (typeof winResize !== undefined) {
                         clearTimeout(winResize);
                     }
-                    winResize = setTimeout(function() {
+                    winResize = setTimeout(function () {
                         docHeight = doc.documentElement.clientHeight - 6;
                         docWidth = doc.documentElement.clientWidth - 6;
                     }, 334);
@@ -9179,7 +9204,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         }
     }, 2000);
 
-    (function() { //疑惑？
+    (function () { //疑惑？
         var locationHref = location.href;
 
         function decode(url, target) {
@@ -9189,7 +9214,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 headers: {
                     "Referer": locationHref,
                 },
-                onload: function(response) {
+                onload: function (response) {
                     var newUrl = response.finalUrl;
                     //console.log(newUrl);
                     target.setAttribute('href', newUrl);
@@ -9217,21 +9242,26 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             var watch = document.querySelector(selector);
             if (!watch) return;
 
-            var observer = new MutationObserver(function(mutations) {
-                var nodeAdded = mutations.some(function(x) { return x.addedNodes.length > 0; });
+            var observer = new MutationObserver(function (mutations) {
+                var nodeAdded = mutations.some(function (x) {
+                    return x.addedNodes.length > 0;
+                });
                 if (nodeAdded) {
                     // observer.disconnect();
                     callback();
                 }
             });
-            observer.observe(watch, { childList: true, subtree: true });
+            observer.observe(watch, {
+                childList: true,
+                subtree: true
+            });
         }
         run();
         addMutationObserver('#j_p_postlist', run);
     })();
 
     //查看发帖 by 文科
-    window.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('DOMContentLoaded', function () {
         var $ = unsafeWindow.$;
 
         function getUserHistory(e) {
@@ -9245,7 +9275,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             window.open("http://tieba.baidu.com/f/search/ures?ie=utf-8&kw=" + encodeURIComponent(barName) + "&qw=&rn=100&un=" + encodeURIComponent(userName) + "&sm=1", "_blank");
         }
         (function addBtn() {
-            $('.d_author .p_author').each(function() {
+            $('.d_author .p_author').each(function () {
                 var data = this.querySelector('.p_author_name').getAttribute('data-field');
                 $(this).append('<li class="user_post_li" style="margin-top:4px"><a style="cursor: pointer;color:#FF6600;" data=' + data + '>全贴吧发言记录</a></li>')
                 $(this).append('<li class="user_post_li" style="margin-top:4px"><a style="cursor: pointer;color:#FF6600;" data=' + data + '>某贴吧发言记录</a></li>')
@@ -9270,7 +9300,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 
     var yipaixun = 0;
     var yipaixun2 = false;
-    (function() {
+    (function () {
         if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
 
         function sortById() {
@@ -9319,7 +9349,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             } else {
                 yipaixun = 0;
                 $(".fatieshijianpaixu").html('按发贴时间排序<span style="color:#000 !important;">(当前为:回复时间顺序)</span>')
-                    //console.log("666");
+                //console.log("666");
                 let threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
                 for (let thread of threads3) {
                     try {
@@ -9344,7 +9374,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             var a = document.createElement('a');
             a.textContent = '按发贴时间排序(贴子ID)';
             a.setAttribute('class', 'fatieshijianpaixu');
-            a.setAttribute('style', 'color:#999 !important;position: absolute;left: 102%;width: 110px;top: 12px;height: 40px;cursor: -webkit-grab;');
+            if (!GM_getValue("tiebameihua")) {
+                a.setAttribute('style', 'color:#999 !important;position: absolute;left: 102%;width: 110px;top: 12px;height: 40px;cursor: -webkit-grab;');
+            } else {
+                a.setAttribute('style', 'color:#999 !important;position: absolute;left:470px;width: 110px;top: 38px;height: 40px;cursor: -webkit-grab;z-index: 1000;');
+            }
             //a.setAttribute('href', 'javascript:;');
             var paixun = false
             a.addEventListener('click', e => { //必须先自动滚动网页，预览所有图片后，才能保证图片都能显示出来
@@ -9377,7 +9411,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         }, 3000);
     })();
 
-    (function() {
+    (function () {
         // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
         var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
         if (localStorage.getItem("userid") == null) {
@@ -9428,7 +9462,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         }
     })();
 
-    (function() {
+    (function () {
         let jishu = 0;
         let t = setInterval(() => {
             if (jishu < 60) {
@@ -9601,7 +9635,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         }, 5000);
     })();
 
-    (function() { //参考显示用户名和贴子屏蔽检测脚本 https://greasyfork.org/scripts/31207-%E8%B4%B4%E5%90%A7%E6%98%BE%E7%A4%BA%E7%9C%9F%E5%AE%9Eid https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
+    (function () { //参考显示用户名和贴子屏蔽检测脚本 https://greasyfork.org/scripts/31207-%E8%B4%B4%E5%90%A7%E6%98%BE%E7%A4%BA%E7%9C%9F%E5%AE%9Eid https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
         var tiebadongtai = "";
         tiebadongtai = `
         /* 使用 animation 监测 DOM 变化 */
@@ -9698,11 +9732,15 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }
         }
         const tieba_action = (event) => {
-            const { target } = event;
-            const { classList } = target;
+            const {
+                target
+            } = event;
+            const {
+                classList
+            } = target;
             //console.log(target);
             if (classList.contains('core_reply_tail')) {
-                if (GM_getValue("qiangdiaoxinxitishi") != null && GM_getValue("qiangdiaoxinxitishi") == true) {
+                if (qiangdiaoxinxitishi == true) {
                     //console.log(target.querySelectorAll(".core_reply_tail")[0])
                     target.style = "color:#000 !important;"; //强调信息显示,对旧版贴吧基本没用
                 }
@@ -9786,25 +9824,28 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
                         $("div.edui-btn-red")[0].style = "display:block;"
                     }*/
-                    let userimg = "";
-                    let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-                    if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
-                        userimg = localStorage.getItem("userimg");
-                    } else {
-                        temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-                        //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
-                        //console.log(temp.src)
-                        localStorage.setItem("userimg", temp.src)
-                        userimg = temp.src;
-                    }
-                    //console.log(userimg);
-                    if (userimg != undefined && userimg != null && userimg != "") {
-                        if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
-                            $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
+                    let t = setTimeout(() => { //增加延时以提高右上角按钮显示用户头像的成功率
+                        clearTimeout(t);
+                        let userimg = "";
+                        let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+                        if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
+                            userimg = localStorage.getItem("userimg");
+                        } else {
+                            temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+                            //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
+                            console.log(temp.src)
+                            localStorage.setItem("userimg", temp.src)
+                            userimg = temp.src;
                         }
-                    }
-                    //console.log(userimg);
-                    //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
+                        //console.log(userimg);
+                        if (userimg != undefined && userimg != null && userimg != "") {
+                            if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
+                                $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
+                            }
+                        }
+                        //console.log(userimg);
+                        //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
+                    }, 1000);
                 }
             }
             if (classList.contains('u_news')) {
@@ -9812,7 +9853,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 try {
                     let ii = 0;
                     let t = setInterval(() => {
-                            if (GM_getValue("qiangdiaoxinxitishi") != null && GM_getValue("qiangdiaoxinxitishi") == true) {
+                            if (qiangdiaoxinxitishi == true) {
                                 let temp1 = $(".u_news_wrap span"); //浮动按钮
                                 let temp2 = $(".u_notity_bd .category_item"); //浮动按钮
                                 let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span"); //浮动按钮
@@ -9862,7 +9903,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                                     temp[0].style = "background:#fff;";
                                 }
                             }
-                            if (GM_getValue("qiangdiaoxinxitishi") != null && GM_getValue("qiangdiaoxinxitishi") == true) {
+                            if (qiangdiaoxinxitishi == true) {
                                 let temp6 = $(".meihua"); //美化开关
                                 if (ii <= 59) {
                                     ii++;
@@ -10029,9 +10070,13 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             document.addEventListener('animationstart', tieba_action, false);
         };
         var yingcang = false;
-        window.addEventListener("transitionend", function(e) { //解决刷新贴子自动跳转到某个位置可能无法隐藏下工具栏问题，缓解工具栏偶尔出现不隐藏问题
-            const { target } = e;
-            const { classList } = target;
+        window.addEventListener("transitionend", function (e) { //解决刷新贴子自动跳转到某个位置可能无法隐藏下工具栏问题，缓解工具栏偶尔出现不隐藏问题
+            const {
+                target
+            } = e;
+            const {
+                classList
+            } = target;
             //console.log(target);
             let temp = $('#j_core_title_wrap'); //主体框架
             if (temp[0] != null) {
@@ -10049,7 +10094,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }
         });
         var scrollY1 = window.scrollY;
-        window.addEventListener("scroll", function(e) {
+        window.addEventListener("scroll", function (e) {
             //const { target } = e;
             //const { classList } = target;
             //console.log(target);
@@ -10091,7 +10136,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                         $('#thread_theme_5')[0].style = "display:block !important;";
                     }
                     $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
-                        /*
+                    /*
                 修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
 目标标签class p_thread thread_theme_5
 加个thread_theme_bright_absolute
@@ -10105,7 +10150,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         initListener();
     })();
 
-    (function() {
+    (function () {
         function resetx() {
             localStorage.removeItem("userimg"); //一个用户退出登录后，再用其他账户登录会残留上一个用户的贴吧头像
             alert("已删除贴吧用户头像缓存！");
@@ -10119,7 +10164,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         GM_registerMenuCommand("删除贴吧用户头像缓存", resetx); // @grant        GM_registerMenuCommand
         GM_registerMenuCommand(GM_getValue("tiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
     })();
-    (function() {
+    (function () {
         if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
             let temp = document.createElement("input"); //创建节点<input/>
             temp.setAttribute('type', 'button');
@@ -10128,7 +10173,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             temp.setAttribute('value', ">>");
             document.body.appendChild(temp);
             temp.addEventListener('click', (e) => {
-                const { target } = e;
+                const {
+                    target
+                } = e;
                 //console.log(target);
                 let temp3 = $("div.userbar ")[0];
                 let temp4 = $("ul.tbui_aside_float_bar")[0];
@@ -10157,7 +10204,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             });
         }
     })();
-})();
+})($);
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
 /*https://www.jb51.net/article/147217.htm
