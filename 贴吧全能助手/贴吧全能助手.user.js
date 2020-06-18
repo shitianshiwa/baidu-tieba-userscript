@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016947beta)
+// @version      2.1(0.016948beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -9411,56 +9411,59 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         }, 3000);
     })();
 
-    (function () {
+    /*(function () {
         // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
-        var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
-        if (localStorage.getItem("userid") == null) {
-            localStorage.setItem("userid", getIsLogin2)
-        }
-        //console.log(getIsLogin2)
-        if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("tiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
-            // let jishu = 0;
-            // let t = setInterval(() => { //为右上角的浮动按钮添加头像
-            // if (jishu < 20) {
-            //console.log($("div.edui-icon-bold")[0]);
-            /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
-                //console.log($("div.edui-icon-bold")[0]);
-                suo = true;
-                $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
-                $("div.edui-btn-red")[0].style = "display:block;"
+        let t = setTimeout(() => {
+            clearTimeout(t);
+            var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
+            if (localStorage.getItem("userid") == null) {
+                localStorage.setItem("userid", getIsLogin2)
             }*/
-            /* let userimg = "";
-             let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-             if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
-                 userimg = localStorage.getItem("userimg");
-             } else {
-                 temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
-                 //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
-                 //console.log(temp.src)
-                 localStorage.setItem("userimg", temp.src)
-                 userimg = temp.src;
-             }
-             //console.log(userimg);
-             if (userimg != undefined && userimg != null && userimg != "") {
-                 if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
-                     $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
-                     clearInterval(t);
-                 }
-             }*/
+    //console.log(getIsLogin2)
+    //if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("tiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
+    // let jishu = 0;
+    // let t = setInterval(() => { //为右上角的浮动按钮添加头像
+    // if (jishu < 20) {
+    //console.log($("div.edui-icon-bold")[0]);
+    /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
+        //console.log($("div.edui-icon-bold")[0]);
+        suo = true;
+        $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
+        $("div.edui-btn-red")[0].style = "display:block;"
+    }*/
+    /* let userimg = "";
+     let temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+     if (localStorage.getItem("userimg") != null && localStorage.getItem("userimg") != "" && localStorage.getItem("userimg") != undefined) { //https://www.cnblogs.com/zhaoxinmei-123/p/9046962.html
+         userimg = localStorage.getItem("userimg");
+     } else {
+         temp = $("img.head_img")[0] || $("a.userinfo_head>img")[0] || $("#img_aside_head")[0] || $("span.pm_user_logo>img")[0] || $("img.user_avatar")[0];
+         //贴吧主题列表，我的贴吧，我的i贴吧，贴吧服务中心，吧务后台
+         //console.log(temp.src)
+         localStorage.setItem("userimg", temp.src)
+         userimg = temp.src;
+     }
+     //console.log(userimg);
+     if (userimg != undefined && userimg != null && userimg != "") {
+         if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
+             $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
+             clearInterval(t);
+         }
+     }*/
 
-            //   jishu++;
-            //} else {
-            //     clearInterval(t);
-            // }
-            //console.log(userimg);
-            //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
-            //}, 1000);
+    //   jishu++;
+    //} else {
+    //     clearInterval(t);
+    // }
+    //console.log(userimg);
+    //var userimg=$("img.head_img")[0].src;//document.querySelector("img.head_img").src//得到自己的贴吧头像
+    //}, 1000);
 
-        } else {
-            localStorage.removeItem("userimg");
-            localStorage.removeItem("userid");
-        }
-    })();
+    /*} else {
+                localStorage.removeItem("userimg");
+                localStorage.removeItem("userid");
+            }
+        }, 1000);
+    })();*/
 
     (function () {
         let jishu = 0;
