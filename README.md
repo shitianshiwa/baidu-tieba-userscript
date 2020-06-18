@@ -40,6 +40,9 @@
 * [这TM还叫贴吧？](https://greasyfork.org/ja/scripts/23127-%E8%BF%99tm%E8%BF%98%E5%8F%AB%E8%B4%B4%E5%90%A7) 去除PC贴吧帖子列表会自动播放的视频
 * [百度贴吧不可能会跳转！](https://greasyfork.org/zh-CN/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC)去除贴吧帖子里链接的跳转
 * [自动展开百度贴吧帖子的图片](https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87)自动展开百度贴吧帖子的图片，方便浏览图片帖
+* [B站视频跳转（可以把贴吧贴子内的av号，bv号，cv号转变为可点击的链接）](https://greasyfork.org/zh-CN/scripts/400724-b%E7%AB%99%E8%A7%86%E9%A2%91%E8%B7%B3%E8%BD%AC)
+
+
 ## 搜索
 * [搜索引擎跳转-文科版](https://github.com/shitianshiwa/search_engineJump/raw/master/search_engineJump.user.js)
 * [Search-By-Image](https://github.com/shitianshiwa/Search-By-Image/raw/%E4%BF%AE%E6%94%B9%E7%89%88/search-by-image.user.js) 一个以图搜图的脚本。通过该脚本，你可以快速地搜索图片。https://github.com/shitianshiwa/Search-By-Image
