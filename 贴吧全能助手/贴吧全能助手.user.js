@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016949beta)
+// @version      2.1(0.016950beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -9653,7 +9653,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                clip: rect(0px, auto, auto, auto);
            }
         }
-        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.core_title_txt,.tbui_aside_float_bar{
+        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.core_title_txt,.tbui_aside_float_bar,.j_d_post_content>.replace_div{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9683,7 +9683,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
        /*贴子内页标题*/
        .core_title_txt,
        /*侧工具栏*/
-       .tbui_aside_float_bar{
+       .tbui_aside_float_bar,
+       /*展开长图片*/
+       .j_d_post_content>.replace_div{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
             animation: __tieba_action__;
@@ -9765,6 +9767,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             if (event.animationName !== '__tieba_action__') {
                 return;
             }
+            if (classList.contains('replace_div')) {/*展开长图片*/
+                //console.log(target);
+                target.classList.add("zhankaichangtupian");
+                target.children[1].classList.add("zhankaichangtupian2");
+                //console.log(target.children[1]);
+            }
             /*贴子内页楼层列表*/
             if (classList.contains('core_title_txt')) {
                 $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute");
@@ -9816,7 +9824,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
                 //console.log(localStorage.getItem("userid"));
                 var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
-                if (localStorage.getItem("userid") == null||localStorage.getItem("userid")!= ""||localStorage.getItem("userid")!=undefined) {//可能没用？
+                if (localStorage.getItem("userid") == null || localStorage.getItem("userid") != "" || localStorage.getItem("userid") != undefined) { //可能没用？
                     localStorage.setItem("userid", getIsLogin2)
                 }
                 //console.log(getIsLogin2)
@@ -10026,12 +10034,6 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 //$("div.replace_div>div.replace_tip").click()
                 let t = setTimeout(() => { //要延时等图片加载完
                     clearTimeout(t);
-                    let temp = $("div.replace_div");
-                    for (let i = 0; i < temp.length; i++) {
-                        temp[i].classList.add("zhankaichangtupian");
-                        //console.log(temp[i].children[1]);
-                        temp[i].children[1].classList.add("zhankaichangtupian2");
-                    }
                     if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                         let temp2 = $("a.tieba-link-anchor");
                         for (let i2 = 0; i2 < temp2.length; i2++) {
