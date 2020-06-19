@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016950beta)
+// @version      2.1(0.016951beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -9653,7 +9653,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                clip: rect(0px, auto, auto, auto);
            }
         }
-        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.core_title_txt,.tbui_aside_float_bar,.j_d_post_content>.replace_div{
+        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.core_title_txt,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
+        .tieba-link-anchor{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9685,7 +9686,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
        /*侧工具栏*/
        .tbui_aside_float_bar,
        /*展开长图片*/
-       .j_d_post_content>.replace_div{
+       .j_d_post_content>.replace_div,
+       /*复制链接按钮*/
+       .tieba-link-anchor{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
             animation: __tieba_action__;
@@ -9767,11 +9770,19 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             if (event.animationName !== '__tieba_action__') {
                 return;
             }
-            if (classList.contains('replace_div')) {/*展开长图片*/
+            if (classList.contains('replace_div')) {
+                /*展开长图片*/
                 //console.log(target);
                 target.classList.add("zhankaichangtupian");
                 target.children[1].classList.add("zhankaichangtupian2");
                 //console.log(target.children[1]);
+            }
+            if (classList.contains('tieba-link-anchor')) {//调整复制链接按钮在旧版贴吧的位置
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+                    if (target.parentNode.className == "core_title_btns") {
+                        target.style = "position: absolute;left: 440px;top: 0px;";
+                    }
+                }
             }
             /*贴子内页楼层列表*/
             if (classList.contains('core_title_txt')) {
@@ -10030,30 +10041,17 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }
             /*if (classList.contains('pager_theme_4')) {
             }*/
-            if (classList.contains('l_posts_num') || classList.contains('thread_theme_5')) { //贴子内只动态执行一次 thread_theme_5只在第一次打开贴子时执行，翻页执行 ||classList.contains('pager_theme_4')
+            /*if (classList.contains('l_posts_num') || classList.contains('thread_theme_5')) { //贴子内只动态执行一次 thread_theme_5只在第一次打开贴子时执行，翻页执行 ||classList.contains('pager_theme_4')
                 //$("div.replace_div>div.replace_tip").click()
-                let t = setTimeout(() => { //要延时等图片加载完
-                    clearTimeout(t);
-                    if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
-                        let temp2 = $("a.tieba-link-anchor");
-                        for (let i2 = 0; i2 < temp2.length; i2++) {
-                            if (temp2[i2].parentNode.className == "core_title_btns") {
-                                temp2[i2].style = "position: absolute;left: 440px;top: 0px;";
-                                break;
-                            }
-                            //console.log(temp2[i2]);
-                        }
-                    }
-                }, 3000);
-                /*
+                
                         by tency
                         https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
                         自动展开百度贴吧帖子的图片
                         自动展开百度贴吧帖子的图片，方便浏览图片帖
                         version    0.2
                         copyright  2014+, LYY
-                        */
-            }
+                        
+            }*/
             if (classList.contains('right')) { //显示移除粉丝按钮
                 //console.log(target);
                 //console.log(target.children[0].querySelectorAll("div")[1]);
