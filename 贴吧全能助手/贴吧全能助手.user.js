@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016951beta)
+// @version      2.1(0.016952beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -9687,6 +9687,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
        .tbui_aside_float_bar,
        /*展开长图片*/
        .j_d_post_content>.replace_div,
+       /*展开楼层气泡中的长图片*/
+       .j_d_post_content>.post_bubble_middle>.post_bubble_middle_inner>.replace_div,
        /*复制链接按钮*/
        .tieba-link-anchor{
             -webkit-animation: __tieba_action__;
