@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016952beta)
+// @version      2.1(0.016953beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -9653,7 +9653,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                clip: rect(0px, auto, auto, auto);
            }
         }
-        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.core_title_txt,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
+        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
         .tieba-link-anchor{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
@@ -9681,8 +9681,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
        #main_aside,
        /*登陆按钮*/
        .u_login,
-       /*贴子内页标题*/
-       .core_title_txt,
+       /*贴子内容列表框架*/
+       .p_postlist,
        /*侧工具栏*/
        .tbui_aside_float_bar,
        /*展开长图片*/
@@ -9752,7 +9752,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             if (classList.contains('core_reply_tail')) {
                 if (qiangdiaoxinxitishi == true) {
                     //console.log(target.querySelectorAll(".core_reply_tail")[0])
-                    target.style = "color:#000 !important;"; //强调信息显示,对旧版贴吧基本没用
+                    target.style = "color:#000 !important;"; //强调信息显示。楼层的时间。对旧版贴吧作用一般。
                 }
                 if (!GM_getValue("tiebameihua")) { //贴吧美化
                     //console.log(target.querySelectorAll(".p_reply_first"));
@@ -9779,7 +9779,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 target.children[1].classList.add("zhankaichangtupian2");
                 //console.log(target.children[1]);
             }
-            if (classList.contains('tieba-link-anchor')) {//调整复制链接按钮在旧版贴吧的位置
+            if (classList.contains('tieba-link-anchor')) { //调整复制链接按钮在旧版贴吧的位置
                 if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                     if (target.parentNode.className == "core_title_btns") {
                         target.style = "position: absolute;left: 440px;top: 0px;";
@@ -9787,8 +9787,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
             }
             /*贴子内页楼层列表*/
-            if (classList.contains('core_title_txt')) {
-                $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute");
+            if (classList.contains('p_postlist')) {
+                let t = setTimeout(() => {
+                    clearTimeout(t);
+                    $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute");
+                }, 1000);
                 /*
                 修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
 目标标签class p_thread thread_theme_5
