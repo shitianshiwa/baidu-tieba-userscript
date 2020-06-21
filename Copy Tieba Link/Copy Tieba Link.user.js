@@ -272,7 +272,7 @@ async function copyLink() {
                         }
                         if (temp != "") {
                             temp = temp.replace(/<span class="topic-tag".*?>/g, "").replace(/<\/span>/g, ""); //清理#XXX#话题插入
-                            textGroup.push("内容:\n" + temp.trim() + " ");
+                            textGroup.push("内容:" + temp.trim() + " ");
                         }
                     }
                     if (setting.link) {
@@ -364,7 +364,7 @@ async function copyLink() {
                     } //话题贴作者
                     //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
                     if (setting.neirong_liebiao) {
-                        textGroup.push("内容:\n " + parent.parentNode.querySelectorAll(".listDescCnt")[0].innerHTML + " ");
+                        textGroup.push("内容: " + parent.parentNode.querySelectorAll(".listDescCnt")[0].innerHTML + " ");
                     }
                     if (setting.link) {
                         textGroup.push("链接：https:" + parent.children[1].children[1].getAttribute('href') + " "); //话题贴链接
@@ -529,7 +529,7 @@ async function copyLink() {
                     temp = temp.replace(/<div class= video_src_wrapper/g, "视频链接: ").replace(/<div class= video_src_wrap_main/g, "").replace(/<video style= width: .*px; height: .*px; background:.*;  src=/g, "").replace(/data-threadid=.*data-md5=.*controls=.*autoplay=/g, "").replace(/<\/video  <span class= apc_src_wrapper/g, "").replace("视频来自：百度贴吧", "");
                     temp = temp.replace(/style=/g, "");
                     temp = temp.trim();
-                    textGroup.push("内容:\n " + temp + " ");
+                    textGroup.push("内容: " + temp + " ");
                 }
                 if (setting.link) {
                     textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id + " ");
@@ -653,7 +653,7 @@ async function copyLink() {
                     textGroup.push("内容:\n" + temp3.trim() + " ");
 
                     //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".imgtopic_gallery")[0].querySelectorAll(".threadlist_pic")[0].getAttribute('bpic'));
-                    //       textGroup.push("内容:\n " + temp.trim() + " ");
+                    //       textGroup.push("内容: " + temp.trim() + " ");
                 }
                 if (setting.author) {
                     textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + temp4.data.thread.name + ' ');
