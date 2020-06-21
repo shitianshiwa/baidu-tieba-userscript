@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016953beta)
+// @version      2.1(0.016954beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -71,7 +71,7 @@ url(http://onox.qiniudn.com/maverick/materialicons_safari_v16.woff) format(\'wof
 background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 */
 (function ($) {
-    //var $ = window.jQuery;
+    //const $ = unsafeWindow.jQuery;
     /*var baiban = document.createElement("div");
     baiban.setAttribute("class "baiban");
     baiban.setAttribute("style "width:9999px;height: 99999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
@@ -4273,7 +4273,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	position: relative;
                 	margin: 0 !important;
                 	padding: 0 !important;
-              /*	-moz-user-select: none;不让人选择文字*/
+              /*	-moz-user-select: none;禁止选择文字*/
               /*	-webkit-user-select: none;*/
                 	height: 45px !important;
                 	background: rgba(0,0,0,.02) !important;
@@ -5214,12 +5214,15 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .thread_theme_bright_absolute .l_thread_info {
                 	display: block;
                 }
+                /*浮动下工具栏页数列表按钮样式*/
                 .thread_theme_bright_absolute .pb_list_pager >* {
                 	padding: 0 6px !important;
-                	background: rgba(0, 0, 0, .1) !important;
+                	/*background: rgba(0, 0, 0, 0.1) !important;*/
                 }
                 .thread_theme_bright_absolute .pb_list_pager >a:hover {
-                	background: #4285F4 !important;
+                    background: #4285F4 !important;
+                    /*color:#000 !important;*/
+                    background: rgba(0, 0, 0, 0.6) !important;
                 }
                 .thread_theme_bright_absolute .l_reply_num>span {
                 	margin-left: 50% !important;
@@ -9646,12 +9649,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         @-moz-keyframes __tieba_action__ {}
         @keyframes __tieba_action__ {}
         @keyframes tiebaaction {
-           from {
-               clip: rect(1px, auto, auto, auto);
-           }
-           to {
-               clip: rect(0px, auto, auto, auto);
-           }
+            from {
+                clip: rect(1px, auto, auto, auto);
+            }
+            to {
+                clip: rect(0px, auto, auto, auto);
+            }
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
         .tieba-link-anchor{
@@ -9669,28 +9672,28 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         .l_posts_num,
         /*会员       .置顶图标*/
         .icon-member-top,
-       /*个人主页按钮的头像*/
-       .u_menu_username,
-       /*消息按钮*/
-       .u_news,
-       /*设置按钮*/
-       .u_setting,
-       /*移除粉丝按钮*/
-       .user>.right,
-       /*删除某些页面会出现的错误头像*/
-       #main_aside,
-       /*登陆按钮*/
-       .u_login,
-       /*贴子内容列表框架*/
-       .p_postlist,
-       /*侧工具栏*/
-       .tbui_aside_float_bar,
-       /*展开长图片*/
-       .j_d_post_content>.replace_div,
-       /*展开楼层气泡中的长图片*/
-       .j_d_post_content>.post_bubble_middle>.post_bubble_middle_inner>.replace_div,
-       /*复制链接按钮*/
-       .tieba-link-anchor{
+        /*个人主页按钮的头像*/
+        .u_menu_username,
+        /*消息按钮*/
+        .u_news,
+        /*设置按钮*/
+        .u_setting,
+        /*移除粉丝按钮*/
+        .user>.right,
+        /*删除某些页面会出现的错误头像*/
+        #main_aside,
+        /*登陆按钮*/
+        .u_login,
+        /*贴子内容列表框架*/
+        .p_postlist,
+        /*侧工具栏*/
+        .tbui_aside_float_bar,
+        /*展开长图片*/
+        .j_d_post_content>.replace_div,
+        /*展开楼层气泡中的长图片*/
+        .j_d_post_content>.post_bubble_middle>.post_bubble_middle_inner>.replace_div,
+        /*复制链接按钮*/
+        .tieba-link-anchor{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
             animation: __tieba_action__;
@@ -9698,30 +9701,68 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         .zhankaichangtupian{
             height:auto;
         }
-       .zhankaichangtupian2{
-           display:none;
+        .zhankaichangtupian2{
+            display:none;
         }
-       .yincangcebianlan{
-           width: 2px;
-    height: 20px;
-    position: fixed;
-    right: 0px;
-    bottom: 200px;
-    padding: 5px;
-    z-index: 1005;
-    background-color: rgb(0,0,0,0.05);
-    border: none;
-    color: #999;
-       }
-    .yincangcebianlan:hover{
-           background-color: rgb(0,0,0,0.5);
-           width: 30px;
-           color: #fff;
-       }
-       /*解决主题列表回复人名字和发贴人名字不对齐问题，兼容新版、旧版及美化版贴吧*/
-       .tb_icon_author_rely>a {
-                       position: absolute;
-                    }
+        .yincangcebianlan{
+            width: 2px;
+            height: 20px;
+            position: fixed;
+            right: 0px;
+            bottom: 200px;
+            padding: 5px;
+            z-index: 1005;
+            background-color: rgb(0,0,0,0.05);
+            border: none;
+            color: #999;
+        }
+        .yincangcebianlan:hover{
+            background-color: rgb(0,0,0,0.5);
+            width: 30px;
+            color: #fff;
+        }
+        /*解决主题列表回复人名字和发贴人名字不对齐问题，兼容新版、旧版及美化版贴吧*/
+        tb_icon_author_rely>a {
+            position: absolute;
+        }
+        /*图片话题*/
+        /*图片工具栏*/
+        .media_pic_control{
+            margin-top: 30px;
+        }
+        /*进入贴子按钮*/
+        .j_enter_pb_wrapper
+        {
+            min-width: 50px;
+        }
+        .j_enter_pb_wrapper>a
+        {
+            position: absolute;
+            left: -40px;
+        }
+        /*主题贴高度框架*/
+        .imgtopic_gallery{
+            width: auto !important;
+            height:200px !important;
+        }
+        /*滚动长框架*/
+        .imgtopic_album{
+            width:850px !important;
+            height:200px !important;
+        }
+        /*包裹图片*/
+        .imgtopic_gallery>.thread_pic_show{
+            width: 200px!important;
+            height: 200px !important;
+            /*visibility:visible;*/
+            /*display:flex !important;*/
+            /*overflow:auto !important;*/
+        }
+        /*图片*/
+        .imgtopic_gallery>.thread_pic_show>.threadlist_pic{
+            width: -webkit-fill-available !important;
+            height: -webkit-fill-available !important;
+        }
     `;
         if (typeof GM_addStyle != "undefined") {
             GM_addStyle(tiebadongtai);
@@ -10038,9 +10079,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                     let temp1 = target.querySelectorAll(".post_bubble_top")[0];
                     let temp2 = target.querySelectorAll(".post_bubble_middle")[0];
                     let temp3 = target.querySelectorAll(".post_bubble_bottom")[0];
-                    temp1.style = "backgrounde:none;";
-                    temp2.style = "backgrounde:none;padding:unset;";
-                    temp3.style = "backgrounde:none;";
+                    if (temp1 != null && temp1 != null && temp1 != null) {
+                        temp1.style = "backgrounde:none;";
+                        temp2.style = "backgrounde:none;padding:unset;";
+                        temp3.style = "backgrounde:none;";
+                    }
                 }
 
             }
@@ -10048,14 +10091,12 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }*/
             /*if (classList.contains('l_posts_num') || classList.contains('thread_theme_5')) { //贴子内只动态执行一次 thread_theme_5只在第一次打开贴子时执行，翻页执行 ||classList.contains('pager_theme_4')
                 //$("div.replace_div>div.replace_tip").click()
-                
                         by tency
                         https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
                         自动展开百度贴吧帖子的图片
                         自动展开百度贴吧帖子的图片，方便浏览图片帖
                         version    0.2
                         copyright  2014+, LYY
-                        
             }*/
             if (classList.contains('right')) { //显示移除粉丝按钮
                 //console.log(target);
@@ -10243,3 +10284,5 @@ if (document.addEventListener) { //firefox
 //滚动滑轮触发scrollFunc方法 //ie 谷歌
 window.onmousewheel = document.onmousewheel = scrollFunc;
 */
+
+//document.querySelectorAll("span.tP")[0].removeEventListener("click")
