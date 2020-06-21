@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013457)
+// @version      1.1(0.013458)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -102,7 +102,7 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
 
                 if (responseDetails.readyState === 4) {
                     if (responseDetails.status === 200 /* || responseDetails.status === 304 || responseDetails.status === 0*/ ) {
-                        console.log(responseDetails.response)
+                        //console.log(responseDetails.response)
                         resolve(responseDetails.response);
                     } else {
                         console.log("onreadystatechange: " + responseDetails.status);
@@ -123,27 +123,27 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
  *
  * @param {number} tid - 贴子 id
  * @returns {string} URL
+ * src: 1
+ * z: 贴子 id
+ * pn: 1
+ * frsrn: 1
+ * pbrn: 1
+ * 需要登陆才能显示30楼
  */
 const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;
 const getAuthorMoUrl = tid => `//tieba.baidu.com/photo/bw/picture/toplist?tid=${tid}&ie=utf-8`;
 /**
- * 返回wap贴吧贴子1楼的时间
+ * 返回wap贴吧信息
  *
  * @param {string} res - 页面内容
- * @returns {boolean} 是否被屏蔽
  */
-const threadIsNotExist = res => res.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0].split(" ")[1]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
-const threadIsNotExist2 = res => res.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0];
+const threadreturnxinxi = res => res;
 /**
- * 获取主题贴是否被屏蔽
  *
  * @param {number} tid - 贴子 id
- * @returns {Promise<boolean>} 是否被屏蔽
  */
-const getThreadBlocked = tid => request(getThreadMoUrl(tid))
-    .then(threadIsNotExist);
-const getThreadBlocked2 = tid => request(getThreadMoUrl(tid))
-    .then(threadIsNotExist2);
+const getWaptiebaxinxi = tid => request(getThreadMoUrl(tid))
+    .then(threadreturnxinxi);
 const getAuthor = tid => ajaxGetAuthor(getAuthorMoUrl(tid))
 
 var linkAnchor = document.createElement('a');
@@ -189,13 +189,15 @@ async function copyLink() {
                 if (temp1 != null) {
                     //console.log(parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
                     let temp2 = JSON.parse(temp1.getAttribute("data-field"));
-                    let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
-                    if (temp3.split("-").length == 2 && temp3.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //判断日期
-                    {
-                        temp3 = new Date().getFullYear().toString() + "-" + temp3 //2020-2-2
-                    }
-                    if (temp3.split(":").length == 2) {
-                        temp3 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp3 //2020-02-02 02:00
+                    let temp3 = null;
+                    if (setting.createtime || setting.huifushu) {
+                        temp3 = await getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]).then(result => {
+                            if (result) {
+                                return result;
+                            } else {
+                                return "";
+                            }
+                        });
                     }
                     if (setting.title) {
                         let temp = parent.children[0].className;
@@ -231,8 +233,14 @@ async function copyLink() {
                         let x01 = parent.parentNode.parentNode.querySelectorAll(".threadlist_video")[0];
                         //console.log(x0)
                         if (x01 != null) {
-                            //console.log(x1[0].innerHTML);
-                            temp += "(视频)";
+                            //console.log(x01.innerHTML);
+                            temp += "视频封面：" + x01.innerHTML.match(/(http|https):\/\/((tiebapic|imgsa)\.baidu\.com\/forum\/pic\/item\/.*jpg?|gss3\.baidu\.com\/.*\/tieba-video-frame\/.*\.jpg)/g) + "\n";
+                            let temp2 = x01.innerHTML.match(/data-video="(http|https):\/\/gss3\.baidu\.com\/.*\/tieba-smallvideo.*\/.*\.mp4" data-vsrc="/g);
+                            if (temp2 != null) {
+                                temp += "视频链接：" + temp2.toString().replace('data-video="', "").toString().replace('" data-vsrc="', "") + "\n";
+                            }
+                            //console.log(x01.innerHTML.match(/(http|https):\/\/tiebapic\.baidu\.com\/forum\/pic\/item\/.*jpg/g));
+                            //console.log(x01.innerHTML.match(/(http|https):\/\/gss3\.baidu\.com\/.*\/tieba-smallvideo-transcode-crf\/.*\.mp4/g));
                         }
                         let x1 = parent.parentNode.parentNode.querySelectorAll("div.threadlist_abs");
                         if (x1[0] != null) {
@@ -264,7 +272,7 @@ async function copyLink() {
                         }
                         if (temp != "") {
                             temp = temp.replace(/<span class="topic-tag".*?>/g, "").replace(/<\/span>/g, ""); //清理#XXX#话题插入
-                            textGroup.push("内容: " + temp.trim() + " ");
+                            textGroup.push("内容:\n" + temp.trim() + " ");
                         }
                     }
                     if (setting.link) {
@@ -274,15 +282,20 @@ async function copyLink() {
                         textGroup.push("百度贴吧: " + tieba + "吧 ");
                     }
                     if (setting.createtime) {
-                        let temp4 = await getThreadBlocked(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]).then(result => {
-                            if (result) {
-                                return result;
-                            } else {
-                                return "";
+                        let temp4 = temp3;
+                        if (temp4 != "") {
+                            //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
+                            temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                            //console.log(temp3);
+                            if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                            {
+                                temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
+                            } else if (temp4.split(":").length == 2) { //只有时间，没有年月
+                                temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
                             }
-                        });
-                        textGroup.push("发贴时间: " + temp3 + " " + temp4 + " ");
-                        //console.log(getThreadBlocked(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
+                            textGroup.push("发贴时间: " + temp4 + " ");
+                        }
+                        //console.log(getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
                         //let temp5="";
                         /*if (temp4) {
                             temp5=await Promise.resolve(temp4).then(result => {
@@ -302,15 +315,44 @@ async function copyLink() {
                             //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
                             //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
                             //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
-                            textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g,"-"));
+                            textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g, "-"));
                         }
 
                     }
                     if (setting.huifushu) {
-                        textGroup.push("贴子回复数: " + parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML + " ");
-                        //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
+                        let temp4 = temp3;
+                        if (temp4 != "") {
+                            if (temp4.match(/<div class="h">.*<\/div>/g) != null) {
+                                let temp = parseInt(temp4.match(/<div class="h">.*<\/div>/g).toString().split("第")[1].split("页")[0].split("/")[1]);
+                                if (parseInt(temp / 3) == 0) //因为api调用的wap网页只能显示10层楼，这会导致页数*3
+                                {
+                                    temp4 = 1;
+                                } else {
+                                    if (temp % 3 == 0) {
+                                        temp4 = temp / 3;
+                                    } else {
+                                        temp4 = parseInt(temp / 3) + 1;
+                                    }
+                                }
+                            } else {
+                                temp4 = 1;
+                            } //console.log(temp4);
+                            //(最大30层楼显示)
+                            textGroup.push("贴子页数:" + temp4 + " , 回复数: " + parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML + " ");
+                            //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
+                        }
                     }
                 } else {
+                    let temp3 = null;
+                    if (setting.createtime || setting.huifushu) {
+                        temp3 = await getWaptiebaxinxi(parent.children[1].children[1].getAttribute('href').split("/p/")[1]).then(result => {
+                            if (result) {
+                                return result;
+                            } else {
+                                return "";
+                            }
+                        });
+                    }
                     //console.log("https:"+parent.children[1].children[1].getAttribute('href'));//话题贴链接
                     //console.log(parent.children[1].children[1].getAttribute('title'));//话题贴标题
                     //console.log(parent.children[2].children[0].getAttribute('href').split("un=")[1].split("&")[0]);//话题贴作者
@@ -322,12 +364,36 @@ async function copyLink() {
                     } //话题贴作者
                     //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
                     if (setting.neirong_liebiao) {
-                        textGroup.push("内容: " + parent.parentNode.querySelectorAll(".listDescCnt")[0].innerHTML + " ");
+                        textGroup.push("内容:\n " + parent.parentNode.querySelectorAll(".listDescCnt")[0].innerHTML + " ");
                     }
                     if (setting.link) {
                         textGroup.push("链接：https:" + parent.children[1].children[1].getAttribute('href') + " "); //话题贴链接
                     }
                     if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
+                    if (setting.createtime) {
+                        //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
+                        let temp4 = temp3;
+                        if (temp4 != "") {
+                            temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                            //console.log(temp3);
+                            if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                            {
+                                temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
+                            } else if (temp4.split(":").length == 2) { //只有时间，没有年月
+                                temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                            }
+                            textGroup.push("发贴时间: " + temp4 + " ");
+                        }
+                        //console.log(getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
+                        //let temp5="";
+                        /*if (temp4) {
+                            temp5=await Promise.resolve(temp4).then(result => {
+                                if (result) {
+                                     return result;
+                                }
+                            });
+                        }*/
+                    }
                     if (setting.lasthuifutime) {
                         let temp4 = await getAuthor(parent.children[1].children[1].getAttribute('href').split("/p/")[1]);
                         if (temp4 != null) {
@@ -338,12 +404,31 @@ async function copyLink() {
                             //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
                             //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
                             //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
-                            textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g,"-"));
+                            textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g, "-"));
                         }
                     }
                     if (setting.huifushu) {
-                        textGroup.push("贴子回复数: " + parent.parentNode.querySelectorAll(".listReplyNum")[0].innerHTML + " ");
-                        //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
+                        let temp4 = temp3;
+                        if (temp4 != "") {
+                            if (temp4.match(/<div class="h">.*<\/div>/g) != null) {
+                                let temp = parseInt(temp4.match(/<div class="h">.*<\/div>/g).toString().split("第")[1].split("页")[0].split("/")[1]);
+                                if (parseInt(temp / 3) == 0) //因为api调用的wap网页只能显示10层楼，这会导致页数*3
+                                {
+                                    temp4 = 1;
+                                } else {
+                                    if (temp % 3 == 0) {
+                                        temp4 = temp / 3;
+                                    } else {
+                                        temp4 = parseInt(temp / 3) + 1;
+                                    }
+                                }
+                            } else {
+                                temp4 = 1;
+                            }
+                            //(最大30层楼显示)
+                            textGroup.push("贴子页数:" + temp4 + " , 回复数: " + parent.parentNode.querySelectorAll(".listReplyNum")[0].innerHTML + " ");
+                            //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
+                        }
                     }
                 }
                 break;
@@ -363,19 +448,31 @@ async function copyLink() {
                     textGroup.push("百度贴吧: " + tieba + "吧 ");
                 }
                 if (setting.createtime) {
-                    let temp4 = await getThreadBlocked2(unsafeWindow.PageData.thread.thread_id).then(result => {
-                        return result;
+                    //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
+                    let temp3 = await getWaptiebaxinxi(unsafeWindow.PageData.thread.thread_id).then(result => {
+                        if (result) {
+                            return result.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                        } else {
+                            return "";
+                        }
                     });
-                    if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) { //补上年份 2020-2-2
-                        temp4 = new Date().getFullYear().toString() + "-" + temp4;
-                    } else if (temp4.split("-").length == 2 && temp4.search(":") != -1) ////补上年份  2-2 02:02
+                    console.log(temp3);
+                    if (temp3.split("-").length == 2 && temp3.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
                     {
-                        temp4 = new Date().getFullYear().toString() + "-" + temp4;
-
-                    } else if (temp4.split(":").length == 2 && temp4.search("-") == -1) { //补上年月日  02:02
-                        temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                        temp3 = new Date().getFullYear().toString() + "-" + temp3 //2020-2-2
+                    } else if (temp3.split(":").length == 2) { //只有时间，没有年月
+                        temp3 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp3 //2020-02-02 02:00
                     }
-                    textGroup.push("发贴时间: " + temp4 + " ");
+                    textGroup.push("发贴时间: " + temp3 + " ");
+                    //console.log(getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
+                    //let temp5="";
+                    /*if (temp4) {
+                        temp5=await Promise.resolve(temp4).then(result => {
+                            if (result) {
+                                 return result;
+                            }
+                        });
+                    }*/
                 }
                 if (setting.lasthuifutime) {
                     let temp4 = await getAuthor(unsafeWindow.PageData.thread.thread_id);
@@ -388,8 +485,13 @@ async function copyLink() {
                         //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
                         //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
                         //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
-                        textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g,"-"));
+                        textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g, "-"));
                     }
+                }
+                if (setting.huifushu) {
+                    let temp = parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".thread_theme_5>.l_thread_info")[0].querySelectorAll(".l_reply_num>span");
+                    //console.log(parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".thread_theme_5>.l_thread_info")[0].querySelectorAll(".l_reply_num>span"));
+                    textGroup.push("贴子页数:" + temp[1].innerHTML + " , 贴子回复数: " + temp[0].innerHTML + " ");
                 }
                 break;
             case '2': // 贴子内页获取楼层链接
@@ -424,10 +526,10 @@ async function copyLink() {
                     temp = temp.replace(/https/g, " https"); //加个空格
                     temp = temp.replace(/<span class= txt  点击展开，查看完整图片/g, "");
                     temp = temp.replace(/<em class= expand/g, "");
-                    temp = temp.replace(/<div class= video_src_wrapper/g, "(视频贴)").replace(/<div class= video_src_wrap_main/g, "").replace(/<video style= width: .*px; height: .*px; background:.*;  src=/g, "").replace(/data-threadid=.*data-md5=.*controls=.*autoplay=/g, "").replace(/<\/video  <span class= apc_src_wrapper/g, "");
+                    temp = temp.replace(/<div class= video_src_wrapper/g, "视频链接: ").replace(/<div class= video_src_wrap_main/g, "").replace(/<video style= width: .*px; height: .*px; background:.*;  src=/g, "").replace(/data-threadid=.*data-md5=.*controls=.*autoplay=/g, "").replace(/<\/video  <span class= apc_src_wrapper/g, "").replace("视频来自：百度贴吧", "");
                     temp = temp.replace(/style=/g, "");
                     temp = temp.trim();
-                    textGroup.push("内容: " + temp + " ");
+                    textGroup.push("内容:\n " + temp + " ");
                 }
                 if (setting.link) {
                     textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id + " ");
@@ -514,6 +616,16 @@ async function copyLink() {
                 //console.log(JSON.parse(parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll("#pic_theme_list")[0].getAttribute('data-field')).id);
                 //console.log(parent.parentNode.children[0].querySelectorAll("#pic_post_title")[0].getAttribute('title'));
                 var temp = JSON.parse(parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll("#pic_theme_list")[0].getAttribute('data-field'));
+                var temp6;
+                if (setting.createtime || setting.huifushu) {
+                    temp6 = await getWaptiebaxinxi(temp.id).then(result => {
+                        if (result) {
+                            return result;
+                        } else {
+                            return "";
+                        }
+                    });
+                }
                 var temp4 = await getAuthor(temp.id);
                 if (setting.title) {
                     textGroup.push("图片话题: " + parent.parentNode.children[0].querySelectorAll("#pic_post_title")[0].getAttribute('title') + " ");
@@ -541,7 +653,7 @@ async function copyLink() {
                     textGroup.push("内容:\n" + temp3.trim() + " ");
 
                     //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".imgtopic_gallery")[0].querySelectorAll(".threadlist_pic")[0].getAttribute('bpic'));
-                    //       textGroup.push("内容: " + temp.trim() + " ");
+                    //       textGroup.push("内容:\n " + temp.trim() + " ");
                 }
                 if (setting.author) {
                     textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + temp4.data.thread.name + ' ');
@@ -553,6 +665,30 @@ async function copyLink() {
                 if (setting.tiebaming) {
                     textGroup.push("百度贴吧: " + tieba + "吧 ");
                 }
+                if (setting.createtime) {
+                    let temp4 = temp6;
+                    if (temp4 != "") {
+                        //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
+                        temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                        //console.log(temp3);
+                        if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                        {
+                            temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
+                        } else if (temp4.split(":").length == 2) { //只有时间，没有年月
+                            temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                        }
+                        textGroup.push("发贴时间: " + temp4 + " ");
+                    }
+                    //console.log(getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
+                    //let temp5="";
+                    /*if (temp4) {
+                        temp5=await Promise.resolve(temp4).then(result => {
+                            if (result) {
+                                 return result;
+                            }
+                        });
+                    }*/
+                }
                 if (setting.lasthuifutime) {
                     var newDate = new Date();
                     newDate.setTime(temp4.data.thread.last_time * 1000);
@@ -561,11 +697,30 @@ async function copyLink() {
                     //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
                     //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
                     //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
-                    textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g,"-"));
+                    textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g, "-"));
                 }
                 if (setting.huifushu) {
-                    textGroup.push("贴子回复数: " + temp.reply_num + " ");
-                    //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
+                    let temp4 = temp6;
+                    if (temp4 != "") {
+                        if (temp4.match(/<div class="h">.*<\/div>/g) != null) {
+                            let temp = parseInt(temp4.match(/<div class="h">.*<\/div>/g).toString().split("第")[1].split("页")[0].split("/")[1]);
+                            if (parseInt(temp / 3) == 0) //因为api调用的wap网页只能显示10层楼，这会导致页数*3
+                            {
+                                temp4 = 1;
+                            } else {
+                                if (temp % 3 == 0) {
+                                    temp4 = temp / 3;
+                                } else {
+                                    temp4 = parseInt(temp / 3) + 1;
+                                }
+                            }
+                        } else {
+                            temp4 = 1;
+                        }
+                        //(最大30层楼显示)
+                        textGroup.push("贴子页数:" + temp4 + " , 回复数: " + temp.reply_num + " ");
+                        //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
+                    }
                 }
                 break;
         }
