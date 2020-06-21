@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013456)
+// @version      1.1(0.013457)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -19,6 +19,8 @@
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
 // @grant        unsafeWindow
+// @grant        GM.xmlHttpRequest
+// @grant        GM_xmlHttpRequest
 // @namespace    http://ext.ccloli.com
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 ///原脚本地址：https://greasyfork.org/zh-CN/scripts/17375-copy-tieba-link
@@ -41,6 +43,7 @@ var setting = {
     neirong_lzl: true,
     qianmingdang: true,
     createtime: true,
+    lasthuifutime: true,
     huifushu: true,
     split: "\n",
     tips: true,
@@ -55,6 +58,7 @@ var setting = {
 // 是否复制楼层的内容，默认为true
 // 是否复制楼中楼的内容，默认为true
 // 是否复制发贴时间，默认为true
+// 是否复制最后回复时间，默认为true
 // 是否复制回复数，默认为true
 // 分隔符，默认为换行符 \n
 // 是否显示提示信息，默认为 true
@@ -69,6 +73,8 @@ var setting = {
  */
 const $ = unsafeWindow.jQuery;
 //console.log("jquery版本号：" + $.fn.jquery);
+//https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js
+//参考贴吧屏蔽检测脚本的代码 https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
 const request = (url, options = {}) => fetch(url, Object.assign({
     credentials: 'omit',
     // 部分贴吧（如 firefox 吧）会强制跳转回 http（2020年已经全改成https了）
@@ -79,8 +85,38 @@ const request = (url, options = {}) => fetch(url, Object.assign({
         'X-Requested-With': 'XMLHttpRequest'
     }
 }, options)).then(res => res.text());
-//https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js
-//参考贴吧屏蔽检测脚本的代码 https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
+const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/30307-%E6%89%B9%E9%87%8F%E4%B8%8B%E8%BD%BD%E8%B4%B4%E5%90%A7%E5%8E%9F%E5%9B%BE
+    var GM_download = GM.xmlHttpRequest || GM_xmlHttpRequest;
+    return new Promise(function (resolve, reject) {
+        GM_download({
+            method: 'GET',
+            responseType: 'json',
+            url: url,
+            //redirect: 'follow',
+            // 阻止浏览器发出 CORS 检测的 HEAD 请求头
+            //mode: 'same-origin',
+            onreadystatechange: function (responseDetails) {
+                //console.log(responseDetails.status)
+                //                console.log(responseDetails)
+
+                if (responseDetails.readyState === 4) {
+                    if (responseDetails.status === 200 /* || responseDetails.status === 304 || responseDetails.status === 0*/ ) {
+                        console.log(responseDetails.response)
+                        resolve(responseDetails.response);
+                    } else {
+                        console.log("onreadystatechange: " + responseDetails.status);
+                        resolve(null);
+                    }
+                }
+            },
+            onerror: function (responseDetails) {
+                console.log("onerror: " + responseDetails.status);
+                resolve(null);
+            }
+        });
+    });
+}
+
 /**
  * 获取主题贴的移动端地址
  *
@@ -88,6 +124,7 @@ const request = (url, options = {}) => fetch(url, Object.assign({
  * @returns {string} URL
  */
 const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;
+const getAuthorMoUrl = tid => `//tieba.baidu.com/photo/bw/picture/toplist?tid=${tid}&ie=utf-8`;
 /**
  * 返回wap贴吧贴子1楼的时间
  *
@@ -106,6 +143,7 @@ const getThreadBlocked = tid => request(getThreadMoUrl(tid))
     .then(threadIsNotExist);
 const getThreadBlocked2 = tid => request(getThreadMoUrl(tid))
     .then(threadIsNotExist2);
+const getAuthor = tid => ajaxGetAuthor(getAuthorMoUrl(tid))
 
 var linkAnchor = document.createElement('a');
 linkAnchor.className = 'tieba-link-anchor';
@@ -160,7 +198,7 @@ async function copyLink() {
                     }
                     if (setting.title) {
                         let temp = parent.children[0].className;
-                        console.log(temp);
+                        //console.log(temp);
                         if (temp == "icon-vote") {
                             textGroup.push("投票贴: " + parent.getElementsByClassName('j_th_tit')[0].getAttribute('title') + " ");
                         } else if (temp == "icon-good") {
@@ -253,6 +291,20 @@ async function copyLink() {
                             });
                         }*/
                     }
+                    if (setting.lasthuifutime) {
+                        let temp4 = await getAuthor(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]);
+                        if (temp4 != null) { //有可能获取失败
+                            let newDate = new Date();
+                            newDate.setTime(temp4.data.thread.last_time * 1000);
+                            //console.log(newDate.toLocaleDateString()); // 2014年6月18日
+                            //console.log(newDate.toLocaleString()); // 2014年6月18日 上午10:33:24
+                            //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
+                            //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+                            //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
+                            textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g,"-"));
+                        }
+
+                    }
                     if (setting.huifushu) {
                         textGroup.push("贴子回复数: " + parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML + " ");
                         //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
@@ -268,10 +320,26 @@ async function copyLink() {
                         textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + parent.children[2].children[0].getAttribute('href').split("un=")[1].split("&")[0] + ' ');
                     } //话题贴作者
                     //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
+                    if (setting.neirong_liebiao) {
+                        textGroup.push("内容: " + parent.parentNode.querySelectorAll(".listDescCnt")[0].innerHTML + " ");
+                    }
                     if (setting.link) {
                         textGroup.push("链接：https:" + parent.children[1].children[1].getAttribute('href') + " "); //话题贴链接
                     }
                     if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
+                    if (setting.lasthuifutime) {
+                        let temp4 = await getAuthor(parent.children[1].children[1].getAttribute('href').split("/p/")[1]);
+                        if (temp4 != null) {
+                            let newDate = new Date();
+                            newDate.setTime(temp4.data.thread.last_time * 1000);
+                            //console.log(newDate.toLocaleDateString()); // 2014年6月18日
+                            //console.log(newDate.toLocaleString()); // 2014年6月18日 上午10:33:24
+                            //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
+                            //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+                            //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
+                            textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g,"-"));
+                        }
+                    }
                     if (setting.huifushu) {
                         textGroup.push("贴子回复数: " + parent.parentNode.querySelectorAll(".listReplyNum")[0].innerHTML + " ");
                         //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
@@ -307,6 +375,20 @@ async function copyLink() {
                         temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
                     }
                     textGroup.push("发贴时间: " + temp4 + " ");
+                }
+                if (setting.lasthuifutime) {
+                    let temp4 = await getAuthor(unsafeWindow.PageData.thread.thread_id);
+                    //console.log(temp4);
+                    if (temp4 != undefined) {
+                        let newDate = new Date();
+                        newDate.setTime(temp4.data.thread.last_time * 1000);
+                        //console.log(newDate.toLocaleDateString()); // 2014年6月18日
+                        //console.log(newDate.toLocaleString()); // 2014年6月18日 上午10:33:24
+                        //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
+                        //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+                        //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
+                        textGroup.push("最后回复时间: " + newDate.toLocaleString());
+                    }
                 }
                 break;
             case '2': // 贴子内页获取楼层链接
@@ -427,6 +509,64 @@ async function copyLink() {
                 //if (setting.author) textGroup.push((setting.with_at ? '@' : '') + floorData.author.user_name + ' ');
                 //if (setting.link) textGroup.push(linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData.content.post_id + '#' + floorData.content.post_id);
                 break;
+            case '4':
+                //console.log(JSON.parse(parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll("#pic_theme_list")[0].getAttribute('data-field')).id);
+                //console.log(parent.parentNode.children[0].querySelectorAll("#pic_post_title")[0].getAttribute('title'));
+                var temp = JSON.parse(parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll("#pic_theme_list")[0].getAttribute('data-field'));
+                var temp4 = await getAuthor(temp.id);
+                if (setting.title) {
+                    textGroup.push("图片话题: " + parent.parentNode.children[0].querySelectorAll("#pic_post_title")[0].getAttribute('title') + " ");
+                } //图片话题贴标题
+                //if (setting.author) {
+                //    textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + parent.children[2].children[0].getAttribute('href').split("un=")[1].split("&")[0] + ' ');
+                //} //图片话题贴无法直接获取到作者
+                //console.log(temp4.data);
+                //console.log(temp4.data.thread.name);
+                //console.log(temp4.data.thread.last_time);
+                if (setting.neirong_liebiao) {
+                    let temp2 = parent.parentNode.parentNode.parentNode.querySelectorAll(".imgtopic_gallery")[0].querySelectorAll(".thread_pic_show");
+                    let temp3 = "图片数: " + parent.parentNode.querySelectorAll("span.all_num")[0].innerHTML + "\n"
+                    for (let i = 0; i < temp2.length; i++) {
+                        if (temp2[i].getAttribute('content') != "") {
+                            temp3 += temp2[i].children[0].getAttribute('bpic') + " ";
+                            temp3 += temp2[i].getAttribute('content') + "\n";
+                        } else {
+                            temp3 += temp2[i].children[0].getAttribute('bpic') + "\n";
+                        }
+                        //console.log(temp2[i].getAttribute('content'));
+                        //console.log(temp2[i].children[0].getAttribute('bpic'));
+
+                    }
+                    textGroup.push("内容:\n" + temp3.trim() + " ");
+
+                    //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".imgtopic_gallery")[0].querySelectorAll(".threadlist_pic")[0].getAttribute('bpic'));
+                    //       textGroup.push("内容: " + temp.trim() + " ");
+                }
+                if (setting.author) {
+                    textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + temp4.data.thread.name + ' ');
+                }
+
+                if (setting.link) {
+                    textGroup.push("链接：https://tieba.baidu.com/p/" + temp.id + " "); //话题贴链接
+                }
+                if (setting.tiebaming) {
+                    textGroup.push("百度贴吧: " + tieba + "吧 ");
+                }
+                if (setting.lasthuifutime) {
+                    var newDate = new Date();
+                    newDate.setTime(temp4.data.thread.last_time * 1000);
+                    //console.log(newDate.toLocaleDateString()); // 2014年6月18日
+                    //console.log(newDate.toLocaleString()); // 2014年6月18日 上午10:33:24
+                    //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
+                    //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+                    //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
+                    textGroup.push("最后回复时间: " + newDate.toLocaleString());
+                }
+                if (setting.huifushu) {
+                    textGroup.push("贴子回复数: " + temp.reply_num + " ");
+                    //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].innerHTML);
+                }
+                break;
         }
         console.log(textGroup);
         text = textGroup.join(setting.split);
@@ -458,8 +598,18 @@ function catchLinkTarget(event) {
     var curAnchor = linkAnchor.cloneNode(true);
     curAnchor.addEventListener('click', copyLink);
     if ((classList.contains('threadlist_title') || classList.contains('listTitleCnt')) && target.querySelectorAll(".tieba-link-anchor").length == 0 && target.querySelectorAll(".icon-bazhupublicity")[0] == null && target.querySelectorAll(".icon-bazhurecruit")[0] == null) { //贴吧主题贴列表
-        curAnchor.setAttribute('data-anchor-type', '0');
-        target.appendChild(curAnchor); //添加"复制链接"按钮
+        //console.log(target.querySelectorAll(".icon_interview_picture")[0]);
+        if (target.querySelectorAll(".icon_interview_picture")[0] != null) {
+            var linkAnchor2 = document.createElement('span');
+            linkAnchor2.className = 'tieba-link-anchor';
+            linkAnchor2.textContent = '[复制链接]';
+            linkAnchor2.addEventListener('click', copyLink);
+            linkAnchor2.setAttribute('data-anchor-type', '4');
+            target.appendChild(linkAnchor2); //添加"复制链接"按钮
+        } else {
+            curAnchor.setAttribute('data-anchor-type', '0');
+            target.appendChild(curAnchor); //添加"复制链接"按钮
+        }
         //target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
     } else if (classList.contains('pager_theme_4') && target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0] != null) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
         if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) {
