@@ -28,6 +28,7 @@
 ///@狐狸已经乱了
 ///http://tieba.baidu.com/p/4371750793
 // ==/UserScript==
+//仅支持有图片的贴子获取最后回复时间
 //语音和表情内容不好处理
 //未来计划增加一个UI界面
 //目前本脚本不适合复制贴吧里面的代码，容易少复制内容！
@@ -58,7 +59,7 @@ var setting = {
 // 是否复制楼层的内容，默认为true
 // 是否复制楼中楼的内容，默认为true
 // 是否复制发贴时间，默认为true
-// 是否复制最后回复时间，默认为true
+// 是否复制最后回复时间，默认为true（仅支持有图片的贴子获取最后回复时间）
 // 是否复制回复数，默认为true
 // 分隔符，默认为换行符 \n
 // 是否显示提示信息，默认为 true
@@ -387,7 +388,7 @@ async function copyLink() {
                         //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
                         //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
                         //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
-                        textGroup.push("最后回复时间: " + newDate.toLocaleString());
+                        textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g,"-"));
                     }
                 }
                 break;
@@ -560,7 +561,7 @@ async function copyLink() {
                     //console.log(newDate.toLocaleTimeString()); // 上午10:33:24
                     //版权声明：本文为CSDN博主「拼搏的小叔」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
                     //原文链接：https://blog.csdn.net/js_admin/java/article/details/76973074
-                    textGroup.push("最后回复时间: " + newDate.toLocaleString());
+                    textGroup.push("最后回复时间: " + newDate.toLocaleString().replace(/\//g,"-"));
                 }
                 if (setting.huifushu) {
                     textGroup.push("贴子回复数: " + temp.reply_num + " ");
