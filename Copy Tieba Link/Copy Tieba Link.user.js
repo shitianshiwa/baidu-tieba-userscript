@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013458)
+// @version      1.1(0.013459)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -489,9 +489,13 @@ async function copyLink() {
                     }
                 }
                 if (setting.huifushu) {
-                    let temp = parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".thread_theme_5>.l_thread_info")[0].querySelectorAll(".l_reply_num>span");
-                    //console.log(parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".thread_theme_5>.l_thread_info")[0].querySelectorAll(".l_reply_num>span"));
-                    textGroup.push("贴子页数:" + temp[1].innerHTML + " , 贴子回复数: " + temp[0].innerHTML + " ");
+                    let temp = parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".thread_theme_5>.l_thread_info")[0] || parent.parentNode.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".thread_theme_5")[0];
+                    //console.log(parent.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".thread_theme_5")[0]);//新版贴吧的贴子
+                    //console.log(parent.parentNode.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".thread_theme_5")[0]);//旧版贴吧的贴子
+                    if (temp != null) {
+                        temp = temp.querySelectorAll(".l_reply_num>span");
+                        textGroup.push("贴子页数:" + temp[1].innerHTML + " , 回复数: " + temp[0].innerHTML + " ");
+                    }
                 }
                 break;
             case '2': // 贴子内页获取楼层链接
