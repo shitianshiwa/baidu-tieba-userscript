@@ -16,10 +16,10 @@
 //http://tieba.baidu.com/i/i/my_tie
 //删帖必须同时有tid和pid
 
-(function() {
+(function () {
     'use strict';
-    var $ = unsafeWindow.jQuery;// @grant        不能为none，否则不能用
-    const css1=`
+    var $ = unsafeWindow.jQuery; // @grant        不能为none，否则不能用
+    const css1 = `
 /*按钮样式*/
 .miaocss02
 {
@@ -41,85 +41,77 @@ color: #3e89fa;
 border: 1px solid #3e89fa;
 }
 `;
-    const patt =/^\d+$/;//判断是否全是数字的正则表达式
-    const IE="utf-8";//编码
-    const style = document.createElement('style');//创建新样式节点
-    style.textContent = css1;//添加样式内容
-    document.head.appendChild(style);//给head头添加新样式节点
-    $.post("/dc/common/tbs","",function(o){sessionStorage.setItem("miaousertbs",o.tbs);},"json");//获取用户tbs口令号并储存在sessionStorage中，待使用
-    function xianshi()//显示贴子链接和删除按钮
+    const patt = /^\d+$/; //判断是否全是数字的正则表达式
+    const IE = "utf-8"; //编码
+    const style = document.createElement('style'); //创建新样式节点
+    style.textContent = css1; //添加样式内容
+    document.head.appendChild(style); //给head头添加新样式节点
+    $.post("/dc/common/tbs", "", function (o) {
+        sessionStorage.setItem("miaousertbs", o.tbs);
+    }, "json"); //获取用户tbs口令号并储存在sessionStorage中，待使用
+    function xianshi() //显示贴子链接和删除按钮
     {
         clearTimeout(t2);
-        try//用来解决无法捕捉到标签导致javascript出错无法运行下
+        try //用来解决无法捕捉到标签导致javascript出错无法运行下
         {
             //http*://tieba.baidu.com/i/i/*
             //($("a.b_reply")).attr("href")
-            $("a.b_reply").each(function()
-                                {
+            $("a.b_reply").each(function () {
                 //alert("233");
                 //$("input.j_deltag1").attr("title")
                 //添加删除按钮
-                $(this).parents("div.wrap_container").after('<input class="j_deltag1 miaocss02" type="button" id="" value="删贴" title="https://tieba.baidu.com'+$(this).attr("href")+'"/>');//我的贴子
+                $(this).parents("div.wrap_container").after('<input class="j_deltag1 miaocss02" type="button" id="" value="删贴" title="https://tieba.baidu.com' + $(this).attr("href") + '"/>'); //我的贴子
                 //-------------------
                 //添加显示链接
-                $(this).parents("div.wrap_container").after('<p class="" style="color:#F00;font-size:12px;font-weight:bold;">https://tieba.baidu.com' +$(this).attr("href")+'</p>');//我的贴子
+                $(this).parents("div.wrap_container").after('<p class="" style="color:#F00;font-size:12px;font-weight:bold;">https://tieba.baidu.com' + $(this).attr("href") + '</p>'); //我的贴子
                 //-------------------
                 //添加删除按钮
-                $(this).parents("div.b_right_up>nobr").after('<input class="j_deltag2 miaocss02" type="button" id="" value="删贴" title="https://tieba.baidu.com'+$(this).attr("href")+'"/>');//我的回复的回复
+                $(this).parents("div.b_right_up>nobr").after('<input class="j_deltag2 miaocss02" type="button" id="" value="删贴" title="https://tieba.baidu.com' + $(this).attr("href") + '"/>'); //我的回复的回复
                 //-------------------
                 //添加显示链接
-                $(this).parents("div.b_right_up>nobr").after('<p class="" style="color:#F00;font-size:12px;font-weight:bold;">https://tieba.baidu.com' +$(this).attr("href")+'</p>');//我的回复的回复
+                $(this).parents("div.b_right_up>nobr").after('<p class="" style="color:#F00;font-size:12px;font-weight:bold;">https://tieba.baidu.com' + $(this).attr("href") + '</p>'); //我的回复的回复
                 //-------------------
                 //添加删除按钮
                 //$(this).parents("div.common_source_main").after('<input class="j_deltag3" type="button" id="" value="删贴" title="https://tieba.baidu.com'+$(this).attr("href")+'">');//我的回复的主题贴，无法获得pid,这个没用
                 //-------------------
                 //添加显示链接
-                $(this).parents("div.common_source_main").after('<p class="" style="color:#999;font-size:12px;">https://tieba.baidu.com' +$(this).attr("href")+'</p>');//我的回复的主题贴
+                $(this).parents("div.common_source_main").after('<p class="" style="color:#999;font-size:12px;">https://tieba.baidu.com' + $(this).attr("href") + '</p>'); //我的回复的主题贴
                 //-------------------
 
             });
             //event.target.title事件获取到按钮，获取title值
-            $("input.j_deltag1,input.j_deltag2").click(function(event)
-                                                       {
-                if(window.prompt('确认要删除贴子？输入"1"继续')=="1")
-                {
+            $("input.j_deltag1,input.j_deltag2").click(function (event) {
+                if (window.prompt('确认要删除贴子？输入"1"继续') == "1") {
                     Del1(event);
                 }
-            });//我的贴子
+            }); //我的贴子
             //$("input.j_deltag1").click(function(event){Del1(event.target.title);});//我的贴子
             //$("input.j_deltag2").click(function(event){Del1(event.target.title);});//我的回复的回复
             //$("input.j_deltag3").click(function(event){Del1(event.target.title);});//我的回复的主题贴,没有pid所以不用了
-        }
-        catch(error)
-        {
+        } catch (error) {
             alert(error);
         }
-        try//用来解决无法捕捉到标签导致javascript出错无法运行下
+        try //用来解决无法捕捉到标签导致javascript出错无法运行下
         {
             //高级搜索
             //http*://tieba.baidu.com/f/search/*
             //$("div.s_post").children("span.p_title").children("a.bluelink").attr("href")
-            $("div.s_post").each(function()
-                                 {
+            $("div.s_post").each(function () {
                 //alert("233");
                 //添加删除按钮
-                $(this).children("span.p_title").after('<input class="j_deltag4 miaocss02" type="button" id="" value="删贴" title="https://tieba.baidu.com'+$(this).children("span.p_title").children("a.bluelink").attr("href")+'"/>');
+                $(this).children("span.p_title").after('<input class="j_deltag4 miaocss02" type="button" id="" value="删贴" title="https://tieba.baidu.com' + $(this).children("span.p_title").children("a.bluelink").attr("href") + '"/>');
                 //-------------------
                 //添加显示链接
-                $(this).children("span.p_title").after('<p class="" style="color:#F00;font-size:12px;font-weight:bold;">https://tieba.baidu.com' +$(this).children("span.p_title").children("a.bluelink").attr("href")+'</p>');
+                $(this).children("span.p_title").after('<p class="" style="color:#F00;font-size:12px;font-weight:bold;">https://tieba.baidu.com' + $(this).children("span.p_title").children("a.bluelink").attr("href") + '</p>');
                 //-------------------
 
             });
-            $("input.j_deltag4").click(function(event)
-                                       {
-                if(window.prompt('确认要删除贴子？输入"1"继续')=="1")
-                {
+            $("input.j_deltag4").click(function (event) {
+                if (window.prompt('确认要删除贴子？输入"1"继续') == "1") {
                     Del1(event);
                 }
-            });//高级搜索
-        }
-        catch(error)
-        {
+            }); //高级搜索
+        } catch (error) {
             alert(error);
         }
         /*try//主题贴列表
@@ -151,26 +143,22 @@ border: 1px solid #3e89fa;
             alert(error);
         }*/
     }
-    function Del1(obj)
-    {
+
+    function Del1(obj) {
         //alert(sessionStorage.getItem("miaousertbs"));
         //let href=prompt("输入要删除的贴子链接");
         //alert(obj.target.title);
-        try
-        {
-            var href=obj.target.title;
-            var temp1=href.split("/")[4];
-            var temp2=temp1.split("?");
-            if(temp2.length>1)
-            {
-                var temp3=temp2[1].split("&");
-                var TID=temp2[0];
+        try {
+            var href = obj.target.title;
+            var temp1 = href.split("/")[4];
+            var temp2 = temp1.split("?");
+            if (temp2.length > 1) {
+                var temp3 = temp2[1].split("&");
+                var TID = temp2[0];
                 //alert(temp3[1].split("=")[1].split("#")[0]);
-                for(let x in temp3)
-                {
-                    if(temp3[x].indexOf("cid")!=-1)
-                    {
-                        var PID=temp3[x].split("=")[1].split("#")[1];//取链接#后面的数字，放入pid中，https://tieba.baidu.com/p/XXXXXXX?pid=XXXXXX&cid=XXXXXXX#XXXXXXX
+                for (let x in temp3) {
+                    if (temp3[x].indexOf("cid") != -1) {
+                        var PID = temp3[x].split("=")[1].split("#")[1]; //取链接#后面的数字，放入pid中，https://tieba.baidu.com/p/XXXXXXX?pid=XXXXXX&cid=XXXXXXX#XXXXXXX
                         break;
                     }
                     //alert(x);
@@ -182,48 +170,42 @@ border: 1px solid #3e89fa;
                 }
                 //alert(TID+","+PID+","+CID);
                 //alert(TID+","+PID);
-                if(window.prompt('tid='+TID+',pid(删楼中楼是取cid值)='+PID+',确认后输入"1"继续')=="1")
-                {
+                if (window.prompt('tid=' + TID + ',pid(删楼中楼是取cid值)=' + PID + ',确认后输入"1"继续') == "1") {
                     //alert(TID+","+PID);
                     //let a=prompt("输入要删除的贴子tid(数字)（tieba.baidu.com/p/xxxxxxxxx）");
                     //let b=prompt("请输入pid(数字)(主题贴,楼层，楼中楼均必填)");
-                    if(TID!=null&&TID!=""&&PID!=null&&PID!=""&&patt.test(TID)==true&&patt.test(PID)==true)//不能为空和null,必须全是数字
+                    if (TID != null && TID != "" && PID != null && PID != "" && patt.test(TID) == true && patt.test(PID) == true) //不能为空和null,必须全是数字
                     {
-                        let s="/f/commit/post/delete";
-                        let c={tbs:sessionStorage.getItem("miaousertbs"),tid:TID,pid:PID,ie:IE};//kw:PageData.forum.name,fid:PageData.forum.id
-                        $.post(s,c,function(o)
-                               {
-                            if(o.no!=0)
-                            {
-                                alert("no:"+o.no+"nerr_code:"+o.err_code+"nerror:"+o.error);
-                            }
-                            else
-                            {
+                        let s = "/f/commit/post/delete";
+                        let c = {
+                            tbs: sessionStorage.getItem("miaousertbs"),
+                            tid: TID,
+                            pid: PID,
+                            ie: IE
+                        }; //kw:PageData.forum.name,fid:PageData.forum.id
+                        $.post(s, c, function (o) {
+                            if (o.no != 0) {
+                                alert("no:" + o.no + "nerr_code:" + o.err_code + "nerror:" + o.error);
+                            } else {
                                 alert("OK");
-                                obj.target.value="已删除";
-                                obj.target.style="color:#999;"
-                                obj.target.disabled=true;
+                                obj.target.value = "已删除";
+                                obj.target.style = "color:#999;"
+                                obj.target.disabled = true;
                             }
-                        },"json");
-                    }
-                    else
-                    {
-                        alert("tid="+TID+",pid(删楼中楼是取cid值)="+PID);
+                        }, "json");
+                    } else {
+                        alert("tid=" + TID + ",pid(删楼中楼是取cid值)=" + PID);
                     }
                 }
-            }
-            else
-            {
-                alert("只有tid="+temp2+",没有pid和cid(删楼中楼是取cid值)");
+            } else {
+                alert("只有tid=" + temp2 + ",没有pid和cid(删楼中楼是取cid值)");
             }
             //alert("已启用.");
-        }
-        catch(error)
-        {
+        } catch (error) {
             alert(error);
         }
     }
-    function Del2()
+    /*function Del2()
     {
         try
         {
@@ -246,13 +228,13 @@ border: 1px solid #3e89fa;
             clearInterval(t3);
             alert(error);
         }
-    }
-    function Del3()
+    }*/
+    /*function Del3()
     {
         alert("清除封禁提示已关闭");
         clearInterval(t3);
-    }
-    var t2=setTimeout(xianshi,2000);//延迟2s启动
-    var t3=setInterval(Del2,1000);//每一秒启动一次
-    GM_registerMenuCommand("关掉清除封禁提示(账号被封时才有使用，会把退出账号弹窗也删掉）", Del3);
+    }*/
+    var t2 = setTimeout(xianshi, 2000); //延迟2s启动
+    //var t3=setInterval(Del2,1000);//每一秒启动一次
+    //GM_registerMenuCommand("关掉清除封禁提示(账号被封时才有使用，会把退出账号弹窗也删掉）", Del3);
 })();
