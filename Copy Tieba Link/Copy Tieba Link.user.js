@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013461)
+// @version      1.1(0.013462)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -130,7 +130,7 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
  * 需要登陆才能显示30楼
  */
 const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;
-const getAuthorMoUrl = tid => `//tieba.baidu.com/photo/bw/picture/toplist?tid=${tid}&ie=utf-8`;//存在抽风，导致楼主和最后回复人位置交换？
+const getAuthorMoUrl = tid => `//tieba.baidu.com/photo/bw/picture/toplist?tid=${tid}&ie=utf-8`; //存在抽风，导致楼主和最后回复人位置交换？
 /**
  * 返回wap贴吧信息
  *
@@ -285,16 +285,22 @@ async function copyLink() {
                     if (setting.createtime) {
                         let temp4 = temp3;
                         if (temp4 != "") {
-                            //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
-                            temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
-                            //console.log(temp3);
-                            if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
-                            {
-                                temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
-                            } else if (temp4.split(":").length == 2) { //只有时间，没有年月
-                                temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                            try {
+                                //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
+                                temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                                //console.log(temp3);
+                                if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                                {
+                                    temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
+                                } else if (temp4.split(":").length == 2) { //只有时间，没有年月
+                                    temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                                }
+                                textGroup.push("发贴时间: " + temp4 + " ");
+                            } catch (err) {
+                                console.log("发贴时间: " + err);
+                                textGroup.push("贴子可能已被删除");
                             }
-                            textGroup.push("发贴时间: " + temp4 + " ");
+
                         }
                         //console.log(getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
                         //let temp5="";
@@ -375,15 +381,20 @@ async function copyLink() {
                         //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
                         let temp4 = temp3;
                         if (temp4 != "") {
-                            temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
-                            //console.log(temp3);
-                            if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
-                            {
-                                temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
-                            } else if (temp4.split(":").length == 2) { //只有时间，没有年月
-                                temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                            try {
+                                temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                                //console.log(temp3);
+                                if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                                {
+                                    temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
+                                } else if (temp4.split(":").length == 2) { //只有时间，没有年月
+                                    temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                                }
+                                textGroup.push("发贴时间: " + temp4 + " ");
+                            } catch (err) {
+                                console.log("发贴时间: " + err);
+                                textGroup.push("贴子可能已被删除");
                             }
-                            textGroup.push("发贴时间: " + temp4 + " ");
                         }
                     }
                     if (setting.lasthuifutime) {
@@ -443,19 +454,28 @@ async function copyLink() {
                     //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
                     let temp3 = await getWaptiebaxinxi(unsafeWindow.PageData.thread.thread_id).then(result => {
                         if (result) {
-                            return result.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                            try {
+                                return result.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                            } catch (err) {
+                                console.log("发贴时间: " + err);
+                                return "";
+                            }
                         } else {
                             return "";
                         }
                     });
-                    console.log(temp3);
-                    if (temp3.split("-").length == 2 && temp3.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
-                    {
-                        temp3 = new Date().getFullYear().toString() + "-" + temp3 //2020-2-2
-                    } else if (temp3.split(":").length == 2) { //只有时间，没有年月
-                        temp3 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp3 //2020-02-02 02:00
+                    //console.log(temp3);
+                    if (temp3 != "") {
+                        if (temp3.split("-").length == 2 && temp3.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                        {
+                            temp3 = new Date().getFullYear().toString() + "-" + temp3 //2020-2-2
+                        } else if (temp3.split(":").length == 2) { //只有时间，没有年月
+                            temp3 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp3 //2020-02-02 02:00
+                        }
+                        textGroup.push("发贴时间: " + temp3 + " ");
+                    } else {
+                        textGroup.push("贴子可能已被删除");
                     }
-                    textGroup.push("发贴时间: " + temp3 + " ");
                     //console.log(getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
                     //let temp5="";
                     /*if (temp4) {
@@ -664,16 +684,21 @@ async function copyLink() {
                 if (setting.createtime) {
                     let temp4 = temp6;
                     if (temp4 != "") {
-                        //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
-                        temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
-                        //console.log(temp3);
-                        if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
-                        {
-                            temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
-                        } else if (temp4.split(":").length == 2) { //只有时间，没有年月
-                            temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                        try {
+                            //let temp3 = parent.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML;
+                            temp4 = temp4.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0]; //.indexOf('您要浏览的贴子不存在') >= 0 || res.indexOf('(共0贴)') >= 0;
+                            //console.log(temp3);
+                            if (temp4.split("-").length == 2 && temp4.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                            {
+                                temp4 = new Date().getFullYear().toString() + "-" + temp4 //2020-2-2
+                            } else if (temp4.split(":").length == 2) { //只有时间，没有年月
+                                temp4 = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp4 //2020-02-02 02:00
+                            }
+                            textGroup.push("发贴时间: " + temp4 + " ");
+                        } catch (err) {
+                            console.log("发贴时间: " + err);
+                            textGroup.push("贴子可能已被删除");
                         }
-                        textGroup.push("发贴时间: " + temp4 + " ");
                     }
                     //console.log(getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
                     //let temp5="";
