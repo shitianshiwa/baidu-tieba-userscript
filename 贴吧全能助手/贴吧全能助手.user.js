@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016954beta)
+// @version      2.1(0.016955beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -43,6 +43,7 @@
 ///https://userstyles.org/styles/124770/tieba-maverick-2018 TieBa - Maverick by Onox
 // ==/UserScript==
 /*
+图片话题贴外面的上传图片功能没法发出图片，因为全部会被系统删除。而且这个上传图片功能是使用flash插件的做的
 修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
 有些时候隐藏侧边栏功能无法实现完全屏蔽效果
 http://tieba.baidu.com/i/* 这个域名内无法功能都不能正常运行，例如不能在网页内开关美化，设置功能等
@@ -80,6 +81,52 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         clearTimeout(baiban2);
         $("div.baiban").remove();
     }, 1000);*/
+    /**
+     * 精简封装 fetch 请求，自带请求 + 通用配置 + 自动 .text()
+     *
+     * @param {string} url - 请求 URL
+     * @param {object} [options={}] - fetch Request 配置
+     * @returns {Promise<string>} fetch 请求
+     */
+    //console.log("jquery版本号：" + $.fn.jquery);
+    //https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js
+    //参考贴吧屏蔽检测脚本的代码 https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
+    const request = (url, options = {}) => fetch(url, Object.assign({
+        credentials: 'omit',
+        // 部分贴吧（如 firefox 吧）会强制跳转回 http（2020年已经全改成https了）
+        redirect: 'follow',
+        // 阻止浏览器发出 CORS 检测的 HEAD 请求头
+        mode: 'same-origin',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    }, options)).then(res => res.text());
+    /**
+     * 获取主题贴的移动端地址
+     *
+     * @param {number} tid - 贴子 id
+     * @returns {string} URL
+     * src: 1
+     * z: 贴子 id
+     * pn: 1
+     * frsrn: 1
+     * pbrn: 1
+     * 需要登陆才能显示30楼
+     */
+    const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;
+    /**
+     * 返回wap贴吧信息
+     *
+     * @param {string} res - 页面内容
+     */
+    const threadreturnxinxi = res => res;
+    /**
+     *
+     * @param {number} tid - 贴子 id
+     */
+    const getWaptiebaxinxi = tid => request(getThreadMoUrl(tid))
+        .then(threadreturnxinxi);
+
     console.log("jquery版本号：" + $.fn.jquery);
     let baiban2 = setTimeout(() => {
         clearTimeout(baiban2);
@@ -3591,7 +3638,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .j_jb_ele .pb_list_triangle_down {
                 	display: none !important;
                 }
-                .j_jb_ele > a {
+                /*楼层删楼按钮样式*/
+                .j_jb_ele > a:not(.post_del_href) {
                 	font-size: 0 !important;
                 	background: none !important;
                 }
@@ -3613,9 +3661,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	opacity: 0;
                 	pointer-events: none;
                 }*/
-                .lzl_jb_in:before,
+                /*楼层删楼按钮样式*/
+                .p_post_del_my {
+                    font-size: 5px !important;
+                    width: 50px;
+                }
+                /*一大堆楼中楼删楼按钮样式*/
+                /*.lzl_jb_in:before,
                 .j_jb_ele > a:before {
-
                 	font-family: \'Material Icons\';
                 	line-height: 1;
                 	display: block;
@@ -3624,16 +3677,16 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	left: 50%;
                 	top: 50%;
                 	transform: translate(-50%, -50%);
-                }
+                }*/
                 /*删除*/
-                .lzl_jb_in[data-field*=\"\'delete_mine\':\'1\'\"]:before,
+                /*.lzl_jb_in[data-field*=\"\'delete_mine\':\'1\'\"]:before,
                 .j_jb_ele > a[data-field*=\"\'delete_mine\':\'1\'\"]:before{
                 	content: \"\\e872\";
                 }
                 .lzl_jb_in[data-field*=\"\'delete_mine\':\'1\'\"]:hover:before,
                 .j_jb_ele > a[data-field*=\"\'delete_mine\':\'1\'\"]:hover:before{
                 	color: #F44336 !important;
-                }
+                }*/
                 .super_jubao {
                 	display: block !important;
                 	position: absolute;
@@ -9657,7 +9710,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
-        .tieba-link-anchor{
+        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9693,7 +9746,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         /*展开楼层气泡中的长图片*/
         .j_d_post_content>.post_bubble_middle>.post_bubble_middle_inner>.replace_div,
         /*复制链接按钮*/
-        .tieba-link-anchor{
+        .tieba-link-anchor,
+        /*图片话题贴*/
+        .imgtopic_album,
+        /*话题贴 图片和文字*/
+        .icon_interview_picture,.listThreadTitle{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
             animation: __tieba_action__;
@@ -9726,10 +9783,6 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             position: absolute;
         }
         /*图片话题*/
-        /*图片工具栏*/
-        .media_pic_control{
-            margin-top: 30px;
-        }
         /*进入贴子按钮*/
         .j_enter_pb_wrapper
         {
@@ -9763,7 +9816,40 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             width: -webkit-fill-available !important;
             height: -webkit-fill-available !important;
         }
+        /*左右切换图片区域*/
+        .j_display_pre,.j_display_next{
+            top: 60px !important;
+        }
     `;
+        if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+            tiebadongtai += `
+        /*图片工具栏*/
+        .media_pic_control{
+            padding-top: 10px !important;
+            margin-top: 15px;
+        }
+    .icon_retract,.icon_ypic,.icon_turnleft,.icon_turnright{
+        animation-duration: 0.001 s;
+        animation-name: tiebaaction;
+    }
+    /*图片工具栏_收起，查看大图，向左转，向右转*/
+        .icon_retract,.icon_ypic,.icon_turnleft,.icon_turnright{
+            -webkit-animation: __tieba_action__;
+            -moz-animation: __tieba_action__;
+            animation: __tieba_action__;
+        }
+    `;
+        } else {
+            tiebadongtai += `
+            .threadlist_img>span.all_num{
+                position: absolute;
+            }
+            .threadlist_img>span.tieba-link-anchor{
+                position: absolute;
+                left: 670px;
+            }
+            `;
+        }
         if (typeof GM_addStyle != "undefined") {
             GM_addStyle(tiebadongtai);
         } else if (typeof PRO_addStyle != "undefined") {
@@ -9782,7 +9868,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 document.documentElement.appendChild(node);
             }
         }
-        const tieba_action = (event) => {
+        const tieba_action = async (event) => {
             const {
                 target
             } = event;
@@ -9812,6 +9898,138 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }
             if (event.animationName !== '__tieba_action__') {
                 return;
+            }
+            /*图片话题贴*/
+            if (classList.contains('icon_interview_picture')) {
+                //console.log(target.parentNode.parentNode.parentNode.parentNode);
+                let tid = JSON.parse(target.parentNode.parentNode.parentNode.parentNode.getAttribute('tid'));
+                let time = await getWaptiebaxinxi(tid).then(result => {
+                    if (result) {
+                        return result;
+                    } else {
+                        return "";
+                    }
+                });
+                let temp = time;
+                if (temp != "") {
+                    temp = temp.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0];
+                    if (temp.split("-").length == 2 && temp.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                    {
+                        temp = new Date().getFullYear().toString() + "-" + temp //2020-2-2
+                    } else if (temp4.split(":").length == 2) { //只有时间，没有年月
+                        temp = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp //2020-02-02 02:00
+                    }
+                    let temp2 = document.createElement("span");
+                    temp2.setAttribute('class', 'createtimecsss');
+                    temp2.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                    if (GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
+                        temp2.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 10px;top:10px;color: #999;position: absolute');
+                        target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].style = "top: 60px;position: absolute;";
+                    }
+                    temp2.innerHTML = temp;
+                    target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].before(temp2);
+                    //console.log(temp);
+                }
+            }
+            /*文字话题贴*/
+            if (classList.contains('listThreadTitle')) {
+                //console.log(target.parentNode.querySelectorAll(".listReplyNum")[0]);
+                //console.log(target.querySelectorAll(".word_live_title")[0].href.split("/p/")[1]);
+                let tid = JSON.parse(target.querySelectorAll(".word_live_title")[0].href.split("/p/")[1]);
+                let time = await getWaptiebaxinxi(tid).then(result => {
+                    if (result) {
+                        return result;
+                    } else {
+                        return "";
+                    }
+                });
+                let temp = time;
+                if (temp != "") {
+                    temp = temp.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0];
+                    if (temp.split("-").length == 2 && temp.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+                    {
+                        temp = new Date().getFullYear().toString() + "-" + temp //2020-2-2
+                    } else if (temp4.split(":").length == 2) { //只有时间，没有年月
+                        temp = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp //2020-02-02 02:00
+                    }
+                    let temp2 = document.createElement("span");
+                    temp2.setAttribute('class', 'createtimecsss');
+                    temp2.setAttribute('style', 'position: absolute;text-align: center;top:40px;width: 70px;left: 0px;color: #999;');
+                    if (GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
+                        temp2.setAttribute('style', 'text-align: center;top: 40px !important;width: 70px;left: 10px;top:10px;color: #999;position: absolute');
+                    }
+                    temp2.innerHTML = temp;
+                    target.parentNode.querySelectorAll(".listReplyNum")[0].before(temp2);
+                    //console.log(temp);
+                }
+            }
+            if (classList.contains('icon_retract') || classList.contains('icon_ypic') || classList.contains('icon_turnleft') || classList.contains('icon_turnright')) {
+                target.style = "display:none !important;"
+            }
+            /*图片话题贴清理多余图片工具栏标签+修复大图模式切换图片功能*/
+            var page = 1;
+            var suo2 = false;
+            if (classList.contains('imgtopic_album')) {
+                console.log("整个图片标签刷新");
+                $(".imgtopic_gallery>.thread_pic_show>.threadlist_pic").click((e) => {
+                    let t = setTimeout(() => {
+                        clearTimeout(t);
+                        console.log("点击图片");
+                        let temp = $(".j_media_box");
+                        if (temp.length > 1) {
+                            for (let i = 1; i < temp.length; i++) {
+                                temp[i].remove(); //清理无限自增的多余标签
+                            }
+                        }
+                        page = parseInt($(".j_display_next")[0].getAttribute("cur"));
+                        if (suo2 == false) {
+                            suo2 = true;
+                            /*$(".j_retract").click((e) => {
+                                console.log("关闭");
+                            });*/
+                            $(".j_display_pre").click((e) => {
+                                let target = e.target;
+                                console.log("上一页");
+                                let t2 = setTimeout(() => {
+                                    clearTimeout(t2);
+                                    //console.log(target.getAttribute("cur"));
+                                    //console.log(target.getAttribute("total"));
+                                    page = page - 1;
+                                    let temp1 = $(".j_display_pre");
+                                    for (let i = 0; i < temp1.length; i++) {
+                                        //console.log(temp2[i]);
+                                        temp1[i].setAttribute("cur", page);
+                                    }
+                                    let temp2 = $(".j_display_next");
+                                    for (let i = 0; i < temp2.length; i++) {
+                                        //console.log(temp2[i]);
+                                        temp2[i].setAttribute("cur", page);
+                                    }
+                                }, 0);
+                            });
+                            $(".j_display_next").click((e) => {
+                                let target = e.target;
+                                console.log("下一页");
+                                let t2 = setTimeout(() => {
+                                    clearTimeout(t2);
+                                    //console.log(target.getAttribute("cur"));
+                                    //console.log(target.getAttribute("total"));
+                                    page = page + 1;
+                                    let temp1 = $(".j_display_pre");
+                                    for (let i = 0; i < temp1.length; i++) {
+                                        //console.log(temp2[i]);
+                                        temp1[i].setAttribute("cur", page);
+                                    }
+                                    let temp2 = $(".j_display_next");
+                                    for (let i = 0; i < temp2.length; i++) {
+                                        //console.log(temp2[i]);
+                                        temp2[i].setAttribute("cur", page);
+                                    }
+                                }, 0);
+                            });
+                        }
+                    }, 0);
+                });
             }
             if (classList.contains('replace_div')) {
                 /*展开长图片*/

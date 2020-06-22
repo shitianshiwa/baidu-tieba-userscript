@@ -272,7 +272,7 @@ async function copyLink() {
                         }
                         if (temp != "") {
                             //兼容这个脚本https://greasyfork.org/ja/scripts/400724-b%E7%AB%99%E8%A7%86%E9%A2%91%E8%B7%B3%E8%BD%AC
-                            temp=temp.replace(/<a.*href="?/g,"").replace(/<\/a>/g,"").replace(/<a.*href="?/g,"").replace(/">/g," ");
+                            temp = temp.replace(/<a.*href="?/g, "").replace(/<\/a>/g, "").replace(/<a.*href="?/g, "").replace(/">/g, " ");
                             temp = temp.replace(/<span class="topic-tag".*?>/g, "").replace(/<\/span>/g, ""); //清理#XXX#话题插入
                             textGroup.push("内容:" + temp.trim() + " ");
                         }
