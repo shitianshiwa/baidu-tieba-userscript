@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013459)
+// @version      1.1(0.013460)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -271,6 +271,8 @@ async function copyLink() {
                             }
                         }
                         if (temp != "") {
+                            //兼容这个脚本https://greasyfork.org/ja/scripts/400724-b%E7%AB%99%E8%A7%86%E9%A2%91%E8%B7%B3%E8%BD%AC
+                            temp=temp.replace(/<a.*href="?/g,"").replace(/<\/a>/g,"").replace(/<a.*href="?/g,"").replace(/">/g," ");
                             temp = temp.replace(/<span class="topic-tag".*?>/g, "").replace(/<\/span>/g, ""); //清理#XXX#话题插入
                             textGroup.push("内容:" + temp.trim() + " ");
                         }
@@ -345,7 +347,7 @@ async function copyLink() {
                 } else {
                     let temp3 = null;
                     if (setting.createtime || setting.huifushu) {
-                        temp3 = await getWaptiebaxinxi(parent.children[1].children[1].getAttribute('href').split("/p/")[1]).then(result => {
+                        temp3 = await getWaptiebaxinxi(parent.querySelectorAll(".word_live_title")[0].getAttribute('href').split("/p/")[1]).then(result => {
                             if (result) {
                                 return result;
                             } else {
@@ -353,21 +355,21 @@ async function copyLink() {
                             }
                         });
                     }
-                    //console.log("https:"+parent.children[1].children[1].getAttribute('href'));//话题贴链接
-                    //console.log(parent.children[1].children[1].getAttribute('title'));//话题贴标题
+                    //console.log("https:"+parent.querySelectorAll(".word_live_title")[0].getAttribute('href'));//话题贴链接
+                    //console.log(parent.querySelectorAll(".word_live_title")[0].getAttribute('title'));//话题贴标题
                     //console.log(parent.children[2].children[0].getAttribute('href').split("un=")[1].split("&")[0]);//话题贴作者
                     if (setting.title) {
-                        textGroup.push("今日话题: " + parent.children[1].children[1].getAttribute('title') + " ");
+                        textGroup.push("今日话题: " + parent.querySelectorAll(".word_live_title")[0].getAttribute('title') + " ");
                     } //话题贴标题
                     if (setting.author) {
-                        textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + parent.children[2].children[0].getAttribute('href').split("un=")[1].split("&")[0] + ' ');
+                        textGroup.push((setting.with_at ? '楼主: @' : '楼主: ') + parent.querySelectorAll("span.listUser>a")[0].getAttribute('href').split("un=")[1].split("&")[0] + ' ');
                     } //话题贴作者
                     //parent.nextElementSibling.getElementsByClassName('j_user_card')[0].textContent//旧的复制用户名，会复制昵称
                     if (setting.neirong_liebiao) {
                         textGroup.push("内容: " + parent.parentNode.querySelectorAll(".listDescCnt")[0].innerHTML + " ");
                     }
                     if (setting.link) {
-                        textGroup.push("链接：https:" + parent.children[1].children[1].getAttribute('href') + " "); //话题贴链接
+                        textGroup.push("链接：https:" + parent.querySelectorAll(".word_live_title")[0].getAttribute('href') + " "); //话题贴链接
                     }
                     if (setting.tiebaming) textGroup.push("百度贴吧: " + tieba + "吧 ");
                     if (setting.createtime) {
@@ -384,18 +386,9 @@ async function copyLink() {
                             }
                             textGroup.push("发贴时间: " + temp4 + " ");
                         }
-                        //console.log(getWaptiebaxinxi(parent.getElementsByClassName('j_th_tit')[0].href.split("/p/")[1]));
-                        //let temp5="";
-                        /*if (temp4) {
-                            temp5=await Promise.resolve(temp4).then(result => {
-                                if (result) {
-                                     return result;
-                                }
-                            });
-                        }*/
                     }
                     if (setting.lasthuifutime) {
-                        let temp4 = await getAuthor(parent.children[1].children[1].getAttribute('href').split("/p/")[1]);
+                        let temp4 = await getAuthor(parent.querySelectorAll(".word_live_title")[0].getAttribute('href').split("/p/")[1]);
                         if (temp4 != null) {
                             let newDate = new Date();
                             newDate.setTime(temp4.data.thread.last_time * 1000);
