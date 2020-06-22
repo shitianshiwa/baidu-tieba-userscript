@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013460)
+// @version      1.1(0.013461)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -22,7 +22,6 @@
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlHttpRequest
 // @namespace    http://ext.ccloli.com
-// @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
 ///原脚本地址：https://greasyfork.org/zh-CN/scripts/17375-copy-tieba-link
 ///【噗通一声跪下】求大神发布一个PC端一键复制帖子标题和链接脚本
 ///@狐狸已经乱了
@@ -102,7 +101,7 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
 
                 if (responseDetails.readyState === 4) {
                     if (responseDetails.status === 200 /* || responseDetails.status === 304 || responseDetails.status === 0*/ ) {
-                        //console.log(responseDetails.response)
+                        console.log(responseDetails.response)
                         resolve(responseDetails.response);
                     } else {
                         console.log("onreadystatechange: " + responseDetails.status);
@@ -131,7 +130,7 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
  * 需要登陆才能显示30楼
  */
 const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;
-const getAuthorMoUrl = tid => `//tieba.baidu.com/photo/bw/picture/toplist?tid=${tid}&ie=utf-8`;
+const getAuthorMoUrl = tid => `//tieba.baidu.com/photo/bw/picture/toplist?tid=${tid}&ie=utf-8`;//存在抽风，导致楼主和最后回复人位置交换？
 /**
  * 返回wap贴吧信息
  *
