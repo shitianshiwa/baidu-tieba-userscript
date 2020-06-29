@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013462)
+// @version      1.1(0.013463)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -71,7 +71,7 @@ var setting = {
  * @param {object} [options={}] - fetch Request 配置
  * @returns {Promise<string>} fetch 请求
  */
-const $ = unsafeWindow.jQuery;
+//const $ = unsafeWindow.jQuery;
 //console.log("jquery版本号：" + $.fn.jquery);
 //https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js
 //参考贴吧屏蔽检测脚本的代码 https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
