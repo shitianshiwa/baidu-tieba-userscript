@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016957beta)
+// @version      2.1(0.016958beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -43,6 +43,7 @@
 ///https://userstyles.org/styles/124770/tieba-maverick-2018 TieBa - Maverick by Onox
 // ==/UserScript==
 /*
+发现https://tieba.baidu.com/p/898425820 主题贴列表的发贴日期有误
 图片话题贴外面的上传图片功能没法发出图片，因为全部会被系统删除。而且这个上传图片功能是使用flash插件的做的
 修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
 有些时候隐藏侧边栏功能无法实现完全屏蔽效果
@@ -5598,9 +5599,11 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .tbui_fbar_top[style*=\"visible\"]{
                 	opacity: 1;
                 }
-
+                .threadListGroupCnt>.listBtnCnt>#interview-share-wrapper>.tbshare_popup_wrapper{
+                    position:unset !important;/*特殊的今日话题分享按钮*/
+                }
                 .tbshare_popup_wrapper{
-                	position: fixed;
+                	position: fixed;/*特殊的今日话题分享按钮*/
                 	width: inherit;
                 	height: inherit;
                 	text-indent: 0;
@@ -5609,10 +5612,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 .tbui_aside_float_bar .tbshare_popup_wrapper{
                 	transform: translateY(-100%);
                 }
-                .tbshare_popup_enter {
+                .tbshare_popup_enter {/*特殊的今日话题分享按钮*/
                 	width: inherit;
                 	height: inherit;
-                	background: none !important;
+                	/*background: none !important;*/
                 }
                 .tbshare_popup_main {
                 	display: block !important;
@@ -6059,10 +6062,16 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	margin-left: 78px;
                 	margin-right: 40px;
                 }
-                #interview-share-wrapper,
+                /*#interview-share-wrapper,特殊的今日话题分享按钮*/
                 .interview .threadListGroupCnt .mini .faceIcon,
                 #liveIcon{
                 	display: none !important;
+                }
+                #interview-share-wrapper{
+                    position: absolute;
+                    top: 5px;
+                    left: 510px;
+                    border-bottom: 0px;
                 }
                 .interview .threadListGroupCnt .listTitleCnt .listThreadTitle a:first-of-type:before{
                 	content: \'今日话题\';
@@ -6156,6 +6165,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	color: #999;
                 	text-decoration: none !important;
                 	text-transform: capitalize;
+                }
+                .threadListGroupCnt>.listPostCnt>.listTitle{
+                    font-size:0px !important;/*特殊的今日话题吧友讨论*/
+                    border-radius: unset !important;
+                    border: none !important;
+                }
+                .threadListGroupCnt>.listBtnCnt>.slideBtn{
+                    background: unset !important;/*展开特殊的今日话题吧友讨论*/
                 }
                 .interview .threadListGroupCnt .listTalkCnt .listTitle,
                 .interview .threadListGroupCnt .listPostCnt .listTitle{
@@ -9823,6 +9840,10 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
     `;
         if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
             tiebadongtai += `
+            .threadlist_btn_play{
+                top: 33px !important;/*特殊的今日话题有视频*/
+                left: 0px !important;
+            }
         /*图片工具栏*/
         .media_pic_control{
             padding-top: 10px !important;
@@ -9844,6 +9865,9 @@ margin-top: 20px;
     `;
         } else {
             tiebadongtai += `
+            .threadlist_btn_play{
+                top: 33px !important;/*特殊的今日话题有视频*/
+            }
             .threadlist_img>span.all_num{
                 position: absolute;
             }
