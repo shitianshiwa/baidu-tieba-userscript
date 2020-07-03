@@ -10444,6 +10444,19 @@ margin-top: 20px;
 
         });
         initListener();
+        if (window.location.href.search(/http:\/\/tieba\.baidu\.com\/bawu2\/platform\/listTools\?word=.*/g) != -1) {
+            //console.log("版块分区1");
+            let t = setTimeout(() => {
+                clearTimeout(t);
+                $("#sectionPartitionApp").click(() => {
+                    //console.log("版块分区2");
+                    let t2 = setTimeout(() => {
+                        clearTimeout(t2);
+                        $(".dialogJtxt")[0].parentNode.parentNode.querySelectorAll(".dialogJbody")[0].style = "height:450px;"
+                    }, 1000);
+                });
+            }, 1000);
+        }
     })();
 
     (function () {
