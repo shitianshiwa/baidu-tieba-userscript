@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013463)
+// @version      1.1(0.013464)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?kz=*
 // @include      http*://tieba.baidu.com/f?ie=utf-8&kw=*
+// @include      http*://tieba.baidu.com/f?fr=wwwt&kw=*
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=album
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=video
 /// @exclude     http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
