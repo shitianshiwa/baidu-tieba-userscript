@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        贴吧贴子屏蔽检测(兼容版)
-// @version     测试(beta)0.6547
+// @version     测试(beta)0.65481
 // @description 1.可能支持无用户名的贴吧账号（楼中楼未完全验证过）2.修改为只在各个贴吧的主题列表和主题贴内运行 3.发主题贴后，屏蔽样式会消失，刷新贴吧即可
 // @include     http*://tieba.baidu.com/p/*
 // @include     http*://tieba.baidu.com/f?*
@@ -19,6 +19,7 @@ $.post("/f/user/json_userinfo","",function(o){localStorage.setItem("userid",o.da
                             $.post("/dc/common/tbs","",function(o){localStorage.setItem("usertbs",o.tbs);},"json");//获取用户tbs口令号并储存在localStorage中，待使用
 */
 //投票贴会被误判楼层被屏蔽 http://tieba.baidu.com/newvote/createvote?kw=贴吧名&ie=utf-8
+//不支持投票贴 http://tieba.baidu.com/newvote/createvote?kw=贴吧名&ie=utf-8 (已尝试解决)
 //新bug，第一次打开无法为所有楼层添加屏蔽样式,原因是发生了异步问题
 //可能支持无用户名的贴吧账号（楼中楼未完全验证过）
 //修改为只在各个贴吧的主题列表和主题贴内运行
@@ -363,8 +364,9 @@ const detectBlocked = () => {
         //var TID2=0;
         var PID2 = new Array();
         var tizi22 = new Array();
-        var tizi23 = new Array();
+        //var tizi23 = new Array();
         var tizi24 = new Array();
+        var tizi25 = new Array(); //投票
         var index2 = 0;
         $("div.l_post").each(
             function() {
@@ -373,8 +375,15 @@ const detectBlocked = () => {
                         //const tid = window.PageData.thread.thread_id; //const tid = JSON.parse(($(".l_post")).attr('data-field')).content.thread_id;
                         const pid = $(this).attr('data-pid') || '';
                         //TID2=tid;
+                        //console.log($(this)[0].children[0].className);
+                        if ($(this)[0].children[0].className == "vote_crypt") {
+                            //console.log("投票");
+                            tizi25[tizi22[index2]] = 1;
+                        } else {
+                            tizi25[tizi22[index2]] = 0;
+                        }
                         tizi22[index2] = pid;
-                        tizi23[tizi22[index2]] = pid;
+                        //tizi23[tizi22[index2]] = pid;
                         tizi24[tizi22[index2]] = false;
                         index2++;
                         //console.log(tizi2[index2]);
@@ -401,25 +410,38 @@ const detectBlocked = () => {
             }
             //console.log(index2);
             const tid = window.PageData.thread.thread_id;
-            const pid = tizi22[index2]
-                //console.log(pid);
+            const pid = tizi22[index2];
+            const toupiao = tizi25[index2];
+            //console.log(pid);
             let checker;
             if (!pid) {
                 // 新回复可能没有 pid
                 return;
             }
-            if (replyCache[pid] !== undefined) {
-                //console.log("1");
-                checker = replyCache[pid];
+            if (toupiao == 0) {
+                if (replyCache[pid] !== undefined) {
+                    //console.log("1");
+                    checker = replyCache[pid];
+                } else {
+                    //console.log("2");
+                    checker = getReplyBlocked(tid, pid).then(result => {
+                        //console.log("233");
+                        replyCache[pid] = result;
+                        //saveCache('reply');
+                        //alert(result)
+                        return result;
+                    });
+                }
             } else {
-                //console.log("2");
-                checker = getReplyBlocked(tid, pid).then(result => {
-                    //console.log("233");
-                    replyCache[pid] = result;
-                    //saveCache('reply');
-                    //alert(result)
-                    return result;
-                });
+                if (threadCache[tid] !== undefined) {
+                    checker = threadCache[tid];
+                } else {
+                    checker = getThreadBlocked(tid).then(result => {
+                        threadCache[tid] = result;
+                        //saveCache('thread');
+                        return result;
+                    });
+                }
             }
             //console.log(checker);
             if (checker) {
@@ -453,7 +475,7 @@ const detectBlocked = () => {
             $("#miaocount6").html("6.被屏蔽的贴子总数(主题贴或(楼层+楼中楼)):" + countx6);
         }
     } catch (error) {
-        alert(error); //这个偶尔会报错 SyntaxError: Unexpected token u in JSON at position 0
+        console.log(error); //这个偶尔会报错 SyntaxError: Unexpected token u in JSON at position 0
     }
 };
 //alert(checker);
@@ -631,7 +653,7 @@ const init2 = () => {
     initStyle(username);
     initListener();
     t1 = setTimeout(detectBlocked0, 1000); //主题贴列表
-    t2 = setTimeout(detectBlocked, 1000); //主题贴里的楼层
+    //t2 = setTimeout(detectBlocked, 1000); //主题贴里的楼层
     const style = document.createElement('style'); //创建新样式节点
     style.textContent = css1; //添加样式内容
     document.head.appendChild(style); //给head头添加新样式节点
