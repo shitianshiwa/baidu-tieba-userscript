@@ -1,3 +1,67 @@
+v2.1(0.01640beta)
+1、新增隐藏侧边工具栏功能，支持全局生效（beta）
+2、再修了下隐藏下工具栏的功能，闪烁现象好转一点点
+3、中规模调整了各种功能，以支持主题贴列表和贴子内的动态翻页（beta）
+4、新增主题贴列表显示发贴时间(支持动态翻页，位置移到回复数上面，支持置顶贴和话题贴)
+5、修复贴子标识（精品，置顶，会员置顶）翻页会掉色bug(还有转回原版贴吧模式会影响原版贴子标识的bug)；贴子内自动展开长图，强调信息显示翻页失效bug
+6、我的粉丝页面可以显示“移除粉丝按钮”按钮了（开美化不开美化都生效）http://tieba.baidu.com/i/i/fans； 强化隐藏该页面因脚本问题导致不正常显示的头像。
+8、我的收藏页面背景现在会自动全铺为白色了
+9、调整了主题贴列表的印记栏，现在基本和原脚本一样了；调整主题贴列表的标题下边距为贴吧默认距离（两个都是弄回原样）
+10、修复隐藏挽尊卡背景和会员标识的功能（但文字还是会保留为不显眼格式）
+11、新增隐藏楼层气泡功能
+13、新增强调信息显示功能（贴子内强调日期，右上角强调信息数）
+14、修复美化主题模式下主题贴列表的话题贴回复框表情按钮不正常显示bug
+15、修改了贴子排序功能的按钮文字颜色（功能未动）
+16、全力支持“复制贴子链接脚本”https://greasyfork.org/zh-CN/scripts/404771-copy-tieba-link 兼容开了美化模式的贴吧和原版贴吧，旧版贴吧
+17，调整功能模块设置说明，现在修改配置会自动刷新网页；现在支持脚本管理器全局设置图片放大功能（推荐和这个脚本一起使用，以弥补手机上超大型图片无法移动的缺陷 https://greasyfork.org/ja/scripts/24204-picviewer-ce
+）
+18、调整了一下脚本结构？
+19、兼容了一下一些特殊的游戏贴吧(特殊吧头图)
+2020-5-26 v2.1(0.01635beta)
+1.修复图标成口的问题(紧急)
+修复方法来自
+https://userstyles.org/styles/124770/tieba-maverick-2018
+本脚本样式的原作者
+https://forum.userstyles.org/discussion/49558/ 图标无法显示请看这里
+2.显示移除粉丝选项(经常无效，只能多刷新) http://tieba.baidu.com/i/i/fans
+3.把"自定义设置"按钮名改为“图片放大设置”
+----------
+（不需要黑夜模式的话，可以不装）尝试兼容别人写的"贴吧黑夜模式"样式 https://userstyles.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles 
+这个样式有安装顺序要求!
+https://greasyfork.org/zh-CN/forum/discussion/77243/x
+其实本脚本应该有用这个样式的旧版本，这次就修改兼容到能用吧！
+* 我用的是xStyle样式管理器 https://github.com/FirefoxBar/xStyle 不过由于长期没有更新，会有些问题。。！
+* 要选择"夜间模式"才是基本全黑的，否则发主题帖的编辑器会有点亮。。！
+* 这个推荐用文本编辑器去查找在那里
+* tieba-maverick-2018样式还需要修改
+    threadlist_bright .threadlist_author {
+	float: none !important;
+	//display: flex;
+	width: 16% !important;
+	min-width: 155px;
+	padding-right: 20px;
+	white-space: nowrap;
+	//font-size: 0 !important;
+	overflow: visible !important;
+}
+不修改主题帖列表就不显示发贴日期
+#footer {
+	margin-bottom: 20px !important;
+	background-color:#000 !important;
+}
+.forum_foot{
+	border-radius: 0 0 var(--m-radius) var(--m-radius);
+	background-color:#000 !important;
+}
+不修改以上两个，贴吧底部可能会有点亮
+<a href=https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B/Tieba%20-%20Maverick%202018%20%5B%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%5D(%E9%BB%91%E5%A4%9C%E6%A8%A1%E5%BC%8F%E5%85%BC%E5%AE%B9).txt
+>复制粘贴用</a>
+* maverick-demo-styles样式还需要修改（这个不用文本编辑器，要在样式脚本管理器里面改）
+	--m-href-color: hsl(0, 0%, 95%);
+	--m-href-visited: hsl(0, 0%, 60%);
+不修改黑夜模式，主题贴列表的标题就是暗蓝色的
+6. 调整了一些代码
+
 2020-5-1 v2.1(0.016934beta)
 修复带错的背景样式
 2020-5-1 v2.1(0.016933beta)
