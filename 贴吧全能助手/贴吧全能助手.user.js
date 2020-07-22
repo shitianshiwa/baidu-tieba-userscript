@@ -5655,7 +5655,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	line-height: 100px;
                 }
                 /*帖子标题标识*/
-                .threadlist_title i:not(.icon-bazhurecruit):not(.icon-bazhupublicity/*排除吧主投票贴和公示贴*/){
+                .threadlist_title i:not(.icon-bazhurecruit):not(.icon-bazhupublicity/*排除吧主投票贴和公示贴*/):not(.icon-bazhuvote){
                 	flex: 0 0 auto;
                 	background-image: none !important;
                 	display: inline-block !important;
