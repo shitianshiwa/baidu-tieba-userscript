@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016959beta)
+// @version      2.1(0.016960beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -6066,16 +6066,16 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 }
                 /*#interview-share-wrapper,特殊的今日话题分享按钮*/
                 .interview .threadListGroupCnt .mini .faceIcon,
-                #liveIcon{
+                /*#liveIcon{视频直播
                 	display: none !important;
-                }
+                }*/
                 #interview-share-wrapper{
                     position: absolute;
                     top: 5px;
                     left: 510px;
                     border-bottom: 0px;
                 }
-                .interview .threadListGroupCnt .listTitleCnt .listThreadTitle a:first-of-type:before{
+                /*.interview .threadListGroupCnt .listTitleCnt .listThreadTitle a:first-of-type:before{
                 	content: \'今日话题\';
                 	background-color: #4285F5;
                 	height: 20px !important;
@@ -6093,7 +6093,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	font-size: 12px !important;
                 	font-style: normal !important;
                 	color: #fff !important;
-                }
+                }*/
                 .interview .threadListGroupCnt .listTitleCnt .listThreadTitle img[src*=\"interview_icon.gif\"]+a:first-of-type:before{
                 	content: \'访谈直播\';
                 }
@@ -9841,10 +9841,48 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         }
     `;
         if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+            //let t = setTimeout(() => {
+            //   clearTimeout(t);
+            //                if (document.querySelectorAll("#liveIcon")[0].getAttribute("src").search("interview_live_tv_icon.gif") == -1) {
+            //                  tiebadongtai += `
+            //            #liveIcon{/*各种话题贴图标*/
+            //              display: none !important;
+            //        }`;
+            //      } else {
+            //        tiebadongtai += `
+            //  #liveIcon{/*各种话题贴图标*/
+            //     height: 17px !important;
+            // }`;
+            // }
+            // }, 5000);
+
             tiebadongtai += `
+            #liveIcon{/*各种话题贴图标*/
+                margin-top: 2px !important;
+                height: 19px !important;
+            }
+            /*.interview .threadListGroupCnt .listTitleCnt .listThreadTitle a:first-of-type:before{
+                content: \'今日话题\';
+                background-color: #4285F5;
+                height: 20px !important;
+                line-height: 20px;
+                border-radius: 4px;
+                padding: 0 4px;
+                vertical-align: top;
+
+                flex: 0 0 auto;
+                display: inline-block !important;
+                width: auto !important;
+                margin-top: 1px;
+                margin-right: 2px;
+                text-align: center;
+                font-size: 12px !important;
+                font-style: normal !important;
+                color: #fff !important;
+            }*/
             .threadlist_btn_play{
-                top: 33px !important;/*特殊的今日话题有视频*/
-                left: 0px !important;
+                top: 15px !important;/*特殊的今日话题有视频*/
+                left: -1px !important;
             }
         /*图片工具栏*/
         .media_pic_control{
@@ -9868,7 +9906,7 @@ margin-top: 20px;
         } else {
             tiebadongtai += `
             .threadlist_btn_play{
-                top: 33px !important;/*特殊的今日话题有视频*/
+                top: 15px !important;/*特殊的今日话题有视频*/
             }
             .threadlist_img>span.all_num{
                 position: absolute;
