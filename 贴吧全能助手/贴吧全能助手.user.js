@@ -6065,15 +6065,19 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 	margin-right: 40px;
                 }
                 /*#interview-share-wrapper,特殊的今日话题分享按钮*/
-                .interview .threadListGroupCnt .mini .faceIcon,
-                /*#liveIcon{视频直播
+                .interview .threadListGroupCnt .mini .faceIcon/*,
+                #liveIcon{视频直播*/{
                 	display: none !important;
-                }*/
+                }
                 #interview-share-wrapper{
                     position: absolute;
                     top: 5px;
                     left: 510px;
                     border-bottom: 0px;
+                }
+                .btn_small/*主题贴列表点开贴子图片后，右下角的进入贴子按钮*/
+                {
+                	top:-10px !important;
                 }
                 /*.interview .threadListGroupCnt .listTitleCnt .listThreadTitle a:first-of-type:before{
                 	content: \'今日话题\';
@@ -9902,6 +9906,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 .threadlist_img>span.tieba-link-anchor{
 margin-top: 20px;
             }
+            .btn_default{/*主题贴列表点开图片后右下角的按钮*/
+                left: -4px !important;
+            }
     `;
         } else {
             tiebadongtai += `
@@ -9915,6 +9922,10 @@ margin-top: 20px;
             .threadlist_img>span.tieba-link-anchor{
                 position: absolute;
                 left: 670px;
+            }
+            .btn_default {
+                left: -4px !important;
+                width: 50px;
             }
             `;
         }
