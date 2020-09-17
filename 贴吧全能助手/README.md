@@ -1,6 +1,23 @@
 # 贴吧全能助手
-* 原作者的发布链接
-[https://greasyfork.org/en/scripts/26992-贴吧全能助手](https://greasyfork.org/en/scripts/26992-贴吧全能助手)<br/>
+- 原作者的发布链接： https://greasyfork.org/en/scripts/26992-贴吧全能助手 by 忆世萧遥
+- 百度贴吧按发帖时间（帖子ID）排序 by NULL
+- 查看发帖 by 文科
+- 百度贴吧图片点击放大 by lliwhx
+- 百度贴吧：不登录即可看贴 by VA
+- 梦姬贴吧助手 by jixun
+- 引用脚本库 https://greasyfork.org/scripts/2657/code/tieba_ui.js ,Interval_Looper.js,gm2_port_v103.js by Jixun.Moe
+- 脚本主题样式 https://userstyles.org/styles/124770/tieba-maverick-2018 TieBa - Maverick by Onox
+- 待补充完整。。。
+
+- 贴吧发贴技巧提示：
+- 0、贴吧现在有屏蔽审核贴子系统，系统认为贴子内容有问题即隐藏贴子为仅自己可见，外人无法看见。
+- 1、新发出的主题贴如果自己点击收藏失败则为被隐藏了。
+- 2、楼层和楼中楼一般情况下只能依靠另开一个未登录的浏览器看自己的贴子来确认是否被隐藏了，楼中楼二楼及之后被隐藏回复自己也看不到。
+- 3、贴吧客户端可以尝试点赞自己，然后退出刷新再进看看是否点赞成功了，没有成功则为被隐藏（未测试过）
+- 4、被隐藏的贴子或回复过一段时间后可能会过审自己显示出来，不想反复删发可以尝试等待。
+- 5、图片相对不容易被隐藏，只要处理过（仅适合发长文）
+
+# 只测试了Google Chrome 75.0.3770.142（正式版本） （64 位）
 # 安装
 * [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B.user.js)
 * [Install From greasyfork](https://greasyfork.org/zh-CN/scripts/398404-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B-%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
