@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016960beta)
+// @version      2.1(0.016961beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -154,15 +154,14 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                	font-family: \'Open Sans\';
                	font-style: normal;
                	font-weight: 400;
-               	src: url(https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFW50bbck.woff2) format(\'woff\');
+               	src: url(https://fonts.gstatic.com/s/opensans/v17/mem8YaGs126MiZpBA-UFUZ0bbck.woff2) format(\'woff\');
                }
                /*https://forum.userstyles.org/discussion/49558/ ——图标无法显示请看这里——*/
                @font-face {
                	font-family: \'Material Icons\';
                	font-style: normal;
                	font-weight: 400;
-               	src: url(https://fonts.gstatic.com/s/materialicons/v38/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format(\'woff2\'),
-                  url(https://onox.qiniudn.com/maverick/materialicons_safari_v38.woff) format(\'woff\');
+               	src: url(https://fonts.gstatic.com/s/materialicons/v54/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format(\'woff2\')
                }
 
                body,
