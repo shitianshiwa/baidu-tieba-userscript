@@ -10502,6 +10502,13 @@ http://tb.himg.baidu.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/
         }
     })();
 })($);
+(function () {
+    function closemeihua() {
+        GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
+        window.location.reload(); //刷新网页
+    }
+    GM_registerMenuCommand(GM_getValue("tiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
+})();
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
 /*https://www.jb51.net/article/147217.htm
