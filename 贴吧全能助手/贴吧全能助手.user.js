@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016963beta)
+// @version      2.1(0.016964beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -9102,8 +9102,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             if (repairDefinedEvent && e.clientX - imageMouse[0] <= 1 && e.clientY - imageMouse[1] <= 1) { //尝试修复关闭图片功能
                                 log("尝试修复关闭图片功能", "已执行");
                                 imageButton = true;
-                            } else if (scriptDebug && !imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
+                            } else if (/*scriptDebug && */!imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
                                 log("鼠标click事件判断", "\n一.操作时页面不在激活状态。请保证浏览器正在被操作，在执行一次\n二.关闭图片功能可能损坏，建议修复");
+                                imageButton = true;//不知道能不能解决偶尔关不掉大图片的bug
                             }
                             if (!imageButton) {
                                 RegEx = target.style.transform.match(/[-0-9.]+/g);
@@ -9684,7 +9685,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
-        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle{
+        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9708,6 +9709,8 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         /*移除粉丝按钮*/
         .user>.right,
         /*删除某些页面会出现的错误头像*/
+        .userbar,
+        /*右上角包住登陆按钮的大框架*/
         #main_aside,
         /*登陆按钮*/
         .u_login,
@@ -10089,12 +10092,11 @@ margin-top: 20px;
             }
             if (classList.contains('u_login')) {
                 console.log("未登陆");
-                unsafeWindow.PageData.user.is_login = 1;
                 //百度贴吧：不登录即可看贴 by VA
                 if (!GM_getValue("tiebameihua")) { //贴吧美化
                     if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
                         if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
-                            let temp3 = $("div.userbar ")[0];
+                            let temp3 = $("div.userbar")[0];
                             yincangcebianlanx = true;
                             $("#yincangcebianlan")[0].value = "<<";
                             if (temp3 != null) {
@@ -10104,6 +10106,10 @@ margin-top: 20px;
                         }
                     }
                 }
+            }
+            if (classList.contains('userbar')) {
+                console.log("不登陆看贴");
+                unsafeWindow.PageData.user.is_login = 1;
             }
             /*侧工具栏*/
             /*下半部分单独处理以避免偶尔隐藏失败*/
