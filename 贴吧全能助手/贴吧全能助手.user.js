@@ -9102,9 +9102,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                             if (repairDefinedEvent && e.clientX - imageMouse[0] <= 1 && e.clientY - imageMouse[1] <= 1) { //尝试修复关闭图片功能
                                 log("尝试修复关闭图片功能", "已执行");
                                 imageButton = true;
-                            } else if (/*scriptDebug && */!imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
+                            } else if ( /*scriptDebug && */ !imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
                                 log("鼠标click事件判断", "\n一.操作时页面不在激活状态。请保证浏览器正在被操作，在执行一次\n二.关闭图片功能可能损坏，建议修复");
-                                imageButton = true;//不知道能不能解决偶尔关不掉大图片的bug
+                                imageButton = true; //不知道能不能解决偶尔关不掉大图片的bug
                             }
                             if (!imageButton) {
                                 RegEx = target.style.transform.match(/[-0-9.]+/g);
@@ -9572,7 +9572,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
                 let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
                 $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
             }
-            let i = 0;
+            //let i = 0;
             //let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
             //if (temp.length > 0) {
             //    for (i = 0; i < temp.length; i++) {
@@ -9685,7 +9685,7 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
             }
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
-        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar{
+        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9727,6 +9727,9 @@ background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
         /*图片话题贴*/
         .imgtopic_album,
         /*话题贴 图片和文字*/
+        /*修复极罕见的我的贴吧和贴吧主页的头像bug*/
+        #j_userhead,
+        #user_info,
         .icon_interview_picture,.listThreadTitle{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
@@ -10126,6 +10129,7 @@ margin-top: 20px;
                         }
                     }
                 }
+                //console.log(target);
             }
             //let checker;
             //console.log(target);
@@ -10160,10 +10164,10 @@ margin-top: 20px;
                         需要填上时间戳才能保证头像显示正确
                         一般默认显示64*64
 https://gss0.bdstatic.com/一串大小写字母数字/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
-https://gss0.baidu.com/一串大小写字母数字/sys/portraith/item/[PageData.user.portrait]?t=时间戳/1000 大图 
-https://himg.bdimg.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110 960*960，580*580
+https://gss0.baidu.com/一串大小写字母数字/sys/portraith/item/[PageData.user.portrait]?t=时间戳/1000 大图 960*960，580*580
+https://himg.bdimg.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
 http://tb.himg.baidu.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
-                        */
+https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1000                        */
                         //console.log(userimg);
                         if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
                             $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
@@ -10366,6 +10370,24 @@ http://tb.himg.baidu.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/
                     target.remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
                     //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
                 }
+            }
+            //修复贴吧头像bug1
+            if (target.getAttribute('id') == "j_userhead") {
+                //if (/https:\/\/tieba\.baidu\.com\/home\/main\/.*/.test(window.location.href) == true) {
+                    let t=setTimeout(() => {
+                        clearTimeout(t);
+                        $("#j_userhead>a>img")[0].setAttribute("src", unsafeWindow.ihome.Userinfo.portraitRoot.MIDDLE + $("#j_userhead")[0].getAttribute("data-sign"));//重设头像链接
+                    }, 1000);
+               // }
+            }
+            //修复贴吧头像bug1
+            if (target.getAttribute('id') == "user_info") {
+                //if (/https:\/\/tieba\.baidu\.com\//.test(window.location.href) == true) {
+                    let t=setTimeout(() => {
+                        clearTimeout(t);
+                        $("#user_info>a>img")[0].setAttribute("src", "https://himg.bdimg.com/sys/portrait/item/" + unsafeWindow.PageData.user.portrait);//重设头像链接
+                    }, 1000);
+               // }
             }
         }
         const initListener = () => {
