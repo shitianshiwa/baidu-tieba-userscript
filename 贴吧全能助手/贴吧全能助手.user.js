@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1(0.016964beta)
+// @version      2.1(0.016965beta)
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块，全面精简并美化各种贴吧页面，去除贴吧帖子里链接的跳转（已失效），按发帖时间排序，查看贴吧用户发言记录，贴子关键字屏蔽，移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -14,11 +14,14 @@
 ///document-start,document-idle;必须使用document-body，否则对多个浏览器的兼容性会下降
 ///只测试了Google Chrome 75.0.3770.142（正式版本） （64 位）
 /// jQuery 留一份自己用
-// @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
-// @require     http://cdn.staticfile.org/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js
+// @require      https://cdn.jsdelivr.net/npm/jquery@3.4.0/dist/jquery.min.js
+// @require      https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js
 
+/// @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
+/// @require     http://cdn.staticfile.org/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js
 /// 配置界面 UI
-// @require     http://cdn.staticfile.org/mustache.js/0.8.1/mustache.min.js
+// @require     https://cdn.jsdelivr.net/npm/mustache@4.0.1/mustache.min.js
+/// @require     http://cdn.staticfile.org/mustache.js/0.8.1/mustache.min.js
 // @require     https://greasyfork.org/scripts/2657/code/tieba_ui.js
 
 /// 非同步数组枚举回调
@@ -10152,11 +10155,25 @@ margin-top: 20px;
                         $("div.edui-btn-red")[0].style = "display:block;"
                     }*/
                     //贴吧右上角的用户头像
-                    let t = setTimeout(() => { //增加延时以提高右上角按钮显示用户头像的成功率
+                    let t = setTimeout(async () => { //增加延时以提高右上角按钮显示用户头像的成功率
                         clearTimeout(t);
                         let userimg = "";
                         let userportrait = unsafeWindow.PageData.user.portrait; //.replace(/\?t=.*/, "");
-                        userimg = "https://himg.bdimg.com/sys/portrait/item/" + userportrait;
+                        //https://sign.52fisher.cn/93.html 常用贴吧接口 April 15, 2016
+                        if (userportrait == "") {//解决无法获取到portrait的情况
+                            var c = {
+                                'un': unsafeWindow.PageData.user.name || unsafeWindow.PageData.user.user_name
+                            };
+                            await $.get("/home/get/panel", c,
+                                function (o) {
+                                    if (o != null) {
+                                        console.log("/home/get/panel: "+o.data.portrait);
+                                        userimg = "https://himg.bdimg.com/sys/portrait/item/" + o.data.portrait;
+                                    }
+                                }, "json");
+                        } else {
+                            userimg = "https://himg.bdimg.com/sys/portrait/item/" + userportrait;
+                        }
                         /*
                         贴吧用户头像
                         PC网页端贴吧，自定义头像一天只能更换3次，贴吧默认头像应该不限制次数
@@ -10374,20 +10391,20 @@ https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1
             //修复贴吧头像bug1
             if (target.getAttribute('id') == "j_userhead") {
                 //if (/https:\/\/tieba\.baidu\.com\/home\/main\/.*/.test(window.location.href) == true) {
-                    let t=setTimeout(() => {
-                        clearTimeout(t);
-                        $("#j_userhead>a>img")[0].setAttribute("src", unsafeWindow.ihome.Userinfo.portraitRoot.MIDDLE + $("#j_userhead")[0].getAttribute("data-sign"));//重设头像链接
-                    }, 1000);
-               // }
+                let t = setTimeout(() => {
+                    clearTimeout(t);
+                    $("#j_userhead>a>img")[0].setAttribute("src", unsafeWindow.ihome.Userinfo.portraitRoot.MIDDLE + $("#j_userhead")[0].getAttribute("data-sign")); //重设头像链接
+                }, 1000);
+                // }
             }
             //修复贴吧头像bug1
             if (target.getAttribute('id') == "user_info") {
                 //if (/https:\/\/tieba\.baidu\.com\//.test(window.location.href) == true) {
-                    let t=setTimeout(() => {
-                        clearTimeout(t);
-                        $("#user_info>a>img")[0].setAttribute("src", "https://himg.bdimg.com/sys/portrait/item/" + unsafeWindow.PageData.user.portrait);//重设头像链接
-                    }, 1000);
-               // }
+                let t = setTimeout(() => {
+                    clearTimeout(t);
+                    $("#user_info>a>img")[0].setAttribute("src", "https://himg.bdimg.com/sys/portrait/item/" + unsafeWindow.PageData.user.portrait); //重设头像链接
+                }, 1000);
+                // }
             }
         }
         const initListener = () => {
@@ -10488,7 +10505,108 @@ https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1
             }, 1000);
         }
     })();
+    /*
+                参考
+                https://greasyfork.org/scripts/375218-%E8%B4%B4%E5%90%A7%E5%9B%9E%E5%A4%8D%E4%BF%AE%E6%AD%A3 贴吧回复修正
+                https://github.com/indefined/UserScripts/tree/master/tiebaPostAdjustment
+                已知问题继承
+                展开的被折叠楼层会显示隐藏提示（有意没有去掉它）
+                展开的被隐藏楼中楼需要点击两次数字才能收起该层楼中楼（暂时无法解决）
+                可能对某些帖子不管用，如果出现这种情况请反馈准确帖子链接
+                ---
+                https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js 贴吧贴子屏蔽检测
+                */
+    // @version      0.011
+    // @description  还原被折叠隐藏的楼层、楼中楼，附带自动展开楼中楼的查看更多
+    (function () {
+        'use strict';
+        const getTriggerStyle = () => {
+            return `
+        /* 使用 animation 监测 DOM 变化 */
+        @-webkit-keyframes __tieba_zhankai__ {}
+        @-moz-keyframes __tieba_zhankai__ {}
+        @keyframes __tieba_zhankai__ {}
+        /* 楼中楼 */
+        .lzl_li_pager{//lzl_li_pager j_lzl_l_p lzl_li_pager_s 随便选了一个 在回复层主标签元素那块
+        -webkit-animation: __tieba_zhankai__;
+        -moz-animation: __tieba_zhankai__;
+        animation: __tieba_zhankai__;
+        }
+        .__tieba_zhankai2__{
+        }
+        `;
+        };
 
+        function unfoldPost() { //楼层内容折叠展开
+            [].forEach.call(document.querySelectorAll('[style="display:;"]>.p_forbidden_post_content_fold'), node => {
+                //console.log(node)
+                node.click();
+            });
+        }
+
+        function unfoldPost2() { //楼中楼内容折叠展开
+            //console.log('223');
+            [].forEach.call(document.querySelectorAll('div>.j_lzl_container.core_reply_wrapper[style="min-height: 0px; display: none;"]'), node => {
+                if (JSON.parse(node.getAttribute("data-field")).total_num > 0) {
+                    node.style = "min-height: 1px; display:block;" //和原来的样式有所不同，这样就可以人为收起来楼中楼了。。！
+                    //node.parentNode.children[0].children[0].children[0].click();
+                    //node.classList.add("_yizhankai_");
+                }
+                //console.log(JSON.parse(node.getAttribute("data-field")).total_num)
+                //JSON.parse(json).XXXX
+                //https://blog.csdn.net/weixin_39889465/article/details/86220538 js通过'data-xxx'自定义属性获取dom元素
+                //https://www.cnblogs.com/landeanfen/p/5159911.html JS组件系列——使用HTML标签的data属性初始化JS组件
+                //https://www.w3school.com.cn/tags/att_global_data.asp HTML data-* 属性
+            });
+        }
+        const unfoldPost3 = (event) => { //楼中楼楼层太长折叠展开
+            if (event.animationName !== '__tieba_zhankai__') {
+                return;
+            }
+            const {
+                target
+            } = event;
+            const {
+                classList
+            } = target;
+            let temp = target.children[1].children[1];
+            if (temp != undefined) {
+                if (temp.classList == "j_lzl_m") {
+                    temp.classList.add("__tieba_zhankai2__");
+                    temp.click();
+                }
+            }
+            //console.log(target.classList);
+            //console.log(temp);
+            //console.log("2333");
+            //console.log(target.children[1].children[1])
+            //document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
+        }
+        /**
+         * 初始化样式
+         */
+        const initStyle = () => {
+            const style = document.createElement('style');
+            style.textContent = getTriggerStyle();
+            document.head.appendChild(style);
+        };
+
+        /**
+         * 初始化事件监听
+         *
+         */
+        const initListener = () => {
+            document.addEventListener('webkitAnimationStart', unfoldPost3, false);
+            document.addEventListener('MSAnimationStart', unfoldPost3, false);
+            document.addEventListener('animationstart', unfoldPost3, false);
+        };
+
+        setTimeout(unfoldPost, 1000); //要延迟一会儿，才能保证捕捉到标签
+        /*var t=*/
+        setInterval(unfoldPost2, 2000); //要定时循环查找才能找全整个贴子的楼中楼。。！
+        initListener();
+        initStyle();
+    })();
     (function () {
         if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
             let temp = document.createElement("input"); //创建节点<input/>
