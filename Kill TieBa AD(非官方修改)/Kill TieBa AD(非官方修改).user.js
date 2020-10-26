@@ -3,7 +3,7 @@
 // @name:zh-CN   貼吧廣告清理(非官方修改)
 // @name:zh-TW   貼吧廣告去除(非官方修改)
 // @namespace    hoothin
-// @version      1.3.2((beta)0.324)
+// @version      1.3.2((beta)0.3.25)
 // @description        Just Kill TieBa AD
 // @description:zh-CN  清理百度貼吧（tieba.baidu.com）内的列表僞裝，帖内僞裝，觸點廣告，頁首廣告，推薦應用等各類廣告
 // @description:zh-TW  去除百度貼吧（tieba.baidu.com）内的列表偽裝，帖內偽裝，觸點廣告，頁首廣告，推薦應用等各類廣告
@@ -103,7 +103,7 @@
             }
             //class="l_banner banner_theme"
 
-            easyADs = document.querySelectorAll("#banner_pb_customize"); //贴子内的吧背景图顶偶然发现的广告,这个出现一段时间后会自己消失
+            easyADs = document.querySelectorAll(".l_banner.banner_theme"); //贴子内的吧背景图顶偶然发现的广告,这个出现一段时间后会自己消失#banner_pb_customize
             //alert(easyADs[0])
             if (easyADs[0] != null) {
                 easyADs[0].style = "display:none;";
