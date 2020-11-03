@@ -42,10 +42,10 @@
 ///https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B 贴吧全能助手 by 忆世萧遥
 ///百度贴吧按发帖时间（帖子ID）排序 by NULL
 ///查看发帖 by 文科
-///百度贴吧图片点击放大 by lliwhx
-///百度贴吧：不登录即可看贴 by VA
+///百度贴吧图片点击放大 by lliwhx https://greasyfork.org/zh-CN/scripts/20969-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7
+///百度贴吧：不登录即可看贴 by VA 
 ///梦姬贴吧助手 by jixun
-///tieba_ui.js,Interval_Looper.js,gm2_port_v103.js by Jixun.Moe
+///tieba_ui.js,Interval_Looper.js,gm2_port_v103.js by Jixun.Moe https://greasyfork.org/scripts/2657/code/tieba_ui.js
 ///https://userstyles.org/styles/124770/tieba-maverick-2018 TieBa - Maverick by Onox
 // ==/UserScript==
 /*
