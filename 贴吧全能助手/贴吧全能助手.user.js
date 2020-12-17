@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.170
+// @version      2.1.171
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
@@ -50,6 +50,9 @@
 // ==/UserScript==
 /*
 脚步日志+备注
+历史更新记录
+https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B/%E5%8E%86%E5%8F%B2%E6%9B%B4%E6%96%B0%E8%AE%B0%E5%BD%95.txt
+
 2020-7-23 由于无法确定贴子内的链接实际情况，所以关掉自动替换跳转链接
 发现https://tieba.baidu.com/p/898425820 主题贴列表的发贴日期有误
 图片话题贴外面的上传图片功能没法发出图片，因为全部会被系统删除。而且这个上传图片功能是使用flash插件的做的
@@ -66,19 +69,6 @@ http://tieba.baidu.com/f/center/createtb 创建贴吧
 有点击图片放大和引用楼层和楼中楼功能失效bug（仅在旧版贴吧有效，这种贴吧是http链接），图片点击放大偶尔可以用，引用楼层和楼中楼功能只有链接为http的贴子可以用
 http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http，但偶尔会跳转到https导致出错（仅在手机yandex浏览器见过这个问题）
 发现一个bug，电脑端贴吧主题贴列表网页右边的"大家都在搜"（class="search_back_box")和"贴吧热议榜"（class="topic_list_box"）在网页拉到底时会向class中自动添加"search-back-fixed"和"topic-search-back-fixed",这个会导致发主题贴编辑器右边冒出一个"大家都在搜"，暂时用计时器定时删除新加的class来解决这个问题(现在是彻底删了，因为贴吧删掉了贴吧主页（不是首页）的贴吧热议榜)
-
-.threadlist_bright .threadlist_author{
-                	float: none !important;
-                	display: flex;
-                	width: 16% !important;
-                	min-width: 155px;
-                	padding-right: 20px;
-                	white-space: nowrap;
-                	font-size: 0 !important;
-                	overflow: visible !important;
-                }
-url(http://onox.qiniudn.com/maverick/materialicons_safari_v16.woff) format(\'woff\');
-background-image: url(http://onox.qiniudn.com/maverick/tbbg/1.jpg) !important;
 */
 (function ($) {
     //const $ = unsafeWindow.jQuery;
@@ -10114,6 +10104,7 @@ margin-top: 20px;
                         }
                     }
                 }
+                document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove();//解决未登陆贴吧看贴会无限弹窗的问题
             }
             if (classList.contains('userbar')) {
                 console.log("不登陆看贴");
