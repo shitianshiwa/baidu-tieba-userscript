@@ -7552,7 +7552,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             $($ads).remove();
                             clearTimeout(adst);
                             adst = null;
-                        }, 2000);
+                        }, 5000);
                         $($ads).remove();
                         //https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
                         //console.log(GM_getValue("tiebameihua"));
