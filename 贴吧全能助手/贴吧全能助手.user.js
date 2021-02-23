@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.172
+// @version      2.1.173
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
 // @include      http*://c.tieba.baidu.com/p/*
+// @include      http*://jump2.bdimg.com/*
 ///新发现的贴吧贴子链接
 // @exclude      http*://tieba.baidu.com/f/fdir*
 // @exclude      http*://tieba.baidu.com/f/search*
@@ -129,10 +130,18 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
     console.log("jquery版本号：" + $.fn.jquery);
     let tieziurl = window.location.href;
-    if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/) {
-        let temp = /(https|http):\/\/c\.tieba\.baidu\.com\/p\/(\d+)/.exec(tieziurl);
+    //https://www.v2ex.com/t/611007
+    //https://jump2.bdimg.com/f?kw=
+    //https://jump2.bdimg.com/p/
+    if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/ || tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/p\//g) != -1) {
+        let temp = /(https|http):\/\/c\.tieba\.baidu\.com\/p\/(\d+)/.exec(tieziurl) || /(https|http):\/\/jump2\.bdimg\.com\/p\/(\d+)/.exec(tieziurl);
         //console.log(temp[2]);
-        window.location.href = "https://tieba.baidu.com/p/" + temp[2];
+        window.location.href = "https://tieba.baidu.com/p/" + temp[2];//贴子跳转
+    }
+    else if (tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/f\?kw=/g) != -1) {//贴吧跳转
+        let temp2 = /(https|http):\/\/jump2\.bdimg\.com\/f\?kw=(.+)/.exec(tieziurl);
+        //console.log(temp2[2]);
+        window.location.href = "https://tieba.baidu.com/f?kw=" + temp2[2];
     }
     let baiban2 = setTimeout(() => {
         clearTimeout(baiban2);
@@ -402,6 +411,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                 /*广告和无用功能*/
                 .tbui_fbar_bazhu,
+                .new_list li[data-ext_info],
+
                 .game-head-game-info-wrapper,
                 [id=\"pagelet_entertainment-liveshow/pagelet/video_head\"],
                 .l_post_bright[data-field*=\"user_name\\\"\\:\\\"\\\\u4e3f\\\\u5929\\\\u4e36\\\\u4e4b\\\\u6b87\"][data-field*=\"content\\\"\\:\\\"\\\\u5e0c\\\\u671b\\\\u5404\\\\u4f4d\\\\u5427\\\\u53cb\\\\u80fd\\\\u652f\\\\u6301\\\\u9b54\\\\u5427\\\\u6708\\\\u520a\\\\u3002\\\"\"],
@@ -421,7 +432,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 #spage_liveshow_slide,
                 #plat_act_wrapper,
                 #spage_game_tab_wrapper,
-                .member_rank,
+                div.member_rank,
+                /*楼层列表的幽灵广告*/
+                div.fengchao-wrap-feed,
+                /*右上角的幽灵广告*/
+                .fengchao-wrap,
                 #search_fengchao,
                 #search_union_mod,
                 #search_bottomad,
@@ -6833,7 +6848,51 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     }
                     .wrap2:before {
                     	display: none !important;
-                    }`;
+                    }
+                    /*隐藏贴吧首页隐藏的广告位 by Tieba - Maverick 2018 [百度贴吧]*/
+                    .new_list>li{
+                        margin-bottom: 16px;
+                        padding: 0 !important;
+                        border-radius: 6px;
+                        background: var(--m-block-w010) !important;
+                        border: 1px solid var(--m-line-d010);
+                        box-shadow: 0 2px 6px rgba(0,0,0,.06);
+                    }
+                    .new_list>li.home-place-item{
+                        display: none !important;
+                    }
+                    /*贴吧首页贴子列表外观修饰 by Tieba - Maverick 2018 [百度贴吧]*/
+                    .new_list li .n_right{
+                        padding: 10px !important;
+                        width: 100% !important;
+                        position: relative;
+                    }
+                    .new_list li .n_right>div:first-of-type{
+                        width: 100%;
+                    }
+                    .new_list .enter_pb_btn{
+                        width: 50px;
+                        position: absolute;
+                        right: 25px;
+                        bottom: 8px;
+                        z-index: 9;
+                    }
+                    .new_list .title{
+                        flex: 1;
+                    }
+                    .new_list .title{
+                        color: var(--m-href-color) !important;
+                        text-decoration: none !important;
+                    }
+                    .new_list .em{
+                        color: var(--m-href-color) !important;
+                        text-decoration: none !important;
+                    }
+                    #new_list div.n_txt
+                    {
+                        width: 510px;
+                    }
+                    `;
             }
             if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+i/+.*$")).test(document.location.href)) {
                 css += `
@@ -7548,11 +7607,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             // 贴吧推荐
                             '#forum_recommend'
                         ].join(', ');
-                        let adst = setTimeout(() => {//处理两次广告，增加清理成功率
-                            $($ads).remove();
-                            clearTimeout(adst);
-                            adst = null;
-                        }, 5000);
                         $($ads).remove();
                         //https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
                         //console.log(GM_getValue("tiebameihua"));
@@ -9686,7 +9740,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             }
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
-        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic{
+        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9733,6 +9787,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         #user_info,
         /*修复我的贴吧-热门动态-图片显示*/
         img.m_pic,
+        /*清理标签*/
+        div.dialog_block,
         .icon_interview_picture,.listThreadTitle{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
@@ -10424,6 +10480,9 @@ https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1
                     i++;
                 }, 2000);
                 //document.querySelectorAll("ul.new_list>div>div>ul>li>img.m_pic").forEach(pic => pic.style = "width: 100px; height: 100px;");//浏览器开发者工具可用
+            }
+            if (classList.contains('dialog_block')) {
+                target.remove();
             }
         }
         const initListener = () => {
