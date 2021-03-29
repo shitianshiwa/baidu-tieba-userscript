@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 不知道怎么做?
+    url: test
+    about: 建议你先查看此教程
+  - name: 讨论区
+    url: test1
+    about: test2
