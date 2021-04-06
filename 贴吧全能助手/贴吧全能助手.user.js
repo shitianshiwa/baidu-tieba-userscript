@@ -1,20 +1,21 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.173
+// @version      2.1.174
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
 // @include      http*://tieba.baidu.com/*
 // @include      http*://c.tieba.baidu.com/p/*
-// @include      http*://jump2.bdimg.com/*
+// @include      http*://jump2.bdimg.com/f?kw=*
+// @include      http*://live.baidu.com/f?kw=*
 ///新发现的贴吧贴子链接
 // @exclude      http*://tieba.baidu.com/f/fdir*
 // @exclude      http*://tieba.baidu.com/f/search*
 // @exclude      http*://tieba.baidu.com/f/center/*
 // @run-at       document-body
 ///document-start,document-idle;必须使用document-body，否则对多个浏览器的兼容性会下降
-///只测试了Google Chrome 75.0.3770.142（正式版本） （64 位）
+///只测试了Google Chrome 75.0.3770.142（正式版本） (64 位),87.0.4280.66（正式版本） （64 位）
 /// jQuery 留一份自己用
 // @require      https://cdn.jsdelivr.net/npm/jquery@3.4.0/dist/jquery.min.js
 // @require      https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js
@@ -133,12 +134,13 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     //https://www.v2ex.com/t/611007
     //https://jump2.bdimg.com/f?kw=
     //https://jump2.bdimg.com/p/
+    //https://live.baidu.com/f?kw=
     if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/ || tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/p\//g) != -1) {
         let temp = /(https|http):\/\/c\.tieba\.baidu\.com\/p\/(\d+)/.exec(tieziurl) || /(https|http):\/\/jump2\.bdimg\.com\/p\/(\d+)/.exec(tieziurl);
         //console.log(temp[2]);
         window.location.href = "https://tieba.baidu.com/p/" + temp[2];//贴子跳转
     }
-    else if (tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/f\?kw=/g) != -1) {//贴吧跳转
+    else if (tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/live\.baidu\.com\/f\?kw=/g) != -1) {//贴吧跳转
         let temp2 = /(https|http):\/\/jump2\.bdimg\.com\/f\?kw=(.+)/.exec(tieziurl);
         //console.log(temp2[2]);
         window.location.href = "https://tieba.baidu.com/f?kw=" + temp2[2];
@@ -9740,7 +9742,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             }
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
-        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block{
+        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,/*img.m_pic,*/div.dialog_block{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9786,7 +9788,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         #j_userhead,
         #user_info,
         /*修复我的贴吧-热门动态-图片显示*/
-        img.m_pic,
+        /*img.m_pic,*/
         /*清理标签*/
         div.dialog_block,
         .icon_interview_picture,.listThreadTitle{
@@ -10464,7 +10466,7 @@ https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1
                 // }
             }
             ///*修复我的贴吧-热门动态-图片显示*/
-            if (classList.contains('m_pic')) {
+            /*if (classList.contains('m_pic')) {
                 let i = 0;
                 let t = setInterval(() => {
                     if (target.style[0] != undefined) {//等待图片加载完成
@@ -10480,7 +10482,7 @@ https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1
                     i++;
                 }, 2000);
                 //document.querySelectorAll("ul.new_list>div>div>ul>li>img.m_pic").forEach(pic => pic.style = "width: 100px; height: 100px;");//浏览器开发者工具可用
-            }
+            }*/
             if (classList.contains('dialog_block')) {
                 target.remove();
             }
