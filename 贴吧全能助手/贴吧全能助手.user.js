@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.175
+// @version      2.1.176
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
@@ -10170,10 +10170,16 @@ margin-top: 20px;
                         }
                     }
                 }
-                try {
-                    document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove();//解决未登陆贴吧看贴会无限弹窗的问题,贴子里才会弹窗，贴吧主页列表会报错
-                }
-                catch (e) { }
+                let killlogin = 6;
+                let t = setInterval(() => {
+                    if (killlogin == 0) {
+                        clearInterval(t);
+                        t = null;
+                    } try {
+                        document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove();//解决未登陆贴吧看贴会弹窗的问题
+                    } catch (e) { }
+                    killlogin--;
+                }, 1000);
             }
             if (classList.contains('userbar')) {
                 console.log("不登陆看贴");
@@ -10242,11 +10248,11 @@ margin-top: 20px;
                         时间戳/1000  应该可以选头像
                         需要填上时间戳才能保证头像显示正确
                         一般默认显示64*64
-https://gss0.bdstatic.com/一串大小写字母数字/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
-https://gss0.baidu.com/一串大小写字母数字/sys/portraith/item/[PageData.user.portrait]?t=时间戳/1000 大图 960*960，580*580
-https://himg.bdimg.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
-http://tb.himg.baidu.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
-https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1000                        */
+    https://gss0.bdstatic.com/一串大小写字母数字/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
+    https://gss0.baidu.com/一串大小写字母数字/sys/portraith/item/[PageData.user.portrait]?t=时间戳/1000 大图 960*960，580*580
+    https://himg.bdimg.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
+    http://tb.himg.baidu.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
+    https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1000                        */
                         //console.log(userimg);
                         if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
                             $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
@@ -10564,8 +10570,8 @@ https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1
                     $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
                     /*
                 修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
-目标标签class p_thread thread_theme_5
-加个thread_theme_bright_absolute
+    目标标签class p_thread thread_theme_5
+    加个thread_theme_bright_absolute
                 */
                 }
                 scrollY1 = window.scrollY;
