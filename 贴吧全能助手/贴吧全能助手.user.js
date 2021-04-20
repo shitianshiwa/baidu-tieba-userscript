@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.176
+// @version      2.1.177
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
@@ -8596,14 +8596,18 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         //temp.remove();
                     },
                     _proc: function (floorType, args) { //chrome测试无效
-                        //console.log("44444444444444444")
-                        if ($('.save_face_post', args._main).size()) {
-                            // 发现挽尊卡
-                            $('<div>').addClass('floor-stripe save_lz_face')
-                                .attr('who', $('.p_author_name', args._main).text())
-                                .insertBefore(args._main);
-                            args._main.addClass('savedFace').hide();
+                        try {
+                            if ($('.save_face_post', args._main).size()) {
+                                // 发现挽尊卡
+                                $('<div>').addClass('floor-stripe save_lz_face')
+                                    .attr('who', $('.p_author_name', args._main).text())
+                                    .insertBefore(args._main);
+                                args._main.addClass('savedFace').hide();
+                            }
+                        } catch (error) {
+                            console.log("$('.save_face_post', args._main).size():" + error);
                         }
+
                     }
                 },
                 "rmSaveFace": {
@@ -9047,26 +9051,19 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                 if (!imageSrc) return false;
                                 image = doc.createElement("img");
                                 image.classList.add("Tie_enlargeImage");
+                                //作者已经出了新版，但还没移过来。。。
                                 //修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
+                                //贴吧的链接现在基本都是https了
                                 image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
                                 image.onerror = function () {
-                                    if (protocol === "https:") {
-                                        log("图片请求", "https转向http");
-                                        protocol = "http:";
-                                        this.src = "http://tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
-                                    }
-                                    elss
-                                    if (protocol === "https:") {
-                                        log("图片请求", "https转向http");
-                                        protocol = "http:";
-                                        this.src = "http://imgsrc.baidu.com/forum/pic/item/" + imageSrc[1];
-                                    } else {
+                                    this.src = "https://imgsrc.baidu.com/forum/pic/item/" + imageSrc[1];
+                                    this.onerror = function () {
                                         this.onerror = null;
                                         this.onload = null;
                                         imageSrc = null;
                                         log("图片请求", "失败");
                                         alert("图片获取失败\n\n如多次获取失败\n请在设置里勾选“调试脚本”打印脚本日志并截图反馈给作者，以便更好的解决问题");
-                                    }
+                                    };
                                 };
                                 image.onload = function () {
                                     log("图片创建", "进行中");
