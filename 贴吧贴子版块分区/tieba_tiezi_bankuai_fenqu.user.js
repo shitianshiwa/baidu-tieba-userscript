@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧贴子版块分区修改(仅吧主有用)
 // @namespace    http://tampermonkey.net/
-// @version      0.03
+// @version      0.0.3.1
 // @description  修改贴子的版块分区，仅吧主可用。备注：并无法看到贴子的版块分区，也就是需要配合贴吧客户端使用才行（贴吧客户端还支持批量操作，而这个脚本仅支持单个贴子。这脚本有用吗？233）
 // @author       shitianshiwa
 // @run-at       document-idle
@@ -12,12 +12,12 @@
 // @grant        unsafeWindow
 // ==/UserScript==
 //const $ = unsafeWindow.jQuery;
-(function() {
+(function () {
     'use strict';
     console.log("New Userscript jquery版本号：" + $.fn.jquery);
     const patt = /^\d+$/; //判断是否全是数字的正则表达式
     async function BB() {
-        let temp3 = await $.post("/bawu2/platform/listForumTab?word=" + unsafeWindow.PageData.forum.name + "&tbs=" + (unsafeWindow.PageData.tbs || unsafeWindow.PageData.user.tbs).toString() + "&ie=utf-8", "", function(o) {
+        let temp3 = await $.post("/bawu2/platform/listForumTab?word=" + unsafeWindow.PageData.forum.name + "&tbs=" + (unsafeWindow.PageData.tbs || unsafeWindow.PageData.user.tbs).toString() + "&ie=utf-8", "", function (o) {
             //console.log(o.errno);
             if (o.errno == 0) {
                 console.log("listForumTab：ok");
@@ -56,10 +56,15 @@
         if (a4 != null) {
             let a7 = "";
             for (let i = 0; i < a4.length; i++) {
-                a7 += a4[i] + "\n";
+                if (i < a4.length - 1) {
+                    a7 += a4[i] + "\n";
+                }
+                else {
+                    a7 += a4[i];
+                }
             }
-            a5 = prompt(a7 + "请输入该贴子的现有分区号：");
-            a6 = prompt(a7 + "请输入该贴子的目标分区号：");
+            a5 = prompt(a7 + "请输入该贴的现有分区号(不输则默认填没有分区):");
+            a6 = prompt(a7 + "请输入该贴的目标分区号(不输入则操作无效):");
             if (a5 == "" || a5 == null) {
                 a5 = "0";
             }
@@ -112,7 +117,7 @@
                 }
                 d += "tiebaclient!!!";
                 c['sign'] = MD5(d);
-                $.post(s, c, function(o) {
+                $.post(s, c, function (o) {
                     if (o.error_code == 0) {
                         alert("OK");
                     } else {
