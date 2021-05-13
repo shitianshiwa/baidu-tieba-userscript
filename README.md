@@ -75,3 +75,5 @@
 * [Google翻译 替换](https://greasyfork.org/zh-CN/scripts/35072-google-translate-replace)对翻译后的字符串进行替换。github:https://github.com/Ahaochan/Tampermonkey，欢迎star和fork。
 * [Dark++](https://greasyfork.org/ja/scripts/376268-dark)CSS 实现夜间模式; 代码是从贴吧抄的, 嗯 ... over; 由于该实现本质上是覆盖一层, 可能会有未知问题出现: 如 sortTable.js 拖拽无效
 * [允许推特内YouTube视频全屏](https://greasyfork.org/zh-CN/scripts/375464-allow-youtube-videos-in-twitter-to-fullscreen) 使推特中嵌入的YouTube视频可以全屏
+
+https://segmentfault.com/a/1190000011368506
