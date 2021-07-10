@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.180
+// @version      2.1.181
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
@@ -8757,11 +8757,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             })();
 
             // 未登录用户可以通过 GM 菜单激活配置项
-            GM_registerMenuCommand('梦姬贴吧助手模块配置', _menu);
+            GM_registerMenuCommand('助手设置', _menu);
 
             if (unsafeWindow.__YUME_DEBUG__) {
                 GM_registerMenuCommand('打印模组配置', function () {
-                    console.info('梦姬模组配置: ');
+                    console.info('助手设置: ');
                     console.info($conf.get('modules'));
                 });
             }
@@ -10365,60 +10365,65 @@ margin-top: 20px;
                 }
             }
             if (classList.contains("t_con")) {
-                try {
-                    //console.log(target);
-                    let temp6 = target.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8
-                    let temp9 = target.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
-                    let temp10 = target.querySelectorAll(".icon-top")[0]; //显示置顶标识
-                    //let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
-                    //console.log(temp6)
-                    //console.log(temp9)
-                    //console.log(temp10)
-                    //console.log(temp6.childNodes);
-                    if (temp6.querySelectorAll(".createtimecsss")[0] != null) {
-                        return false;
-                    }
-                    if (temp6.children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
-                    {
-                        let temp7 = document.createElement("span");
-                        temp7.setAttribute('class', 'createtimecsss');
-                        if (temp6.parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6.parentNode.querySelectorAll(".icon-top")[0] == null) {
-                            temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
-                            temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
-                        } else {
-                            if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
-                                temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                                temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
+                let t = setTimeout(() => {
+                    try {
+                        //console.log(target);
+                        let temp6 = target.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
+                        let temp9 = target.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
+                        let temp10 = target.querySelectorAll(".icon-top")[0]; //显示置顶标识
+                        //let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
+                        console.log("temp6:"+temp6)
+                        console.log("temp9:"+temp9)
+                        console.log("temp10:"+temp10)
+                        //console.log(temp6.childNodes);
+                        if (temp6.querySelectorAll(".createtimecsss")[0] != null) {
+                            return false;
+                        }
+                        if (temp6.children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
+                        {
+                            let temp7 = document.createElement("span");
+                            temp7.setAttribute('class', 'createtimecsss');
+                            if (temp6.parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6.parentNode.querySelectorAll(".icon-top")[0] == null) {
+                                temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
+                                temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
                             } else {
-                                temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                                temp6.children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
+                                if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
+                                    temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                                    temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
+                                } else {
+                                    temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                                    temp6.children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
+                                }
                             }
+                            //console.log(temp6.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
+                            let temp8 = target.querySelectorAll(".is_show_create_time")[0].innerHTML;
+                            //console.log(temp6.parentNode.querySelectorAll(".icon-member-top"))
+                            //console.log(temp6.parentNode.querySelectorAll(".icon-top"))
+                            if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
+                                temp8 = new Date().getFullYear().toString() + "-" + temp8
+                            }
+                            temp7.innerHTML = temp8;
+                            //console.log(temp8)
+                            temp6.children[0].before(temp7);
                         }
-                        //console.log(temp6.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
-                        let temp8 = target.querySelectorAll(".is_show_create_time")[0].innerHTML;
-                        //console.log(temp6.parentNode.querySelectorAll(".icon-member-top"))
-                        //console.log(temp6.parentNode.querySelectorAll(".icon-top"))
-                        if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
-                            temp8 = new Date().getFullYear().toString() + "-" + temp8
+                        if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+                            if (temp9 != null) {
+                                temp9.style = "background-color: #FF6666;";
+                            }
+                            if (temp10 != null) {
+                                temp10.style = "background:none;background-color: #4285F5;";
+                            }
+                            // if (temp11 != null) {
+                            //     temp11.style = "background:none;background-color: #FFCC26;";
+                            // }
                         }
-                        temp7.innerHTML = temp8;
-                        //console.log(temp8)
-                        temp6.children[0].before(temp7);
+                        clearTimeout(t);
+                    } catch (err) {
+                        console.log("t_con:" + err);
+                        clearTimeout(t);
                     }
-                    if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                        if (temp9 != null) {
-                            temp9.style = "background-color: #FF6666;";
-                        }
-                        if (temp10 != null) {
-                            temp10.style = "background:none;background-color: #4285F5;";
-                        }
-                        // if (temp11 != null) {
-                        //     temp11.style = "background:none;background-color: #FFCC26;";
-                        // }
-                    }
-                } catch (err) {
-                    console.log("t_con:" + err);
-                }
+                }, 2000);
+
             }
             if (classList.contains('l_post')) {
                 try {
