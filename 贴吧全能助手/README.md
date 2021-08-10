@@ -1,5 +1,5 @@
 # 贴吧全能助手
-- 原作者的发布链接： https://greasyfork.org/en/scripts/26992-贴吧全能助手 by 忆世萧遥
+- 原作者的发布链接： https://greasyfork.org/en/scripts/26992-贴吧全能助手 by 忆世萧遥（greasyfork上的页面被炸掉了）
 - 百度贴吧按发帖时间（帖子ID）排序 by NULL
 - 查看发帖 by 文科
 - 百度贴吧图片点击放大 by lliwhx
@@ -21,7 +21,6 @@
 # 只测试了Google Chrome 75.0.3770.142（正式版本） （64 位）
 # 安装
 * [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B.user.js)
-* [Install From greasyfork](https://greasyfork.org/zh-CN/scripts/398404-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B-%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
 # 由于贴吧的图片链接有变动，所以点击图片放大功能失效-2019-12-29 (现在贴吧存在两种大图链接：tiebapic.baidu.com/forum/pic/item/+XXXX.jpg和imgsrc.baidu.com/forum/pic/item/+XXXX.jpg)
 # 修改
 * 支持显示用户头像，然而如果切换到其它贴吧号会残留上一个用户的头像，暂时在脚本管理器那里加了清除头像按钮来更新新头像
