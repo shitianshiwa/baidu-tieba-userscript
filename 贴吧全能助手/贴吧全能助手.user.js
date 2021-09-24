@@ -4742,6 +4742,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	font-family: inherit !important;
                 	width: 730px !important;
                 	z-index: 4 !important;
+                    left: 10px;
                 }
                 .core_title_btns {
                 	margin: 0 !important;
@@ -10218,7 +10219,7 @@ margin-top: 20px;
                         }
                     }
                 }
-//给贴子和我的i贴吧添加一个刷新按钮
+                //给贴子和我的i贴吧添加一个刷新按钮
                 if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+home/+.*$")).test(document.location.href)) {
                     let temp = document.createElement("li"); //创建节点<li/>
                     let temp2 = document.createElement("a"); //创建节点<a/>
@@ -10228,8 +10229,8 @@ margin-top: 20px;
                     temp3.before(temp);
                     temp2.addEventListener('click', (e) => {
                         window.location.reload();
-                    });    
-            }
+                    });
+                }
                 if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href) || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+\\d+.*\\?(.*&)*see_lz=[1-9]+\\d*.*$")).test(document.location.href)) {
                     let temp = document.createElement("li"); //创建节点<li/>
                     let temp2 = document.createElement("a"); //创建节点<a/>
