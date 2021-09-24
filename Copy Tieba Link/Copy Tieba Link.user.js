@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013464)
+// @version      1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -802,7 +802,7 @@ function catchLinkTarget(event) {
             target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor);
             //console.log(target.querySelectorAll(".tieba-link-anchor"));
         }
-    } else if (classList.contains('thread_theme_5') && target.parentNode.querySelectorAll(".tieba-link-anchor").length == 0) { //首次进入网页加载
+    } else if (classList.contains('thread_theme_5') && target.parentNode.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) { //首次进入网页加载
         curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
         //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
         if (target.parentNode.querySelectorAll("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //!= "pull-right"
