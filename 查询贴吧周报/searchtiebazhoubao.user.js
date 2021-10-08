@@ -13,7 +13,7 @@
 // ==/UserScript==
 //https://www.52fisher.cn/93.html 常用贴吧接口 April 15, 2016 http://tieba.baidu.com/sign/info?kw=&ie=utf-8
 //https://tieba.baidu.com/mo/q/weeklybazhuview?fid=&beginTime=1590768000 贴吧周报api
-//https: //tieba.baidu.com/mo/q/weeklybazhuview?fid=26497728&beginTime=1617984000
+//https://tieba.baidu.com/mo/q/weeklybazhuview?fid=26497728&beginTime=1617984000
 (function($) {
     'use strict';
 
