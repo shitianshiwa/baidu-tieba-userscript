@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         贴吧自动签到&一键签到&慢速自动签到
-// @version      测试(beta)0.512
+// @version      0.6
 // @description  ’一键签到‘支持的贴吧数量有限，除非开会员，因为是直接用贴吧电脑端的api,和电脑端贴吧主页那里点击一键签到一个效果（每日北京时间0:00至1:00无法使用）。慢速自动签到目前还没什么用。
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -9,6 +9,7 @@
 // @grant        GM_registerMenuCommand
 // @run-at       document-idle
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
+// @license      MIT
 // ==/UserScript==
 //慢速自动签到目前还没什么用
 (function() {

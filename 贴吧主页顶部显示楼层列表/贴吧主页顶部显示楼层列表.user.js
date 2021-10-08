@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      测试(beta)0.352
+// @version      0.4
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
@@ -10,6 +10,7 @@
 // @grant        none
 // @run-at       document-idle
 // @downloadURL  https://github.com/shitianshiwa/baidu-tieba-userscript/
+// @license      MIT
 // ==/UserScript==
 /*能兼容这个链接了https://tieba.baidu.com/f/good?kw=xxxxxx&tab=good*/
 (function($) {
