@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         查询贴吧周报
 // @namespace    http://tampermonkey.net/
-// @version      0.1.2
+// @version      0.1.3
 // @description  查看某个吧的贴吧周报(以7天为周期),全局上似乎已经不会更新数据了?但每个吧最后更新进度可能不一致。也许api参数变了我还不知道？
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 //https://www.52fisher.cn/93.html 常用贴吧接口 April 15, 2016 http://tieba.baidu.com/sign/info?kw=&ie=utf-8
 //https://tieba.baidu.com/mo/q/weeklybazhuview?fid=&beginTime=1590768000 贴吧周报api
-//https://tieba.baidu.com/mo/q/weeklybazhuview?fid=26497728&beginTime=1617984000
+//https://tieba.baidu.com/mo/q/weeklybazhuview?fid=6087183&beginTime=1590768000
 (function($) {
     'use strict';
 
