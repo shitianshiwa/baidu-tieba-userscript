@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1814
+// @version      2.1.1815
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       忆世萧遥,shitianshiwa
@@ -143,9 +143,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/ || tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/p\//g) != -1) {
         let temp = /(https|http):\/\/c\.tieba\.baidu\.com\/p\/(\d+)/.exec(tieziurl) || /(https|http):\/\/jump2\.bdimg\.com\/p\/(\d+)/.exec(tieziurl);
         //console.log(temp[2]);
-        window.location.href = "https://tieba.baidu.com/p/" + temp[2];//贴子跳转
-    }
-    else if (tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/live\.baidu\.com\/f\?kw=/g) != -1) {//贴吧跳转
+        window.location.href = "https://tieba.baidu.com/p/" + temp[2]; //贴子跳转
+    } else if (tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/live\.baidu\.com\/f\?kw=/g) != -1) { //贴吧跳转
         let temp2 = /(https|http):\/\/jump2\.bdimg\.com\/f\?kw=(.+)/.exec(tieziurl) || /(https|http):\/\/live\.baidu\.com\/f\?kw=(.+)/.exec(tieziurl);
         //console.log(temp2[2]);
         window.location.href = "https://tieba.baidu.com/f?kw=" + temp2[2];
@@ -279,6 +278,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
                 #d_post_manage:hover #j_quick_thread>li:nth-of-type(6){
                     transition-delay: .5s;
+                }
+                /*官方号服务中心post_head_official*/
+                /*贴吧贴子列表顶的游击广告*/
+                li.u_official,.bus-top-activity-wrap{
+                    display: none !important;
                 }
 
               /*.tbui_fbar_share,右侧浮层-分享*/
@@ -7622,9 +7626,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             '#forum_recommend',
 
                             /*贴吧贴子列表顶的游击广告*/
-                            ".bus-top-activity-wrap",
+                            //".bus-top-activity-wrap",
                             /*官方号服务中心post_head_official*/
-                            "li.u_official",
+                            //"li.u_official",
                         ].join(', ');
                         $($ads).remove();
                         //https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
@@ -10169,7 +10173,7 @@ margin-top: 20px;
                 */
             }
             if (classList.contains('u_login')) {
-                $("li.u_login").click(() => {//解决贴子刚加载后，点不出登陆弹窗
+                $("li.u_login").click(() => { //解决贴子刚加载后，点不出登陆弹窗
                     if (tieba_custom_pass_login != null && tieba_custom_pass_login != false) {
                         clearInterval(tieba_custom_pass_login);
                         tieba_custom_pass_login = null;
@@ -10195,8 +10199,9 @@ margin-top: 20px;
                     if (killlogin == 0) {
                         clearInterval(tieba_custom_pass_login);
                         tieba_custom_pass_login = null;
-                    } try {
-                        document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove();//解决未登陆贴吧看贴会弹窗的问题
+                    }
+                    try {
+                        document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove(); //解决未登陆贴吧看贴会弹窗的问题
                     } catch (e) { }
                     killlogin--;
                 }, 1000);
@@ -10275,7 +10280,7 @@ margin-top: 20px;
                         let userimg = "";
                         let userportrait = unsafeWindow.PageData.user.portrait; //.replace(/\?t=.*/, "");
                         //https://sign.52fisher.cn/93.html 常用贴吧接口 April 15, 2016
-                        if (userportrait == "") {//解决无法获取到portrait的情况
+                        if (userportrait == "") { //解决无法获取到portrait的情况
                             var c = {
                                 'un': unsafeWindow.PageData.user.name || unsafeWindow.PageData.user.user_name
                             };
@@ -10530,12 +10535,12 @@ margin-top: 20px;
             if (classList.contains('m_pic')) {
                 let i = 0;
                 let t = setInterval(() => {
-                    if (target.style[0] != undefined) {//等待图片加载完成
+                    if (target.style[0] != undefined) { //等待图片加载完成
                         target.style = "width: 100px; height: 100px;";
                         clearInterval(t);
                         t = null;
                     }
-                    if (i == 10) {//超时处理
+                    if (i == 10) { //超时处理
                         target.style = "width: 100px; height: 100px;";
                         clearInterval(t);
                         t = null;
@@ -10621,10 +10626,10 @@ margin-top: 20px;
                     }
                     $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
                     /*
-                修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
-    目标标签class p_thread thread_theme_5
-    加个thread_theme_bright_absolute
-                */
+            修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
+目标标签class p_thread thread_theme_5
+加个thread_theme_bright_absolute
+            */
                 }
                 scrollY1 = window.scrollY;
                 //console.log($('#j_core_title_wrap')[0].className);
