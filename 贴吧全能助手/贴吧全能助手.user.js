@@ -159,8 +159,91 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     var yincangcebianlanx = false; //隐藏侧边栏
     var qiangdiaoxinxitishi = false; //强调信息显示
     var tieba_custom_pass_login = false;
+    var css = "";
+    css +=
+        `/*广告和无用功能*/
+    .tbui_fbar_bazhu,
+    .new_list li[data-ext_info],
+    .game-head-game-info-wrapper,
+    [id=\"pagelet_entertainment-liveshow/pagelet/video_head\"],
+    .l_post_bright[data-field*=\"user_name\\\"\\:\\\"\\\\u4e3f\\\\u5929\\\\u4e36\\\\u4e4b\\\\u6b87\"][data-field*=\"content\\\"\\:\\\"\\\\u5e0c\\\\u671b\\\\u5404\\\\u4f4d\\\\u5427\\\\u53cb\\\\u80fd\\\\u652f\\\\u6301\\\\u9b54\\\\u5427\\\\u6708\\\\u520a\\\\u3002\\\"\"],
+    .l_post_bright[data-field*=\"template_id\"],
+    .l_post_bright[data-field*=\"monitor_id\"],
+    #duoku_servers_list_wrapper,
+    a[locate*=\"common_search_button\"],
+    .play_list_panel,
+    .middle-sec,
+    .game_live_list,
+    .firework_sender_wrap,
+    [data-daid],
+    #pb_adbanner,
+    #forum_recommend,
+    .top-sec,
+    .r-top-sec,
+    #spage_liveshow_slide,
+    #plat_act_wrapper,
+    #spage_game_tab_wrapper,
+    div.member_rank,
+    /*楼层列表的幽灵广告*/
+    div.fengchao-wrap-feed,
+    /*右上角的幽灵广告*/
+    .fengchao-wrap,
+    #search_fengchao,
+    #search_union_mod,
+    #search_bottomad,
+    .app_forum_top_nav_holdplace,
+    .app_forum_top_nav,
+    .fav-toolbar,
+    img.close_btn,
+    img.close_btn.j_click_close+div,
+    p.switch_radios+div,
+    #aside_ad,
+    .region_bright#tieba-notice+div,
+    .thread_recommend,
+    #platform_left_float,
+    .content_top,
+    .aside_region.my_app.j_encourage_entry,
+    img[src^=\"http://tb1.bdstatic.com/tb/cms/ngmis/adsense/\"],
+    #top_activity,
+    .life_helper,
+    .middle-sec>div>.iframe_wrapper,
+    #search_fengchao_left,
+    div[id=\"pagelet_entertainment-base/pagelet/xiu8_aside_slide\"],
+    [id=\"pagelet_frs-aside/pagelet/ad\"],
+    div[id=\"pagelet_frs-header/pagelet/head_content_middle\"] > div:first-child > div[class^=\"iframe_\"],
+    .j_voice_ad_gif,
+    .p_share_ding,/*发帖域顶部分享控件*/
+    .p_mall_tail,/*层主使用了贴吧特权标识*/
+    #pop_frame,/*右下弹窗*/
+    #encourage_entry,/*右边栏-我的应用*/
+    #global_notice_wrap,/*全贴吧底部公共通知*/
+    .firework-wrap,.firework-wrap2,/*烟花*/
+    ul#thread_list>li:not([data-field]):not(.thread_top_list_folder),/*帖子列表所有项*/
+    #j_p_postlist>div:nth-of-type(1)~div:not([data-field]):not(#j_p_postlist),/*帖子内页所有楼层*/
+    ul#thread_list>li.j_df_card,/*推广*/
+    #j_p_postlist>div[data-isautoreply]:not(:first-of-type),/*推广*/
+    .diamond-mall-aside,/*贴吧夺宝*/
+    #pc2client,/*i贴吧页面客户端广告*/
+    /*贴吧会员相关项*/
+    .u_member,
+    #celebrity,
+    .aside_region.celebrity,
+    .j-placeholder-pay-member,
+    .icon-crown-super-non,
+    /*.sign_tip_sbox_1key,贴吧右上角的一键签到*/
+    .p-post-forbid-speech,
+    /*超级会员各种提示*/
+    .poster_success .success-foot-tip,
+    .l_thread_manage #notify_bubble,
+    /*官方号服务中心post_head_official*/
+    /*贴吧贴子列表顶的游击广告*/
+    li.u_official,
+    .bus-top-activity-wrap,
+    .quick-reply-desc
+    #com_u9_head{
+        display: none !important;
+    }`;
     if (!GM_getValue("tiebameihua")) {
-        var css = "";
         if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
             css +=
                 `
@@ -257,6 +340,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 /*超级会员各种提示*/
                 .poster_success .success-foot-tip,
                 .l_thread_manage #notify_bubble,
+                /*官方号服务中心post_head_official*/
+                /*贴吧贴子列表顶的游击广告*/
+                li.u_official,
+                .bus-top-activity-wrap,
                 .quick-reply-desc {
                     display: none !important;
                 }
@@ -278,11 +365,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
                 #d_post_manage:hover #j_quick_thread>li:nth-of-type(6){
                     transition-delay: .5s;
-                }
-                /*官方号服务中心post_head_official*/
-                /*贴吧贴子列表顶的游击广告*/
-                li.u_official,.bus-top-activity-wrap{
-                    display: none !important;
                 }
 
               /*.tbui_fbar_share,右侧浮层-分享*/
@@ -419,74 +501,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
                 .userbar>ul>li.u_news:hover~li {
                 	transition-delay: .05s;
-                }
-
-                /*广告和无用功能*/
-                .tbui_fbar_bazhu,
-                .new_list li[data-ext_info],
-
-                .game-head-game-info-wrapper,
-                [id=\"pagelet_entertainment-liveshow/pagelet/video_head\"],
-                .l_post_bright[data-field*=\"user_name\\\"\\:\\\"\\\\u4e3f\\\\u5929\\\\u4e36\\\\u4e4b\\\\u6b87\"][data-field*=\"content\\\"\\:\\\"\\\\u5e0c\\\\u671b\\\\u5404\\\\u4f4d\\\\u5427\\\\u53cb\\\\u80fd\\\\u652f\\\\u6301\\\\u9b54\\\\u5427\\\\u6708\\\\u520a\\\\u3002\\\"\"],
-                .l_post_bright[data-field*=\"template_id\"],
-                .l_post_bright[data-field*=\"monitor_id\"],
-                #duoku_servers_list_wrapper,
-                a[locate*=\"common_search_button\"],
-                .play_list_panel,
-                .middle-sec,
-                .game_live_list,
-                .firework_sender_wrap,
-                [data-daid],
-                #pb_adbanner,
-                #forum_recommend,
-                .top-sec,
-                .r-top-sec,
-                #spage_liveshow_slide,
-                #plat_act_wrapper,
-                #spage_game_tab_wrapper,
-                div.member_rank,
-                /*楼层列表的幽灵广告*/
-                div.fengchao-wrap-feed,
-                /*右上角的幽灵广告*/
-                .fengchao-wrap,
-                #search_fengchao,
-                #search_union_mod,
-                #search_bottomad,
-                .app_forum_top_nav_holdplace,
-                .app_forum_top_nav,
-                .fav-toolbar,
-                img.close_btn,
-                img.close_btn.j_click_close+div,
-                p.switch_radios+div,
-                #aside_ad,
-                .region_bright#tieba-notice+div,
-                .thread_recommend,
-                #platform_left_float,
-                .content_top,
-                .aside_region.my_app.j_encourage_entry,
-                img[src^=\"http://tb1.bdstatic.com/tb/cms/ngmis/adsense/\"],
-                #top_activity,
-                .life_helper,
-                .middle-sec>div>.iframe_wrapper,
-                #search_fengchao_left,
-                div[id=\"pagelet_entertainment-base/pagelet/xiu8_aside_slide\"],
-                [id=\"pagelet_frs-aside/pagelet/ad\"],
-                div[id=\"pagelet_frs-header/pagelet/head_content_middle\"] > div:first-child > div[class^=\"iframe_\"],
-                .j_voice_ad_gif,
-                .p_share_ding,/*发帖域顶部分享控件*/
-                .p_mall_tail,/*层主使用了贴吧特权标识*/
-                #pop_frame,/*右下弹窗*/
-                #encourage_entry,/*右边栏-我的应用*/
-                #global_notice_wrap,/*全贴吧底部公共通知*/
-                .firework-wrap,.firework-wrap2,/*烟花*/
-                ul#thread_list>li:not([data-field]):not(.thread_top_list_folder),/*帖子列表所有项*/
-                #j_p_postlist>div:nth-of-type(1)~div:not([data-field]):not(#j_p_postlist),/*帖子内页所有楼层*/
-                ul#thread_list>li.j_df_card,/*推广*/
-                #j_p_postlist>div[data-isautoreply]:not(:first-of-type),/*推广*/
-                .diamond-mall-aside,/*贴吧夺宝*/
-                #pc2client,/*i贴吧页面客户端广告*/
-                #com_u9_head{
-                	display: none !important;
                 }
 
                 .creativeplatform-wrap-word-repost-btn .btn-default,
@@ -6453,7 +6467,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 .spread_btn{
                 	z-index: 999;
                 }`;
-
             if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)(/*|(?!/+tbmall/+).*)$")).test(document.location.href)) {
                 css += `
                     /*T逗商城以外的页面*/
@@ -7343,23 +7356,23 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 //管用户头像栏的 http://tieba.baidu.com/i/i/*
             }
         }
-        if (typeof GM_addStyle != "undefined") {
-            GM_addStyle(css);
-        } else if (typeof PRO_addStyle != "undefined") {
-            PRO_addStyle(css); //有警告
-        } else if (typeof addStyle != "undefined") {
-            addStyle(css); //有警告
+    }
+    if (typeof GM_addStyle != "undefined") {
+        GM_addStyle(css);
+    } else if (typeof PRO_addStyle != "undefined") {
+        PRO_addStyle(css); //有警告
+    } else if (typeof addStyle != "undefined") {
+        addStyle(css); //有警告
+    } else {
+        var node = document.createElement("style");
+        node.type = "text/css";
+        node.appendChild(document.createTextNode(css));
+        var heads = document.getElementsByTagName("head");
+        if (heads.length > 0) {
+            heads[0].appendChild(node);
         } else {
-            var node = document.createElement("style");
-            node.type = "text/css";
-            node.appendChild(document.createTextNode(css));
-            var heads = document.getElementsByTagName("head");
-            if (heads.length > 0) {
-                heads[0].appendChild(node);
-            } else {
-                // no head yet, stick it whereever
-                document.documentElement.appendChild(node);
-            }
+            // no head yet, stick it whereever
+            document.documentElement.appendChild(node);
         }
     }
     //百度贴吧：不登录即可看贴 by VA
@@ -10626,10 +10639,10 @@ margin-top: 20px;
                     }
                     $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
                     /*
-            修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
+    修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
 目标标签class p_thread thread_theme_5
 加个thread_theme_bright_absolute
-            */
+    */
                 }
                 scrollY1 = window.scrollY;
                 //console.log($('#j_core_title_wrap')[0].className);
