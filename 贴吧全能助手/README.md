@@ -1,4 +1,5 @@
 # 贴吧全能助手
+- [openuserjs](https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9))
 - 原作者的发布链接： https://greasyfork.org/en/scripts/26992-贴吧全能助手 by 忆世萧遥（greasyfork上的页面被炸掉了）
 - 梦姬贴吧助手 by jixun https://github.com/jixunmoe/yume-tieba-helper https://openuserjs.org/scripts/JixunMoe/%E6%A2%A6%E5%A7%AC%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B MIT License https://github.com/jixunmoe/yume-tieba-helper/blob/master/LICENSE ;tieba_ui.js,Interval_Looper.js,gm2_port_v103.js by Jixun.Moe https://greasyfork.org/scripts/2657/code/tieba_ui.js
 - 百度贴吧按发帖时间（帖子ID）排序 by NULL https://greasyfork.org/zh-CN/scripts/23356-tiebasortbyid
