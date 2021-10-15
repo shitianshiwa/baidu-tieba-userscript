@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1815
+// @version      2.1.1816
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
-// @author       忆世萧遥,shitianshiwa
+// @author       shitianshiwa
+// @homepage     https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
 // @include      http*://tieba.baidu.com/*
 // @include      http*://c.tieba.baidu.com/p/*
 // @include      http*://jump2.bdimg.com/f?kw=*
@@ -41,25 +42,24 @@
 // @grant        GM_registerMenuCommand
 // @grant       GM_deleteValue
 // @grant       GM_xmlhttpRequest
-///https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B 贴吧全能助手 by 忆世萧遥
-///百度贴吧按发帖时间（帖子ID）排序 by NULL
-///查看发帖 by 文科
+///该脚本是多个脚本的集合
+///贴吧全能助手 by 忆世萧遥 https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B 
+///梦姬贴吧助手 by jixun https://github.com/jixunmoe/yume-tieba-helper https://openuserjs.org/scripts/JixunMoe/%E6%A2%A6%E5%A7%AC%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B MIT License https://github.com/jixunmoe/yume-tieba-helper/blob/master/LICENSE ;tieba_ui.js,Interval_Looper.js,gm2_port_v103.js by Jixun.Moe https://greasyfork.org/scripts/2657/code/tieba_ui.js
+///查看发帖 by 文科 https://github.com/wenketel 
+///百度贴吧：不登录即可看贴 by VA 
+///百度贴吧按发帖时间（帖子ID）排序 by NULL https://greasyfork.org/zh-CN/scripts/23356-tiebasortbyid
 ///百度贴吧图片点击放大 by lliwhx https://greasyfork.org/zh-CN/scripts/20969-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7
 ///MIT License
 ///Copyright (c) 2017 lliwhx
 ///Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 ///The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or substantial portions of the Software.
 ///THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-///百度贴吧：不登录即可看贴 by VA 
-///梦姬贴吧助手 by jixun
-///tieba_ui.js,Interval_Looper.js,gm2_port_v103.js by Jixun.Moe https://greasyfork.org/scripts/2657/code/tieba_ui.js
-///https://userstyles.org/styles/124770/tieba-maverick-2018 TieBa - Maverick by Onox
+///---
+///TieBa - Maverick by Onox CC https://userstyles.org/styles/124770/tieba-maverick-2018  BY-NC - Creative Commons Attribution-NonCommercial
 // ==/UserScript==
 /*
-脚步日志+备注
 历史更新记录
 https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B/%E5%8E%86%E5%8F%B2%E6%9B%B4%E6%96%B0%E8%AE%B0%E5%BD%95.txt
-
 2021-2-14 修复我的贴吧里，热门动态的图片全挂了的bug;尝试提高清理广告的成功率
 2020-7-23 由于无法确定贴子内的链接实际情况，所以关掉自动替换跳转链接
 发现https://tieba.baidu.com/p/898425820 主题贴列表的发贴日期有误
@@ -78,7 +78,7 @@ http://tieba.baidu.com/f/center/createtb 创建贴吧
 http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http，但偶尔会跳转到https导致出错（仅在手机yandex浏览器见过这个问题）
 发现一个bug，电脑端贴吧主题贴列表网页右边的"大家都在搜"（class="search_back_box")和"贴吧热议榜"（class="topic_list_box"）在网页拉到底时会向class中自动添加"search-back-fixed"和"topic-search-back-fixed",这个会导致发主题贴编辑器右边冒出一个"大家都在搜"，暂时用计时器定时删除新加的class来解决这个问题(现在是彻底删了，因为贴吧删掉了贴吧主页（不是首页）的贴吧热议榜)
 */
-(function ($) {
+(function($) {
     //const $ = unsafeWindow.jQuery;
     /*var baiban = document.createElement("div");
     baiban.setAttribute("class "baiban");
@@ -7383,11 +7383,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     // } catch (error) {}
     // }, true);
     //梦姬贴吧助手 by jixun
-    (function () {
+    (function() {
         var w = unsafeWindow,
             _main;
-        jQuery(function ($) { //有警告
-            var iv = setInterval(function () {
+        jQuery(function($) { //有警告
+            var iv = setInterval(function() {
                 if (w.jQuery && w.PageData && w.PageData.tbs) {
                     clearInterval(iv);
                     console.log('PageData loaded.');
@@ -7400,7 +7400,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                     w.PageData.games = unsafeObject([]); //有警告
                     //有警告
-                    unsafeExec(function () {
+                    unsafeExec(function() {
                         // 改进自 congxz6688 的 tieba_quote [#147]
                         // 节取自 寂寞的原子 的  悬浮窗脚本 [#116]
                         //2019-11-4 这个会贴吧会报错
@@ -7415,7 +7415,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
             }, 500);
 
-            setTimeout(function () {
+            setTimeout(function() {
                 // 15s later force kill waiting.
                 clearInterval(iv);
             }, 15000);
@@ -7430,7 +7430,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             __mod_enable = 1,
             __mod_disable = 2; //关掉模块
 
-        _main = function ($, wPageData) {
+        _main = function($, wPageData) {
             // 检查是否在贴吧
             if (!wPageData.forum) return;
             var isThread = !!wPageData.thread;
@@ -7440,18 +7440,18 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
             //// Function Helper
             Object.defineProperty(Function.prototype, 'extract', {
-                value: function () {
+                value: function() {
                     return this.toString().match(/\/\*([\s\S]+)\*\//)[1];
                 }
             });
 
-            var _function = function (foo, proto) {
+            var _function = function(foo, proto) {
                 foo.prototype = proto;
                 return foo;
             };
 
-            var $conf = new (_function(function () { }, {
-                get: function (m, def) {
+            var $conf = new(_function(function() {}, {
+                get: function(m, def) {
                     var val = GM_getValue(m, null);
                     if (!val) return def;
 
@@ -7461,22 +7461,22 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         return def;
                     }
                 },
-                set: function (m, val) {
+                set: function(m, val) {
                     return GM_setValue(m, JSON.stringify(val));
                 },
-                rm: function () {
+                rm: function() {
                     [].forEach.call(arguments, GM_deleteValue);
                 },
-                ls: function () {
+                ls: function() {
                     return GM_listValues();
                 }
             }))();
 
-            var _hide = function () {
+            var _hide = function() {
                 _cssH.prepend(Array.prototype.join.call(arguments, ',') + ',');
             };
 
-            var _run = function (foo, name) {
+            var _run = function(foo, name) {
                 // console.groupCollapsed ('[贴吧助手]: ' + (name || '[未知区段]'));
 
                 for (var args = [], i = 2, ret; i < arguments.length; i++) {
@@ -7497,7 +7497,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 return ret;
             };
 
-            $.fn.getField = function () {
+            $.fn.getField = function() {
                 // var $data = this.attr('data-field');
                 var $data = this.data('field');
 
@@ -7507,11 +7507,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 return $data;
             };
 
-            $.goToEditor = function () {
+            $.goToEditor = function() {
                 $('#ueditor_replace').focus();
                 $.scrollTo($('#tb_rich_poster_container'), 500);
             };
-            $.create = function (ele, cls, attr) {
+            $.create = function(ele, cls, attr) {
                 var r = $(document.createElement(ele));
 
                 if (cls) {
@@ -7523,10 +7523,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                 return r;
             };
-            $.stamp = function () {
+            $.stamp = function() {
                 return +new Date();
             };
-            $.toDateStr = function (d) {
+            $.toDateStr = function(d) {
                 return d.toLocaleString();
             };
 
@@ -7536,7 +7536,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '移除美化贴吧时底部出现的工具栏。',
                     flag: 0,
                     def: false,
-                    _init: function () {
+                    _init: function() {
                         //core_title_wrap_bright clearfix  没底工具栏时
                         //core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright 有底工具栏时
                         rmBottom = true;
@@ -7554,7 +7554,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '屏蔽无用、广告内容',
                     flag: ~0,
                     def: true,
-                    _init: function () {
+                    _init: function() {
                         var $ads = [
                             // 贴吧推广
                             '.spreadad, .game_frs_step1, .BAIDU_CLB_AD, .dasense, .u9_head',
@@ -7647,14 +7647,14 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         //https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
                         //console.log(GM_getValue("tiebameihua"));
                         //console.log(window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g));
-                        if (GM_getValue("tiebameihua") && window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g) != -1 /*贴吧主页才执行*/) {
+                        if (GM_getValue("tiebameihua") && window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g) != -1 /*贴吧主页才执行*/ ) {
                             let temp2 = $(".wrap1")[0];
                             if (temp2 != null) {
                                 temp2.style = "background-image: none !important;";
                             }
                         }
                         $('<style>').text($ads + /* File: ads_hide.css */
-                            (function () {
+                            (function() {
                                 /*
     {
     display:none !important;
@@ -7677,15 +7677,15 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         for (let i = 0; i < temp.length; i++) {
                             //console.log(temp[i].innerHTML);
                             //console.log(temp[i].parentNode);
-                            if (temp[i].innerHTML == "" || temp[i].innerHTML == "玩乐" || temp[i].innerHTML == "游戏" /* || temp[i].innerHTML == undefined*占位的*/) {
+                            if (temp[i].innerHTML == "" || temp[i].innerHTML == "玩乐" || temp[i].innerHTML == "游戏" /* || temp[i].innerHTML == undefined*占位的*/ ) {
                                 temp[i].parentNode.style = "display:none;";
                             }
                         }
                         // 执行三次, 确保分隔符会消失
                         for (var i = 3; i--;) {
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 $('.split_text').next('.split_text').remove();
-                                $('.split').filter(function () {
+                                $('.split').filter(function() {
                                     return this.nextElementSibling === null ||
                                         this.nextElementSibling.className == this.className ||
                                         !$(this.nextElementSibling).is(':visible');
@@ -7696,7 +7696,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         this.removePromoteThread();
                     },
 
-                    _proc: function (floorType, args) {
+                    _proc: function(floorType, args) {
                         if (floorType == __type_forum) {
                             if (args.thread.find('.threadlist_rep_num').text() == '推广') {
                                 args.thread.remove();
@@ -7704,7 +7704,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         }
                     },
 
-                    removePromoteThread: function () {
+                    removePromoteThread: function() {
                         // 清理帖子列表的推广
                         var it = document.evaluate('//*[@id="thread_list"]/li/div/div/div[text()="推广"]', document.body, null, XPathResult.ANY_TYPE, null);
                         var thread, threads = [];
@@ -7721,7 +7721,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '并不清楚到底会屏蔽多少东西）',
                     flag: ~0,
                     def: false,
-                    _init: function () {
+                    _init: function() {
                         var $ads = [
                             // 帖子列表顶部, 如直播贴
                             '#threadListGroupCnt'
@@ -7736,7 +7736,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '屏蔽楼层气泡',
                     flag: __type_floor,
                     def: false,
-                    _init: function () {
+                    _init: function() {
                         pingbi_loucengqipao = true;
                         let temp1 = $(".post_bubble_top");
                         let temp2 = $(".post_bubble_middle");
@@ -7752,7 +7752,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             temp3[i].style = "backgrounde:none;";
                         }
                     },
-                    _proc: function (floorType, args) {
+                    _proc: function(floorType, args) {
                         //console.log("666666666666");
                     }
                 },
@@ -7761,7 +7761,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '强调信息提示',
                     flag: __type_floor,
                     def: false,
-                    _init: function () {
+                    _init: function() {
                         qiangdiaoxinxitishi = true;
                         let ii = 0;
                         try {
@@ -7808,7 +7808,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             console.log("强调信息提示:" + err);
                         }
                     },
-                    _proc: function (floorType, args) {
+                    _proc: function(floorType, args) {
                         //console.log("666666666666");
                     }
                 },
@@ -7843,7 +7843,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     def: false,
 
                     // 辅助函数
-                    _match_type: function (_M) {
+                    _match_type: function(_M) {
                         switch (_M) {
                             case this.__M_REGEX:
                                 return 'tp_regex';
@@ -7854,19 +7854,19 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         return 'undefined_' + _M;
                     },
                     // 辅助函数
-                    _range: function (old, min, max) {
+                    _range: function(old, min, max) {
                         return Math.min(Math.max(min, old), max);
                     },
 
                     // 初始化样式表
-                    _init: function () {
+                    _init: function() {
                         _css
                             .append('ul#jx_post_kword > li {margin-bottom: .2em}')
                             .append('.jx_word { padding: 0 .5em; width: 8em } span.regex::before, span.regex::after { content: "/"; color: #777 }')
                             .append('span.regex > .jx_word { border: 0; padding: 0 .2em }')
                             .append('.jx_modifier { width: 4em; border: 0; padding: 0 0 0 .2em }')
 
-                            .append('.jx_post_block_stripe::before{content: "共隐藏 " attr(hide-count) " 个数据"}');
+                        .append('.jx_post_block_stripe::before{content: "共隐藏 " attr(hide-count) " 个数据"}');
 
 
                         $.extend(this, {
@@ -7896,7 +7896,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         this._compileRegex();
 
                         this.$tplConfig = /* File: block_post.html */
-                            (function () {
+                            (function() {
                                 /*
     <div class="jx_autoflow">
     <h3>当匹配到时的操作</h3>
@@ -7948,7 +7948,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     */
                             }).extract();
                         this.$tplAddWord = /* File: block_post_kword.html */
-                            (function () {
+                            (function() {
                                 /*
     <li>
     <select class="jx_word_type">
@@ -7969,7 +7969,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     },
 
                     // 重构样式表
-                    _rebuildStyle: function () {
+                    _rebuildStyle: function() {
                         var sBuilder = '.jx_post_block_act {';
                         switch (this.config.onmatch) {
                             case this.__ACT_BAR:
@@ -8006,9 +8006,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         this.css.text(sBuilder);
                     },
                     // 编译正则匹配
-                    _compileRegex: function () {
+                    _compileRegex: function() {
                         var that = this;
-                        this.config.kword.forEach(function (e) {
+                        this.config.kword.forEach(function(e) {
                             try {
                                 if (e.type === that.__M_REGEX) {
                                     e.regex = new RegExp(e.word, e.modi);
@@ -8016,7 +8016,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             } catch (err) {
                                 console.error('编译正则表达式时出错!\n表达式: %s, 开关: %s', err.word, err.modi);
                                 err.regex = {
-                                    test: function () {
+                                    test: function() {
                                         return false;
                                     }
                                 };
@@ -8025,7 +8025,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     },
 
                     // 配置窗口回调
-                    _conf: function () {
+                    _conf: function() {
                         var $view = $.extend(true, {}, this.config);
 
                         $view.tp_hide = $view.onmatch === this.__ACT_HIDE;
@@ -8046,18 +8046,18 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         });
 
                         var that = this;
-                        $tpl.on('click', 'a.jx-rm-key', function () {
+                        $tpl.on('click', 'a.jx-rm-key', function() {
                             // 移除那一行
                             $(this).parent().remove();
-                        }).on('change', '.jx_word_type', function () {
+                        }).on('change', '.jx_word_type', function() {
                             var isRegex = parseInt(this.value) === that.__M_REGEX;
 
                             var line = $(this).parent();
                             line.find('.jx_word').parent().toggleClass('regex', isRegex);
                             line.find('.jx_modifier').toggleClass('hide', !isRegex);
-                        }).on('change', '#jx_post_match', function () {
+                        }).on('change', '#jx_post_match', function() {
                             $('#jx_post_opa', $tpl).parent().toggleClass('hide', parseInt(this.value) !== that.__ACT_OPA);
-                        }).on('click', '.ui_btn', function () {
+                        }).on('click', '.ui_btn', function() {
                             switch ($(this).data('btn')) {
                                 case 'add':
                                     var $tplAdd = $(Mustache.render(that.$tplAddWord, {
@@ -8073,7 +8073,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                         kword: [],
                                         user: $('#jx_post_user', $tpl).val().split('\n')
                                     };
-                                    $('#jx_post_kword > li').each(function () {
+                                    $('#jx_post_kword > li').each(function() {
                                         var rule = $(this);
                                         newConf.kword.push({
                                             type: parseInt(rule.find('select').val()),
@@ -8096,7 +8096,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     },
 
                     // 标记贴子为隐藏
-                    _hit: function (floor) {
+                    _hit: function(floor) {
                         floor.addClass('jx_post_block_act');
 
                         if (floor.prev().is('script')) {
@@ -8117,11 +8117,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         }
                     },
 
-                    _getAuthor: function (f) {
+                    _getAuthor: function(f) {
                         return f.user_name || f.author_name || (f.author ? f.author.user_name : null);
                     },
 
-                    _proc: function (floorType, args) {
+                    _proc: function(floorType, args) {
                         // 首先检查用户名
                         if (this.config.user.indexOf(this._getAuthor(args._main.getField())) !== -1) {
                             this._hit(args._main);
@@ -8165,7 +8165,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     flag: __type_postact | __type_forum,
                     def: false,
 
-                    _findUser: function (name) {
+                    _findUser: function(name) {
                         if (0 === this.blockList.author.length) {
                             return -1;
                         }
@@ -8178,16 +8178,16 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                         return -1;
                     },
-                    _userExist: function (user) {
+                    _userExist: function(user) {
                         return -1 !== this._findUser(user);
                     },
 
-                    _conf: function () {
+                    _conf: function() {
                         var that = this;
 
                         //有警告
                         var $tpl = $(Mustache.render(this.tplHideAuthor, {
-                            author: this.blockList.author.map(function (e, i) {
+                            author: this.blockList.author.map(function(e, i) {
                                 return {
                                     name: e.name,
                                     time: e.time ? $.toDateStr(new Date(e.time)) : '尚未'
@@ -8202,7 +8202,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         });
 
                         var $inp = $('#jx_new_id', $tpl);
-                        var cbAddName = function () {
+                        var cbAddName = function() {
                             var user = $inp.val().trim();
                             that._updList();
 
@@ -8225,13 +8225,13 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                         // 绑定事件
                         $('#jx_add', $tpl).click(cbAddName);
-                        $inp.keypress(function (e) {
+                        $inp.keypress(function(e) {
                             if (e.which === 13) {
                                 cbAddName();
                             }
                         });
                         $tpl
-                            .on('click', '.jx_man_hide, .jx_man_rm', function (e) {
+                            .on('click', '.jx_man_hide, .jx_man_rm', function(e) {
                                 var $l = $(e.target);
                                 if ($l.hasClass('text-disabled')) {
                                     return;
@@ -8244,7 +8244,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                 switch (true) {
                                     case $l.hasClass('jx_man_hide'):
                                         that.blockList.author[that._findUser($un)].time = $.stamp();
-                                        that._hide(function () { }, $un);
+                                        that._hide(function() {}, $un);
                                         break;
                                     case $l.hasClass('jx_man_rm'):
                                         that.blockList.author.splice(that._findUser($un), 1);
@@ -8255,22 +8255,22 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             });
 
                         $('#jx_close', $tpl).click($wndHideUser.close.bind($wndHideUser));
-                        $('#jx_all', $tpl).click(function () {
+                        $('#jx_all', $tpl).click(function() {
                             var hideStatus = $('#jx_hide_info', $tpl).show().text('正在初始化…');
 
-                            that.hideQueue.onProgress = function (i, t) {
+                            that.hideQueue.onProgress = function(i, t) {
                                 hideStatus.text(Mustache.render('正在隐藏 {{i}} / {{t}}... 请勿关闭该窗口!', {
                                     i: i,
                                     t: t
                                 })); //有警告
                             };
-                            that.hideQueue.onComplete = function () {
+                            that.hideQueue.onComplete = function() {
                                 that.hideQueue.onProgress = that.hideQueue.onComplete = null;
                                 hideStatus.text('全部用户已成功隐藏!');
                             };
                             that.hideQueue.add.apply(
                                 that.hideQueue,
-                                Array.prototype.slice.call($('a.jx.jx_man_hide:not(.text-disabled)').addClass('text-disabled').map(function (i, e) {
+                                Array.prototype.slice.call($('a.jx.jx_man_hide:not(.text-disabled)').addClass('text-disabled').map(function(i, e) {
                                     return $(e).parent().data('name');
                                 }))
                             );
@@ -8278,7 +8278,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         return $tpl;
                     },
 
-                    _hide: function (cb, author) {
+                    _hide: function(cb, author) {
                         // 检查是否在列表
                         this._updList();
                         if (this._userExist(author)) {
@@ -8300,9 +8300,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         }).success(cb);
                     },
 
-                    _init: function () {
+                    _init: function() {
                         this.tplHideAuthor = /* File: hide_loops_config.html */
-                            (function () {
+                            (function() {
                                 /*
     <div class="jx_autoflow">
     <h2>3 天循环隐藏的列表</h2>
@@ -8330,7 +8330,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     */
                             }).extract();
                         this.tplNewLine = /* File: hide_loops_author.html */
-                            (function () {
+                            (function() {
                                 /*
     <li data-name="{{name}}"><b>{{name}}</b>
     [ 上次隐藏: <span class="text-red">{{time}}</span> | <a class="jx jx_man_hide">手动</a> | <a class="jx jx_man_rm">移除</a> ]</li>
@@ -8345,14 +8345,14 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         var t3Days = 3 * 24 * 60 * 60;
 
                         var that = this;
-                        this.blockList.author.forEach(function (e) {
+                        this.blockList.author.forEach(function(e) {
                             if (curTime - e.time > t3Days) {
                                 that.hideQueue.add(e.name);
                             }
                         });
                     },
 
-                    _updList: function () {
+                    _updList: function() {
                         this.blockList = $.extend({
                             author: [
                                 // 格式如下
@@ -8363,23 +8363,23 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             ]
                         }, $conf.get(this.id, {}));
                     },
-                    _saveList: function () {
+                    _saveList: function() {
                         $conf.set(this.id, this.blockList);
                     },
 
-                    _findNameAndHide: function (e) {
+                    _findNameAndHide: function(e) {
                         var floorData = $(e.target).parents('.lzl_single_post,.l_post')
                             .first().getField();
                         var author = floorData.user_name || floorData.author.user_name;
                         if (this._userExist(author)) { //有警告
                             $.dialog.alert(Mustache.render( /* File: hide_loops_already_in_list.html */
-                                (function () {
+                                (function() {
                                     /*
     用户 [<b>{{name}}</b>] 已存在于屏蔽列表!
     */
                                 }).extract(), {
-                                name: author
-                            }), {
+                                    name: author
+                                }), {
                                 title: '3 天循环隐藏'
                             });
                             return;
@@ -8390,9 +8390,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             time: $.stamp()
                         });
                         this._saveList();
-                        this._hide(function (r) { //有警告
+                        this._hide(function(r) { //有警告
                             $.dialog.alert(Mustache.render( /* File: hide_loop_result.html */
-                                (function () {
+                                (function() {
                                     /*
     对 <b>{{name}}</b> 的隐藏处理结果: {{msg}}({{no}})
     */
@@ -8405,7 +8405,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         }, author);
                     },
 
-                    _menu: function (floorType, args) {
+                    _menu: function(floorType, args) {
                         var $act = $('.user-hide-post-action', args._main);
                         var $actHidePost = $.create('a', 'jx jx-post-action');
 
@@ -8423,7 +8423,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     flag: ~0,
                     def: false,
 
-                    _init: function () {
+                    _init: function() {
                         _hide('.icon_wrap');
                     }
                 },
@@ -8451,7 +8451,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                     clsList: ['sign_highlight', 'vip_red', 'fiesta_member', 'fiesta_member_red', 'member_thread_title_frs', 'sign_highlight'],
 
-                    rmOrange: function (target) {
+                    rmOrange: function(target) {
                         var $target = $(target);
 
                         for (var i = 1; i < this.clsList.length; i++) {
@@ -8459,11 +8459,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         }
                     },
 
-                    _init: function () {
+                    _init: function() {
                         // 标题红名移除
                         this.rmOrange('body');
                     },
-                    _proc: function (floorType, args) {
+                    _proc: function(floorType, args) {
                         this.rmOrange(args._main);
                     }
 
@@ -8473,11 +8473,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '引用某一层的内容',
                     flag: __type_floor,
                     def: true,
-                    _proc: function (floorType, args) {
+                    _proc: function(floorType, args) {
                         //console.log("233333333333");
                         var $quote = $('<li>').addClass('pad-left').append( //<li>
                             $('<a>').text('#引用').addClass('jx')
-                                .data('jx', 'quote').data('floor', args.floorNum)
+                            .data('jx', 'quote').data('floor', args.floorNum)
                         ).prependTo($('.p_tail', args._main));
                         /*setTimeout(() => {
                             console.log(args);
@@ -8487,7 +8487,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             ));
                         }, 5000);*/
                     },
-                    _click: function ($ele, $eve) {
+                    _click: function($ele, $eve) {
                         var $floor = $ele.parents('.l_post');
                         var $editor = $('#ueditor_replace');
                         var $quote = $('<p>').appendTo($editor);
@@ -8498,7 +8498,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             .append('——————————')
                             .append('<br>');
 
-                        $('.j_d_post_content', $floor).contents().each(function (i, ele) {
+                        $('.j_d_post_content', $floor).contents().each(function(i, ele) {
                             if (ele.nodeType == 3) {
                                 if (ele.nodeValue.trim() !== '') {
                                     $quote.append(ele.nodeValue);
@@ -8531,19 +8531,19 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '引用楼中楼的回复',
                     flag: __type_lzl,
                     def: true,
-                    _init: function () { //新旧版贴吧都生效
+                    _init: function() { //新旧版贴吧都生效
                         tupianfangda = true;
                         //console.log("123")
                         //_css.append('.jx_no_overflow { max-width: 100%; }');
                         //this.rmImg(document);
                     },
-                    _proc: function (floorType, args) { //仅旧版贴吧生效
+                    _proc: function(floorType, args) { //仅旧版贴吧生效
                         $('<a>').text('引用').addClass('jx d_tail')
                             .insertBefore($('.lzl_time', args._main))
                             .after($('<span>').addClass('d_tail').text(' | '))
                             .data('jx', 'quote_lzl');
                     },
-                    _click: function ($ele, $eve) {
+                    _click: function($ele, $eve) {
                         var $editor = $('#ueditor_replace');
                         var $cnt = $ele.parents('.lzl_cnt');
                         $('<p>').appendTo($editor)
@@ -8561,9 +8561,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '将百度所谓安全链接改成直链。',
                     flag: __type_floor | __type_lzl,
                     def: false,
-                    _proc: function (floorType, args) {
+                    _proc: function(floorType, args) {
                         var $floor = $(args._main);
-                        $floor.find('a[href*="jump.bdimg.com/safecheck"]').each(function (i, ele) {
+                        $floor.find('a[href*="jump.bdimg.com/safecheck"]').each(function(i, ele) {
                             var $ele = $(ele),
                                 $url = $ele.text();
 
@@ -8581,7 +8581,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                         Referer: 'http://tieba.baidu.com/p/123456789',
                                         Range: 'bytes=0-0'
                                     },
-                                    onload: function (response) {
+                                    onload: function(response) {
                                         if (response.finalUrl.indexOf('http') === 0) {
                                             $ele.attr('href', response.finalUrl);
                                         }
@@ -8604,7 +8604,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '隐藏挽尊卡背景图片',
                     flag: __type_floor,
                     def: true,
-                    _init: function () {
+                    _init: function() {
                         /*
                         标题: 出一个使用挽尊卡的教程吧
                         链接：http://tieba.baidu.com/p/5889895156
@@ -8629,7 +8629,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         }
                         //temp.remove();
                     },
-                    _proc: function (floorType, args) { //chrome测试无效
+                    _proc: function(floorType, args) { //chrome测试无效
                         try {
                             if ($('.save_face_post', args._main).size()) {
                                 // 发现挽尊卡
@@ -8648,7 +8648,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     name: '隐藏挽尊卡会员提示',
                     desc: '隐藏会员发帖的使用挽尊卡提示。',
                     flag: 0,
-                    _init: function () {
+                    _init: function() {
                         _hide('.save_face_bg');
                     }
                 },
@@ -8657,8 +8657,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '还原为旧版贴吧点图看大图功能',
                     flag: __type_floor,
                     def: false,
-                    rmImg: function ($root) {
-                        $('img.BDE_Image', $root).each(function () {
+                    rmImg: function($root) {
+                        $('img.BDE_Image', $root).each(function() {
                             var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
                             if (!m) return;
                             var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
@@ -8670,13 +8670,13 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             $(this).remove();
                         });
                     },
-                    _init: function () { //新旧版贴吧都生效
+                    _init: function() { //新旧版贴吧都生效
                         tupianfangda = false;
                         //console.log("123")
                         //_css.append('.jx_no_overflow { max-width: 100%; }');
                         //this.rmImg(document);
                     },
-                    _proc: function (floorType, args) { //仅旧版贴吧生效
+                    _proc: function(floorType, args) { //仅旧版贴吧生效
                         tupianfangda = false;
                         //console.log("456")
                         //this.rmImg(args._main);
@@ -8687,8 +8687,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     desc: '切换为贴吧点图看大图功能',
                     flag: __type_floor,
                     def: false,
-                    rmImg: function ($root) {
-                        $('img.BDE_Image', $root).each(function () {
+                    rmImg: function($root) {
+                        $('img.BDE_Image', $root).each(function() {
                             var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
                             if (!m) return;
                             var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
@@ -8700,14 +8700,14 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             $(this).remove();
                         });
                     },
-                    _init: function () {
+                    _init: function() {
                         if (tupianfangda == true) {
                             _css.append('.jx_no_overflow { max-width: 100%; }');
                             this.rmImg(document);
                         }
 
                     },
-                    _proc: function (floorType, args) {
+                    _proc: function(floorType, args) {
                         if (tupianfangda == true) {
                             this.rmImg(args._main);
 
@@ -8716,9 +8716,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
             };
 
-            var _menu = (function () {
+            var _menu = (function() {
                 var $template = /* File: main_config.html */
-                    (function () {
+                    (function() {
                         /*
     <div style="height: 100%; overflow-y: auto">
     <h2>启用的模组</h2>
@@ -8741,7 +8741,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     */
                     }).extract();
 
-                return _run.bind({}, function () {
+                return _run.bind({}, function() {
                     var $view = {
                         modules: []
                     };
@@ -8764,16 +8764,16 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         height: 200
                     });
 
-                    $('.jx_conf', $tpl).click(function () {
+                    $('.jx_conf', $tpl).click(function() {
                         var x = $(this).data('config');
                         if (lMods.hasOwnProperty(x)) {
                             _run(lMods[x]._conf.bind(lMods[x]), '模组配置 [' + lMods[x].name + ' (' + x + ')]');
                         }
                     });
 
-                    $('#jx_save', $tpl).click(function () {
+                    $('#jx_save', $tpl).click(function() {
                         var newStatus = {};
-                        $('#jx_conf_modules>label>input', $tpl).each(function (i, inp) {
+                        $('#jx_conf_modules>label>input', $tpl).each(function(i, inp) {
                             newStatus[$(inp).data('module')] = inp.checked ? __mod_enable : __mod_disable;
                         });
                         $conf.set('modules', newStatus);
@@ -8788,16 +8788,16 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             GM_registerMenuCommand('助手设置', _menu);
 
             if (unsafeWindow.__YUME_DEBUG__) {
-                GM_registerMenuCommand('打印模组配置', function () {
+                GM_registerMenuCommand('打印模组配置', function() {
                     console.info('助手设置: ');
                     console.info($conf.get('modules'));
                 });
             }
 
-            _run(function () {
-                var _callMenu = function ($parent) {
+            _run(function() {
+                var _callMenu = function($parent) {
                     console.info('成功捕捉到菜单元素，传递至回调…');
-                    _run(function () {
+                    _run(function() {
                         var $menuItem = $('<li>'),
                             $menuLink = $('<a>').appendTo($menuItem).addClass('jx').text('助手设置');
                         //$parent.find('.u_tb_profile').before($menuItem);
@@ -8811,17 +8811,17 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             //console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
                             lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
                         }
-                        $menuLink2.click(function () {
+                        $menuLink2.click(function() {
                             GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
                             location.reload();
                         });
                     }, '菜单召唤');
                 };
 
-                var ma = new MutationObserver(function ($q) {
+                var ma = new MutationObserver(function($q) {
                     try {
-                        $($q).each(function (i, $eve) {
-                            $($eve.addedNodes).each(function (i, $ele) {
+                        $($q).each(function(i, $eve) {
+                            $($eve.addedNodes).each(function(i, $ele) {
                                 if ($ele.nodeType != 3 && $ele.className == 'u_ddl') {
                                     throw {
                                         ele: $($ele),
@@ -8842,7 +8842,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     }
                 });
 
-                setTimeout(function () {
+                setTimeout(function() {
                     var _m = $('.u_setting>.u_ddl');
                     if (_m.length) {
                         _callMenu(_m);
@@ -8852,7 +8852,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                 childList: true,
                                 subtree: true
                             });
-                        } catch (error) { }
+                        } catch (error) {}
                     }
                 }, 1500);
             }, '捕捉设定');
@@ -8860,10 +8860,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
             var lMods = {};
 
-            _run(function () {
+            _run(function() {
                 _css = $('<style>').appendTo(document.head);
                 _css.append( /* File: tieba.css */
-                    (function () {
+                    (function() {
                         /*
     .pull-right	{ float: right			}
     a.jx, .ptr	{ cursor: pointer		}
@@ -8914,7 +8914,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     case 0:
                         var $disabledMods = $conf.get('modules', []);
                         var $modsList = {};
-                        $disabledMods.forEach(function (e) {
+                        $disabledMods.forEach(function(e) {
                             $modsList[e] = __mod_disable;
                         });
                         $conf.set('modules', $modsList);
@@ -8925,7 +8925,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                 var $mods = $conf.get('modules', {});
 
-                $.each(modules, function (mId, fMod) {
+                $.each(modules, function(mId, fMod) {
                     if ($mods[mId] == __mod_disable ||
                         (($mods[mId] == __mod_default || !$mods.hasOwnProperty(mId)) &&
                             fMod.def === false
@@ -8942,9 +8942,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 });
             }, 'Init. modules');
 
-            var _event = function (floorType, otherInfo, _proc) {
+            var _event = function(floorType, otherInfo, _proc) {
                 var fooCB = _proc || '_proc';
-                $.each(lMods, function (mId, m) {
+                $.each(lMods, function(mId, m) {
                     if (!m[fooCB] || !(m.flag & floorType)) {
                         return;
                     }
@@ -8952,7 +8952,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 });
             };
 
-            var _procLzlContainer = function (i, tailer) {
+            var _procLzlContainer = function(i, tailer) {
                 var $tailer = $(tailer),
                     _main = $tailer.parents('.l_post');
 
@@ -8971,7 +8971,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 return _main;
             };
 
-            var _procThreadList = function (i, threadlist) {
+            var _procThreadList = function(i, threadlist) {
                 var $thread = $(threadlist);
                 _event(__type_forum, {
                     _main: $thread,
@@ -8980,7 +8980,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 return $thread;
             };
 
-            var _procLzlPost = function (i, lzlPost) {
+            var _procLzlPost = function(i, lzlPost) {
                 var $lzl = $(lzlPost);
                 _event(__type_lzl, {
                     _main: $lzl,
@@ -8995,12 +8995,12 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             } else {
                 $('.j_thread_list').each(_run.bind({}, _procThreadList, '初始化贴吧页帖子搜索'));
             }
-            var mo = new MutationObserver(function (eve) {
-                _run(function () {
-                    $(eve).each(function (i, eve) {
+            var mo = new MutationObserver(function(eve) {
+                _run(function() {
+                    $(eve).each(function(i, eve) {
                         if (!eve.addedNodes.length) return;
 
-                        $(eve.addedNodes).each(function (i, ele) {
+                        $(eve.addedNodes).each(function(i, ele) {
                             // Text node.
                             if (ele.nodeType == 3) return;
 
@@ -9031,7 +9031,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }, '页面元素插入');
             });
 
-            $(document.body).on('click', '.jx', function (eve) {
+            $(document.body).on('click', '.jx', function(eve) {
                 var $eve = $(eve.target);
                 var $data = $eve.data('jx');
                 if (!$data || !lMods[$data] || !lMods[$data]._click) return;
@@ -9057,13 +9057,13 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     //推荐和这个脚本一起使用https://greasyfork.org/ja/scripts/24204-picviewer-ce
     setTimeout(() => {
         if (tupianfangda == true) {
-            (function (window) {
+            (function(window) {
                 "use strict";
                 //CSS
                 var parentElement = document.getElementById("j_p_postlist");
                 GM_addStyle(".BDE_Image,.j_user_sign{cursor:alias;}#Tie_enlargeImage_parentDIV{position:fixed;z-index:1005;top:0;left:0;}.Tie_enlargeImage{position:absolute;box-shadow:1px 1px 10px #000;cursor:move;}.Tie_enlargeImage:hover{z-index:1006;}#Tie_setValue_DIV{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);}.Tie_definedDIV{position:absolute;z-index:10000;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);}.Tie_definedDIV_title{border-bottom:1px solid #f2f2f5;line-height:40px;font-size:15px;font-weight:700;padding:0 0 0 15px;}.Tie_definedDIV_point{padding:20px 40px;}.Tie_definedDIV_groupSubtitle{font-weight:bold;}.Tie_definedDIV_configItem{line-height:30px;margin:0 20px}.Tie_definedDIV_configItem select{margin:0.5em}.Tie_definedDIV_configItem br+label{margin-left:3em}.Tie_definedDIV_configItem input{vertical-align:middle;margin-right:0.5em}#Tie_debugConfig{margin:0.5em}.Tie_debugConfig_icon{position:relative;display:inline-block;top:4px;width:16px;height:16px;background-position:-350px -100px;background-image:url('https://img.t.sinajs.cn/t6/style/images/common/icon.png');background-repeat:no-repeat;}.Tie_bubble_DIV{position:absolute;visibility:hidden;max-width:280px;top:20%}.Tie_definedDIV_configItem label:hover+.Tie_bubble_DIV{visibility:visible}.Tie_bubble_content{position:relative;background:#fff;padding:6px 13px 6px 16px;border:1px solid #ccc;border-radius:3px;}.Tie_bubble_mainTxt{line-height:18px;}.Tie_bubble_bor{position:absolute;overflow:hidden;bottom:-14px;line-height:14px;}.Tie_bubble_line{border-color:#ccc transparent transparent transparent;}.Tie_bubble_br{margin:-1px 0 0 -14px;border-color:#fff transparent transparent transparent;}.Tie_bubble_bor i,.Tie_bubble_bor em{display:inline-block;width:0;height:0;border-width:7px;border-style:solid;vertical-align:top;overflow:hidden;}.Tie_definedDIV_SaveBtn{background-color:#f2f2f5;text-align:center;padding:10px 0;}.Tie_SaveBtn_a{background:#ff8140;color:#fff;font-size:15px;display:inline-block;padding:0 15px;line-height:35px;border-radius:3px;}.Tie_SaveBtn_a:hover{background:#f7671d}");
                 //数据缓存
-                var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function () { },
+                var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function() {},
                     mouseWheel = /Firefox/.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel",
                     protocol = window.location.protocol || "https",
                     doc = window.document,
@@ -9072,13 +9072,13 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     definedEvent = GM_getValue("definedEvent", "click,click,1,0,1").split(","),
                     repairDefinedEvent = GM_getValue("repairDefinedEvent", false),
                     imageEvent = {
-                        init: function (e) { //主事件
+                        init: function(e) { //主事件
                             var target = e.target,
                                 image, imageSrc;
                             if (e.button === 0 && (target.className === "BDE_Image" || target.className === "j_user_sign")) {
                                 log("图片创建", "开始");
                                 imageSrc = target.src.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/);
-                                log("图片地址获取", function () {
+                                log("图片地址获取", function() {
                                     if (imageSrc) return "成功";
                                     else return "失败";
                                 }, target.src);
@@ -9089,9 +9089,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                 //修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
                                 //贴吧的链接现在基本都是https了
                                 image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
-                                image.onerror = function () {
+                                image.onerror = function() {
                                     this.src = "https://imgsrc.baidu.com/forum/pic/item/" + imageSrc[1];
-                                    this.onerror = function () {
+                                    this.onerror = function() {
                                         this.onerror = null;
                                         this.onload = null;
                                         imageSrc = null;
@@ -9099,7 +9099,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                         alert("图片获取失败\n\n如多次获取失败\n请在设置里勾选“调试脚本”打印脚本日志并截图反馈给作者，以便更好的解决问题");
                                     };
                                 };
-                                image.onload = function () {
+                                image.onload = function() {
                                     log("图片创建", "进行中");
                                     var target = this,
                                         width = target.width,
@@ -9124,7 +9124,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                     }; //缓存当前图片数据
                                     target.style.transform = "translate(" + X + "px," + Y + "px)";
                                     parentDIV.appendChild(target);
-                                    log("图片创建", function () {
+                                    log("图片创建", function() {
                                         target.id = Date.now();
                                         if (doc.getElementById(target.id)) return "成功";
                                         else return "失败";
@@ -9133,17 +9133,17 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                 image = null;
                             }
                         },
-                        StopPropagation: function (e) {
+                        StopPropagation: function(e) {
                             if (e.button === 0 && e.target.className === "BDE_Image") {
                                 e.stopPropagation(); //阻止冒泡，阻止图片原事件
                                 log("阻止贴吧图片原事件", "已执行");
                             }
                         },
-                        Down: function (e) {
+                        Down: function(e) {
                             var target = e.target,
                                 imageData = target.imageData;
                             imageTarget = target;
-                            log("鼠标down事件", function () {
+                            log("鼠标down事件", function() {
                                 if (!target.id) target.id = Date.now();
                                 return "开始";
                             });
@@ -9157,7 +9157,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             doc.addEventListener("mouseup", imageEvent.Up);
                             log("鼠标down事件", "结束");
                         },
-                        Move: function (e) {
+                        Move: function(e) {
                             log("鼠标move事件", "开始");
                             var target = imageTarget,
                                 X = e.clientX + imageCount[0],
@@ -9183,7 +9183,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             target.style.transform = "translate(" + X + "px," + Y + "px)";
                             log("鼠标move事件", "结束", target.style.transform);
                         },
-                        Up: function (e) {
+                        Up: function(e) {
                             log("鼠标up事件", "开始");
                             var target = imageTarget,
                                 RegEx;
@@ -9206,20 +9206,20 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             doc.removeEventListener("mouseup", imageEvent.Up);
                             log("鼠标up事件", "结束", imageButton);
                         },
-                        Close: function (e) {
+                        Close: function(e) {
                             log("鼠标click事件", "开始");
                             var target = e.target;
                             if (imageButton) {
                                 imageButton = null;
                                 delete target.imageData;
                                 parentDIV.removeChild(target);
-                                log("鼠标click事件", function () {
+                                log("鼠标click事件", function() {
                                     if (!doc.getElementById(target.id)) return "成功";
                                     else return "失败";
                                 });
                             }
                         },
-                        Wheel: function (e) {
+                        Wheel: function(e) {
                             var target = e.target,
                                 imageData = target.imageData,
                                 wheelKey = definedEvent[3],
@@ -9277,18 +9277,18 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     };
                 //图片放大设置
                 var userEvent = {
-                    init: function () {
+                    init: function() {
                         this.create();
                         this.Event();
                     },
-                    create: function () {
+                    create: function() {
                         var definedDIV = doc.createElement("div"); //创建自定义DIV框架
                         definedDIV.id = "Tie_setValue_DIV";
                         definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>图片放大设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作(仅支持贴子内的楼层图片！)</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片，修改配置后刷新一下</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select>若条件允许，推荐选择双击以兼容鼠标移动图片<br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
                         doc.body.appendChild(definedDIV);
                         definedDIV = null;
                     },
-                    Event: function () {
+                    Event: function() {
                         var definedDIV = doc.getElementById("Tie_setValue_DIV"),
                             repairValue = doc.getElementById("Tie_repairValue"),
                             debugConfig = doc.getElementById("Tie_debugConfig"),
@@ -9299,34 +9299,34 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             setValue[i].value = oldDefinedEvent[i];
                         }
                         if (setValue[3].value === "0") setValue[4].style.visibility = "hidden";
-                        setValue[3].onchange = function () {
+                        setValue[3].onchange = function() {
                             setValue[4].style.visibility = this.value === "0" ? "hidden" : "visible";
                         };
                         repairValue.checked = repairDefinedEvent;
                         debugConfig.checked = scriptDebug;
-                        doc.getElementById("Tie_setValue_a").onclick = function () {
+                        doc.getElementById("Tie_setValue_a").onclick = function() {
                             definedEvent = [setValue[0].value, setValue[1].value, setValue[2].value, setValue[3].value, setValue[4].value];
                             repairDefinedEvent = repairValue.checked;
                             scriptDebug = debugConfig.checked;
                             if (oldDefinedEvent[0] !== definedEvent[0]) {
-                                if (!parentElement) { } else {
+                                if (!parentElement) {} else {
                                     parentElement.removeEventListener(oldDefinedEvent[0], imageEvent.init, true);
                                     parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
                                 }
                             }
                             if (oldDefinedEvent[1] !== definedEvent[1]) {
-                                if (!parentElement) { } else {
+                                if (!parentElement) {} else {
                                     parentDIV.removeEventListener(oldDefinedEvent[1], imageEvent.Close);
                                     parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
                                 }
                             }
-                            log = scriptDebug && function (text, types, data) { //脚本调试，日志
+                            log = scriptDebug && function(text, types, data) { //脚本调试，日志
                                 if (typeof types === "function") {
                                     types = types();
                                 }
                                 if (data === undefined) console.log(text, types);
                                 else console.log(text, types, data);
-                            } || function () { };
+                            } || function() {};
                             log("图片放大设置", "已执行", definedEvent + "," + repairDefinedEvent);
                             this.onclick = null;
                             setValue[3].onchange = null;
@@ -9342,7 +9342,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         };
                     }
                 };
-                GM_registerMenuCommand("图片放大设置", function () {
+                GM_registerMenuCommand("图片放大设置", function() {
                     if (!doc.getElementById("Tie_setValue_DIV")) {
                         userEvent.init();
                     }
@@ -9366,11 +9366,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 if (!GM_getValue("definedEvent")) {
                     userEvent.init();
                 }
-                window.addEventListener("resize", function () {
+                window.addEventListener("resize", function() {
                     if (typeof winResize !== undefined) {
                         clearTimeout(winResize);
                     }
-                    winResize = setTimeout(function () {
+                    winResize = setTimeout(function() {
                         docHeight = doc.documentElement.clientHeight - 6;
                         docWidth = doc.documentElement.clientWidth - 6;
                     }, 334);
@@ -9436,7 +9436,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     })();*/
 
     //查看发帖 by 文科
-    window.addEventListener('DOMContentLoaded', function () {
+    window.addEventListener('DOMContentLoaded', function() {
         var $ = unsafeWindow.$;
 
         function getUserHistory(e) {
@@ -9450,7 +9450,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             window.open("http://tieba.baidu.com/f/search/ures?ie=utf-8&kw=" + encodeURIComponent(barName) + "&qw=&rn=100&un=" + encodeURIComponent(userName) + "&sm=1", "_blank");
         }
         (function addBtn() {
-            $('.d_author .p_author').each(function () {
+            $('.d_author .p_author').each(function() {
                 var data = this.querySelector('.p_author_name').getAttribute('data-field');
                 $(this).append('<li class="user_post_li" style="margin-top:4px"><a style="cursor: pointer;color:#FF6600;" data=' + data + '>全贴吧发言记录</a></li>')
                 $(this).append('<li class="user_post_li" style="margin-top:4px"><a style="cursor: pointer;color:#FF6600;" data=' + data + '>某贴吧发言记录</a></li>')
@@ -9475,7 +9475,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
     var yipaixun = 0;
     var yipaixun2 = false;
-    (function () {
+    (function() {
         if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
 
         function sortById() {
@@ -9524,7 +9524,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             } else {
                 yipaixun = 0;
                 $(".fatieshijianpaixu").html('按发贴时间排序<span style="color:#000 !important;">(当前为:回复时间顺序)</span>')
-                //console.log("666");
+                    //console.log("666");
                 let threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
                 for (let thread of threads3) {
                     try {
@@ -9586,7 +9586,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         }, 3000);
     })();
 
-    (function () {
+    (function() {
         let jishu = 0;
         let t = setInterval(() => {
             if (jishu < 60) {
@@ -9601,7 +9601,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         }
                     }
                 }
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                     //以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
                     //u_username_wrap
                     //u_news_wrap
@@ -9757,7 +9757,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         }, 5000);
     })();
 
-    (function () { //参考显示用户名和贴子屏蔽检测脚本 https://greasyfork.org/scripts/31207-%E8%B4%B4%E5%90%A7%E6%98%BE%E7%A4%BA%E7%9C%9F%E5%AE%9Eid https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
+    (function() { //参考显示用户名和贴子屏蔽检测脚本 https://greasyfork.org/scripts/31207-%E8%B4%B4%E5%90%A7%E6%98%BE%E7%A4%BA%E7%9C%9F%E5%AE%9Eid https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
         var tiebadongtai = "";
         tiebadongtai = `
         /* 使用 animation 监测 DOM 变化 */
@@ -9893,7 +9893,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             top: 60px !important;
         }
     `;
-        if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+        if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
             //let t = setTimeout(() => {
             //   clearTimeout(t);
             //                if (document.querySelectorAll("#liveIcon")[0].getAttribute("src").search("interview_live_tv_icon.gif") == -1) {
@@ -9996,7 +9996,7 @@ margin-top: 20px;
                 document.documentElement.appendChild(node);
             }
         }
-        const tieba_action = async (event) => {
+        const tieba_action = async(event) => {
             const {
                 target
             } = event;
@@ -10050,7 +10050,7 @@ margin-top: 20px;
                     let temp2 = document.createElement("span");
                     temp2.setAttribute('class', 'createtimecsss');
                     temp2.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                    if (GM_getValue("tiebameihua") /*贴吧美化后*/) {
+                    if (GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
                         temp2.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 10px;top:10px;color: #999;position: absolute');
                         target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].style = "top: 60px;position: absolute;";
                     }
@@ -10083,7 +10083,7 @@ margin-top: 20px;
                     let temp2 = document.createElement("span");
                     temp2.setAttribute('class', 'createtimecsss');
                     temp2.setAttribute('style', 'position: absolute;text-align: center;top:40px;width: 70px;left: 0px;color: #999;');
-                    if (GM_getValue("tiebameihua") /*贴吧美化后*/) {
+                    if (GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
                         temp2.setAttribute('style', 'text-align: center;top: 40px !important;width: 70px;left: 10px;top:10px;color: #999;position: absolute');
                     }
                     temp2.innerHTML = temp;
@@ -10167,7 +10167,7 @@ margin-top: 20px;
                 //console.log(target.children[1]);
             }
             if (classList.contains('tieba-link-anchor')) { //调整复制链接按钮在旧版贴吧的位置
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                     if (target.parentNode.className == "core_title_btns") {
                         target.style = "position: absolute;left: 440px;top: 0px;";
                     }
@@ -10195,7 +10195,7 @@ margin-top: 20px;
                 console.log("未登陆");
                 //百度贴吧：不登录即可看贴 by VA
                 if (!GM_getValue("tiebameihua")) { //贴吧美化
-                    if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
+                    if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
                         if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
                             let temp3 = $("div.userbar")[0];
                             yincangcebianlanx = true;
@@ -10215,7 +10215,7 @@ margin-top: 20px;
                     }
                     try {
                         document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove(); //解决未登陆贴吧看贴会弹窗的问题
-                    } catch (e) { }
+                    } catch (e) {}
                     killlogin--;
                 }, 1000);
             }
@@ -10228,7 +10228,7 @@ margin-top: 20px;
             if (classList.contains('tbui_aside_float_bar')) {
                 //$("li.tbui_fbar_favor")[0].before();
                 if (!GM_getValue("tiebameihua")) { //贴吧美化
-                    if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
+                    if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
                         if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
                             if (yincangcebianlanx == false) {
                                 yincangcebianlanx = true;
@@ -10279,7 +10279,7 @@ margin-top: 20px;
                     localStorage.setItem("userid", getIsLogin2)
                 }
                 //console.log(getIsLogin2)
-                if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("tiebameihua") /*关闭贴吧美化后，不显示大头像*/) {
+                if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("tiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
                     //console.log($("div.edui-icon-bold")[0]);
                     /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
                         //console.log($("div.edui-icon-bold")[0]);
@@ -10288,7 +10288,7 @@ margin-top: 20px;
                         $("div.edui-btn-red")[0].style = "display:block;"
                     }*/
                     //贴吧右上角的用户头像
-                    let t = setTimeout(async () => { //增加延时以提高右上角按钮显示用户头像的成功率
+                    let t = setTimeout(async() => { //增加延时以提高右上角按钮显示用户头像的成功率
                         clearTimeout(t);
                         let userimg = "";
                         let userportrait = unsafeWindow.PageData.user.portrait; //.replace(/\?t=.*/, "");
@@ -10298,7 +10298,7 @@ margin-top: 20px;
                                 'un': unsafeWindow.PageData.user.name || unsafeWindow.PageData.user.user_name
                             };
                             await $.get("/home/get/panel", c,
-                                function (o) {
+                                function(o) {
                                     if (o != null) {
                                         console.log("/home/get/panel: " + o.data.portrait);
                                         userimg = "https://himg.bdimg.com/sys/portrait/item/" + o.data.portrait;
@@ -10330,40 +10330,40 @@ margin-top: 20px;
                 try {
                     let ii = 0;
                     let t = setInterval(() => {
-                        if (qiangdiaoxinxitishi == true) {
-                            let temp1 = $(".u_news_wrap span"); //浮动按钮
-                            let temp2 = $(".u_notity_bd .category_item"); //浮动按钮
-                            let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span"); //浮动按钮
-                            let temp5 = $("ul.sys_notify_last>li>a>span"); //浮动按钮
-                            //console.log(temp1);
-                            //console.log(temp2);
-                            //console.log(temp4);
-                            //console.log(temp5);
-                            if (ii <= 59) {
-                                ii++;
-                            } else {
-                                clearInterval(t);
-                            }
-                            if (temp1[0] != null && temp2[0] != null && temp4[0] != null && temp5[0] != null) {
-                                clearInterval(t);
-                                let i = 0;
-                                for (i = 0; i < temp1.length; i++) {
-                                    temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
+                            if (qiangdiaoxinxitishi == true) {
+                                let temp1 = $(".u_news_wrap span"); //浮动按钮
+                                let temp2 = $(".u_notity_bd .category_item"); //浮动按钮
+                                let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span"); //浮动按钮
+                                let temp5 = $("ul.sys_notify_last>li>a>span"); //浮动按钮
+                                //console.log(temp1);
+                                //console.log(temp2);
+                                //console.log(temp4);
+                                //console.log(temp5);
+                                if (ii <= 59) {
+                                    ii++;
+                                } else {
+                                    clearInterval(t);
                                 }
-                                for (i = 0; i < temp2.length; i++) {
-                                    temp2[i].style["color"] = "#f00 !important;";
-                                }
+                                if (temp1[0] != null && temp2[0] != null && temp4[0] != null && temp5[0] != null) {
+                                    clearInterval(t);
+                                    let i = 0;
+                                    for (i = 0; i < temp1.length; i++) {
+                                        temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
+                                    }
+                                    for (i = 0; i < temp2.length; i++) {
+                                        temp2[i].style["color"] = "#f00 !important;";
+                                    }
 
-                                for (i = 0; i < temp4.length; i++) {
-                                    temp4[i].style = "color:#f00 !important;";
-                                }
-                                for (i = 0; i < temp5.length; i++) {
-                                    temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
+                                    for (i = 0; i < temp4.length; i++) {
+                                        temp4[i].style = "color:#f00 !important;";
+                                    }
+                                    for (i = 0; i < temp5.length; i++) {
+                                        temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
+                                    }
                                 }
                             }
-                        }
 
-                    },
+                        },
                         1000);
                 } catch (err) {
                     console.log("强调信息提示:" + err);
@@ -10374,31 +10374,31 @@ margin-top: 20px;
                 try {
                     let ii = 0;
                     let t = setInterval(() => {
-                        if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                            let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
-                            if (temp[0] != null) {
-                                temp[0].style = "background:#fff;";
+                            if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+                                let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
+                                if (temp[0] != null) {
+                                    temp[0].style = "background:#fff;";
+                                }
                             }
-                        }
-                        if (qiangdiaoxinxitishi == true) {
-                            let temp6 = $(".meihua"); //美化开关
-                            if (ii <= 59) {
-                                ii++;
-                            } else {
-                                clearInterval(t);
+                            if (qiangdiaoxinxitishi == true) {
+                                let temp6 = $(".meihua"); //美化开关
+                                if (ii <= 59) {
+                                    ii++;
+                                } else {
+                                    clearInterval(t);
+                                }
+                                if (temp6[0] != null) {
+                                    clearInterval(t);
+                                    temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+                                }
                             }
-                            if (temp6[0] != null) {
-                                clearInterval(t);
-                                temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
-                            }
-                        }
 
-                    },
+                        },
                         1000);
                 } catch (err) {
                     console.log("强调信息提示:" + err);
                 }
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
                     if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
                         let temp3 = $("div.userbar ")[0];
                         //let temp4 = $("ul.tbui_aside_float_bar")[0];
@@ -10415,7 +10415,7 @@ margin-top: 20px;
                 }
             }
             if (classList.contains('icon-member-top')) {
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                     target.style = "background:none;background-color: #FFCC26;";
                 }
             }
@@ -10430,7 +10430,7 @@ margin-top: 20px;
                         console.log("temp6:" + temp6)
                         console.log("temp9:" + temp9)
                         console.log("temp10:" + temp10)
-                        //console.log(temp6.childNodes);
+                            //console.log(temp6.childNodes);
                         if (temp6.querySelectorAll(".createtimecsss")[0] != null) {
                             return false;
                         }
@@ -10442,7 +10442,7 @@ margin-top: 20px;
                                 temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
                                 temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
                             } else {
-                                if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
+                                if (!GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
                                     temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
                                     temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
                                 } else {
@@ -10461,7 +10461,7 @@ margin-top: 20px;
                             //console.log(temp8)
                             temp6.children[0].before(temp7);
                         }
-                        if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+                        if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
                             if (temp9 != null) {
                                 temp9.style = "background-color: #FF6666;";
                             }
@@ -10572,7 +10572,7 @@ margin-top: 20px;
             document.addEventListener('animationstart', tieba_action, false);
         };
         var yingcang = false;
-        window.addEventListener("transitionend", function (e) { //解决刷新贴子自动跳转到某个位置可能无法隐藏下工具栏问题，缓解工具栏偶尔出现不隐藏问题
+        window.addEventListener("transitionend", function(e) { //解决刷新贴子自动跳转到某个位置可能无法隐藏下工具栏问题，缓解工具栏偶尔出现不隐藏问题
             const {
                 target
             } = e;
@@ -10596,7 +10596,7 @@ margin-top: 20px;
             }
         });
         var scrollY1 = window.scrollY;
-        window.addEventListener("scroll", function (e) {
+        window.addEventListener("scroll", function(e) {
             //const { target } = e;
             //const { classList } = target;
             //console.log(target);
@@ -10609,14 +10609,14 @@ margin-top: 20px;
                 //console.log(temp[0].style["top"]);
                 if (window.scrollY - scrollY1 < 0) {
                     //console.log("向上滚动");
-                    if (temp[0].className != "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" && temp[0].className != "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/) {
+                    if (temp[0].className != "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" && temp[0].className != "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
                         yingcang = false
                     }
                     //window.scrollTo(window.scrollY, window.scrollY+10);
                 }
                 if (window.scrollY - scrollY1 > 0) { //当向下滚动时
                     //console.log("向下滚动");
-                    if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" || temp[0].className == "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/) {
+                    if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" || temp[0].className == "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
                         yingcang = true;
                     }
                 }
@@ -10638,7 +10638,7 @@ margin-top: 20px;
                         $('#thread_theme_5')[0].style = "display:block !important;";
                     }
                     $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
-                    /*
+                        /*
     修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
 目标标签class p_thread thread_theme_5
 加个thread_theme_bright_absolute
@@ -10677,7 +10677,7 @@ margin-top: 20px;
                 */
     // @version      0.011
     // @description  还原被折叠隐藏的楼层、楼中楼，附带自动展开楼中楼的查看更多
-    (function () {
+    (function() {
         'use strict';
         const getTriggerStyle = () => {
             return `
@@ -10708,8 +10708,8 @@ margin-top: 20px;
             [].forEach.call(document.querySelectorAll('div>.j_lzl_container.core_reply_wrapper[style="min-height: 0px; display: none;"]'), node => {
                 if (JSON.parse(node.getAttribute("data-field")).total_num > 0) {
                     node.style = "min-height: 1px; display:block;" //和原来的样式有所不同，这样就可以人为收起来楼中楼了。。！
-                    //node.parentNode.children[0].children[0].children[0].click();
-                    //node.classList.add("_yizhankai_");
+                        //node.parentNode.children[0].children[0].children[0].click();
+                        //node.classList.add("_yizhankai_");
                 }
                 //console.log(JSON.parse(node.getAttribute("data-field")).total_num)
                 //JSON.parse(json).XXXX
@@ -10719,31 +10719,31 @@ margin-top: 20px;
             });
         }
         const unfoldPost3 = (event) => { //楼中楼楼层太长折叠展开
-            if (event.animationName !== '__tieba_zhankai__') {
-                return;
-            }
-            const {
-                target
-            } = event;
-            const {
-                classList
-            } = target;
-            let temp = target.children[1].children[1];
-            if (temp != undefined) {
-                if (temp.classList == "j_lzl_m") {
-                    temp.classList.add("__tieba_zhankai2__");
-                    temp.click();
+                if (event.animationName !== '__tieba_zhankai__') {
+                    return;
                 }
+                const {
+                    target
+                } = event;
+                const {
+                    classList
+                } = target;
+                let temp = target.children[1].children[1];
+                if (temp != undefined) {
+                    if (temp.classList == "j_lzl_m") {
+                        temp.classList.add("__tieba_zhankai2__");
+                        temp.click();
+                    }
+                }
+                //console.log(target.classList);
+                //console.log(temp);
+                //console.log("2333");
+                //console.log(target.children[1].children[1])
+                //document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
             }
-            //console.log(target.classList);
-            //console.log(temp);
-            //console.log("2333");
-            //console.log(target.children[1].children[1])
-            //document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
-        }
-        /**
-         * 初始化样式
-         */
+            /**
+             * 初始化样式
+             */
         const initStyle = () => {
             const style = document.createElement('style');
             style.textContent = getTriggerStyle();
@@ -10766,8 +10766,8 @@ margin-top: 20px;
         initListener();
         initStyle();
     })();
-    (function () {
-        if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
+    (function() {
+        if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
             let temp = document.createElement("input"); //创建节点<input/>
             temp.setAttribute('type', 'button');
             temp.setAttribute('id', "yincangcebianlan");
@@ -10807,7 +10807,7 @@ margin-top: 20px;
         }
     })();
 })($);
-(function () {
+(function() {
     function closemeihua() {
         GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
         window.location.reload(); //刷新网页
