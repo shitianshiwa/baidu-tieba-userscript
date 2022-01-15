@@ -3,7 +3,7 @@
 # 反馈
 - [在贴吧的反馈贴](https://tieba.baidu.com/p/6393045120)
 # 安装
-- [Install From GitHub](https://github.com/shitianshiwa/baidu-tieba-userscript/raw/master/Copy%20Tieba%20Link/Copy%20Tieba%20Link.user.js)
+- [Install From openuserjs](https://openuserjs.org/scripts/shitianshiwa/Copy_Tieba_Link)
 # 功能：
 支持复制主题列表的贴子简介，楼层，楼中楼的链接和内容
 默认设置的复制内容有
