@@ -14,7 +14,7 @@
 /// @exclude     http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=tuan
 // @author       shitianshiwa && 864907600cc     
-/// @icon         https://secure.gravatar.com/avatar/147834caf9ccb0a66b2505c753747867
+/// @icon        https://secure.gravatar.com/avatar/147834caf9ccb0a66b2505c753747867
 // @require      http://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
 // @run-at       document-idle
 // @grant        GM_setClipboard
@@ -22,8 +22,10 @@
 // @grant        unsafeWindow
 // @grant        GM.xmlHttpRequest
 // @grant        GM_xmlHttpRequest
+/// @namespace    http://ext.ccloli.com
 // @license      MIT
-///原脚本地址：https://greasyfork.org/zh-CN/scripts/17375-copy-tieba-link
+///这个脚本的维护地址 https://github.com/shitianshiwa/baidu-tieba-userscript/
+///原脚本地址：https://greasyfork.org/zh-CN/scripts/17375-copy-tieba-link https://github.com/ccloli
 ///【噗通一声跪下】求大神发布一个PC端一键复制帖子标题和链接脚本
 ///@狐狸已经乱了
 ///http://tieba.baidu.com/p/4371750793
