@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1816
+// @version      2.1.1817
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa
@@ -240,7 +240,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     /*贴吧贴子列表顶的游击广告*/
     li.u_official,
     .bus-top-activity-wrap,
-    .quick-reply-desc
+    .quick-reply-desc,
     #com_u9_head{
         display: none !important;
     }`;
@@ -5559,7 +5559,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	padding-top: 5px;
                 	padding-left: 7px;
                 }
-
+                /*e2c4字符下,e2c6字符上*/
                 .tbui_fbar_top>a:after {
                 	content:\"\\e255\";
                 	font-size: 32px;
@@ -5601,8 +5601,14 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 .tbui_fbar_feedback>a:before {
                 	content:\"我要反馈\";
                 }
+                .tbui_fbar_feedback>a:after {
+                	content:\"\\e0c9\";
+                }
                 .tbui_fbar_down>a:before {
                 	content:\"下载APP\";
+                }
+                .tbui_fbar_down>a:after {
+                	content:\"\\e0d6\";
                 }
                 .tbui_fbar_favor>a:after {
                 	content:\"\\e87d\";
@@ -5628,6 +5634,12 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
                 .tbui_fbar_post>a:before {
                 	content:\"发表主题\";
+                }
+                .tbui_fbar_auxiliaryCare>a:before {
+                	content:\"辅助功能\";
+                }
+                .tbui_fbar_auxiliaryCare>a:after {
+                	content:\"辅\";
                 }
                 .tbui_fbar_top{
                 	overflow: hidden;
@@ -7333,6 +7345,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     	padding-top: 5px;
                     	padding-left: 7px;
                     }
+                    /*e2c4字符下,e2c6字符上*/
                     .goTop:after{
                     	content: \"\\e255\";
                     	font-size: 32px;
@@ -7638,6 +7651,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                             // 贴吧推荐
                             '#forum_recommend',
+
+                            //贴吧列表右上角的广告
+                            '#mediago-frs-aside',
+                            //贴吧列表内的广告
+                            'div.mediago-ad-wrapper',
 
                             /*贴吧贴子列表顶的游击广告*/
                             //".bus-top-activity-wrap",
@@ -10421,7 +10439,10 @@ margin-top: 20px;
                 }
             }
             if (classList.contains("t_con")) {
-                let t = setTimeout(() => {
+                let t2 = 15; //暴力搜索15s
+                let t = setInterval(() => {
+                    t2--;
+                    console.log("t_con:" + t2);
                     try {
                         //console.log(target);
                         let temp6 = target.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
@@ -10473,13 +10494,14 @@ margin-top: 20px;
                             //     temp11.style = "background:none;background-color: #FFCC26;";
                             // }
                         }
-                        clearTimeout(t);
                     } catch (err) {
                         console.log("t_con:" + err);
-                        clearTimeout(t);
                     }
-                }, 2000);
-
+                    if (t2 < 0) {
+                        clearInterval(t);
+                        t = null;
+                    }
+                }, 1000);
             }
             if (classList.contains('l_post')) {
                 try {
