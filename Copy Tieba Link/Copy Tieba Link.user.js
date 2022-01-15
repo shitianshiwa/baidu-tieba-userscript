@@ -21,7 +21,6 @@
 // @grant        GM_addStyle
 // @grant        unsafeWindow
 // @grant        GM.xmlHttpRequest
-// @grant        GM_xmlHttpRequest
 /// @namespace    http://ext.ccloli.com
 // @license      MIT
 ///这个脚本的维护地址 https://github.com/shitianshiwa/baidu-tieba-userscript/
