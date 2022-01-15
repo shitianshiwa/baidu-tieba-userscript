@@ -13,9 +13,9 @@
 4、复制楼中楼默认包括：标题、回贴人、楼中楼内容、链接、贴吧名、发贴时间
 
 # 注意：
-1、 无用户名的账号会自动用portrait代替(可以粘在这个链接后面，访问我的贴吧 http://tieba.baidu.com/home/main?id= )
+1、 无用户名的账号会自动用portrait代替(可以粘在这个链接后面，访问我的贴吧 https://tieba.baidu.com/home/main?id= )
 2、会自动判断是不是楼主发贴
 3、 如果会点javascript的话，可以在这里调整复制内容 https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/Copy%20Tieba%20Link/Copy%20Tieba%20Link.user.js#L30
 
 # 备注：
-存在无法判断无用户贴吧账号是否是楼主的可能，因为是直接从楼层用户标签那里判断的，如果第二页开始楼主不回复就无法判断。
+存在无法判断无用户贴吧账号(来源是直接用手机号注册百度账号且不设置贴吧用户名)是否是楼主的可能，因为是直接从楼层用户标签那里判断的，如果第二页开始楼主不回复就无法判断。
