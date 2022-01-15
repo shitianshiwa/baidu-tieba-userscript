@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.1(0.013465)
+// @version      1.2
+/// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
@@ -12,9 +13,8 @@
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=video
 /// @exclude     http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
 // @exclude      http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=tuan
-// @author       864907600cc
-// @author       shitianshiwa
-// @icon         https://secure.gravatar.com/avatar/147834caf9ccb0a66b2505c753747867
+// @author       shitianshiwa && 864907600cc     
+/// @icon         https://secure.gravatar.com/avatar/147834caf9ccb0a66b2505c753747867
 // @require      http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
 // @run-at       document-idle
 // @grant        GM_setClipboard
@@ -88,7 +88,7 @@ const request = (url, options = {}) => fetch(url, Object.assign({
 }, options)).then(res => res.text());
 const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/30307-%E6%89%B9%E9%87%8F%E4%B8%8B%E8%BD%BD%E8%B4%B4%E5%90%A7%E5%8E%9F%E5%9B%BE
     var GM_download = GM.xmlHttpRequest || GM_xmlHttpRequest;
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
         GM_download({
             method: 'GET',
             responseType: 'json',
@@ -96,7 +96,7 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
             //redirect: 'follow',
             // 阻止浏览器发出 CORS 检测的 HEAD 请求头
             //mode: 'same-origin',
-            onreadystatechange: function (responseDetails) {
+            onreadystatechange: function(responseDetails) {
                 //console.log(responseDetails.status)
                 //                console.log(responseDetails)
 
@@ -110,7 +110,7 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
                     }
                 }
             },
-            onerror: function (responseDetails) {
+            onerror: function(responseDetails) {
                 console.log("onerror: " + responseDetails.status);
                 resolve(null);
             }
@@ -164,6 +164,55 @@ if (louzhu1 != undefined) {
 } else {
     louzhu2 = "";
 }
+
+let tieziurl = window.location.href;
+if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/ || tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/p\//g) != -1) {
+    let temp = /(https|http):\/\/c\.tieba\.baidu\.com\/p\/(\d+)/.exec(tieziurl) || /(https|http):\/\/jump2\.bdimg\.com\/p\/(\d+)/.exec(tieziurl);
+    //console.log(temp[2]);
+    window.location.href = "https://tieba.baidu.com/p/" + temp[2]; //贴子跳转
+}
+
+//首次进入贴子时暴力寻找位置安插复制按钮
+if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\//g) != -1) {
+    var T2 = 0;
+    var T = setInterval(() => {
+        if (T2 <= 29) {
+            T2++;
+        } else {
+            clearInterval(T);
+            T = null;
+        }
+        try {
+            //core_title_btns 新贴吧是span标签，旧贴吧是ul标签，这里干脆不指定标签了
+            let temp2 = $("div#j_core_title_wrap")[0];
+            //console.log(temp2.querySelectorAll(".core_title_btns"));
+            if (temp2.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) {
+                //console.log(temp2.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length);
+                let curAnchor2 = linkAnchor.cloneNode(true);
+                curAnchor2.addEventListener('click', copyLink);
+                curAnchor2.setAttribute('data-anchor-type', '1'); //贴子内的标题
+                //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
+                if (temp2.querySelectorAll("span.pull-right").length == 1) { //($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //!= "pull-right"
+                    curAnchor2.setAttribute('style', 'width:80px !important;'); //贴子内的标题
+                } else {
+                    curAnchor2.setAttribute('style', 'width:80px !important;position: absolute;left: 510px;top: 22px;'); //贴子内的标题
+                }
+                temp2.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor2);
+                clearInterval(T); //首次进入贴子
+                T = null;
+            } else {
+                clearInterval(T); //刷新贴子
+                T = null;
+            }
+            console.log(temp2.querySelectorAll(".core_title_btns")[0]);
+        } catch (e) {
+            console.error("T2:" + e);
+            clearInterval(T);
+            T = null;
+        }
+    }, 1000);
+}
+
 
 async function copyLink() {
     var textGroup = [];
@@ -606,10 +655,10 @@ async function copyLink() {
                     textGroup.push("内容: " + temp + " ");
                 }
                 console.log(parent.parentNode.children[2]) //.children[3].getAttribute("class"));
-                /*
-                                普通的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li:nth-child(2) > div.lzl_cnt > span.lzl_content_main
-                                会员的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li.lzl_single_post.j_lzl_s_p.first_no_border > div.lzl_cnt > span.lzl_content_main
-                                */
+                    /*
+                                    普通的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li:nth-child(2) > div.lzl_cnt > span.lzl_content_main
+                                    会员的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li.lzl_single_post.j_lzl_s_p.first_no_border > div.lzl_cnt > span.lzl_content_main
+                                    */
                 if (setting.link) {
                     textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid + " ");
                 }
@@ -762,16 +811,15 @@ function showTips(text) {
     node.innerHTML = text2;
     document.body.appendChild(node);
 
-    setTimeout(function () {
+    setTimeout(function() {
         document.body.removeChild(node);
     }, setting.tips_time * 1000);
 }
 
 function catchLinkTarget(event) {
     if (event.animationName !== 'tiebaLinkTarget') return;
-
     var target = event.target;
-    //console.log(target);
+    //console.log("catchLinkTarget:" + target);
     var classList = target.classList;
     var curAnchor = linkAnchor.cloneNode(true);
     curAnchor.addEventListener('click', copyLink);
@@ -789,7 +837,15 @@ function catchLinkTarget(event) {
             target.appendChild(curAnchor); //添加"复制链接"按钮
         }
         //target.insertBefore(curAnchor, target.getElementsByClassName('j_th_tit')[0]);
-    } else if (classList.contains('pager_theme_4') && target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0] != null) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
+    } else if (classList.contains('core_reply_tail') && target.querySelectorAll(".tieba-link-anchor").length == 0) { //core_title
+        curAnchor.setAttribute('data-anchor-type', '2'); //楼层
+        target.appendChild(curAnchor);
+    } else if (classList.contains('lzl_content_reply') && target.querySelectorAll(".tieba-link-anchor").length == 0) { //threadlist_title 楼中楼 && document.querySelectorAll(".lzl_content_reply>a.tieba-link-anchor")[0] == null
+        curAnchor.setAttribute('data-anchor-type', '3');
+        target.appendChild(curAnchor); //target.getElementsByClassName('j_th_tit')[0] insertBefore('','')
+        //console.log(target.querySelectorAll(".tieba-link-anchor"));
+    }
+    if (classList.contains('pager_theme_4') && target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0] != null) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
         if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) {
             //console.log(target.parentNode.parentNode.parentNode.parentNode);
             curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
@@ -802,7 +858,8 @@ function catchLinkTarget(event) {
             target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor);
             //console.log(target.querySelectorAll(".tieba-link-anchor"));
         }
-    } else if (classList.contains('thread_theme_5') && target.parentNode.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) { //首次进入网页加载
+    }
+    /*if (classList.contains('thread_theme_5') && target.parentNode.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) { //首次进入网页加载,不可靠
         curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
         //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
         if (target.parentNode.querySelectorAll("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //!= "pull-right"
@@ -812,15 +869,7 @@ function catchLinkTarget(event) {
         }
         target.parentNode.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor);
         //console.log(target.querySelectorAll(".tieba-link-anchor"));
-    } else if (classList.contains('core_reply_tail') && target.querySelectorAll(".tieba-link-anchor").length == 0) { //core_title
-        curAnchor.setAttribute('data-anchor-type', '2'); //楼层
-        target.appendChild(curAnchor);
-    } else if (classList.contains('lzl_content_reply') && target.querySelectorAll(".tieba-link-anchor").length == 0) { //threadlist_title 楼中楼 && document.querySelectorAll(".lzl_content_reply>a.tieba-link-anchor")[0] == null
-        curAnchor.setAttribute('data-anchor-type', '3');
-        target.appendChild(curAnchor); //target.getElementsByClassName('j_th_tit')[0] insertBefore('','')
-        //console.log(target.querySelectorAll(".tieba-link-anchor"));
-    }
-
+    }*/
 }
 
 // 使用 animation 事件，方便处理贴吧 ajax 加载数据
@@ -899,7 +948,7 @@ float: right;
 color:#f00 !important;
 }
 
-.pager_theme_4,.thread_theme_5{
+.pager_theme_4/*,.thread_theme_5*/{
     animation-duration: 0.001 s;
     animation-name: tiebaLinkTips;
 }
@@ -908,7 +957,7 @@ color:#f00 !important;
 .core_reply_tail,
 /*.core_title_btns,不支持动态加载*/
 .pager_theme_4,
-.thread_theme_5,/*不支持动态加载*/
+/*.thread_theme_5,不支持动态加载*/
 .threadlist_title,
 .listTitleCnt
 {
