@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.2
+// @version      1.2.2
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
@@ -176,40 +176,72 @@ if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发�
 //首次进入贴子时暴力寻找位置安插复制按钮
 if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\//g) != -1) {
     var T2 = 0;
-    var T = setInterval(() => {
-        if (T2 <= 29) {
-            T2++;
-        } else {
-            clearInterval(T);
-            T = null;
-        }
-        try {
-            //core_title_btns 新贴吧是span标签，旧贴吧是ul标签，这里干脆不指定标签了
-            let temp2 = $("div#j_core_title_wrap")[0];
-            //console.log(temp2.querySelectorAll(".core_title_btns"));
-            if (temp2.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) {
-                //console.log(temp2.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length);
-                let curAnchor2 = linkAnchor.cloneNode(true);
-                curAnchor2.addEventListener('click', copyLink);
-                curAnchor2.setAttribute('data-anchor-type', '1'); //贴子内的标题
-                //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
-                if (temp2.querySelectorAll("span.pull-right").length == 1) { //($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //!= "pull-right"
-                    curAnchor2.setAttribute('style', 'width:80px !important;'); //贴子内的标题
-                } else {
-                    curAnchor2.setAttribute('style', 'width:80px !important;position: absolute;left: 510px;top: 22px;'); //贴子内的标题
-                }
-                temp2.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor2);
-                clearInterval(T); //首次进入贴子
-                T = null;
+    var T3 = 0;
+    let TTT = setTimeout(() => { //延迟1秒等待页面加载得更完整些，减少捕获标签失败可能
+        var T = setInterval(() => {
+            if (T2 <= 29) {
+                T2++;
             } else {
-                clearInterval(T); //刷新贴子
+                clearInterval(T);
                 T = null;
             }
-            console.log(temp2.querySelectorAll(".core_title_btns")[0]);
+            try {
+                //core_title_btns 新贴吧是span标签，旧贴吧是ul标签，这里干脆不指定标签了
+                let temp2 = $("div#j_core_title_wrap")[0];
+                if (temp2.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) {
+                    //console.log(temp2.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length);
+                    let curAnchor2 = linkAnchor.cloneNode(true);
+                    curAnchor2.addEventListener('click', copyLink);
+                    curAnchor2.setAttribute('data-anchor-type', '1'); //贴子内的标题
+                    //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
+                    if (temp2.querySelectorAll("span.pull-right").length == 1) { //($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //!= "pull-right"
+                        curAnchor2.setAttribute('style', 'width:80px !important;'); //贴子内的标题
+                    } else {
+                        curAnchor2.setAttribute('style', 'width:80px !important;position: absolute;left: 510px;top: 22px;'); //贴子内的标题,老贴吧用这个
+                    }
+                    temp2.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor2);
+                    clearInterval(T); //首次进入贴子
+                    T = null;
+                } else {
+                    clearInterval(T); //刷新贴子
+                    T = null;
+                }
+                console.log("j_core_title_wrap:" + temp2);
+            } catch (e) {
+                console.error("T2:" + e);
+                clearInterval(T);
+                T = null;
+            }
+        }, 1000);
+        clearTimeout(TTT);
+        TTT = null;
+    }, 1000);
+    var TT = setInterval(() => {
+        if (T3 <= 29) {
+            T3++;
+        } else {
+            clearInterval(TT);
+            TT = null;
+        }
+        try {
+            let temp3 = $("div.core_reply_tail");
+            //暂时解决有时第一次进贴不显示楼层复制按钮问题
+            //依然很后面的代码依然保有动态加载按钮功能
+            //下面会自动清除计时器
+            for (let i = 0; i < temp3.length; i++) {
+                if (temp3[i].querySelectorAll(".tieba-link-anchor").length == 0) { //core_title
+                    let curAnchor3 = linkAnchor.cloneNode(true);
+                    curAnchor3.addEventListener('click', copyLink);
+                    curAnchor3.setAttribute('data-anchor-type', '2'); //楼层
+                    temp3[i].appendChild(curAnchor3);
+                    console.log("core_reply_tail:" + temp3[i]);
+                }
+            }
+            console.log("core_reply_tail:" + temp3.length);
         } catch (e) {
-            console.error("T2:" + e);
-            clearInterval(T);
-            T = null;
+            console.error("T3:" + e);
+            clearInterval(TT);
+            TT = null;
         }
     }, 1000);
 }
@@ -565,8 +597,12 @@ async function copyLink() {
                 //获取楼层的内容
                 var floorData00 = parent.parentNode.parentNode.children[0].children[1].children[1] || parent.parentNode.parentNode.children[0].children[3].children[1] || parent.parentNode.parentNode.parentNode.children[1].children[0].children[3].children[1];
                 var floorData = JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
-                //console.log(parent.parentNode.parentNode.parentNode.children[1])
-                var floorData02 = (parent.parentNode.parentNode.parentNode.children[0].children[0] || parent.parentNode.parentNode.parentNode.children[1].children[0]).getAttribute("class");
+                //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".louzhubiaoshi_wrap")[0].getAttribute("class"))
+                var floorData02 = parent.parentNode.parentNode.parentNode.querySelectorAll(".louzhubiaoshi_wrap")[0];
+                if (floorData02 != null) {
+                    floorData02 = floorData02.getAttribute("class");
+                }
+                //var floorData02 = (parent.parentNode.parentNode.parentNode.children[0].children[0] || parent.parentNode.parentNode.parentNode.children[1].children[0]).getAttribute("class");
                 //console.log(parent.parentNode.parentNode.parentNode.children[0].children[0].getAttribute("class"))判断是不是楼主
                 /*if (floorData.content.post_no == 1) {
                     //console.log("1楼")
@@ -811,10 +847,22 @@ function showTips(text) {
     node.className = 'tieba-link-tips';
     node.innerHTML = text2;
     document.body.appendChild(node);
-
-    setTimeout(function() {
-        document.body.removeChild(node);
+    let showTipsTimer = setTimeout(function() { //默认显示复制文本显示框一段时间后消失，管消失时间的是在css样式里修改，这里是直接删除标签
+        if (node != null) {
+            document.body.removeChild(node);
+            node = null;
+        }
     }, setting.tips_time * 1000);
+    node.addEventListener("click", () => { //点击一次复制内容显示框就不消失
+        node.setAttribute('style', 'animation-play-state:paused;');
+        clearTimeout(showTipsTimer);
+        showTipsTimer = null;
+    });
+    node.addEventListener("dblclick", () => { //双击复制内容显示框会清除掉
+        //https://www.w3school.com.cn/cssref/pr_animation-play-state.asp animation-play-state 属性规定动画正在运行还是暂停。
+        document.body.removeChild(node); //双击提前关闭复制内容提示窗口
+        node = null; //不清楚引擎能不能自动回收不用的东西？
+    })
 }
 
 function catchLinkTarget(event) {
@@ -846,15 +894,15 @@ function catchLinkTarget(event) {
         target.appendChild(curAnchor); //target.getElementsByClassName('j_th_tit')[0] insertBefore('','')
         //console.log(target.querySelectorAll(".tieba-link-anchor"));
     }
-    if (classList.contains('pager_theme_4') && target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0] != null) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
-        if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("span.core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) {
+    if (classList.contains('pager_theme_4') && target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".core_title_btns")[0] != null) { // $("ul.core_title_btns>a.tieba-link-anchor")[0] && document.querySelectorAll(".core_title_btns>a.tieba-link-anchor")[0] == null
+        if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".core_title_btns")[0].querySelectorAll(".tieba-link-anchor").length == 0) {
             //console.log(target.parentNode.parentNode.parentNode.parentNode);
             curAnchor.setAttribute('data-anchor-type', '1'); //贴子内的标题
-            //console.log($("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length)
-            if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("div#j_core_title_wrap")[0].querySelectorAll("span.pull-right").length == 1) { //动态翻页支持添加按钮
+            //console.log($("div#j_core_title_wrap")[0].querySelectorAll(".pull-right").length)
+            if (target.parentNode.parentNode.parentNode.parentNode.querySelectorAll("div#j_core_title_wrap")[0].querySelectorAll(".pull-right").length == 1) { //动态翻页支持添加按钮
                 curAnchor.setAttribute('style', 'width:80px !important;'); //贴子内的标题
             } else {
-                curAnchor.setAttribute('style', 'width:80px !important;position: absolute;left: 510px;top: 22px;'); //贴子内的标题
+                curAnchor.setAttribute('style', 'width:80px !important;position: absolute;left: 510px;top: 22px;'); //贴子内的标题,老贴吧用这个
             }
             target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".core_title_btns")[0].appendChild(curAnchor);
             //console.log(target.querySelectorAll(".tieba-link-anchor"));
@@ -872,11 +920,31 @@ function catchLinkTarget(event) {
         //console.log(target.querySelectorAll(".tieba-link-anchor"));
     }*/
 }
+//https://www.sitepoint.com/css3-animation-javascript-event-handlers/
+//https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations
+/*
+W3C standard	Firefox     	webkit	                Opera	        IE10
+animationstart	animationstart	webkitAnimationStart	oanimationstart	MSAnimationStart
+animationiteration	animationiteration	webkitAnimationIteration	oanimationiteration	MSAnimationIteration
+animationend	animationend	webkitAnimationEnd	oanimationend	MSAnimationEnd
+*/
+var pfx = ["webkit", "moz", "MS", "o", ""];
 
+function PrefixedEvent(element, type, callback) {
+    for (var p = 0; p < pfx.length; p++) {
+        if (!pfx[p]) type = type.toLowerCase();
+        //console.log(pfx[p] + type);
+        element.addEventListener(pfx[p] + type, callback, false);
+    }
+}
 // 使用 animation 事件，方便处理贴吧 ajax 加载数据
-document.addEventListener('animationstart', catchLinkTarget, false);
-document.addEventListener('MSAnimationStart', catchLinkTarget, false);
-document.addEventListener('webkitAnimationStart', catchLinkTarget, false);
+PrefixedEvent(document, "AnimationStart", catchLinkTarget); //开始
+//PrefixedEvent(document, "AnimationIteration", catchLinkTarget);
+//PrefixedEvent(document, "AnimationEnd", catchLinkTarget);
+//document.addEventListener('animationstart', catchLinkTarget, false);
+//document.addEventListener('MSAnimationStart', catchLinkTarget, false);
+//document.addEventListener('webkitAnimationStart', catchLinkTarget, false);
+
 
 GM_addStyle(`
 @-webkit-keyframes tiebaLinkTarget {}
@@ -980,7 +1048,7 @@ position: fixed;
 right: 10px;
 color: #ffffff;
 z-index: 99999999;
-pointer-events: none;
+/*pointer-events: none;这个阻止选择文本和响应注册事件*/
 -webkit-animation: tiebaLinkTips ` + setting.tips_time + `s;
 -moz-animation: tiebaLinkTips ` + setting.tips_time + `s;
 animation: tiebaLinkTips ` + setting.tips_time + `s;
