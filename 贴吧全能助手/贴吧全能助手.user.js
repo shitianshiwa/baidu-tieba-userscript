@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1819
+// @version      2.1.1820
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -9497,21 +9497,21 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     }, false);*/
 
     //百度贴吧按发帖时间（帖子ID）排序 by NULL
-    var backupshunxu = new Array();
-    setTimeout(() => {
-        var parentNodex = document.getElementById('thread_list');
-        if (parentNodex != null) {
-            var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)');
-            for (let i = 0; i < threadsx.length; i++) {
-                //console.log(threadsx[i]);
-                backupshunxu.push(threadsx[i]);
-            }
-        }
-    }, 3000);
-
-    var yipaixun = 0;
-    var yipaixun2 = false;
     (function () {
+        var backupshunxun = new Array();
+        setTimeout(() => {
+            var parentNodex = document.getElementById('thread_list');
+            if (parentNodex != null) {
+                var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)');
+                for (let i = 0; i < threadsx.length; i++) {
+                    //console.log(threadsx[i]);
+                    backupshunxun.push(threadsx[i]);
+                }
+            }
+        }, 3000);
+
+        var yipaixun = 0;
+        var yipaixun2 = false;
         if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
 
         function sortById() {
@@ -9553,9 +9553,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         console.log(e);
                     }
                 }
-                for (let i = backupshunxu.length - 1; i >= 0; i--) {
+                for (let i = backupshunxun.length - 1; i >= 0; i--) {
                     //console.log("2333")
-                    parentNode.appendChild(backupshunxu[i]);
+                    parentNode.appendChild(backupshunxun[i]);
                 }
             } else {
                 yipaixun = 0;
@@ -9569,9 +9569,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         console.log(e);
                     }
                 }
-                for (let i = 0; i < backupshunxu.length; i++) {
+                for (let i = 0; i < backupshunxun.length; i++) {
                     //console.log("2333")
-                    parentNode.appendChild(backupshunxu[i]);
+                    parentNode.appendChild(backupshunxun[i]);
                 }
             }
         }
@@ -9586,9 +9586,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             a.textContent = '按发贴时间排序(贴子ID)';
             a.setAttribute('class', 'fatieshijianpaixu');
             if (!GM_getValue("tiebameihua")) {
-                a.setAttribute('style', 'color:#999 !important;position: absolute;left: 102%;width: 110px;top: 12px;height: 40px;cursor: -webkit-grab;');
+                a.setAttribute('style', 'color:#999 !important;position: absolute;left: 102%;width: 1000px;top: 12px;height: 40px;cursor: -webkit-grab;');
             } else {
-                a.setAttribute('style', 'color:#999 !important;position: absolute;left:470px;width: 110px;top: 38px;height: 40px;cursor: -webkit-grab;z-index: 1000;');
+                a.setAttribute('style', 'color:#999 !important;position: absolute;left:470px;width: 1000px;top: 38px;height: 40px;cursor: -webkit-grab;z-index: 1000;');
             }
             //a.setAttribute('href', 'javascript:;');
             var paixun = false
@@ -10725,7 +10725,7 @@ margin-top: 20px;
 
         function unfoldPost() { //楼层内容折叠展开
             [].forEach.call(document.querySelectorAll('[style="display:;"]>.p_forbidden_post_content_fold'), node => {
-                //console.log(node)
+                console.log("unfoldPost1:"+node)
                 node.click();
             });
         }
@@ -10738,6 +10738,7 @@ margin-top: 20px;
                     //node.parentNode.children[0].children[0].children[0].click();
                     //node.classList.add("_yizhankai_");
                 }
+                console.log("unfoldPost2:"+node)
                 //console.log(JSON.parse(node.getAttribute("data-field")).total_num)
                 //JSON.parse(json).XXXX
                 //https://blog.csdn.net/weixin_39889465/article/details/86220538 js通过'data-xxx'自定义属性获取dom元素
@@ -10768,15 +10769,15 @@ margin-top: 20px;
             //console.log(target.children[1].children[1])
             //document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
         }
-        let liebiao2 = 0;
+        //let liebiao2 = 0;
         function unfoldPost4() { //要定时循环查找才能找全整个贴吧列表的贴子。。!直接搜索+动态加载一起用
-            if (liebiao2 <= 29) {
+            /*if (liebiao2 <= 29) {
                 liebiao2++;
             }
             else {
                 clearInterval(liebiao);
                 liebiao = null;
-            }
+            }*/
             //console.log("xxx:" + tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g))
             if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g) != -1) {
                 let temp6 = document.querySelectorAll(".col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
