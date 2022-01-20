@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1820
+// @version      2.1.1821
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -10725,26 +10725,33 @@ margin-top: 20px;
 
         function unfoldPost() { //楼层内容折叠展开
             [].forEach.call(document.querySelectorAll('[style="display:;"]>.p_forbidden_post_content_fold'), node => {
-                console.log("unfoldPost1:"+node)
+                console.log("unfoldPost1:" + node)
                 node.click();
             });
         }
 
         function unfoldPost2() { //楼中楼内容折叠展开
             //console.log('223');
-            [].forEach.call(document.querySelectorAll('div>.j_lzl_container.core_reply_wrapper[style="min-height: 0px; display: none;"]'), node => {
-                if (JSON.parse(node.getAttribute("data-field")).total_num > 0) {
-                    node.style = "min-height: 1px; display:block;" //和原来的样式有所不同，这样就可以人为收起来楼中楼了。。！
-                    //node.parentNode.children[0].children[0].children[0].click();
-                    //node.classList.add("_yizhankai_");
-                }
-                console.log("unfoldPost2:"+node)
-                //console.log(JSON.parse(node.getAttribute("data-field")).total_num)
-                //JSON.parse(json).XXXX
-                //https://blog.csdn.net/weixin_39889465/article/details/86220538 js通过'data-xxx'自定义属性获取dom元素
-                //https://www.cnblogs.com/landeanfen/p/5159911.html JS组件系列——使用HTML标签的data属性初始化JS组件
-                //https://www.w3school.com.cn/tags/att_global_data.asp HTML data-* 属性
-            });
+            try {
+                [].forEach.call(document.querySelectorAll('div>.j_lzl_container.core_reply_wrapper[style="min-height: 0px; display: none;"]'), node => {
+                    if (JSON.parse(node.getAttribute("data-field")).total_num > 0) {
+                        node.style = "min-height: 1px; display:block;" //和原来的样式有所不同，这样就可以人为收起来楼中楼了。。！
+                        //node.parentNode.children[0].children[0].children[0].click();
+                        //node.classList.add("_yizhankai_");
+                    }
+                    //console.log("unfoldPost2:"+node)
+                    //console.log(JSON.parse(node.getAttribute("data-field")).total_num)
+                    //JSON.parse(json).XXXX
+                    //https://blog.csdn.net/weixin_39889465/article/details/86220538 js通过'data-xxx'自定义属性获取dom元素
+                    //https://www.cnblogs.com/landeanfen/p/5159911.html JS组件系列——使用HTML标签的data属性初始化JS组件
+                    //https://www.w3school.com.cn/tags/att_global_data.asp HTML data-* 属性
+                });
+            }
+            catch (e) {
+                console.error("unfoldPost2:" + e);
+                clearInterval(louzhonglou);
+            }
+
         }
         const unfoldPost3 = (event) => { //楼中楼楼层太长折叠展开
             if (event.animationName !== '__tieba_zhankai__') {
@@ -10771,79 +10778,85 @@ margin-top: 20px;
         }
         //let liebiao2 = 0;
         function unfoldPost4() { //要定时循环查找才能找全整个贴吧列表的贴子。。!直接搜索+动态加载一起用
-            /*if (liebiao2 <= 29) {
-                liebiao2++;
-            }
-            else {
-                clearInterval(liebiao);
-                liebiao = null;
-            }*/
-            //console.log("xxx:" + tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g))
-            if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g) != -1) {
-                let temp6 = document.querySelectorAll(".col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
-                let temp9 = document.querySelectorAll(".icon-good"); //显示精品贴，精华贴标识
-                let temp10 = document.querySelectorAll(".icon-top"); //显示置顶标识
-                //let temp11 = document.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
-                console.log("temp6x:" + temp6[0])
-                //console.log("temp9:" + temp9)
-                //console.log("temp10:" + temp10)
-                //console.log(temp6.childNodes);
-                let i = 0;
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                    if (temp9 != null) {
-                        for (i = 0; i < temp9.length; i++) {
-                            temp9[i].style = "background-color: #FF6666;";
+            try {
+                /*if (liebiao2 <= 29) {
+               liebiao2++;
+           }
+           else {
+               clearInterval(liebiao);
+               liebiao = null;
+           }*/
+                //console.log("xxx:" + tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g))
+                if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g) != -1) {
+                    let temp6 = document.querySelectorAll(".col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
+                    let temp9 = document.querySelectorAll(".icon-good"); //显示精品贴，精华贴标识
+                    let temp10 = document.querySelectorAll(".icon-top"); //显示置顶标识
+                    //let temp11 = document.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
+                    //console.log("temp6x:" + temp6[0])
+                    //console.log("temp9:" + temp9)
+                    //console.log("temp10:" + temp10)
+                    //console.log(temp6.childNodes);
+                    let i = 0;
+                    if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+                        if (temp9 != null) {
+                            for (i = 0; i < temp9.length; i++) {
+                                temp9[i].style = "background-color: #FF6666;";
+                            }
                         }
-                    }
-                    if (temp10 != null) {
-                        for (i = 0; i < temp10.length; i++) {
-                            temp10[i].style = "background:none;background-color: #4285F5;";
+                        if (temp10 != null) {
+                            for (i = 0; i < temp10.length; i++) {
+                                temp10[i].style = "background:none;background-color: #4285F5;";
+                            }
                         }
+                        // if (temp11 != null) {
+                        //     temp11.style = "background:none;background-color: #FFCC26;";
+                        // }
                     }
-                    // if (temp11 != null) {
-                    //     temp11.style = "background:none;background-color: #FFCC26;";
-                    // }
-                }
-                if (temp6 != null) {
-                    for (i = 0; i < temp6.length; i++) {
-                        if (temp6[i].children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
-                        {
-                            if (temp6[i].querySelectorAll(".createtimecsss")[0] == null) {
-                                let temp7 = document.createElement("span");
-                                temp7.setAttribute('class', 'createtimecsss');
-                                console.log("temp6:" + temp6[i])
-                                if (temp6[i].parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6[i].parentNode.querySelectorAll(".icon-top")[0] == null) {
-                                    temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
-                                    temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
-                                } else {
-                                    if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
-                                        temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                                        temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
+                    if (temp6 != null) {
+                        for (i = 0; i < temp6.length; i++) {
+                            if (temp6[i].children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
+                            {
+                                if (temp6[i].querySelectorAll(".createtimecsss")[0] == null) {
+                                    let temp7 = document.createElement("span");
+                                    temp7.setAttribute('class', 'createtimecsss');
+                                    console.log("temp6:" + temp6[i])
+                                    if (temp6[i].parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6[i].parentNode.querySelectorAll(".icon-top")[0] == null) {
+                                        temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
+                                        temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
                                     } else {
-                                        temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                                        temp6[i].children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
+                                        if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
+                                            temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                                            temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
+                                        } else {
+                                            temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                                            temp6[i].children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
+                                        }
                                     }
+                                    //console.log(temp6[i].parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
+                                    let temp8 = temp6[i].parentNode.querySelectorAll(".is_show_create_time")[0].innerHTML;//得到创建时间
+                                    //console.log(temp6[i].parentNode.querySelectorAll(".icon-member-top"))
+                                    //console.log(temp6[i].parentNode.querySelectorAll(".icon-top"))
+                                    if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
+                                        temp8 = new Date().getFullYear().toString() + "-" + temp8
+                                    }
+                                    temp7.innerHTML = temp8;
+                                    //console.log(temp8)
+                                    temp6[i].children[0].before(temp7);
                                 }
-                                //console.log(temp6[i].parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
-                                let temp8 = temp6[i].parentNode.querySelectorAll(".is_show_create_time")[0].innerHTML;//得到创建时间
-                                //console.log(temp6[i].parentNode.querySelectorAll(".icon-member-top"))
-                                //console.log(temp6[i].parentNode.querySelectorAll(".icon-top"))
-                                if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
-                                    temp8 = new Date().getFullYear().toString() + "-" + temp8
-                                }
-                                temp7.innerHTML = temp8;
-                                //console.log(temp8)
-                                temp6[i].children[0].before(temp7);
                             }
                         }
                     }
+                    //console.log("unfoldPost4");
                 }
-                console.log("unfoldPost4");
+                else {
+                    //console.log("666666666666")
+                    clearInterval(liebiao);
+                    liebiao = null;
+                }
             }
-            else {
-                //console.log("666666666666")
+            catch (e) {
+                console.error("unfoldPost4:" + e);
                 clearInterval(liebiao);
-                liebiao = null;
             }
         }
         /**
@@ -10869,7 +10882,7 @@ margin-top: 20px;
 
         setTimeout(unfoldPost, 1000); //要延迟一会儿，才能保证捕捉到标签
         /*var t=*/
-        setInterval(unfoldPost2, 2000); //要定时循环查找才能找全整个贴子的楼中楼。。!
+        var louzhonglou = setInterval(unfoldPost2, 2000); //要定时循环查找才能找全整个贴子的楼中楼。。!
         var liebiao = setInterval(unfoldPost4, 2000); //要定时循环查找才能找全整个贴吧列表的贴子。。!
         initListener();
         initStyle();
