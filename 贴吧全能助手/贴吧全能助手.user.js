@@ -38,7 +38,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_listValues
-// @grant        GM_info
+/// @grant        GM_info
 // @grant        GM_addStyle
 // @grant        GM_registerMenuCommand
 // @grant       GM_deleteValue
@@ -10870,7 +10870,7 @@ margin-top: 20px;
         setTimeout(unfoldPost, 1000); //要延迟一会儿，才能保证捕捉到标签
         /*var t=*/
         setInterval(unfoldPost2, 2000); //要定时循环查找才能找全整个贴子的楼中楼。。!
-        var liebiao = setInterval(unfoldPost4, 1000); //要定时循环查找才能找全整个贴吧列表的贴子。。!
+        var liebiao = setInterval(unfoldPost4, 2000); //要定时循环查找才能找全整个贴吧列表的贴子。。!
         initListener();
         initStyle();
     })();
