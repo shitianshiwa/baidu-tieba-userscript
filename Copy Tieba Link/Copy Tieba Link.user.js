@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.2.2
+// @version      1.2.2.2
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
@@ -89,7 +89,7 @@ const request = (url, options = {}) => fetch(url, Object.assign({
 }, options)).then(res => res.text());
 const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/30307-%E6%89%B9%E9%87%8F%E4%B8%8B%E8%BD%BD%E8%B4%B4%E5%90%A7%E5%8E%9F%E5%9B%BE
     var GM_download = GM.xmlHttpRequest || GM_xmlHttpRequest;
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         GM_download({
             method: 'GET',
             responseType: 'json',
@@ -97,12 +97,12 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
             //redirect: 'follow',
             // 阻止浏览器发出 CORS 检测的 HEAD 请求头
             //mode: 'same-origin',
-            onreadystatechange: function(responseDetails) {
+            onreadystatechange: function (responseDetails) {
                 //console.log(responseDetails.status)
                 //                console.log(responseDetails)
 
                 if (responseDetails.readyState === 4) {
-                    if (responseDetails.status === 200 /* || responseDetails.status === 304 || responseDetails.status === 0*/ ) {
+                    if (responseDetails.status === 200 /* || responseDetails.status === 304 || responseDetails.status === 0*/) {
                         console.log(responseDetails.response)
                         resolve(responseDetails.response);
                     } else {
@@ -111,7 +111,7 @@ const ajaxGetAuthor = (url) => { //参考 https://greasyfork.org/ja/scripts/3030
                     }
                 }
             },
-            onerror: function(responseDetails) {
+            onerror: function (responseDetails) {
                 console.log("onerror: " + responseDetails.status);
                 resolve(null);
             }
@@ -157,7 +157,7 @@ var louzhu1 = $("div.l_post").children("div.d_author").children("div.louzhubiaos
 var louzhu2;
 if (louzhu1 != undefined) {
     try {
-        louzhu2 = JSON.parse(louzhu1.parentNode.parentNode.getAttribute("data-field") /*.replace(/'/g, '"')*/ ).author.portrait.split("?")[0]; //把这里的'换成"会导致json转换失败 onclick=\"Stats.sendRequest('fr=tb0_forum&st_mod=pb&st_value=atlink');\"
+        louzhu2 = JSON.parse(louzhu1.parentNode.parentNode.getAttribute("data-field") /*.replace(/'/g, '"')*/).author.portrait.split("?")[0]; //把这里的'换成"会导致json转换失败 onclick=\"Stats.sendRequest('fr=tb0_forum&st_mod=pb&st_value=atlink');\"
     } catch (err) {
         console.log("变量louzhu2位置报错:" + err);
         louzhu2 = "";
@@ -258,7 +258,12 @@ async function copyLink() {
     //console.log(parent.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode);
     //console.log(parent.parentNode.parentNode.children[0].children[1].children[1]);//楼层除了第一层
     //console.log(parent.parentNode.parentNode.children[0].children[3].children[1]);//旧版贴吧楼层第一层
-    if (this.dataset.linkText) text = this.dataset.linkText;
+    //console.log("this.dataset.linkText:" + JSON.stringify(this.dataset));
+    if (this.dataset.linkText) {
+        //直接使用储存的合成文本
+        text = this.dataset.linkText;
+        console.log("this.dataset.linkText:" + text);
+    }
     else {
         switch (this.dataset.anchorType) {
             case '0': // 贴吧主题贴列表获取贴子链接
@@ -676,7 +681,7 @@ async function copyLink() {
                 }
                 //应该不会有用户名是null的吧？
                 if (setting.neirong_lzl) {
-                    let temp = (parent.parentNode.children[2].getAttribute("class") == "lzl_content_main" ? parent.parentNode.children[2].innerHTML /*贴吧超级会员的楼中楼*/ : parent.parentNode.children[1].innerHTML /*普通用户*/ );
+                    let temp = (parent.parentNode.children[2].getAttribute("class") == "lzl_content_main" ? parent.parentNode.children[2].innerHTML /*贴吧超级会员的楼中楼*/ : parent.parentNode.children[1].innerHTML /*普通用户*/);
                     temp = temp.replace(/<a.*?">/g, "").replace(/<img.*?src=/g, " ").replace(/<br>/g, "\n").replace(/">/g, " ").replace(/<\/a>/g, "").replace(/"/g, " ").replace(/\[url\]/g, "").replace(/\[\/url\]/g, "");
                     temp = temp.replace(/<div class= voice_player.*>/g, "(语音)").replace(/<span class= speaker.*>/g, "").replace(/<span class= time.*>/g, "").replace(/<span class= second.*>/g, "").replace(/<span class= minute.*>/g, "").replace(/<span class= before.*>/g, "").replace(/<span class= middle.*>/g, "").replace(/<span class= after.*>/g, "");
                     temp = temp.replace(/class= nicknameEmoji/g, "") //昵称
@@ -692,10 +697,10 @@ async function copyLink() {
                     textGroup.push("内容: " + temp + " ");
                 }
                 console.log(parent.parentNode.children[2]) //.children[3].getAttribute("class"));
-                    /*
-                                    普通的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li:nth-child(2) > div.lzl_cnt > span.lzl_content_main
-                                    会员的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li.lzl_single_post.j_lzl_s_p.first_no_border > div.lzl_cnt > span.lzl_content_main
-                                    */
+                /*
+                                普通的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li:nth-child(2) > div.lzl_cnt > span.lzl_content_main
+                                会员的 #j_p_postlist > div:nth-child(25) > div.d_post_content_main > div.core_reply.j_lzl_wrapper > div.j_lzl_container.core_reply_wrapper > div.j_lzl_c_b_a.core_reply_content > ul > li.lzl_single_post.j_lzl_s_p.first_no_border > div.lzl_cnt > span.lzl_content_main
+                                */
                 if (setting.link) {
                     textGroup.push("链接：" + linkPath + unsafeWindow.PageData.thread.thread_id + '?pid=' + floorData3.pid + "&cid=" + floorData2.spid + '#' + floorData2.spid + " ");
                 }
@@ -834,9 +839,9 @@ async function copyLink() {
         }
         console.log(textGroup);
         text = textGroup.join(setting.split);
+        //储存合成的文本
         this.setAttribute('data-link-text', text);
     }
-
     GM_setClipboard(text);
     if (setting.tips) showTips('以下内容已复制到剪贴板：\n' + text);
 }
@@ -847,7 +852,7 @@ function showTips(text) {
     node.className = 'tieba-link-tips';
     node.innerHTML = text2;
     document.body.appendChild(node);
-    let showTipsTimer = setTimeout(function() { //默认显示复制文本显示框一段时间后消失，管消失时间的是在css样式里修改，这里是直接删除标签
+    let showTipsTimer = setTimeout(function () { //默认显示复制文本显示框一段时间后消失，管消失时间的是在css样式里修改，这里是直接删除标签
         if (node != null) {
             document.body.removeChild(node);
             node = null;
