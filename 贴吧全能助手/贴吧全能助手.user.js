@@ -135,7 +135,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     const getWaptiebaxinxi = tid => request(getThreadMoUrl(tid))
         .then(threadreturnxinxi);
 
-    console.log("jquery版本号：" + $.fn.jquery);
+    console.log("jquery版本号: " + $.fn.jquery);
+    console.log("贴吧全能脚本版本号: 2.1.183.1");
     let tieziurl = window.location.href;
     //https://www.v2ex.com/t/611007
     //https://jump2.bdimg.com/f?kw=
@@ -10465,7 +10466,7 @@ margin-top: 20px;
                 let temp9 = target.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
                 let temp10 = target.querySelectorAll(".icon-top")[0]; //显示置顶标识
                 //let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
-                console.log("temp6:" + temp6[0])
+                //console.log("temp6:" + temp6[0])
                 //console.log("temp9:" + temp9)
                 //console.log("temp10:" + temp10)
                 //console.log(temp6.childNodes);
@@ -10780,23 +10781,23 @@ margin-top: 20px;
             //console.log(target.children[1].children[1])
             //document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
         }
-        //let liebiao2 = 0;
+        let liebiao2 = 0;
         function unfoldPost4() { //要定时循环查找才能找全整个贴吧列表的贴子。。!直接搜索+动态加载一起用
             try {
-                /*if (liebiao2 <= 29) {
-               liebiao2++;
-           }
-           else {
-               clearInterval(liebiao);
-               liebiao = null;
-           }*/
-                console.log("xxx:" + tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g))
+                if (liebiao2 <= 29) {
+                    liebiao2++;
+                }
+                else {
+                    clearInterval(liebiao);
+                    liebiao = null;
+                }
+                //console.log("xxx:" + tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g))
                 if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?ie=utf-8&kw=/g) != -1) {
                     let temp6 = document.querySelectorAll(".col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
                     let temp9 = document.querySelectorAll(".icon-good"); //显示精品贴，精华贴标识
                     let temp10 = document.querySelectorAll(".icon-top"); //显示置顶标识
                     //let temp11 = document.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
-                    console.log("temp6x:" + temp6.length)
+                    //console.log("temp6x:" + temp6.length)
                     //console.log("temp9:" + temp9)
                     //console.log("temp10:" + temp10)
                     //console.log(temp6.childNodes);
@@ -10850,7 +10851,7 @@ margin-top: 20px;
                             }
                         }
                     }
-                    console.log("unfoldPost4");
+                    //console.log("unfoldPost4");
                 }
                 else {
                     //console.log("666666666666")
