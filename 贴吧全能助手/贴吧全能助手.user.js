@@ -9814,7 +9814,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             }
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,.j_lzl_m,
-        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block,.video_src_wrapper{
+        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block,.video_src_wrap_main{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9866,7 +9866,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         /*楼中楼*/
         .j_lzl_m,
         /*让视频贴可以下载视频*/
-        .video_src_wrapper,
+        .video_src_wrap_main,
         .icon_interview_picture,.listThreadTitle{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
@@ -10600,7 +10600,7 @@ margin-top: 20px;
             if (classList.contains('dialog_block')) {
                 target.remove();
             }
-            if (classList.contains('video_src_wrapper')) {
+            if (classList.contains('video_src_wrap_main')) {
                 //让视频贴可以下载视频
                 //console.log(target.querySelectorAll("video")[0])
                 target.querySelectorAll("video")[0].setAttribute("controlslist","download")
