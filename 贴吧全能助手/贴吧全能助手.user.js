@@ -9813,7 +9813,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 clip: rect(0px, auto, auto, auto);
             }
         }
-        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,.j_lzl_m,
+        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
         .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block,.video_src_wrap_main,.media_disp{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
@@ -9863,8 +9863,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         img.m_pic,
         /*清理标签*/
         div.dialog_block,
-        /*楼中楼*/
-        .j_lzl_m,
         /*让视频贴可以下载视频*/
         .video_src_wrap_main,
         .media_disp,
@@ -10601,10 +10599,10 @@ margin-top: 20px;
             if (classList.contains('dialog_block')) {
                 target.remove();
             }
-            if (classList.contains('video_src_wrap_main')||classList.contains('media_disp')) {
+            if (classList.contains('video_src_wrap_main') || classList.contains('media_disp')) {
                 //让视频贴可以下载视频,video_src_wrap_main是贴子内的，media_disp是贴子列表简介的
                 console.log(target.querySelectorAll("video"))
-                target.querySelectorAll("video")[0].setAttribute("controlslist","download")
+                target.querySelectorAll("video")[0].setAttribute("controlslist", "download")
             }
         }
         const initListener = () => {
@@ -10728,12 +10726,10 @@ margin-top: 20px;
         @-moz-keyframes __tieba_zhankai__ {}
         @keyframes __tieba_zhankai__ {}
         /* 楼中楼 */
-        .lzl_li_pager{//lzl_li_pager j_lzl_l_p lzl_li_pager_s 随便选了一个 在回复层主标签元素那块
+        .lzl_li_pager,.j_lzl_m{/*lzl_li_pager j_lzl_l_p lzl_li_pager_s 随便选了一个 在回复层主标签元素那块*/
         -webkit-animation: __tieba_zhankai__;
         -moz-animation: __tieba_zhankai__;
         animation: __tieba_zhankai__;
-        }
-        .__tieba_zhankai2__{
         }
         `;
         };
@@ -10777,13 +10773,9 @@ margin-top: 20px;
             } = event;
             const {
                 classList
-            } = target;
-            let temp = target.children[1].children[1];
-            if (temp != undefined) {
-                if (temp.classList == "j_lzl_m") {
-                    temp.classList.add("__tieba_zhankai2__");
-                    temp.click();
-                }
+            } = target
+            if (classList.contains('j_lzl_m')) {
+                target.click();
             }
             //console.log(target.classList);
             //console.log(temp);
