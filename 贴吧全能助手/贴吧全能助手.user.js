@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1831
+// @version      2.1.1832
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -9813,8 +9813,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 clip: rect(0px, auto, auto, auto);
             }
         }
-        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
-        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block{
+        .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,.j_lzl_m,
+        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block,.video_src_wrapper{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -9863,6 +9863,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         img.m_pic,
         /*清理标签*/
         div.dialog_block,
+        /*楼中楼*/
+        .j_lzl_m,
+        /*让视频贴可以下载视频*/
+        .video_src_wrapper,
         .icon_interview_picture,.listThreadTitle{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
@@ -10261,8 +10265,8 @@ margin-top: 20px;
                 }, 1000);
             }
             if (classList.contains('userbar')) {
-                console.log("不登陆看贴");
-                unsafeWindow.PageData.user.is_login = 1;
+                console.log("不登陆看贴")
+                unsafeWindow.PageData.user.is_login = 1
             }
             /*侧工具栏*/
             /*下半部分单独处理以避免偶尔隐藏失败*/
@@ -10596,6 +10600,11 @@ margin-top: 20px;
             if (classList.contains('dialog_block')) {
                 target.remove();
             }
+            if (classList.contains('video_src_wrapper')) {
+                //让视频贴可以下载视频
+                //console.log(target.querySelectorAll("video")[0])
+                target.querySelectorAll("video")[0].setAttribute("controlslist","download")
+            }
         }
         const initListener = () => {
             PrefixedEvent(document, "AnimationStart", tieba_action); //开始
@@ -10744,7 +10753,7 @@ margin-top: 20px;
                         //node.parentNode.children[0].children[0].children[0].click();
                         //node.classList.add("_yizhankai_");
                     }
-                    //console.log("unfoldPost2:"+node)
+                    //console.log("unfoldPost2:"+JSON.stringify(node))
                     //console.log(JSON.parse(node.getAttribute("data-field")).total_num)
                     //JSON.parse(json).XXXX
                     //https://blog.csdn.net/weixin_39889465/article/details/86220538 js通过'data-xxx'自定义属性获取dom元素
