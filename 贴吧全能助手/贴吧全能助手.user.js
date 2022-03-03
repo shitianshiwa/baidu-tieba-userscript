@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1832
+// @version      2.1.1833
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -136,7 +136,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         .then(threadreturnxinxi);
 
     console.log("jquery版本号: " + $.fn.jquery);
-    console.log("贴吧全能脚本版本号: 2.1.183.1");
+    console.log("贴吧全能脚本版本号: 2.1.1833");
     let tieziurl = window.location.href;
     //https://www.v2ex.com/t/611007
     //https://jump2.bdimg.com/f?kw=
@@ -7566,6 +7566,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 return d.toLocaleString();
             };
 
+            GM_setValue("lzl_zhankai", false);
             var modules = {
                 "rmBottom": {
                     name: '移除底部工具栏(不完美)',
@@ -8753,6 +8754,18 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             this.rmImg(args._main);
 
                         }
+                    }
+                },
+                "lzl_zhankai": {
+                    name: '贴子内楼中楼自动展开',
+                    desc: '有些展不开的楼中楼折叠是被贴吧隐藏的回复，手动点开也是空内容',
+                    flag: __type_floor,
+                    def: true,
+                    _init: function () {
+                        GM_setValue("lzl_zhankai", true);
+                    },
+                    _proc: function (floorType, args) {
+                        GM_setValue("lzl_zhankai", true);
                     }
                 }
             };
@@ -10726,7 +10739,8 @@ margin-top: 20px;
         @-moz-keyframes __tieba_zhankai__ {}
         @keyframes __tieba_zhankai__ {}
         /* 楼中楼 */
-        .lzl_li_pager,.j_lzl_m{/*lzl_li_pager j_lzl_l_p lzl_li_pager_s 随便选了一个 在回复层主标签元素那块*/
+        /*在回复层主标签元素那块*/
+        .lzl_li_pager,.j_lzl_l_p,.lzl_li_pager_s{
         -webkit-animation: __tieba_zhankai__;
         -moz-animation: __tieba_zhankai__;
         animation: __tieba_zhankai__;
@@ -10774,12 +10788,22 @@ margin-top: 20px;
             const {
                 classList
             } = target
-            if (classList.contains('j_lzl_m')) {
-                target.click();
+            //console.log(GM_getValue("lzl_zhankai"))
+            if (GM_getValue("lzl_zhankai") == true) {
+                //console.log(target)
+                if (classList.contains('lzl_li_pager')) {
+                    let temp = target.parentNode.querySelectorAll(".lzl_post_hidden")[0]
+                    if (temp != undefined) { 
+                        temp.setAttribute('style', 'display:block')
+                        target.parentNode.querySelectorAll(".lzl_more")[0].setAttribute('style', 'display:none')
+                        target.parentNode.querySelectorAll(".lzl_pager")[0].setAttribute('style', 'display:block') 
+                    }//被贴吧隐藏的回复就是undefined,实际手动点击展开回复也是空的
+                    /*console.log(target.parentNode)
+                    console.log(target.parentNode.querySelectorAll(".lzl_post_hidden")[0])
+                    console.log(target.parentNode.querySelectorAll(".lzl_more")[0])
+                    console.log(target.parentNode.querySelectorAll(".lzl_pager")[0])*/
+                }
             }
-            //console.log(target.classList);
-            //console.log(temp);
-            //console.log("2333");
             //console.log(target.children[1].children[1])
             //document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
         }
