@@ -10615,7 +10615,10 @@ margin-top: 20px;
             if (classList.contains('video_src_wrap_main') || classList.contains('media_disp')) {
                 //让视频贴可以下载视频,video_src_wrap_main是贴子内的，media_disp是贴子列表简介的
                 console.log(target.querySelectorAll("video"))
-                target.querySelectorAll("video")[0].setAttribute("controlslist", "download")
+                let temp = target.querySelectorAll("video")[0]
+                if (temp != undefined) {
+                    temp.setAttribute("controlslist", "download")
+                }
             }
         }
         const initListener = () => {
@@ -10793,10 +10796,10 @@ margin-top: 20px;
                 //console.log(target)
                 if (classList.contains('lzl_li_pager')) {
                     let temp = target.parentNode.querySelectorAll(".lzl_post_hidden")[0]
-                    if (temp != undefined) { 
+                    if (temp != undefined) {
                         temp.setAttribute('style', 'display:block')
                         target.parentNode.querySelectorAll(".lzl_more")[0].setAttribute('style', 'display:none')
-                        target.parentNode.querySelectorAll(".lzl_pager")[0].setAttribute('style', 'display:block') 
+                        target.parentNode.querySelectorAll(".lzl_pager")[0].setAttribute('style', 'display:block')
                     }//被贴吧隐藏的回复就是undefined,实际手动点击展开回复也是空的
                     /*console.log(target.parentNode)
                     console.log(target.parentNode.querySelectorAll(".lzl_post_hidden")[0])
