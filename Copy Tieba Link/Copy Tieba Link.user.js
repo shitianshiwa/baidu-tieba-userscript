@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Copy Tieba Link
-// @version      1.2.2.2
+// @version      1.2.2.3
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
@@ -34,6 +34,11 @@
 //未来计划增加一个UI界面
 //目前本脚本不适合复制贴吧里面的代码，容易少复制内容！
 //document-start
+console.log("jquery版本号: " + $.fn.jquery);
+console.log("Copy Tieba Link版本号: 1.2.2.3");
+if (document.body.className == "page404") {
+    return
+}
 var setting = {
     title: true,
     author: true,
