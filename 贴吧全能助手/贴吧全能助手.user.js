@@ -9740,7 +9740,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             b.setAttribute('type', 'checkbox');
             b.setAttribute('id', 'select2');
             var c = document.createElement('p')
-            c.setAttribute('style', 'position: relative;left: 200px;');
+            c.setAttribute('style', 'position: absolute;left: 410px;')
             c.textContent = "翻页保持/排序是否包含置顶贴"
             c.appendChild(b)
             var d = document.createElement('input')
@@ -10794,7 +10794,7 @@ margin-top: 20px;
             }
             if (classList.contains('video_src_wrap_main') || classList.contains('media_disp')) {
                 //让视频贴可以下载视频,video_src_wrap_main是贴子内的，media_disp是贴子列表简介的
-                console.log("video:" + target.querySelectorAll("video")[0])
+                console.log("video:"+target.querySelectorAll("video")[0].outerHTML)
                 let temp = target.querySelectorAll("video")[0]
                 if (temp != undefined) {
                     temp.setAttribute("controlslist", "download")
