@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
@@ -13,7 +13,7 @@
 // @license      MIT
 // ==/UserScript==
 /*能兼容这个链接了https://tieba.baidu.com/f/good?kw=xxxxxx&tab=good*/
-(function($) {
+(function ($) {
     'use strict';
     var t1, t2, t3;
     var hrefs = window.location.href;
@@ -105,12 +105,18 @@ border: 1px solid #3e89fa;
                             $("div.nav_wrap ").after(text1); //专门给https://tieba.baidu.com/f/good?kw=XXXXX用的
                         } else {
                             $("div.head_content").append(text1); //电脑端贴吧主页主题贴列表顶部增加楼层列表
-
                         }
+                        //给复制的按钮注册动态加载功能
+                        $("#frs_list_pager").on("click", "a", function () {
+                            var i = $.tb.unescapeHTML($(this).tbattr("href"));
+                            return Bigpipe.broadcast("router_handle", {
+                                url: i
+                            }), !1
+                        })
                     }
                 }
                 $("div.pagination-default").children("a").each(
-                    function() //主题贴列表
+                    function () //主题贴列表
                     {
                         let a = false;
                         for (let i = 0; i < $(this)[0].classList.length; i++) {
@@ -124,7 +130,7 @@ border: 1px solid #3e89fa;
                         //alert($(this)[0].className);
                         if (a == false) {
                             $(this)[0].classList.add("miaosuo01"); //添加class
-                            $(this).click(function() {
+                            $(this).click(function () {
                                 $("input.miaojump2").remove(); //跳转确认按钮
                                 $("div.miaoliebiao").remove(); //上面的楼层列表
                                 //alert("4500");
@@ -136,7 +142,7 @@ border: 1px solid #3e89fa;
 
                 //2--------------------------------------------------------
                 $("div.frs_good_nav_wrap").children("span").children("a").each(
-                    function() //精品区列表按钮
+                    function () //精品区列表按钮
                     {
                         //alert("2233");
                         let a = false;
@@ -149,7 +155,7 @@ border: 1px solid #3e89fa;
                         }
                         if (a == false) {
                             $(this)[0].classList.add("miaosuo02");
-                            $(this).click(function() {
+                            $(this).click(function () {
                                 // alert("6666");
                                 clearInterval(t2); //清除计时器，反正网页跳转没有完成前，又自动添加楼层列表
                                 $("div.miaoliebiao").remove();
@@ -160,7 +166,7 @@ border: 1px solid #3e89fa;
 
                 //3--------------------------------------------------
                 $("input.miaojump2").each(
-                    function() //跳转楼层
+                    function () //跳转楼层
                     {
                         let a = false;
                         for (let i = 0; i < $(this)[0].classList.length; i++) {
@@ -173,7 +179,7 @@ border: 1px solid #3e89fa;
                         if (a == false) {
                             $(this)[0].classList.add("miaosuo03");
                             $(this).click(
-                                function(event) {
+                                function (event) {
                                     //alert("3333");
                                     //alert(String(event.target.previousElementSibling.value));//event.target.parentNode.childNodes.length-2
                                     clearInterval(t2); //没有原因，反正先关掉计时器
@@ -241,6 +247,53 @@ border: 1px solid #3e89fa;
     //louceliebiao();使用这个的话，重复切换楼层后，上面就不显示楼层列表了
     t2 = setInterval(louceliebiao, 1000); //延迟1s工作，等网页基本加载完毕
     //t2=setInterval(()=>{louceliebiao();},1000);//延迟1s工作，等网页基本加载完毕
+    var a = false
+    const action = (event) => {
+        //console.log(event.animationName)
+        const {
+            target
+        } = event;
+        const {
+            classList
+        } = target
+        //console.log(target.getAttribute("b"))
+        if (classList.contains("threadlist_title")) {
+            if (a == false && target.getAttribute("b") == null) {//使其只可以执行一次
+                a = true
+                //console.log(target)
+                var parentNodex = document.getElementById('thread_list');
+                if (parentNodex != null) {
+                    //console.log("test")
+                    $("input.miaojump2").remove(); //跳转确认按钮
+                    $("div.miaoliebiao").remove(); //上面的楼层列表
+                }
+                let t = setTimeout(() => {
+                    a = false
+                    clearTimeout(t)
+                    t = null
+                }, 3000);
+            }
+        }
+        target.setAttribute('b', '1')
+    }
+    //https://www.sitepoint.com/css3-animation-javascript-event-handlers/
+    //https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations
+    /*
+    W3C standard	Firefox     	webkit	                Opera	        IE10
+    animationstart	animationstart	webkitAnimationStart	oanimationstart	MSAnimationStart
+    animationiteration	animationiteration	webkitAnimationIteration	oanimationiteration	MSAnimationIteration
+    animationend	animationend	webkitAnimationEnd	oanimationend	MSAnimationEnd
+    */
+    var pfx = ["webkit", "moz", "MS", "o", ""];
+
+    function PrefixedEvent(element, type, callback) {
+        for (var p = 0; p < pfx.length; p++) {
+            if (!pfx[p]) type = type.toLowerCase();
+            //console.log(pfx[p] + type);
+            element.addEventListener(pfx[p] + type, callback, false);
+        }
+    }
+    PrefixedEvent(document, "AnimationStart", action); //开始
 })($);
 /*
 Jquery attr()方法 属性赋值和属性获取详解
