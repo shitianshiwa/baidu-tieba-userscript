@@ -9727,12 +9727,15 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             a.setAttribute('id', 'select1');
             var option = document.createElement("option")
             option.text = s[0]
-            option.setAttribute('selected', 'selected');
             option.setAttribute('value', 0);
             a.appendChild(option)
             for (let i = 1; i < s.length; i++) {
                 option = document.createElement("option")
                 option.text = s[i]
+                if(i==2)
+                {
+                    option.setAttribute('selected', 'selected');
+                }
                 option.setAttribute('value', i);
                 a.appendChild(option)
             }
@@ -9793,7 +9796,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             }, false)
             a.addEventListener('dblclick', e => {
                 //if (yipaixun2 == true) {
-                sortById(GM_getValue("select1"))
+                let temp=document.getElementById("select1").selectedIndex
+                console.log("dblclick:"+temp);
+
+                sortById(temp)
                 //}
             }, false)
             try {
