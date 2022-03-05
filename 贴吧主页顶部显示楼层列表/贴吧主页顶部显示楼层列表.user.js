@@ -107,7 +107,13 @@ border: 1px solid #3e89fa;
                             $("div.head_content").append(text1); //电脑端贴吧主页主题贴列表顶部增加楼层列表
                         }
                         //给复制的按钮注册动态加载功能
-                        $("#frs_list_pager").on("click", "a", function () {
+                        $("div.miaoliebiao>#frs_list_pager").on("click", "a", function () {
+                            var i = $.tb.unescapeHTML($(this).tbattr("href"));
+                            return Bigpipe.broadcast("router_handle", {
+                                url: i
+                            }), !1
+                        })
+                        $("div.thread_list_bottom>#frs_list_pager").on("click", "a", function () {
                             var i = $.tb.unescapeHTML($(this).tbattr("href"));
                             return Bigpipe.broadcast("router_handle", {
                                 url: i
