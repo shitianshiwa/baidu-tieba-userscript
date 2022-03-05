@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1833
+// @version      2.1.1834
 /// @version     2.1
-// @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(然而挡不住幽灵广告，至于贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
+// @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了,已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
 // @homepage     https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
 // @license      MIT
@@ -18,9 +18,9 @@
 // @run-at       document-body
 ///document-start,document-idle;必须使用document-body，否则对多个浏览器的兼容性会下降
 ///只测试了Google Chrome 75.0.3770.142（正式版本） (64 位),87.0.4280.66（正式版本） （64 位）
-/// jQuery 留一份自己用
+/// jQuery 留一份自己用。备注贴吧自带的jQuery是修改过的，至少有lazyload功能
 // @require      https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js
-// @require      https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js
+/// @require      https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js
 
 /// @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
 /// @require     http://cdn.staticfile.org/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js
@@ -136,12 +136,16 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         .then(threadreturnxinxi);
 
     console.log("jquery版本号: " + $.fn.jquery);
-    console.log("贴吧全能脚本版本号: 2.1.1833");
+    console.log("贴吧全能脚本版本号: 2.1.1834");
     let tieziurl = window.location.href;
     //https://www.v2ex.com/t/611007
     //https://jump2.bdimg.com/f?kw=
     //https://jump2.bdimg.com/p/
     //https://live.baidu.com/f?kw=
+    //贴子不存在就直接退出
+    if (document.body.className == "page404") {
+        return
+    }
     if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/ || tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/p\//g) != -1) {
         let temp = /(https|http):\/\/c\.tieba\.baidu\.com\/p\/(\d+)/.exec(tieziurl) || /(https|http):\/\/jump2\.bdimg\.com\/p\/(\d+)/.exec(tieziurl);
         //console.log(temp[2]);
@@ -804,6 +808,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 /*签到*/
                 .plat_header_right,
                 .card_top_right{
+                    max-width:100px;
                 	position: absolute !important;
                 	width: auto !important;
                 	height: 100% !important;
@@ -9514,33 +9519,62 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         })();
     }, false);*/
 
+    //百度贴吧排序
     //百度贴吧按发帖时间（帖子ID）排序 by NULL
+    //关于回复量的排序 https://greasyfork.org/zh-CN/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta
     (function () {
-        var backupshunxun = new Array();
-        setTimeout(() => {
-            var parentNodex = document.getElementById('thread_list');
-            if (parentNodex != null) {
-                var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)');
-                for (let i = 0; i < threadsx.length; i++) {
-                    //console.log(threadsx[i]);
-                    backupshunxun.push(threadsx[i]);
+        //不在主题贴列表就不执行
+        if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
+        var backupshunxun = new Array()//用来备份贴吧默认的贴子排列顺序，用于回复时间排序
+        var yipaixun2 = false;
+
+        const action = (event) => {
+            //console.log(event.animationName)
+            const {
+                target
+            } = event;
+            const {
+                classList
+            } = target
+            //console.log(target.getAttribute("paixun"))
+            if (classList.contains("threadlist_title")) {
+                if (yipaixun2 == false && target.getAttribute("paixun") == null) {//使其只可以执行一次
+                    yipaixun2 = true
+                    console.log(target)
+                    backupshunxun = new Array()
+                    var parentNodex = document.getElementById('thread_list');
+                    if (parentNodex != null) {
+                        var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)');//默认排除置顶贴
+                        if (GM_getValue("select3") == true) {
+                            threadsx = parentNodex.querySelectorAll('.j_thread_list');//默认排除置顶贴
+                        }
+                        for (let i = 0; i < threadsx.length; i++) {
+                            //console.log(threadsx[i]);
+                            backupshunxun.push(threadsx[i]);
+                        }
+                    }
+                    sortById(GM_getValue("select1"))
+                    let t = setTimeout(() => {
+                        yipaixun2 = false
+                        clearTimeout(t)
+                        t = null
+                    }, 3000);
                 }
             }
-        }, 3000);
-
-        var yipaixun = 0;
-        var yipaixun2 = false;
-        if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
-
-        function sortById() {
+            target.setAttribute('paixun', '1')
+        }
+        function sortById(yipaixun) {
             var parentNode = document.getElementById('thread_list');
             if (parentNode == null) {
                 return;
             }
-            if (yipaixun == 0) {
-                $(".fatieshijianpaixu").html('按回复时间倒序<span style="color:#000 !important;">(当前为:发贴时间排序)</span>')
-                yipaixun = 1;
-                var threads = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
+            var threads = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
+            //var $lis = $("#thread_list>.j_thread_list:not(.thread_top)");//获取所有排序的li           
+            if (GM_getValue("select3") == true) {
+                threads = parentNode.querySelectorAll('.j_thread_list');
+                //$lis = $("#thread_list>.j_thread_list");//获取所有排序的li
+            }
+            if (yipaixun == 0) {//发贴时间顺序
                 var threadArray = [];
                 for (var thread of threads) {
                     try {
@@ -9548,7 +9582,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             id: JSON.parse(thread.getAttribute('data-field')).id,
                             thread: thread
                         });
-                        //parentNode.removeChild(thread);
+                        parentNode.removeChild(thread);
                     } catch (e) {
                         console.log(e);
                     }
@@ -9556,42 +9590,119 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 threadArray.sort((a, b) => {
                     return b.id - a.id;
                 });
+                console.log("排序后:", threadArray);
                 for (var thread2 of threadArray) {
                     parentNode.appendChild(thread2.thread);
                 }
-            } else if (yipaixun == 1) {
-                $(".fatieshijianpaixu").html('按回复时间顺序<span style="color:#000 !important;">(当前为:回复时间倒序)</span>')
-                yipaixun = 2;
-                //console.log("666");
-                let threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
-                for (let thread of threads3) {
+            }
+            else if (yipaixun == 1) {//发贴时间倒序
+                var threadArray = [];
+                for (var thread of threads) {
+                    try {
+                        threadArray.push({
+                            id: JSON.parse(thread.getAttribute('data-field')).id,
+                            thread: thread
+                        });
+                        parentNode.removeChild(thread);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                threadArray.sort((a, b) => {
+                    return a.id - b.id;
+                });
+                console.log("排序后:", threadArray);
+                for (var thread2 of threadArray) {
+                    parentNode.appendChild(thread2.thread);
+                }
+            }
+            else if (yipaixun == 2) {//回复时间顺序
+                for (let thread of threads) {
                     try {
                         parentNode.removeChild(thread);
                     } catch (e) {
                         console.log(e);
                     }
                 }
-                for (let i = backupshunxun.length - 1; i >= 0; i--) {
-                    //console.log("2333")
-                    parentNode.appendChild(backupshunxun[i]);
-                }
-            } else {
-                yipaixun = 0;
-                $(".fatieshijianpaixu").html('按发贴时间排序<span style="color:#000 !important;">(当前为:回复时间顺序)</span>')
-                //console.log("666");
-                let threads3 = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
-                for (let thread of threads3) {
-                    try {
-                        parentNode.removeChild(thread);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
+                console.log("排序后:", backupshunxun);
                 for (let i = 0; i < backupshunxun.length; i++) {
-                    //console.log("2333")
                     parentNode.appendChild(backupshunxun[i]);
                 }
             }
+            else if (yipaixun == 3) {//回复时间倒序
+                for (let thread of threads) {
+                    try {
+                        parentNode.removeChild(thread);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                console.log("排序后:", backupshunxun);
+                for (let i = backupshunxun.length - 1; i >= 0; i--) {
+                    parentNode.appendChild(backupshunxun[i]);
+                }
+            }
+            else if (yipaixun == 4) {//回复量顺序
+                var liArray = []; //用于排序的容器
+                for (var thread of threads) {
+                    try {
+                        liArray.push({
+                            count: thread.querySelectorAll("span.threadlist_rep_num.center_text")[0].textContent,
+                            thread: thread
+                        });
+                        //parentNode.removeChild(thread);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                /*$lis.each(function (index, item) {
+                    var replyCount = $(item).find("span.threadlist_rep_num.center_text").text();
+                    liArray.push({ 'count': replyCount, 'li': item });
+                    try {
+                        parentNode.removeChild(item);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                })*/
+                liArray.sort(function (a, b) {
+                    return b.count - a.count;
+                })
+
+                console.log("排序后:", liArray);
+                for (var thread2 of liArray) {
+                    parentNode.appendChild(thread2.thread);
+                }
+                /*$(liArray).each(function (index, item) {
+                    parentNode.appendChild(item.li);
+                })*/
+            }
+            else if (yipaixun == 5) {//回复量倒序
+                var liArray = []; //用于排序的容器
+                for (var thread of threads) {
+                    try {
+                        liArray.push({
+                            count: thread.querySelectorAll("span.threadlist_rep_num.center_text")[0].textContent,
+                            thread: thread
+                        });
+                        //parentNode.removeChild(thread);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+
+                liArray.sort(function (a, b) {
+                    return a.count - b.count;
+                })
+
+                console.log("排序后:", liArray);
+                for (var thread2 of liArray) {
+                    parentNode.appendChild(thread2.thread);
+                }
+            }
+            //排序后 重新绑定懒加载图片
+            //console.log($(".thumbnail.vpic_wrap>img"))
+            this.$(".thumbnail.vpic_wrap>img").lazyload();//只有用贴吧自己的jQuery才有lazyload,用this就是使用贴吧的jQuery
+            GM_setValue("select1", yipaixun)
         }
         //setInterval(() => {
         //    try {
@@ -9600,42 +9711,111 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         //    } catch (error) { /*alert(error);*/ }
         //}, 500);
         setTimeout(() => {
-            var a = document.createElement('a');
-            a.textContent = '按发贴时间排序(贴子ID)';
-            a.setAttribute('class', 'fatieshijianpaixu');
-            if (!GM_getValue("tiebameihua")) {
-                a.setAttribute('style', 'color:#999 !important;position: absolute;left: 102%;width: 1000px;top: 12px;height: 40px;cursor: -webkit-grab;');
-            } else {
-                a.setAttribute('style', 'color:#999 !important;position: absolute;left:470px;width: 1000px;top: 38px;height: 40px;cursor: -webkit-grab;z-index: 1000;');
-            }
-            //a.setAttribute('href', 'javascript:;');
-            var paixun = false
-            a.addEventListener('click', e => { //必须先自动滚动网页，预览所有图片后，才能保证图片都能显示出来
-                if (yipaixun2 == false) {
-                    yipaixun2 = true;
-                    let i = 0;
-                    if (paixun == false) {
-                        paixun = true;
-                        let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
-                            if (i <= document.body.scrollHeight) {
-                                window.scrollTo(0, i);
-                                i += 300;
-                            } else {
-                                clearInterval(t);
-                                paixun = false;
-                                sortById();
-                                window.scrollTo(0, 0);
-                            }
-                        }, 100);
-                    }
-                } else {
-                    sortById();
+            var parentNodex = document.getElementById('thread_list');
+            if (parentNodex != null) {
+                var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)');//默认排除置顶贴
+                if (GM_getValue("select3") == true) {
+                    threadsx = parentNodex.querySelectorAll('.j_thread_list');//默认排除置顶贴
                 }
-            }, false);
+                for (let i = 0; i < threadsx.length; i++) {
+                    //console.log(threadsx[i]);
+                    backupshunxun.push(threadsx[i]);
+                }
+            }
+            let s = ['按发贴时间排序(贴子ID)', '发贴时间倒序', '按回复时间顺序(这是PC端默认)', '按回复时间倒序', '按回复量顺序', '按回复量倒序']
+            var a = document.createElement('select')
+            a.setAttribute('id', 'select1');
+            var option = document.createElement("option")
+            option.text = s[0]
+            option.setAttribute('selected', 'selected');
+            option.setAttribute('value', 0);
+            a.appendChild(option)
+            for (let i = 1; i < s.length; i++) {
+                option = document.createElement("option")
+                option.text = s[i]
+                option.setAttribute('value', i);
+                a.appendChild(option)
+            }
+            var b = document.createElement('input')
+            b.setAttribute('type', 'checkbox');
+            b.setAttribute('id', 'select2');
+            var c = document.createElement('p')
+            c.setAttribute('style', 'position: relative;left: 200px;');
+            c.textContent = "翻页保持/排序是否包含置顶贴"
+            c.appendChild(b)
+            var d = document.createElement('input')
+            d.setAttribute('type', 'checkbox');
+            d.setAttribute('id', 'select3');
+            c.appendChild(d)
+
+            //var paixun = false
+            a.addEventListener('change', e => {
+                //console.log(JSON.stringify(e))//{"isTrusted":true}
+                let temp = document.getElementById("select1").value
+                console.log(document.getElementById("select1").value)
+                //if (yipaixun2 == false) {
+                //  yipaixun2 = true;
+                //   let i = 0;
+                //  if (paixun == false) {
+                //     paixun = true
+                sortById(temp)
+                /*let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
+                    if (i <= document.body.scrollHeight) {
+                        window.scrollTo(0, i);
+                        i += 300;
+                    } else {
+                        clearInterval(t);
+                        paixun = false;
+                        sortById(temp);
+                        window.scrollTo(0, 0);
+                    }
+                }, 100);*/
+                // }
+                //} else {
+                //   sortById(temp);
+                // }
+            }, false)
+            b.addEventListener('change', e => {
+                if (document.getElementById("select2").checked == true) {
+                    GM_setValue("select2", true)
+                }
+                else {
+                    GM_setValue("select2", false)
+                }
+            }, false)
+            d.addEventListener('change', e => {
+                if (document.getElementById("select3").checked == true) {
+                    GM_setValue("select3", true)
+                }
+                else {
+                    GM_setValue("select3", false)
+                }
+            }, false)
+            a.addEventListener('dblclick', e => {
+                //if (yipaixun2 == true) {
+                sortById(GM_getValue("select1"))
+                //}
+            }, false)
             try {
                 document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);
+                document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(c);
             } catch (err) {
                 console.log(err);
+            }
+            finally {
+                if (GM_getValue("select2") == true) {
+                    document.getElementById("select1").selectedIndex = GM_getValue("select1")
+                    document.getElementById("select2").checked = true
+                    sortById(GM_getValue("select1"))
+                }
+                if (GM_getValue("select3") == true) {
+                    document.getElementById("select3").checked = true
+                }
+                //用于刷新网页时，阻止动画事件触发导致重复备份贴子列表顺序导致按回复时间排序出错
+                [].forEach.call(document.querySelectorAll(".threadlist_title"), node => {
+                    node.setAttribute('paixun', '1')
+                });
+                PrefixedEvent(document, "AnimationStart", action); //开始
             }
         }, 3000);
     })();
@@ -10614,7 +10794,7 @@ margin-top: 20px;
             }
             if (classList.contains('video_src_wrap_main') || classList.contains('media_disp')) {
                 //让视频贴可以下载视频,video_src_wrap_main是贴子内的，media_disp是贴子列表简介的
-                console.log(target.querySelectorAll("video"))
+                console.log("video:" + target.querySelectorAll("video")[0])
                 let temp = target.querySelectorAll("video")[0]
                 if (temp != undefined) {
                     temp.setAttribute("controlslist", "download")
@@ -10743,7 +10923,7 @@ margin-top: 20px;
         @keyframes __tieba_zhankai__ {}
         /* 楼中楼 */
         /*在回复层主标签元素那块*/
-        .lzl_li_pager,.j_lzl_l_p,.lzl_li_pager_s{
+        .lzl_li_pager,.j_lzl_l_p,.lzl_li_pager_s,#content_leftList{
         -webkit-animation: __tieba_zhankai__;
         -moz-animation: __tieba_zhankai__;
         animation: __tieba_zhankai__;
@@ -10757,10 +10937,10 @@ margin-top: 20px;
                 node.click();
             });
         }
-
-        function unfoldPost2() { //楼中楼内容折叠展开
-            //console.log('223');
+        var louzhonglousuo = false
+        function unfoldPost2() { //楼层内容和楼中楼内容折叠展开，暴力查询版
             try {
+                unfoldPost();//楼层内容折叠展开
                 [].forEach.call(document.querySelectorAll('div>.j_lzl_container.core_reply_wrapper[style="min-height: 0px; display: none;"]'), node => {
                     if (JSON.parse(node.getAttribute("data-field")).total_num > 0) {
                         node.style = "min-height: 1px; display:block;" //和原来的样式有所不同，这样就可以人为收起来楼中楼了。。！
@@ -10774,14 +10954,46 @@ margin-top: 20px;
                     //https://www.cnblogs.com/landeanfen/p/5159911.html JS组件系列——使用HTML标签的data属性初始化JS组件
                     //https://www.w3school.com.cn/tags/att_global_data.asp HTML data-* 属性
                 });
+                //console.log(GM_getValue("lzl_zhankai"))
+                let temp1 = document.querySelectorAll("ul.j_lzl_m_w")
+                //console.log("temp1:" + temp1.length)
+                let temp2 = document.querySelectorAll(".l_post")
+                //console.log("temp2:" + temp2.length)
+                if (GM_getValue("lzl_zhankai") == true) {
+                    //console.log(target)'
+                    if (temp1.length > 0 && louzhonglousuo == false) {
+                        for (let i = 0; i < temp1.length; i++) {
+                            //console.log(temp1[i])
+                            let temp3 = temp1[i].querySelectorAll(".lzl_post_hidden")[0]
+                            if (temp3 != undefined) {
+                                //console.log(temp2.getAttribute("style"))
+                                if (temp3.getAttribute("style") != "display:block") {
+                                    temp3.setAttribute('style', 'display:block')
+                                    temp1[i].querySelectorAll(".lzl_more")[0].setAttribute('style', 'display:none')
+                                    temp1[i].querySelectorAll(".lzl_pager")[0].setAttribute('style', 'display:block')
+                                }
+
+                            }//被贴吧隐藏的回复就是undefined,实际手动点击展开回复也是空的 
+                        }
+                        /*console.log(target.parentNode)
+                        console.log(target.parentNode.querySelectorAll(".lzl_post_hidden")[0])
+                        console.log(target.parentNode.querySelectorAll(".lzl_more")[0])
+                        console.log(target.parentNode.querySelectorAll(".lzl_pager")[0])*/
+                    }
+                    if (temp1.length == temp2.length) {
+                        louzhonglousuo = true
+                    }
+                    else {
+                        louzhonglousuo = false
+                    }
+                }
             }
             catch (e) {
                 console.error("unfoldPost2:" + e);
                 clearInterval(louzhonglou);
             }
-
         }
-        const unfoldPost3 = (event) => { //楼中楼楼层太长折叠展开
+        const unfoldPost3 = (event) => { //楼中楼楼层太长折叠展开，动态版
             if (event.animationName !== '__tieba_zhankai__') {
                 return;
             }
@@ -10791,6 +11003,7 @@ margin-top: 20px;
             const {
                 classList
             } = target
+
             //console.log(GM_getValue("lzl_zhankai"))
             if (GM_getValue("lzl_zhankai") == true) {
                 //console.log(target)
@@ -10821,72 +11034,65 @@ margin-top: 20px;
                     liebiao = null;
                 }
                 //console.log("xxx:" + tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g))
-                if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?ie=utf-8&kw=/g) != -1) {
-                    let temp6 = document.querySelectorAll(".col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
-                    let temp9 = document.querySelectorAll(".icon-good"); //显示精品贴，精华贴标识
-                    let temp10 = document.querySelectorAll(".icon-top"); //显示置顶标识
-                    //let temp11 = document.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
-                    //console.log("temp6x:" + temp6.length)
-                    //console.log("temp9:" + temp9)
-                    //console.log("temp10:" + temp10)
-                    //console.log(temp6.childNodes);
-                    let i = 0;
-                    if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                        if (temp9 != null) {
-                            for (i = 0; i < temp9.length; i++) {
-                                temp9[i].style = "background-color: #FF6666;";
-                            }
+                let temp6 = document.querySelectorAll(".col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
+                let temp9 = document.querySelectorAll(".icon-good"); //显示精品贴，精华贴标识
+                let temp10 = document.querySelectorAll(".icon-top"); //显示置顶标识
+                //let temp11 = document.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
+                //console.log("temp6x:" + temp6.length)
+                //console.log("temp9:" + temp9)
+                //console.log("temp10:" + temp10)
+                //console.log(temp6.childNodes);
+                let i = 0;
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+                    if (temp9 != null) {
+                        for (i = 0; i < temp9.length; i++) {
+                            temp9[i].style = "background-color: #FF6666;";
                         }
-                        if (temp10 != null) {
-                            for (i = 0; i < temp10.length; i++) {
-                                temp10[i].style = "background:none;background-color: #4285F5;";
-                            }
-                        }
-                        // if (temp11 != null) {
-                        //     temp11.style = "background:none;background-color: #FFCC26;";
-                        // }
                     }
-                    if (temp6 != null) {
-                        for (i = 0; i < temp6.length; i++) {
-                            if (temp6[i].children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
-                            {
-                                if (temp6[i].querySelectorAll(".createtimecsss")[0] == null) {
-                                    let temp7 = document.createElement("span");
-                                    temp7.setAttribute('class', 'createtimecsss');
-                                    console.log("temp6:" + temp6[i])
-                                    if (temp6[i].parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6[i].parentNode.querySelectorAll(".icon-top")[0] == null) {
-                                        temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
-                                        temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
+                    if (temp10 != null) {
+                        for (i = 0; i < temp10.length; i++) {
+                            temp10[i].style = "background:none;background-color: #4285F5;";
+                        }
+                    }
+                    // if (temp11 != null) {
+                    //     temp11.style = "background:none;background-color: #FFCC26;";
+                    // }
+                }
+                if (temp6 != null) {
+                    for (i = 0; i < temp6.length; i++) {
+                        if (temp6[i].children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
+                        {
+                            if (temp6[i].querySelectorAll(".createtimecsss")[0] == null) {
+                                let temp7 = document.createElement("span");
+                                temp7.setAttribute('class', 'createtimecsss');
+                                console.log("temp6:" + temp6[i])
+                                if (temp6[i].parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6[i].parentNode.querySelectorAll(".icon-top")[0] == null) {
+                                    temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
+                                    temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
+                                } else {
+                                    if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
+                                        temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                                        temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
                                     } else {
-                                        if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
-                                            temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                                            temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
-                                        } else {
-                                            temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                                            temp6[i].children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
-                                        }
+                                        temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+                                        temp6[i].children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
                                     }
-                                    //console.log(temp6[i].parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
-                                    let temp8 = temp6[i].parentNode.querySelectorAll(".is_show_create_time")[0].innerHTML;//得到创建时间
-                                    //console.log(temp6[i].parentNode.querySelectorAll(".icon-member-top"))
-                                    //console.log(temp6[i].parentNode.querySelectorAll(".icon-top"))
-                                    if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
-                                        temp8 = new Date().getFullYear().toString() + "-" + temp8
-                                    }
-                                    temp7.innerHTML = temp8;
-                                    //console.log(temp8)
-                                    temp6[i].children[0].before(temp7);
                                 }
+                                //console.log(temp6[i].parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
+                                let temp8 = temp6[i].parentNode.querySelectorAll(".is_show_create_time")[0].innerHTML;//得到创建时间
+                                //console.log(temp6[i].parentNode.querySelectorAll(".icon-member-top"))
+                                //console.log(temp6[i].parentNode.querySelectorAll(".icon-top"))
+                                if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
+                                    temp8 = new Date().getFullYear().toString() + "-" + temp8
+                                }
+                                temp7.innerHTML = temp8;
+                                //console.log(temp8)
+                                temp6[i].children[0].before(temp7);
                             }
                         }
                     }
-                    //console.log("unfoldPost4");
                 }
-                else {
-                    //console.log("666666666666")
-                    clearInterval(liebiao);
-                    liebiao = null;
-                }
+                //console.log("unfoldPost4");
             }
             catch (e) {
                 console.error("unfoldPost4:" + e);
@@ -10913,11 +11119,12 @@ margin-top: 20px;
             // document.addEventListener('MSAnimationStart', unfoldPost3, false);
             // document.addEventListener('animationstart', unfoldPost3, false);
         };
-
-        setTimeout(unfoldPost, 1000); //要延迟一会儿，才能保证捕捉到标签
-        /*var t=*/
-        var louzhonglou = setInterval(unfoldPost2, 2000); //要定时循环查找才能找全整个贴子的楼中楼。。!
-        var liebiao = setInterval(unfoldPost4, 2000); //要定时循环查找才能找全整个贴吧列表的贴子。。!
+        if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?ie=utf-8&kw=/g) != -1) {
+            var liebiao = setInterval(unfoldPost4, 2000); //要定时循环查找才能找全整个贴吧列表的贴子。。!
+        }
+        if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\/.*/g) != -1) {
+            var louzhonglou = setInterval(unfoldPost2, 2000); //要定时循环查找才能找全整个贴子的楼中楼。。!
+        }
         initListener();
         initStyle();
     })();
@@ -10962,13 +11169,13 @@ margin-top: 20px;
         }
     })();
 })($);
-(function () {
+(function ($) {
     function closemeihua() {
         GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
         window.location.reload(); //刷新网页
     }
     GM_registerMenuCommand(GM_getValue("tiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
-})();
+})($);
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
 /*https://www.jb51.net/article/147217.htm
