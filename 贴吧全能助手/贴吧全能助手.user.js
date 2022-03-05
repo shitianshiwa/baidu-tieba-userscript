@@ -9732,8 +9732,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             for (let i = 1; i < s.length; i++) {
                 option = document.createElement("option")
                 option.text = s[i]
-                if(i==2)
-                {
+                if (i == 2) {
                     option.setAttribute('selected', 'selected');
                 }
                 option.setAttribute('value', i);
@@ -9796,8 +9795,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             }, false)
             a.addEventListener('dblclick', e => {
                 //if (yipaixun2 == true) {
-                let temp=document.getElementById("select1").selectedIndex
-                console.log("dblclick:"+temp);
+                let temp = document.getElementById("select1").selectedIndex
+                console.log("dblclick:" + temp);
 
                 sortById(temp)
                 //}
@@ -10800,9 +10799,9 @@ margin-top: 20px;
             }
             if (classList.contains('video_src_wrap_main') || classList.contains('media_disp')) {
                 //让视频贴可以下载视频,video_src_wrap_main是贴子内的，media_disp是贴子列表简介的
-                console.log("video:"+target.querySelectorAll("video")[0].outerHTML)
                 let temp = target.querySelectorAll("video")[0]
                 if (temp != undefined) {
+                    console.log("video:" + target.querySelectorAll("video")[0].outerHTML)
                     temp.setAttribute("controlslist", "download")
                 }
             }
