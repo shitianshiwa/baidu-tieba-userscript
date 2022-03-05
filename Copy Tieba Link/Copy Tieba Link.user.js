@@ -211,7 +211,7 @@ if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\//g) != -1) {
                     clearInterval(T); //刷新贴子
                     T = null;
                 }
-                console.log("j_core_title_wrap:" + temp2);
+                console.log("j_core_title_wrap:" + temp2.outerHTML);
             } catch (e) {
                 console.error("T2:" + e);
                 clearInterval(T);
