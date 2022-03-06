@@ -9743,13 +9743,14 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             b.setAttribute('id', 'select2');
             var c = document.createElement('p')
             c.textContent = "翻页保持/排序是否包含置顶贴"
+            c.setAttribute('style', 'position: absolute;left: 3px;top: 30px;')
             c.appendChild(b)
             var d = document.createElement('input')
             d.setAttribute('type', 'checkbox');
             d.setAttribute('id', 'select3');
             c.appendChild(d)
             var f = document.createElement('div')
-            f.setAttribute('style', 'position: absolute;left: 410px;top: 10px;')
+            f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: -5px;')
             f.appendChild(a)
             f.appendChild(c)
             //var paixun = false
