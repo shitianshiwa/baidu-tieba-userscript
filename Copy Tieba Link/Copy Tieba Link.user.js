@@ -1,6 +1,7 @@
 // ==UserScript==
-// @name         Copy Tieba Link
-// @version      1.2.2.3
+// @name         复制贴吧贴子内容
+// @version      1.2.2.4
+/// @name        Copy Tieba Link
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
 // @include      http*://tieba.baidu.com/f?kw=*
@@ -21,6 +22,7 @@
 // @grant        GM_addStyle
 // @grant        unsafeWindow
 // @grant        GM.xmlHttpRequest
+// @grant        GM_xmlHttpRequest
 /// @namespace    http://ext.ccloli.com
 // @license      MIT
 ///这个脚本的维护地址 https://github.com/shitianshiwa/baidu-tieba-userscript/
@@ -327,7 +329,7 @@ async function copyLink() {
                         if (x01 != null) {
                             //console.log(x01.innerHTML);
                             temp += "视频封面：" + x01.innerHTML.match(/(http|https):\/\/((tiebapic|imgsa)\.baidu\.com\/forum\/pic\/item\/.*jpg?|gss3\.baidu\.com\/.*\/tieba-video-frame\/.*\.jpg)/g) + "\n";
-                            let temp2 = x01.innerHTML.match(/data-video="(http|https):\/\/gss3\.baidu\.com\/.*\/tieba-smallvideo.*\/.*\.mp4" data-vsrc="/g);
+                            let temp2 = x01.innerHTML.match(/data-video=".*" data-vsrc="/g);
                             if (temp2 != null) {
                                 temp += "视频链接：" + temp2.toString().replace('data-video="', "").toString().replace('" data-vsrc="', "") + "\n";
                             }
