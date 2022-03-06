@@ -9742,14 +9742,16 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             b.setAttribute('type', 'checkbox');
             b.setAttribute('id', 'select2');
             var c = document.createElement('p')
-            c.setAttribute('style', 'position: absolute;left: 410px;')
             c.textContent = "翻页保持/排序是否包含置顶贴"
             c.appendChild(b)
             var d = document.createElement('input')
             d.setAttribute('type', 'checkbox');
             d.setAttribute('id', 'select3');
             c.appendChild(d)
-
+            var f = document.createElement('div')
+            f.setAttribute('style', 'position: absolute;left: 410px;top: 10px;')
+            f.appendChild(a)
+            f.appendChild(c)
             //var paixun = false
             a.addEventListener('change', e => {
                 //console.log(JSON.stringify(e))//{"isTrusted":true}
@@ -9802,8 +9804,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 //}
             }, false)
             try {
-                document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(a);
-                document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(c);
+                document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(f);
             } catch (err) {
                 console.log(err);
             }
