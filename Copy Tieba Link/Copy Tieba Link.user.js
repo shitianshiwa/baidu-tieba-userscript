@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         复制贴吧贴子内容
-// @version      1.2.2.4
+// @version      1.2.2.5
 /// @name        Copy Tieba Link
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
@@ -331,7 +331,7 @@ async function copyLink() {
                             temp += "视频封面：" + x01.innerHTML.match(/(http|https):\/\/((tiebapic|imgsa)\.baidu\.com\/forum\/pic\/item\/.*jpg?|gss3\.baidu\.com\/.*\/tieba-video-frame\/.*\.jpg)/g) + "\n";
                             let temp2 = x01.innerHTML.match(/data-video=".*" data-vsrc="/g);
                             if (temp2 != null) {
-                                temp += "视频链接：" + temp2.toString().replace('data-video="', "").toString().replace('" data-vsrc="', "") + "\n";
+                                temp += "视频链接: " + temp2.toString().replace('data-video="', "").toString().replace('" data-vsrc="', "").replace("视频来自：百度贴吧", "").replace('true controlslist\\= download', "").replace(' true  controlslist= nodownload  ', "") + "\n";
                             }
                             //console.log(x01.innerHTML.match(/(http|https):\/\/tiebapic\.baidu\.com\/forum\/pic\/item\/.*jpg/g));
                             //console.log(x01.innerHTML.match(/(http|https):\/\/gss3\.baidu\.com\/.*\/tieba-smallvideo-transcode-crf\/.*\.mp4/g));
@@ -641,7 +641,7 @@ async function copyLink() {
                     temp = temp.replace(/https/g, " https"); //加个空格
                     temp = temp.replace(/<span class= txt  点击展开，查看完整图片/g, "");
                     temp = temp.replace(/<em class= expand/g, "");
-                    temp = temp.replace(/<div class= video_src_wrapper/g, "视频链接: ").replace(/<div class= video_src_wrap_main/g, "").replace(/<video style= width: .*px; height: .*px; background:.*;  src=/g, "").replace(/data-threadid=.*data-md5=.*controls=.*autoplay=/g, "").replace(/<\/video  <span class= apc_src_wrapper/g, "").replace("视频来自：百度贴吧", "");
+                    temp = temp.replace(/<div class= video_src_wrapper/g, "视频链接: ").replace(/<div class= video_src_wrap_main/g, "").replace(/<video style= width: .*px; height: .*px; background:.*;  src=/g, "").replace(/data-threadid=.*data-md5=.*controls=.*autoplay=/g, "").replace(/<\/video  <span class= apc_src_wrapper/g, "").replace("视频来自：百度贴吧", "").replace(' true  controlslist= download  ', "").replace(' true  controlslist= nodownload  ', "")
                     temp = temp.replace(/style=/g, "");
                     temp = temp.trim();
                     textGroup.push("内容: " + temp + " ");
