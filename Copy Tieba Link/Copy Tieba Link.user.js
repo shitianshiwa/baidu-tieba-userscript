@@ -241,7 +241,7 @@ if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\//g) != -1) {
                     curAnchor3.addEventListener('click', copyLink);
                     curAnchor3.setAttribute('data-anchor-type', '2'); //楼层
                     temp3[i].appendChild(curAnchor3);
-                    console.log("core_reply_tail:" + temp3[i]);
+                    console.log("core_reply_tail:" + temp3[i].outerHTML);
                 }
             }
             console.log("core_reply_tail:" + temp3.length);
