@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1835
+// @version      2.1.1836
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了,已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -267,6 +267,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     #mediago-frs-aside,
     /*贴吧列表内的广告*/
     div.mediago-ad-wrapper,
+    /*贴吧游击广告*/
+    #lu-frs-aside,
     #com_u9_head{
         display: none !important;
     }`;
@@ -10014,7 +10016,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             }
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
-        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block,.video_src_wrap_main,.media_disp{
+        .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block,.video_src_wrap_main,.media_disp,#j_more_hotFeed{
             animation-duration: 0.001 s;
             animation-name: tiebaaction;
         }
@@ -10066,6 +10068,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         /*让视频贴可以下载视频*/
         .video_src_wrap_main,
         .media_disp,
+        /*个人主页下方的贴子加载按钮*/
+        #j_more_hotFeed,
         .icon_interview_picture,.listThreadTitle{
             -webkit-animation: __tieba_action__;
             -moz-animation: __tieba_action__;
@@ -10248,6 +10252,9 @@ margin-top: 20px;
                 classList
             } = target;
             //console.log(target);
+            if (event.animationName !== '__tieba_action__') {
+                return;
+            }
             if (classList.contains('core_reply_tail')) {
                 if (qiangdiaoxinxitishi == true) {
                     //console.log(target.querySelectorAll(".core_reply_tail")[0])
@@ -10267,9 +10274,6 @@ margin-top: 20px;
                         }
                     }
                 }
-            }
-            if (event.animationName !== '__tieba_action__') {
-                return;
             }
             /*图片话题贴*/
             if (classList.contains('icon_interview_picture')) {
@@ -10805,6 +10809,20 @@ margin-top: 20px;
                 if (temp != undefined) {
                     console.log("video:" + target.querySelectorAll("video")[0].outerHTML)
                     temp.setAttribute("controlslist", "download")
+                }
+            }
+            //个人主页下方的贴子加载按钮
+            if (target.getAttribute('id') == "j_more_hotFeed") {
+                //https://tieba.baidu.com/home/main?id=
+                //"\\"让?和=作为字符串存在，可以用于匹配
+                //$("#j_more_hotFeed>a")[0].click()
+                if (window.location.href.search("/home/main\\?id\\=") != -1) {
+                    console.log("j_more_hotFeed" + target.outerHTML);
+                    let t = setTimeout(() => {
+                        target.querySelectorAll("a")[0].click()
+                        clearTimeout(t)
+                        t = null
+                    }, 1000)
                 }
             }
         }
