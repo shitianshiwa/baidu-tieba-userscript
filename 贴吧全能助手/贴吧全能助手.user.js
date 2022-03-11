@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1836
+// @version      2.1.1837
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了,已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -20,7 +20,7 @@
 ///只测试了Google Chrome 75.0.3770.142（正式版本） (64 位),87.0.4280.66（正式版本） （64 位）
 /// jQuery 留一份自己用。备注贴吧自带的jQuery是修改过的，至少有lazyload功能
 // @require      https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js
-/// @require      https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js
+// @require      https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js
 
 /// @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
 /// @require     http://cdn.staticfile.org/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js
@@ -38,7 +38,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_listValues
-/// @grant        GM_info
+// @grant        GM_info
 // @grant        GM_addStyle
 // @grant        GM_registerMenuCommand
 // @grant       GM_deleteValue
@@ -135,8 +135,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     const getWaptiebaxinxi = tid => request(getThreadMoUrl(tid))
         .then(threadreturnxinxi);
 
-    console.log("jquery版本号: " + $.fn.jquery);
-    console.log("贴吧全能脚本版本号: 2.1.1834");
+    console.log("脚本引用的jquery版本号: " + $.fn.jquery);
+    setTimeout(() => {
+        console.log("贴吧的jquery版本号: " + this.$.fn.jquery);
+    }, 2000)
+    console.log("贴吧全能脚本版本号:" + JSON.parse(JSON.stringify(GM_info)).script.version);
     let tieziurl = window.location.href;
     //https://www.v2ex.com/t/611007
     //https://jump2.bdimg.com/f?kw=
@@ -8518,16 +8521,25 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                 },
                 "quote": {
-                    name: '引用楼层(仅旧版PC贴吧有效,例如火狐吧)',
+                    name: '引用楼层',
                     desc: '引用某一层的内容',
                     flag: __type_floor,
                     def: true,
+                    _init: function () {
+                    },
                     _proc: function (floorType, args) {
                         //console.log("233333333333");
-                        var $quote = $('<li>').addClass('pad-left').append( //<li>
+                        //旧贴吧
+                        $('<li>').addClass('pad-left').append( //<li>
                             $('<a>').text('#引用').addClass('jx')
                                 .data('jx', 'quote').data('floor', args.floorNum)
                         ).prependTo($('.p_tail', args._main));
+                        //新贴吧
+
+                        $('<li>').addClass('pad-left').append( //<li>
+                            $('<a>').text('#引用').addClass('jx')
+                                .data('jx', 'quote').data('floor', args.floorNum)
+                        ).prependTo($('.post-tail-wrap', args._main));
                         /*setTimeout(() => {
                             console.log(args);
                             var $quote2 = $('.post-tail-wrap').append($('<div>').addClass('pad-left').append( //<li>
@@ -8556,18 +8568,31 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             }
 
                             var $ele = $(ele);
-                            if ($ele.is('a')) {
-                                if ($ele.find('img').size()) {
-                                    $quote.append('[#图片]');
-                                } else {
-                                    $quote.append($ele.text());
+                            console.log($ele)
+                            //console.log($ele.find('img').length)
+                            //console.log($ele.find('img').attr("class"))
+                            if ($ele.find('img').attr("class") == "BDE_Image") {//新贴吧
+                                $quote.append('[#图片]');//BDE_Image
+                                //$quote.append($ele.text());
+                            } else if ($ele.find('img').attr("class") == "BDE_Smiley") {
+                                $quote.append('[#表情]');//BDE_Smiley
+                            }
+                            else if ($ele.is('img')) {//旧贴吧
+                                if ($ele.attr("class") == "BDE_Image") {
+                                    $quote.append('[#图片]');//BDE_Image
+                                    //$quote.append($ele.text());
+                                } else if ($ele.attr("class") == "BDE_Smiley") {
+                                    $quote.append('[#表情]');//BDE_Smiley
                                 }
-                            } else if ($ele.is('img')) {
-                                $quote.append('[#表情]');
-                            } else if ($ele.is('object,embed')) {
-                                $quote.append('[#视频]');
-                            } else {
-                                $quote.append($ele.clone());
+                            }
+                            else if ($ele.attr("class") == "video_src_wrapper") {
+                                $quote.append('[#视频]');//video_src_wrapper
+                            }
+                            else if ($ele.attr("class") == "voice_player voice_player_pb") {
+                                $quote.append('[#语音]');//voice_player voice_player_pb
+                            }
+                            else {
+                                $quote.append($ele.clone())//直接复制内容
                             }
                         });
 
@@ -8576,7 +8601,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     }
                 },
                 "quote_lzl": {
-                    name: '楼中楼帖子引用(仅旧版PC贴吧有效,例如火狐吧)',
+                    name: '楼中楼帖子引用',
                     desc: '引用楼中楼的回复',
                     flag: __type_lzl,
                     def: true,
@@ -8595,8 +8620,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     _click: function ($ele, $eve) {
                         var $editor = $('#ueditor_replace');
                         var $cnt = $ele.parents('.lzl_cnt');
+                        var $floor = JSON.parse($ele.parents(".j_lzl_container").attr("data-field")).floor_num
+                        //console.log(JSON.parse($ele.parents(".j_lzl_container").attr("data-field")).floor_num)
                         $('<p>').appendTo($editor)
-                            .append('引用 @' + $cnt.find('.j_user_card').attr('username') + ' 在楼中楼的发言：<br>')
+                            .append('引用' + $floor + '楼 @' + $cnt.find('.j_user_card').attr('username') + ' 在楼中楼的发言：<br>')
                             .append($ele.parents('.lzl_cnt').find('.lzl_content_main').text())
                             .append('<br>')
                             .append('——————————')
@@ -9013,11 +9040,32 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 });
             };
 
+            //旧贴吧的贴子样式
             var _procLzlContainer = function (i, tailer) {
                 var $tailer = $(tailer),
                     _main = $tailer.parents('.l_post');
 
-                // console.log ($tailer, _main);
+                //console.log($tailer, _main);
+
+                _event(__type_floor, {
+                    _main: _main,
+                    floor: _main,
+                    // 「'」is not standard, convert to 「"」 first.
+                    floorNum: parseInt($tailer.getField().floor_num),
+                    tail: $('.p_tail', _main)
+                });
+
+                // 处理解析 lzl 帖子（…
+                // $tailer.find('.lzl_single_post').each(_procLzlPost);
+                return _main;
+            };
+
+            //新贴吧的贴子样式
+            var _procLzlContainer2 = function (i, tailer) {
+                var $tailer = $(tailer).parents('.j_lzl_container'),
+                    _main = $tailer.parents('.l_post');
+
+                //console.log($tailer, _main);
 
                 _event(__type_floor, {
                     _main: _main,
@@ -9058,19 +9106,37 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             }
             var mo = new MutationObserver(function (eve) {
                 _run(function () {
+                    //console.log("1")
+                    //console.log(eve)
                     $(eve).each(function (i, eve) {
+                        //console.log("2")
+
                         if (!eve.addedNodes.length) return;
+                        //console.log("3")
 
                         $(eve.addedNodes).each(function (i, ele) {
                             // Text node.
+                            //console.log("3")
+
                             if (ele.nodeType == 3) return;
+                            //console.log("4")
 
                             var $ele = $(ele),
                                 _type = 0,
                                 $tmp;
+                            //console.log("5")
 
                             // 单贴处理
-                            if ($ele.hasClass('j_lzl_container')) {
+                            //console.log($ele)
+                            //j_lzl_c_b_a 
+                            if ($ele.hasClass('j_lzl_c_b_a')) {
+                                //console.log("6")
+                                // _type = __type_floor;
+                                $tmp = _procLzlContainer2(i, $ele);
+                                $tmp.find('.lzl_single_post').each(_procLzlPost);
+                            }
+                            else if ($ele.hasClass('j_lzl_container')) {
+                                //console.log("7")
                                 // _type = __type_floor;
                                 $tmp = _procLzlContainer(i, $ele);
                                 $tmp.find('.lzl_single_post').each(_procLzlPost);
@@ -9107,6 +9173,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     childList: true,
                     subtree: true
                 });
+
             } catch (error) {
                 console.log(error);
             }
@@ -10068,6 +10135,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         /*让视频贴可以下载视频*/
         .video_src_wrap_main,
         .media_disp,
+        .media_box,
         /*个人主页下方的贴子加载按钮*/
         #j_more_hotFeed,
         .icon_interview_picture,.listThreadTitle{
@@ -10252,28 +10320,38 @@ margin-top: 20px;
                 classList
             } = target;
             //console.log(target);
-            if (event.animationName !== '__tieba_action__') {
-                return;
-            }
             if (classList.contains('core_reply_tail')) {
                 if (qiangdiaoxinxitishi == true) {
                     //console.log(target.querySelectorAll(".core_reply_tail")[0])
                     target.style = "color:#000 !important;"; //强调信息显示。楼层的时间。对旧版贴吧作用一般。
                 }
                 if (!GM_getValue("tiebameihua")) { //贴吧美化
-                    //console.log(target.querySelectorAll(".p_reply_first"));
-                    let temp1 = target.querySelectorAll(".p_reply_first");
+                    //console.log(target.querySelectorAll("ul.p_reply>li>a"));
+                    let temp1 = target.querySelectorAll(".p_reply_first")//新贴吧的贴子
+                    let temp2 = target.querySelectorAll("ul.p_reply>li>a");//老贴吧的贴子样式特殊
                     if (temp1[0] != null) {
-                        temp1[0].style = "font-size:unset !important;";
-                        //console.log(temp1[0].classList[1]);
-                        if (temp1[0].classList[0] == "p_reply_first") {
-                            temp1[0].style = "font-size:10px !important;";
-                            temp1[0].innerHTML = "回复";
-                        } else {
+                        temp1[0].style = "font-size:10px !important;";
+                        //console.log(temp1[0].classList[0]);
+                        if (temp1[0].classList[1] == "p_reply_first") {
                             temp1[0].innerHTML = "回复楼主";
+                        } else {
+                            temp1[0].innerHTML = "回复";
+                        }
+                    }
+                    if (temp2[0] != null) {
+                        temp2[0].style = "font-size:10px !important;";
+                        //console.log(temp1[0].classList[1]);
+                        if (temp2[0].classList[0] == "p_reply_first") {
+                            temp2[0].innerHTML = "回复楼主";
+                            temp2[0].parentNode.style = "width:auto !important;";
+                        } else {
+                            temp2[0].innerHTML = "回复";
                         }
                     }
                 }
+            }
+            if (event.animationName !== '__tieba_action__') {
+                return;
             }
             /*图片话题贴*/
             if (classList.contains('icon_interview_picture')) {
@@ -10803,7 +10881,7 @@ margin-top: 20px;
             if (classList.contains('dialog_block')) {
                 target.remove();
             }
-            if (classList.contains('video_src_wrap_main') || classList.contains('media_disp')) {
+            if (classList.contains('video_src_wrap_main') || classList.contains('media_disp') || classList.contains('media_box')) {
                 //让视频贴可以下载视频,video_src_wrap_main是贴子内的，media_disp是贴子列表简介的
                 let temp = target.querySelectorAll("video")[0]
                 if (temp != undefined) {
