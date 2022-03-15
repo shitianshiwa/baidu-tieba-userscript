@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         复制贴吧贴子内容
-// @version      1.2.2.5
+// @version      1.2.2.6
 /// @name        Copy Tieba Link
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
@@ -607,7 +607,8 @@ async function copyLink() {
                 break;
             case '2': // 贴子内页获取楼层链接
                 //获取楼层的内容
-                var floorData00 = parent.parentNode.parentNode.children[0].children[1].children[1] || parent.parentNode.parentNode.children[0].children[3].children[1] || parent.parentNode.parentNode.parentNode.children[1].children[0].children[3].children[1];
+                console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".d_post_content.j_d_post_content")[0])
+                var floorData00 = parent.parentNode.parentNode.parentNode.querySelectorAll(".d_post_content.j_d_post_content")[0]//parent.parentNode.parentNode.children[0].children[1].children[1] || parent.parentNode.parentNode.children[0].children[3].children[1] || parent.parentNode.parentNode.parentNode.children[1].children[0].children[3].children[1];//d_post_content j_d_post_content 
                 var floorData = JSON.parse(parent.parentElement.parentElement.parentElement.dataset.field);
                 //console.log(parent.parentNode.parentNode.parentNode.querySelectorAll(".louzhubiaoshi_wrap")[0].getAttribute("class"))
                 var floorData02 = parent.parentNode.parentNode.parentNode.querySelectorAll(".louzhubiaoshi_wrap")[0];
@@ -620,6 +621,7 @@ async function copyLink() {
                     //console.log("1楼")
                     //console.log(parent)
                 }*/
+                //console.log(floorData00)
                 //console.log(floorData00.innerHTML.replace(/<a.*?">/g,"").replace(/<img.*?src=/g,"").replace(/<br>/g,"\n").replace(/" size.*?">/g,"").replace(/">/g," ").replace(/<\/a>/g,"").replace(/</g,"").replace(/"/g," "))
                 if (setting.title) {
                     textGroup.push("标题: " + unsafeWindow.PageData.thread.title + ' #' + floorData.content.post_no + " ");
