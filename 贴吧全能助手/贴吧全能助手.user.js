@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1838
+// @version      2.1.1839
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序（翻页后失效），查看贴吧用户发言记录（有些用户查不了,已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -9208,7 +9208,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                 image, imageSrc;
                             if (e.button === 0 && (target.className === "BDE_Image" || target.className === "j_user_sign")) {
                                 log("图片创建", "开始");
-                                imageSrc = target.src.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/);
+                                imageSrc = target.src.split("?")[0]//直接清理图片链接?后面的参数
+                                imageSrc = imageSrc.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/);//正则表达式获取部分字符串
+                                //console.log(target.src)
                                 log("图片地址获取", function () {
                                     if (imageSrc) return "成功";
                                     else return "失败";
