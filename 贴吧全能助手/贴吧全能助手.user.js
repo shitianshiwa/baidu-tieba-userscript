@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1839
+// @version      2.1.1840
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -161,7 +161,17 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     let baiban2 = setTimeout(() => {
         clearTimeout(baiban2);
         $(".tieba-app").remove(); //点击打开贴吧APP查看该吧更多内容 https://tieba.baidu.com/mo/q/weeklybazhuview?fid=吧id&beginTime=1590768000(开始的时间戳/秒)
+        //把下载app按钮移到扫码下载app的位置
+        let app1 = document.querySelectorAll(".app_download_info")[0]
+        if (app1 != undefined) {
+            let app2 = document.createElement("a"); //创建节点<a/>
+            app2.setAttribute('href', 'https://tiebac.baidu.com/c/s/download/pc');
+            app2.innerText = "贴吧app下载跳转";
+            app1.after(app2)
+        }
     }, 5000);
+
+    //https://tiebac.baidu.com/c/s/download/pc
     //https://www.sitepoint.com/css3-animation-javascript-event-handlers/
     //https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations
     /*
@@ -278,6 +288,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     /*贴吧顶部广告*/
     #pb_adbanner,
     .l_banner.banner_theme,
+    /*右侧浮动的下载app按钮*/
+    .tbui_fbar_down,
     #com_u9_head{
         display: none !important;
     }`;
@@ -5676,23 +5688,31 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 .tbui_fbar_auxiliaryCare>a:after {
                 	content:\"辅\";
                 }
-                .tbui_fbar_top{
+                /*隐藏动画效果?*/
+                .tbui_fbar_top,.tbui_fbar_bottom{
                 	overflow: hidden;
                 	padding-right: 2px;
                 	padding-bottom: 2px;
                 }
-                .tbui_fbar_top>a{
+                
+                .tbui_fbar_top>a,.tbui_fbar_bottom>a{
                 	transition-property: text-indent,transform;
                 }
-                .tbui_fbar_top[style*=\"hidden\"]{
+                .tbui_fbar_top[style*=\"hidden\"],.tbui_fbar_bottom[style*=\"hidden\"]{
                 	pointer-events: none;
                 	visibility: visible !important;
                 }
-                .tbui_fbar_top[style*=\"hidden\"]>a{
+                .tbui_fbar_top[style*=\"hidden\"]>a,.tbui_fbar_bottom[style*=\"hidden\"]>a{
                 	transform: translateX(-110%);
                 }
-                .tbui_fbar_top[style*=\"visible\"]{
+                .tbui_fbar_top[style*=\"visible\"],.tbui_fbar_bottom[style*=\"visible\"]{
                 	opacity: 1;
+                }
+                .tbui_fbar_bottom>a:before {
+                	content:\"快速到底\";
+                }
+                .tbui_fbar_bottom>a:after {
+                	content:\"\\e2c4\";
                 }
                 .threadListGroupCnt>.listBtnCnt>#interview-share-wrapper>.tbshare_popup_wrapper{
                     position:unset !important;/*特殊的今日话题分享按钮*/
@@ -10101,7 +10121,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
         /*.pager_theme_4,*/
         .thread_theme_5,
         .l_posts_num,
-        /*会员       .置顶图标*/
+        /*会员置顶图标*/
         .icon-member-top,
         /*个人主页按钮的头像*/
         .u_menu_username,
@@ -10558,6 +10578,7 @@ margin-top: 20px;
             /*下半部分单独处理以避免偶尔隐藏失败*/
             if (classList.contains('tbui_aside_float_bar')) {
                 //$("li.tbui_fbar_favor")[0].before();
+                //console.log(target);
                 if (!GM_getValue("tiebameihua")) { //贴吧美化
                     if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
                         if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
@@ -10570,33 +10591,56 @@ margin-top: 20px;
                         }
                     }
                 }
-                //给贴子和我的i贴吧添加一个刷新按钮
-                if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+home/+.*$")).test(document.location.href)) {
-                    let temp = document.createElement("li"); //创建节点<li/>
-                    let temp2 = document.createElement("a"); //创建节点<a/>
-                    let temp3 = target.querySelectorAll(".tbui_fbar_top")[0];
-                    temp.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_refresh');
-                    temp.appendChild(temp2);
-                    temp3.before(temp);
-                    temp2.addEventListener('click', (e) => {
+                //给贴子和我的贴吧添加一个刷新按钮
+                //https://tieba.baidu.com/home/main?id=
+                //if ((new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href) || (new RegExp("^(https|http)?://(tieba.baidu.com|www.tieba.com)/home/main\\?id\\=.*$")).test(document.location.href)) {
+                let fuzuodian1 = target.querySelectorAll(".tbui_fbar_down")[0] || target.querySelectorAll(".tbui_fbar_top")[0];//tbui_fbar_top .tbui_fbar_down下载app按钮
+                let fuzuodian2 = target.querySelectorAll(".tbui_fbar_top")[0];
+                if (target.querySelectorAll(".tbui_fbar_refresh")[0] == undefined) {
+                    let refresh1 = document.createElement("li"); //创建节点<li/>
+                    let refresh2 = document.createElement("a"); //创建节点<a/>
+                    refresh1.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_refresh');
+                    refresh1.appendChild(refresh2);
+                    fuzuodian1.before(refresh1);
+                    refresh2.addEventListener('click', (e) => {
                         window.location.reload();
                     });
                 }
-                if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href) || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+\\d+.*\\?(.*&)*see_lz=[1-9]+\\d*.*$")).test(document.location.href)) {
-                    let temp = document.createElement("li"); //创建节点<li/>
-                    let temp2 = document.createElement("a"); //创建节点<a/>
-                    let temp3 = target.querySelectorAll(".tbui_fbar_down")[0];
-                    //temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
-                    temp.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_refresh');
-                    temp.appendChild(temp2);
-                    temp3.before(temp);
-                    temp3.remove();
-                    temp2.addEventListener('click', (e) => {
-                        window.location.reload();
-                    });
-                }
-                //<li class="tbui_aside_fbar_button tbui_fbar_refresh"><a href="#"></a></li>
-                //console.log(target);
+                let bottom1 = document.createElement("li"); //创建节点<li/>
+                let bottom2 = document.createElement("a"); //创建节点<a/>
+                //temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
+                bottom1.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_bottom');
+                bottom1.appendChild(bottom2);
+                fuzuodian2.after(bottom1);
+                bottom2.addEventListener('click', (e) => {
+                    //window.scrollTo(0, document.body.scrollHeight);
+                    let i = document.documentElement.scrollTop;
+                    let t = setInterval(() => { 
+                        //console.log(document.documentElement.scrollTop)
+                        if (i <= document.body.scrollHeight) {
+                            window.scrollTo(document.documentElement.scrollTop, i);
+                            i += 500;
+                        } else {
+                            clearInterval(t);
+                        }
+                    }, 40);
+                });
+                //快速到底按钮动画效果
+                window.addEventListener("scroll", function (e) {
+                    let temp = document.querySelectorAll(".tbui_fbar_bottom")[0]
+                    if (temp != undefined) {
+                        //console.log(document.documentElement.scrollTop)
+                        //console.log(document.body.scrollHeight- 1000)
+                        //console.log(window.scrollY)
+                        if (window.scrollY >= document.body.scrollHeight - 1000) {
+                            temp.setAttribute("style", "visibility: hidden;")
+                        }
+                        else {
+                            temp.setAttribute("style", "visibility: visible;")
+                        }
+                    }
+                });
+                //}
             }
             //let checker;
             //console.log(target);
@@ -10899,6 +10943,7 @@ margin-top: 20px;
                 //https://tieba.baidu.com/home/main?id=
                 //"\\"让?和=作为字符串存在，可以用于匹配
                 //$("#j_more_hotFeed>a")[0].click()
+                //如果瞬移到网页底部可能会失效
                 if (window.location.href.search("/home/main\\?id\\=") != -1) {
                     console.log("j_more_hotFeed" + target.outerHTML);
                     let t = setTimeout(() => {
@@ -11312,4 +11357,24 @@ if (document.addEventListener) { //firefox
 }
 //滚动滑轮触发scrollFunc方法 //ie 谷歌
 window.onmousewheel = document.onmousewheel = scrollFunc;
-*/
+                获取坐标： IE  (event.x  event.y)
+获取滚动条位置：
+     document.body.scrollTop （滚动条离页面最上方的距离）
+
+     document.body.scrollLeft   （滚动条离页面最左方的距离）
+
+当我用js获取当前垂直或者水平方向滚动条位置的时候，使用"document.body.scrollTop"或者"document.body.scrollLeft"是无效的，得到的数值永远是0。但是，当写在“onscroll”事件里面的时候，上述方法可以获得当前滚动条的位置。
+
+当网页最前面有以下内容：
+
+<! DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+     document.documentElement.scrollTop （滚动条离页面最上方的距离）
+
+     document.documentElement.scrollLeft   （滚动条离页面最左方的距离）
+所以为了准确取得当前滚动条的位置，正确的使用方法是：
+
+      document.documentElement.scrollTop：垂直方向
+     document.documentElement.scrollLeft：水平方向
+     https://blog.csdn.net/gimsoft/article/details/4424781
+                */
