@@ -255,23 +255,27 @@ border: 1px solid #3e89fa;
     }
     var tP = "-1"
     function tiezi() {
-        if (tP != $("span.tP")[0].innerHTML) {
-            tP = $("span.tP")[0].innerHTML
-            let temp = $("li.pager_theme_4")
-            let temp1 = temp.clone()//复制节点
-            temp.before(temp1)//插入节点
-            temp.remove()//删除节点
-            console.log("贴子内翻页按钮:/p/" + PageData.thread.thread_id)
-            $("li.pager_theme_4>a").click((e) => {
-                console.log("贴子内翻页:/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)
-                e.preventDefault()//阻止点击刷新网页
-                $(".loading-tip")[0].style = "display:block"
-                this.Path.nav("/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)//挖出来的贴吧自带功能模块
-            });
+        if ($("span.tP")[0] != undefined) {
+            if (tP != $("span.tP")[0].innerHTML) {
+                tP = $("span.tP")[0].innerHTML
+                let temp = $("li.pager_theme_4")
+                let temp1 = temp.clone()//复制节点
+                temp.before(temp1)//插入节点
+                temp.remove()//删除节点
+                console.log("贴子内翻页按钮:/p/" + PageData.thread.thread_id)
+                $("li.pager_theme_4>a").click((e) => {
+                    console.log("贴子内翻页:/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)
+                    e.preventDefault()//阻止点击刷新网页
+                    $(".loading-tip")[0].style = "display:block"
+                    this.Path.nav("/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)//挖出来的贴吧自带功能模块
+                });
+            }
         }
     }
     //louceliebiao();使用这个的话，重复切换楼层后，上面就不显示楼层列表了
-    t1 = setInterval(tiezi, 1000);//由于需要使用贴吧自带的功能模块，时间不能太短
+    if (hrefs.search(/(https|http):\/\/tieba\.baidu\.com\/p\/.*/g) != -1) {
+        t1 = setInterval(tiezi, 1000);//由于需要使用贴吧自带的功能模块，时间不能太短
+    }
     t2 = setInterval(louceliebiao, 1000);
     //t2=setInterval(()=>{louceliebiao();},1000);//延迟1s工作，等网页基本加载完毕
     var a = false
