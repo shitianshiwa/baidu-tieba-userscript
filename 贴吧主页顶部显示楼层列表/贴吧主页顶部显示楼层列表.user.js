@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
@@ -80,6 +80,9 @@ color: #3e89fa;
 border: 1px solid #3e89fa;
 }
 `;
+    if (document.body.className == "page404") {
+        return
+    }
     const style = document.createElement('style'); //创建新样式节点
     style.textContent = css1; //添加样式内容
     document.head.appendChild(style); //给head头添加新样式节点
@@ -250,8 +253,26 @@ border: 1px solid #3e89fa;
             alert(error + ",贴吧主页顶部显示楼层列表已停止运行_添加添加跳转文本框和确认按钮");
         }
     }
+    var tP = "-1"
+    function tiezi() {
+        if (tP != $("span.tP")[0].innerHTML) {
+            tP = $("span.tP")[0].innerHTML
+            let temp = $("li.pager_theme_4")
+            let temp1 = temp.clone()//复制节点
+            temp.before(temp1)//插入节点
+            temp.remove()//删除节点
+            console.log("贴子内翻页按钮:/p/" + PageData.thread.thread_id)
+            $("li.pager_theme_4>a").click((e) => {
+                console.log("贴子内翻页:/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)
+                e.preventDefault()//阻止点击刷新网页
+                $(".loading-tip")[0].style = "display:block"
+                this.Path.nav("/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)//挖出来的贴吧自带功能模块
+            });
+        }
+    }
     //louceliebiao();使用这个的话，重复切换楼层后，上面就不显示楼层列表了
-    t2 = setInterval(louceliebiao, 1000); //延迟1s工作，等网页基本加载完毕
+    t1 = setInterval(tiezi, 1000);//由于需要使用贴吧自带的功能模块，时间不能太短
+    t2 = setInterval(louceliebiao, 1000);
     //t2=setInterval(()=>{louceliebiao();},1000);//延迟1s工作，等网页基本加载完毕
     var a = false
     const action = (event) => {
@@ -262,6 +283,7 @@ border: 1px solid #3e89fa;
         const {
             classList
         } = target
+        //console.log(target)
         //console.log(target.getAttribute("b"))
         if (classList.contains("threadlist_title")) {
             if (a == false && target.getAttribute("b") == null) {//使其只可以执行一次
