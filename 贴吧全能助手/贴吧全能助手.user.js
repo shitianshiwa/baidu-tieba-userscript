@@ -7806,6 +7806,19 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         $('<style>').text($ads + '{display: none !important}').appendTo('head');
                     }
                 },
+                "rm_user_icon": {
+                    name:'移除头像',
+                    desc:'移除用户头像',
+                    flag: 0,
+                    def: false,
+                    _init: function () {
+                        $('ul.p_author .icon').remove();
+                        $('.p_content').each(function (i,e){
+                            e.style='min-height:0;padding:3px 0 0 3px !important;'
+                        });
+                        $('.p_content > br').remove();
+                    }
+                },
                 "pingbi_loucengqipao": {
                     name: '屏蔽楼层气泡',
                     desc: '屏蔽楼层气泡',
