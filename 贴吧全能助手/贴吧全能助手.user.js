@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1840
+// @version      2.1.1841
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -7600,6 +7600,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             };
 
             GM_setValue("lzl_zhankai", false);
+            GM_setValue("rm_user_icon", false);
             var modules = {
                 "rmBottom": {
                     name: '移除底部工具栏(不完美)',
@@ -7807,16 +7808,15 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     }
                 },
                 "rm_user_icon": {
-                    name:'移除头像',
-                    desc:'移除用户头像',
+                    name: '移除贴子内楼层用户头像',
+                    desc: '移除贴子内楼层用户头像',
                     flag: 0,
                     def: false,
                     _init: function () {
-                        $('ul.p_author .icon').remove();
-                        $('.p_content').each(function (i,e){
-                            e.style='min-height:0;padding:3px 0 0 3px !important;'
-                        });
-                        $('.p_content > br').remove();
+                        GM_setValue("rm_user_icon", true);
+                    },
+                    _proc: function (floorType, args) {
+                        GM_setValue("rm_user_icon", true);
                     }
                 },
                 "pingbi_loucengqipao": {
@@ -10628,7 +10628,7 @@ margin-top: 20px;
                 bottom2.addEventListener('click', (e) => {
                     //window.scrollTo(0, document.body.scrollHeight);
                     let i = document.documentElement.scrollTop;
-                    let t = setInterval(() => { 
+                    let t = setInterval(() => {
                         //console.log(document.documentElement.scrollTop)
                         if (i <= document.body.scrollHeight) {
                             window.scrollTo(document.documentElement.scrollTop, i);
@@ -11153,6 +11153,13 @@ margin-top: 20px;
                         louzhonglousuo = false
                     }
                 }
+                if (GM_getValue("rm_user_icon") == true) {
+                    $('ul.p_author .icon').remove();
+                    $('.p_content').each(function (i, e) {
+                        e.style = 'min-height:0;padding:3px 0 0 3px !important;'
+                    });
+                    $('.p_content > br').remove();
+                }
             }
             catch (e) {
                 console.error("unfoldPost2:" + e);
@@ -11185,6 +11192,13 @@ margin-top: 20px;
                     console.log(target.parentNode.querySelectorAll(".lzl_more")[0])
                     console.log(target.parentNode.querySelectorAll(".lzl_pager")[0])*/
                 }
+            }
+            if (GM_getValue("rm_user_icon") == true) {
+                $('ul.p_author .icon').remove();
+                $('.p_content').each(function (i, e) {
+                    e.style = 'min-height:0;padding:3px 0 0 3px !important;'
+                });
+                $('.p_content > br').remove();
             }
             //console.log(target.children[1].children[1])
             //document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
