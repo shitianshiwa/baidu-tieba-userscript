@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1841
+// @version      2.1.1842
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -147,6 +147,12 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     //https://live.baidu.com/f?kw=
     //贴子不存在就直接退出
     if (document.body.className == "page404") {
+        console.log("404界面，退出执行脚本")
+        return
+    }
+    //尝试排除移动网页版
+    if (document.body.getAttribute("class") == 'ue_revision' || document.querySelectorAll("div.main-page-wrap")[0] != undefined || document.querySelectorAll("div.tb-mobile-viewport")[0] != undefined) {
+        console.log("不是pc端贴吧，退出执行脚本")
         return
     }
     if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/ || tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/p\//g) != -1) {
@@ -169,8 +175,17 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             app2.innerText = "贴吧app下载跳转";
             app1.after(app2)
         }
+        //某些手机浏览器激活发贴文本编辑器用
+        var c = '<input type="text" name="" value="某些手机浏览器激活发贴文本编辑器用" style="width:110px;font-weight:bold;"/>'; //文本框
+        try {
+            let a = $(".old_style_wrapper");
+            if (a[0] != null) {
+                $(".old_style_wrapper").append(c); //搜索<div class="old_style_wrapper">添加文本框
+            }
+        } catch (error) {
+            alert("激活发贴文本编辑器:" + error);
+        }
     }, 5000);
-
     //https://tiebac.baidu.com/c/s/download/pc
     //https://www.sitepoint.com/css3-animation-javascript-event-handlers/
     //https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations
@@ -290,6 +305,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     .l_banner.banner_theme,
     /*右侧浮动的下载app按钮*/
     .tbui_fbar_down,
+    /*发贴按钮和一键到底按钮功能一样*/
+    .tbui_fbar_post,
     #com_u9_head{
         display: none !important;
     }`;
@@ -10626,8 +10643,8 @@ margin-top: 20px;
                 bottom1.appendChild(bottom2);
                 fuzuodian2.after(bottom1);
                 bottom2.addEventListener('click', (e) => {
-                    //window.scrollTo(0, document.body.scrollHeight);
-                    let i = document.documentElement.scrollTop;
+                    window.scrollTo(0, document.body.scrollHeight);
+                    /*let i = document.documentElement.scrollTop;
                     let t = setInterval(() => {
                         //console.log(document.documentElement.scrollTop)
                         if (i <= document.body.scrollHeight) {
@@ -10636,7 +10653,7 @@ margin-top: 20px;
                         } else {
                             clearInterval(t);
                         }
-                    }, 40);
+                    }, 40);*/
                 });
                 //快速到底按钮动画效果
                 window.addEventListener("scroll", function (e) {
@@ -10759,33 +10776,6 @@ margin-top: 20px;
             }
             if (classList.contains('u_setting')) {
                 //console.log(target);
-                try {
-                    let ii = 0;
-                    let t = setInterval(() => {
-                        if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                            let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
-                            if (temp[0] != null) {
-                                temp[0].style = "background:#fff;";
-                            }
-                        }
-                        if (qiangdiaoxinxitishi == true) {
-                            let temp6 = $(".meihua"); //美化开关
-                            if (ii <= 59) {
-                                ii++;
-                            } else {
-                                clearInterval(t);
-                            }
-                            if (temp6[0] != null) {
-                                clearInterval(t);
-                                temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
-                            }
-                        }
-
-                    },
-                        1000);
-                } catch (err) {
-                    console.log("强调信息提示:" + err);
-                }
                 if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
                     if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
                         let temp3 = $("div.userbar ")[0];
@@ -11096,6 +11086,35 @@ margin-top: 20px;
         }
         `;
         };
+
+        //强调信息提示+修http://tieba.baidu.com/i/i/网页背景
+        try {
+            let ii = 0;
+            let t = setInterval(() => {
+                if (ii <= 59) {
+                    ii++;
+                } else {
+                    clearInterval(t);
+                }
+                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+                    let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
+                    if (temp[0] != null) {
+                        temp[0].style = "background:#fff;";
+                    }
+                }
+                if (qiangdiaoxinxitishi == true) {
+                    let temp6 = $(".meihua"); //美化开关
+                    if (temp6[0] != null) {
+                        clearInterval(t);
+                        temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+                    }
+                }
+
+            },
+                1000);
+        } catch (err) {
+            console.log("强调信息提示:" + err);
+        }
 
         function unfoldPost() { //楼层内容折叠展开
             [].forEach.call(document.querySelectorAll('[style="display:;"]>.p_forbidden_post_content_fold'), node => {
