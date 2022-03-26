@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         贴吧自动签到&一键签到&慢速自动签到
-// @version      0.6
+// @version      0.7
 // @description  ’一键签到‘支持的贴吧数量有限，除非开会员，因为是直接用贴吧电脑端的api,和电脑端贴吧主页那里点击一键签到一个效果（每日北京时间0:00至1:00无法使用）。慢速自动签到目前还没什么用。
 // @author       shitianshiwa
 // @include      http*://tieba.baidu.com/p/*
@@ -67,7 +67,7 @@ font-weight:bold;
             //alert("233");
         }
     } catch (error) {
-        alert(error);
+        console.log("签到:"+error);
     }
 
     function qiandao() //自动签到对超级会员，会员，年费会员似乎一次不能成功,超会签到class="sign_box_member_bright,又可以一次签到成功了？"除了网络问题导致的签到失败外，就只有签到后外观不是会员样式的问题了。
