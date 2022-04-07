@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      0.6
+// @version      0.6.1
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
@@ -264,10 +264,12 @@ border: 1px solid #3e89fa;
                 temp.remove()//删除节点
                 console.log("贴子内翻页按钮:/p/" + PageData.thread.thread_id)
                 $("li.pager_theme_4>a").click((e) => {
-                    console.log("贴子内翻页:/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)
+                    console.log("贴子内翻页:" +  e.target.getAttribute("href"))
+                    //console.log("贴子内翻页:/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)
                     e.preventDefault()//阻止点击刷新网页
                     $(".loading-tip")[0].style = "display:block"
-                    this.Path.nav("/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)//挖出来的贴吧自带功能模块
+                    this.Path.nav(e.target.getAttribute("href"))//挖出来的贴吧自带功能模块
+                    //this.Path.nav("/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)//挖出来的贴吧自带功能模块
                 });
             }
         }
