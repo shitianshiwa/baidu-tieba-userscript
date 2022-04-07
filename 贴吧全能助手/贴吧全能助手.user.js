@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1842
+// @version      2.1.1843
 /// @version     2.1
-// @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（已失效），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
+// @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（beta），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
 // @homepage     https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
 // @license      MIT
@@ -8686,16 +8686,48 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     }
                 },
                 "real_url": {
-                    name: '贴吧跳转链解除(已失效)', //可以用这个脚本代替 https://greasyfork.org/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC 去除贴吧帖子里链接的跳转
+                    name: '贴吧跳转链解除(beta)', //可以用这个脚本代替 https://greasyfork.org/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC 去除贴吧帖子里链接的跳转
                     desc: '将百度所谓安全链接改成直链。',
                     flag: __type_floor | __type_lzl,
                     def: false,
                     _proc: function (floorType, args) {
+                        var $floor = $(args._main)
+                        //console.log($floor)
+                        $floor.find('a[class*="j-no-opener-url"]').each(function (i, ele) {
+                            var $ele = $(ele),
+                                $url = $ele.text();
+                            if ($url.indexOf('@') === 0) {
+                                // Do nothing.
+                                //邮箱
+                            } else if (/^https?:\/\//.test($url)) {
+                                //文本内容即是链接
+                                $ele.attr('href', $url);
+                                console.log("/^https?:\/\//:" + $url)
+                            } else {
+                                //链接时文本，需要跳转才能得到真实链接
+                                // HEAD 请求会变成 error ..?
+                                GM_xmlhttpRequest({
+                                    method: 'GET',
+                                    url: ele.href,
+                                    headers: {
+                                        Host: "jump2.bdimg.com",
+                                    },
+                                    onload: function (response) {
+                                        if (response.finalUrl.indexOf('http') === 0) {
+                                            $ele.attr('href', response.finalUrl);
+                                            console.log("jump2.bdimg.com:" + response.finalUrl)
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    /*_proc: function (floorType, args) {
                         var $floor = $(args._main);
                         $floor.find('a[href*="jump.bdimg.com/safecheck"]').each(function (i, ele) {
                             var $ele = $(ele),
                                 $url = $ele.text();
-
+            
                             if ($url.indexOf('@') === 0) {
                                 // Do nothing.
                             } else if (/^https?:\/\//.test($url)) {
@@ -8718,7 +8750,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                                 });
                             }
                         });
-                    }
+                    }*/
                 },
                 /*"rmImgFav": {
                     name: '移除图片的收藏工具栏（已失效）',
@@ -8861,25 +8893,25 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 var $template = /* File: main_config.html */
                     (function () {
                         /*
-    <div style="height: 100%; overflow-y: auto">
-    <h2>启用的模组</h2>
-    <div id="jx_conf_modules">
-    {{#modules}}
-    <label title="{{desc}}">
-        <input type="checkbox" data-module="{{id}}" {{#enable}}checked{{/enable}}/> {{name}}
-    </label>{{#config}}[ <a data-config="{{id}}" class="jx_conf ptr">配置</a> ]{{/config}}
-    <br />
-    {{/modules}}
-    </div>
-    <br />
-
-    <!-- 按钮区 -->
-    <div class="text-center">
-    <a class="ui_btn ui_btn_m" id="jx_save"><span><em>储存</em></span></a> &nbsp;
-    <a class="ui_btn ui_btn_m" id="jx_close"><span><em>放弃</em></span></a>
-    </div>
-    </div>
-    */
+            <div style="height: 100%; overflow-y: auto">
+            <h2>启用的模组</h2>
+            <div id="jx_conf_modules">
+            {{#modules}}
+            <label title="{{desc}}">
+            <input type="checkbox" data-module="{{id}}" {{#enable}}checked{{/enable}}/> {{name}}
+            </label>{{#config}}[ <a data-config="{{id}}" class="jx_conf ptr">配置</a> ]{{/config}}
+            <br />
+            {{/modules}}
+            </div>
+            <br />
+            
+            <!-- 按钮区 -->
+            <div class="text-center">
+            <a class="ui_btn ui_btn_m" id="jx_save"><span><em>储存</em></span></a> &nbsp;
+            <a class="ui_btn ui_btn_m" id="jx_close"><span><em>放弃</em></span></a>
+            </div>
+            </div>
+            */
                     }).extract();
 
                 return _run.bind({}, function () {
@@ -9006,47 +9038,47 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 _css.append( /* File: tieba.css */
                     (function () {
                         /*
-    .pull-right	{ float: right			}
-    a.jx, .ptr	{ cursor: pointer		}
-    .pad-left	{ padding-left: 0.5em	}
-
-    .floor-stripe {
-    background-image:
-    linear-gradient(45deg,rgba(255,255,255,.15) 25%,
-    transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,
-    rgba(255,255,255,0.15) 75%,
-    transparent 75%, transparent);
-
-    background-color: #d9534f;
-    background-size: 40px 40px;
-    text-align: center;
-    border: 1px solid #ccc;
-    margin: -1px;color: #fff;
-    text-shadow: #000 0 0 .5em;
-    padding: .5em 0
-    }
-
-    .hide { display: none }
-    .text-red { color: red }
-    .text-center { text-align: center }
-    .text-disabled { color: #666; text-decoration: line-through }
-
-    .user-hide-post-action > a.jx-post-action {
-    display: block;
-    padding: 3px 5px 5px;
-    cursor: pointer;
-    color: #222;
-    }
-
-    .user-hide-post-action a.jx-post-action:hover {
-    background: #f2f2f2;
-    }
-
-    .jx_autoflow {
-    height: 100%;
-    overflow-y: auto;
-    }
-    */
+            .pull-right	{ float: right			}
+            a.jx, .ptr	{ cursor: pointer		}
+            .pad-left	{ padding-left: 0.5em	}
+            
+            .floor-stripe {
+            background-image:
+            linear-gradient(45deg,rgba(255,255,255,.15) 25%,
+            transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,
+            rgba(255,255,255,0.15) 75%,
+            transparent 75%, transparent);
+            
+            background-color: #d9534f;
+            background-size: 40px 40px;
+            text-align: center;
+            border: 1px solid #ccc;
+            margin: -1px;color: #fff;
+            text-shadow: #000 0 0 .5em;
+            padding: .5em 0
+            }
+            
+            .hide { display: none }
+            .text-red { color: red }
+            .text-center { text-align: center }
+            .text-disabled { color: #666; text-decoration: line-through }
+            
+            .user-hide-post-action > a.jx-post-action {
+            display: block;
+            padding: 3px 5px 5px;
+            cursor: pointer;
+            color: #222;
+            }
+            
+            .user-hide-post-action a.jx-post-action:hover {
+            background: #f2f2f2;
+            }
+            
+            .jx_autoflow {
+            height: 100%;
+            overflow-y: auto;
+            }
+            */
                     }).extract());
                 _cssH.insertAfter(_css);
 
@@ -9564,7 +9596,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
     /*(function () { //强制转换部分跳转链接
         var locationHref = location.href;
-
+    
         function decode(url, target) {
             GM_xmlhttpRequest({
                 method: 'HEAD',
@@ -9579,7 +9611,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
             });
         }
-
+    
         function run() {
             var urls = document.querySelectorAll('a[href^="http://jump.bdimg.com/safecheck"]');
             for (var i = 0; i < urls.length; i++) {
@@ -9595,11 +9627,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
             }
         }
-
+    
         function addMutationObserver(selector, callback) {
             var watch = document.querySelector(selector);
             if (!watch) return;
-
+    
             var observer = new MutationObserver(function (mutations) {
                 var nodeAdded = mutations.some(function (x) {
                     return x.addedNodes.length > 0;
@@ -9621,7 +9653,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     //查看发帖 by 文科 2022-1-16 这个失效了，现在强制跳转到https://tieba.baidu.com/index.html
     /*window.addEventListener('DOMContentLoaded', function () {
         var $ = unsafeWindow.$;
-
+    
         function getUserHistory(e) {
             var userName = (JSON.parse(e.target.getAttribute('data'))).un;
             var barName = "";
@@ -10562,8 +10594,8 @@ margin-top: 20px;
                 }, 1000);
                 /*
                 修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
-目标标签class p_thread thread_theme_5
-加个thread_theme_bright_absolute
+    目标标签class p_thread thread_theme_5
+    加个thread_theme_bright_absolute
                 */
             }
             if (classList.contains('u_login')) {
@@ -11031,10 +11063,10 @@ margin-top: 20px;
                     }
                     $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
                     /*
-修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
-目标标签class p_thread thread_theme_5
-加个thread_theme_bright_absolute
-*/
+    修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
+    目标标签class p_thread thread_theme_5
+    加个thread_theme_bright_absolute
+    */
                 }
                 scrollY1 = window.scrollY;
                 //console.log($('#j_core_title_wrap')[0].className);
