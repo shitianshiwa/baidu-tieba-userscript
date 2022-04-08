@@ -1,4 +1,16 @@
 更新日志
+2022-4-8 2.1.1840-1843
+1、把”贴吧跳转链解除“功能弄回来
+2、增加“一键到底按钮按钮”，隐藏右侧浮动的发贴按钮，这个和“一键到底按钮”功能一样，去掉一键到底的动画效果
+3、增加"某些手机浏览器激活发贴文本编辑器用"文本框
+4、尝试规避贴吧移动网页端
+5、尝试修复下"强调信息提示+修http://tieba.baidu.com/i/i/网页背景"功能
+6、兼容下贴吧移动网页端（只是去掉了警报弹窗。。。）
+7、feat: 添加移除头像 Merge pull request #8 from WingGao/wing
+让"移除贴子内楼层用户头像"支持贴子内翻页
+https://github.com/shitianshiwa/baidu-tieba-userscript/pull/8
+8、把下载app按钮移到扫码下载app的位置
+9、处理了下增加刷新网页按钮的加载
 
 2022-3-15 2.1.1837-1839
 1、尝试处理下不能点击放大图片的问题 https://github.com/shitianshiwa/baidu-tieba-userscript/issues/7
