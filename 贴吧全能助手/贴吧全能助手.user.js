@@ -8696,6 +8696,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                         $floor.find('a[class*="j-no-opener-url"]').each(function (i, ele) {
                             var $ele = $(ele),
                                 $url = $ele.text();
+                            //console.log($ele)
                             if ($url.indexOf('@') === 0) {
                                 // Do nothing.
                                 //邮箱
@@ -9213,6 +9214,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                             // 单贴处理
                             //console.log($ele)
+                            //贴子内一楼内容太长会导致不触发动作
                             //j_lzl_c_b_a 
                             if ($ele.hasClass('j_lzl_c_b_a')) {
                                 //console.log("6")
