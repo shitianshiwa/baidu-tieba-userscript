@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.2
+// @version      2.1.1843.3
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（beta），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -13,7 +13,7 @@
 // @include      http*://live.baidu.com/f?kw=*
 ///新发现的贴吧贴子链接
 // @exclude      http*://tieba.baidu.com/f/fdir*
-// @exclude      http*://tieba.baidu.com/f/search*
+/// @exclude     http*://tieba.baidu.com/f/search*
 // @exclude      http*://tieba.baidu.com/f/center/*
 // @run-at       document-body
 ///document-start,document-idle;必须使用document-body，否则对多个浏览器的兼容性会下降
@@ -56,7 +56,7 @@
 ///The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or substantial portions of the Software.
 ///THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ///---
-///TieBa - Maverick by Onox CC https://userstyles.org/styles/124770/tieba-maverick-2018  BY-NC - Creative Commons Attribution-NonCommercial
+///TieBa - Maverick by Onox CC https://userstyles.org/styles/124770/tieba-maverick-2018  BY-NC - Creative Commons Attribution-NonCommercial https://github.com/imaverickk/Tieba-Maverick-UserCSS/ https://userstyles.world/style/3686/tieba-maverick
 // ==/UserScript==
 /*
 历史更新记录
@@ -79,140 +79,144 @@ http://tieba.baidu.com/f/center/createtb 创建贴吧
 http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http，但偶尔会跳转到https导致出错（仅在手机yandex浏览器见过这个问题）
 发现一个bug，电脑端贴吧主题贴列表网页右边的"大家都在搜"（class="search_back_box")和"贴吧热议榜"（class="topic_list_box"）在网页拉到底时会向class中自动添加"search-back-fixed"和"topic-search-back-fixed",这个会导致发主题贴编辑器右边冒出一个"大家都在搜"，暂时用计时器定时删除新加的class来解决这个问题(现在是彻底删了，因为贴吧删掉了贴吧主页（不是首页）的贴吧热议榜)
 */
-(function ($) {
-    //const $ = unsafeWindow.jQuery;
-    /*var baiban = document.createElement("div");
-    baiban.setAttribute("class "baiban");
-    baiban.setAttribute("style "width:9999px;height: 99999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
-    document.body.appendChild(baiban);
-    var baiban2 = setTimeout(() => {
-        clearTimeout(baiban2);
-        $("div.baiban").remove();
-    }, 1000);*/
-    /**
-     * 精简封装 fetch 请求，自带请求 + 通用配置 + 自动 .text()
-     *
-     * @param {string} url - 请求 URL
-     * @param {object} [options={}] - fetch Request 配置
-     * @returns {Promise<string>} fetch 请求
-     */
-    //console.log("jquery版本号：" + $.fn.jquery);
-    //https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js
-    //参考贴吧屏蔽检测脚本的代码 https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
-    const request = (url, options = {}) => fetch(url, Object.assign({
-        credentials: 'omit',
-        // 部分贴吧（如 firefox 吧）会强制跳转回 http（2020年已经全改成https了）
-        redirect: 'follow',
-        // 阻止浏览器发出 CORS 检测的 HEAD 请求头
-        mode: 'same-origin',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    }, options)).then(res => res.text());
-    /**
-     * 获取主题贴的移动端地址
-     *
-     * @param {number} tid - 贴子 id
-     * @returns {string} URL
-     * src: 1
-     * z: 贴子 id
-     * pn: 1
-     * frsrn: 1
-     * pbrn: 1
-     * 需要登陆才能显示30楼
-     */
-    const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;
-    /**
-     * 返回wap贴吧信息
-     *
-     * @param {string} res - 页面内容
-     */
-    const threadreturnxinxi = res => res;
-    /**
-     *
-     * @param {number} tid - 贴子 id
-     */
-    const getWaptiebaxinxi = tid => request(getThreadMoUrl(tid))
-        .then(threadreturnxinxi);
+(function($) {
+	//const $ = unsafeWindow.jQuery;
+	/*var baiban = document.createElement("div");
+	baiban.setAttribute("class "baiban");
+	baiban.setAttribute("style "width:9999px;height: 99999px;background-color: white;position: absolute;top: 0px;z-index: 9999;");
+	document.body.appendChild(baiban);
+	var baiban2 = setTimeout(() => {
+	    clearTimeout(baiban2);
+	    $("div.baiban").remove();
+	}, 1000);*/
+	/**
+	 * 精简封装 fetch 请求，自带请求 + 通用配置 + 自动 .text()
+	 *
+	 * @param {string} url - 请求 URL
+	 * @param {object} [options={}] - fetch Request 配置
+	 * @returns {Promise<string>} fetch 请求
+	 */
+	//console.log("jquery版本号：" + $.fn.jquery);
+	//https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js
+	//参考贴吧屏蔽检测脚本的代码 https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
+	const request = (url, options = {}) => fetch(url, Object.assign({
+		credentials: 'omit',
+		// 部分贴吧（如 firefox 吧）会强制跳转回 http（2020年已经全改成https了）
+		redirect: 'follow',
+		// 阻止浏览器发出 CORS 检测的 HEAD 请求头
+		mode: 'same-origin',
+		headers: {
+			'X-Requested-With': 'XMLHttpRequest'
+		}
+	}, options)).then(res => res.text());
+	/**
+	 * 获取主题贴的移动端地址
+	 *
+	 * @param {number} tid - 贴子 id
+	 * @returns {string} URL
+	 * src: 1
+	 * z: 贴子 id
+	 * pn: 1
+	 * frsrn: 1
+	 * pbrn: 1
+	 * 需要登陆才能显示30楼
+	 */
+	const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;
+	/**
+	 * 返回wap贴吧信息
+	 *
+	 * @param {string} res - 页面内容
+	 */
+	const threadreturnxinxi = res => res;
+	/**
+	 *
+	 * @param {number} tid - 贴子 id
+	 */
+	const getWaptiebaxinxi = tid => request(getThreadMoUrl(tid))
+		.then(threadreturnxinxi);
 
-    console.log("脚本引用的jquery版本号: " + $.fn.jquery);
-    setTimeout(() => {
-        console.log("贴吧的jquery版本号: " + this.$.fn.jquery);
-    }, 2000)
-    console.log("贴吧全能脚本版本号:" + JSON.parse(JSON.stringify(GM_info)).script.version);
-    let tieziurl = window.location.href;
-    //https://www.v2ex.com/t/611007
-    //https://jump2.bdimg.com/f?kw=
-    //https://jump2.bdimg.com/p/
-    //https://live.baidu.com/f?kw=
-    //贴子不存在就直接退出
-    if (document.body.className == "page404") {
-        console.log("404界面，退出执行脚本")
-        return
-    }
-    //尝试排除移动网页版
-    if (document.body.getAttribute("class") == 'ue_revision' || document.querySelectorAll("div.main-page-wrap")[0] != undefined || document.querySelectorAll("div.tb-mobile-viewport")[0] != undefined) {
-        console.log("不是pc端贴吧，退出执行脚本")
-        return
-    }
-    if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/ || tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/p\//g) != -1) {
-        let temp = /(https|http):\/\/c\.tieba\.baidu\.com\/p\/(\d+)/.exec(tieziurl) || /(https|http):\/\/jump2\.bdimg\.com\/p\/(\d+)/.exec(tieziurl);
-        //console.log(temp[2]);
-        window.location.href = "https://tieba.baidu.com/p/" + temp[2]; //贴子跳转
-    } else if (tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/live\.baidu\.com\/f\?kw=/g) != -1) { //贴吧跳转
-        let temp2 = /(https|http):\/\/jump2\.bdimg\.com\/f\?kw=(.+)/.exec(tieziurl) || /(https|http):\/\/live\.baidu\.com\/f\?kw=(.+)/.exec(tieziurl);
-        //console.log(temp2[2]);
-        window.location.href = "https://tieba.baidu.com/f?kw=" + temp2[2];
-    }
-    let baiban2 = setTimeout(() => {
-        clearTimeout(baiban2);
-        $(".tieba-app").remove(); //点击打开贴吧APP查看该吧更多内容 https://tieba.baidu.com/mo/q/weeklybazhuview?fid=吧id&beginTime=1590768000(开始的时间戳/秒)
-        //把下载app按钮移到扫码下载app的位置
-        let app1 = document.querySelectorAll(".app_download_info")[0]
-        if (app1 != undefined) {
-            let app2 = document.createElement("a"); //创建节点<a/>
-            app2.setAttribute('href', 'https://tiebac.baidu.com/c/s/download/pc');
-            app2.innerText = "贴吧app下载跳转";
-            app1.after(app2)
-        }
-        //某些手机浏览器激活发贴文本编辑器用
-        var c = '<input type="text" name="" value="某些手机浏览器激活发贴文本编辑器用" style="width:110px;font-weight:bold;"/>'; //文本框
-        try {
-            let a = $(".old_style_wrapper");
-            if (a[0] != null) {
-                $(".old_style_wrapper").append(c); //搜索<div class="old_style_wrapper">添加文本框
-            }
-        } catch (error) {
-            alert("激活发贴文本编辑器:" + error);
-        }
-    }, 5000);
-    //https://tiebac.baidu.com/c/s/download/pc
-    //https://www.sitepoint.com/css3-animation-javascript-event-handlers/
-    //https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations
-    /*
-    W3C standard	Firefox     	webkit	                Opera	        IE10
-    animationstart	animationstart	webkitAnimationStart	oanimationstart	MSAnimationStart
-    animationiteration	animationiteration	webkitAnimationIteration	oanimationiteration	MSAnimationIteration
-    animationend	animationend	webkitAnimationEnd	oanimationend	MSAnimationEnd
-    */
-    var pfx = ["webkit", "moz", "MS", "o", ""];
+	console.log("脚本引用的jquery版本号: " + $.fn.jquery);
+	setTimeout(() => {
+		try {
+			console.log("贴吧的jquery版本号: " + this.$.fn.jquery);
+		} catch (e) {
+			console.log("贴吧的jquery版本号err: " + e);
+		}
+	}, 2000)
+	console.log("贴吧全能脚本版本号:" + JSON.parse(JSON.stringify(GM_info)).script.version);
+	let tieziurl = window.location.href;
+	//https://www.v2ex.com/t/611007
+	//https://jump2.bdimg.com/f?kw=
+	//https://jump2.bdimg.com/p/
+	//https://live.baidu.com/f?kw=
+	//贴子不存在就直接退出
+	if (document.body.className == "page404") {
+		console.log("404界面，退出执行脚本")
+		return
+	}
+	//尝试排除移动网页版
+	if (document.body.getAttribute("class") == 'ue_revision' || document.querySelectorAll("div.main-page-wrap")[0] != undefined || document.querySelectorAll("div.tb-mobile-viewport")[0] != undefined) {
+		console.log("不是pc端贴吧，退出执行脚本")
+		return
+	}
+	if (tieziurl.search(/(https|http):\/\/c\.tieba\.baidu\.com\/p\//g) != -1 /*发现这种链接即跳转*/ || tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/p\//g) != -1) {
+		let temp = /(https|http):\/\/c\.tieba\.baidu\.com\/p\/(\d+)/.exec(tieziurl) || /(https|http):\/\/jump2\.bdimg\.com\/p\/(\d+)/.exec(tieziurl);
+		//console.log(temp[2]);
+		window.location.href = "https://tieba.baidu.com/p/" + temp[2]; //贴子跳转
+	} else if (tieziurl.search(/(https|http):\/\/jump2\.bdimg\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/live\.baidu\.com\/f\?kw=/g) != -1) { //贴吧跳转
+		let temp2 = /(https|http):\/\/jump2\.bdimg\.com\/f\?kw=(.+)/.exec(tieziurl) || /(https|http):\/\/live\.baidu\.com\/f\?kw=(.+)/.exec(tieziurl);
+		//console.log(temp2[2]);
+		window.location.href = "https://tieba.baidu.com/f?kw=" + temp2[2];
+	}
+	let baiban2 = setTimeout(() => {
+		clearTimeout(baiban2);
+		$(".tieba-app").remove(); //点击打开贴吧APP查看该吧更多内容 https://tieba.baidu.com/mo/q/weeklybazhuview?fid=吧id&beginTime=1590768000(开始的时间戳/秒)
+		//把下载app按钮移到扫码下载app的位置
+		let app1 = document.querySelectorAll(".app_download_info")[0]
+		if (app1 != undefined) {
+			let app2 = document.createElement("a"); //创建节点<a/>
+			app2.setAttribute('href', 'https://tiebac.baidu.com/c/s/download/pc');
+			app2.innerText = "贴吧app下载跳转";
+			app1.after(app2)
+		}
+		//某些手机浏览器激活发贴文本编辑器用
+		var c = '<input type="text" name="" value="某些手机浏览器激活发贴文本编辑器用" style="width:110px;font-weight:bold;"/>'; //文本框
+		try {
+			let a = $(".old_style_wrapper");
+			if (a[0] != null) {
+				$(".old_style_wrapper").append(c); //搜索<div class="old_style_wrapper">添加文本框
+			}
+		} catch (error) {
+			alert("激活发贴文本编辑器:" + error);
+		}
+	}, 5000);
+	//https://tiebac.baidu.com/c/s/download/pc
+	//https://www.sitepoint.com/css3-animation-javascript-event-handlers/
+	//https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations
+	/*
+	W3C standard	Firefox     	webkit	                Opera	        IE10
+	animationstart	animationstart	webkitAnimationStart	oanimationstart	MSAnimationStart
+	animationiteration	animationiteration	webkitAnimationIteration	oanimationiteration	MSAnimationIteration
+	animationend	animationend	webkitAnimationEnd	oanimationend	MSAnimationEnd
+	*/
+	var pfx = ["webkit", "moz", "MS", "o", ""];
 
-    function PrefixedEvent(element, type, callback) {
-        for (var p = 0; p < pfx.length; p++) {
-            if (!pfx[p]) type = type.toLowerCase();
-            //console.log(pfx[p] + type);
-            element.addEventListener(pfx[p] + type, callback, false);
-        }
-    }
-    var tupianfangda = true; //贴吧图片放大
-    var pingbi_loucengqipao = false; //屏蔽楼层气泡
-    var rmBottom = false; //移除工具栏
-    var yincangcebianlanx = false; //隐藏侧边栏
-    var qiangdiaoxinxitishi = false; //强调信息显示
-    var tieba_custom_pass_login = false;
-    var css = "";
-    css +=
-        `/*广告和无用功能*/
+	function PrefixedEvent(element, type, callback) {
+		for (var p = 0; p < pfx.length; p++) {
+			if (!pfx[p]) type = type.toLowerCase();
+			//console.log(pfx[p] + type);
+			element.addEventListener(pfx[p] + type, callback, false);
+		}
+	}
+	var tupianfangda = true; //贴吧图片放大
+	var pingbi_loucengqipao = false; //屏蔽楼层气泡
+	var rmBottom = false; //移除工具栏
+	var yincangcebianlanx = false; //隐藏侧边栏
+	var qiangdiaoxinxitishi = false; //强调信息显示
+	var tieba_custom_pass_login = false;
+	var css = "";
+	css +=
+		`/*广告和无用功能*/
     .tbui_fbar_bazhu,
     .new_list li[data-ext_info],
     .game-head-game-info-wrapper,
@@ -307,13 +311,31 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     .tbui_fbar_down,
     /*发贴按钮和一键到底按钮功能一样*/
     .tbui_fbar_post,
-    #com_u9_head{
+    /*不知道是什么*/
+    #com_u9_head,
+    /*新版贴吧广告*/
+    /*贴吧主页列表广告*/
+    div.thread_item_box[data-field*="{}"],
+    /*贴吧贴子内的广告*/    
+    div.l_post_bright[data-field*="{}"],
+    /*贴吧主页列表右上角小正方形广告*/
+    [id=\"pagelet_frs-aside/pagelet/aside_ad\"],
+    /*清理全吧搜索里的广告*/
+    .lu-search-box,
+    #search_union_mod,
+    /*解决一个广告 https://pos.baidu.com/xxxx xxxx是每次都会变化的 百度网盟推广*/
+    #lu-user-right>iframe[src*="/pos.baidu.com/"],
+    /*贴吧首页右上角的广告*/
+    #lu-home-aside>iframe[src*="/pos.baidu.com/"]
+    {
         display: none !important;
     }`;
-    if (!GM_getValue("tiebameihua")) {
-        if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
-            css +=
-                `
+
+	if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\/search\//g) == -1) {
+		if (!GM_getValue("tiebameihua")) {
+			if (false || (document.domain == "tieba.baidu.com" || document.domain.substring(document.domain.indexOf(".tieba.baidu.com") + 1) == "tieba.baidu.com") || (document.domain == "www.tieba.com" || document.domain.substring(document.domain.indexOf(".www.tieba.com") + 1) == "www.tieba.com")) {
+				css +=
+					`
                /*
                ——WebFonts——
                Google Fonts: https://www.google.com/fonts
@@ -3146,7 +3168,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 .u_ddl_con li a {
                 	color: #999 !important;
                 	background: #fff !important;
-                	display: inline-block;
+                	/*display: inline-block;*/
                 	width: 50px !important;
                 	height: 50px !important;
                 	font-size: 12.5px !important;
@@ -3214,10 +3236,20 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
                 .u_ddl_con li a[data-type=\"atme\"],
                 .u_ddl_con li a[data-type=\"friendapply\"],
-                .u_ddl_con li a[data-type=\"fans\"] {
+                .u_ddl_con li a[data-type=\"fans\"],
+                .u_ddl_con_top li a[track-locate=\"2\"], 
+                .u_ddl_con_top li a[track-locate=\"3\"],
+                .u_ddl_con_top li a[track-locate=\"4\"]{
                 	font-size: 0 !important;
                 }
                 .u_ddl_con li a[data-type]:before {
+                	font-size: 12.5px;
+                	letter-spacing: 2px;
+                	text-indent: 2px;
+                	line-height: 19.5px;
+                	display: inline-block;
+                }
+                .u_ddl_con li a[track-locate]:before {
                 	font-size: 12.5px;
                 	letter-spacing: 2px;
                 	text-indent: 2px;
@@ -3232,6 +3264,16 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 }
                 .u_ddl_con li a[data-type=\"fans\"]:before {
                 	content: \"新的粉丝\";
+                }
+                /*贴吧视频*/
+                .u_ddl_con_top li a[track-locate=\"2\"]:before {
+                    content: \"视频发布\";
+                }
+                .u_ddl_con_top li a[track-locate=\"3\"]:before {
+                    content: \"视频管理\";
+                }
+                .u_ddl_con_top li a[track-locate=\"4\"]:before {
+                    content: \"视频数据\";
                 }
                 .u_username_wrap >* {
                 	float: none !important;
@@ -3325,10 +3367,20 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	content: \"\\e850\";
                 	font-size: 28px;
                 }
+                /*贴吧消息管理*/
                 .u_news_wrap:before {
                 	content: \"\\e7f4\";
                 	font-size: 32px;
                 	margin-top: -2px;
+                }
+                /*贴吧视频管理按钮*/
+                li.u_creative a[track-locate=\"1\"]:before {
+                	content: \"\\E04B\";
+                	font-size: 32px;
+                	margin-left: 1px;
+                }
+                li.u_creative a[track-locate=\"1\"]:after {
+                	content: \"视频号创作中心\";
                 }
                 .u_tbmall_wrap:before {
                 	content: \"\\e8cc\";
@@ -6552,8 +6604,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 .spread_btn{
                 	z-index: 999;
                 }`;
-            if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)(/*|(?!/+tbmall/+).*)$")).test(document.location.href)) {
-                css += `
+				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)(/*|(?!/+tbmall/+).*)$")).test(document.location.href)) {
+					css += `
                     /*T逗商城以外的页面*/
                     /*主体框架*/
                     .forum_info_wrap,
@@ -6754,9 +6806,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     	line-height: 40px !important;
                     	color: #ccc !important;
                     }`;
-            }
-            if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)(/*|(?!/+home/+).*)$")).test(document.location.href)) {
-                css += `
+				}
+				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)(/*|(?!/+home/+).*)$")).test(document.location.href)) {
+					css += `
                     /*个人主页以外的页面*/
 
                     .wrap1,
@@ -6767,9 +6819,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     .wrap2{
                     	background-image: none !important;
                     }`;
-            }
-            if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href)) {
-                css += `
+				}
+				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href)) {
+					css += `
                    /*帖子内页调整*/
 
                    .tbui_aside_float_bar {
@@ -6794,9 +6846,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                    	color: #777;
                    	margin: 0 -4px;
                    }`;
-            }
-            if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+\\d+.*\\?(.*&)*see_lz=[1-9]+\\d*.*$")).test(document.location.href)) {
-                css += `
+				}
+				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+\\d+.*\\?(.*&)*see_lz=[1-9]+\\d*.*$")).test(document.location.href)) {
+					css += `
                     /*帖子内页-只看楼主*/
 
                     .core_title_btns #lzonly_cntn:before {
@@ -6812,9 +6864,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     .louzhubiaoshi_wrap {
                     	display: none !important;
                     }`;
-            }
-            if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+home/+.*$")).test(document.location.href)) {
-                css += `
+				}
+				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+home/+.*$")).test(document.location.href)) {
+					css += `
                     /*个人主页*/
                     /*迷之页面结构...无力吐槽....*/
 
@@ -6892,13 +6944,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     	margin-left: 90% !important;
                     /*	margin-left: 600px !important;*/
                     }
-                    /*解决一个广告 https://pos.baidu.com/xxxx xxxx是每次都会变化的 百度网盟推广*/
-                    #lu-user-right>iframe[src*="/pos.baidu.com/"]{
-                    	display: none !important;
-                    }`;
-            }
-            if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+(index.html.*)*([\\?#]+.*)*$")).test(document.location.href)) {
-                css += `
+                    `;
+				}
+				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+(index.html.*)*([\\?#]+.*)*$")).test(document.location.href)) {
+					css += `
                     /*贴吧首页*/
                     .head_right_region{
                     	width: 100% !important;
@@ -7012,10 +7061,15 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     {
                         width: 510px;
                     }
+                    /*贴吧公告板*/
+                    .notice_item
+                    {
+                        position: relative;
+                    }
                     `;
-            }
-            if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+i/+.*$")).test(document.location.href)) {
-                css += `
+				}
+				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+i/+.*$")).test(document.location.href)) {
+					css += `
                     /*i贴吧*/
                     #main_wrapper #footer,
                     .ibody{
@@ -7443,316 +7497,317 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                     	font-family: inherit !important;
                     	left: 0 !important;
                     }`;
-                //管用户头像栏的 http://tieba.baidu.com/i/i/*
-            }
-        }
-    }
-    if (typeof GM_addStyle != "undefined") {
-        GM_addStyle(css);
-    } else if (typeof PRO_addStyle != "undefined") {
-        PRO_addStyle(css); //有警告
-    } else if (typeof addStyle != "undefined") {
-        addStyle(css); //有警告
-    } else {
-        var node = document.createElement("style");
-        node.type = "text/css";
-        node.appendChild(document.createTextNode(css));
-        var heads = document.getElementsByTagName("head");
-        if (heads.length > 0) {
-            heads[0].appendChild(node);
-        } else {
-            // no head yet, stick it whereever
-            document.documentElement.appendChild(node);
-        }
-    }
-    //百度贴吧：不登录即可看贴 by VA
-    //unsafeWindow.Object.freeze = null;
-    //document.addEventListener('DOMContentLoaded', function(event) {
-    // try {
-    //     unsafeWindow.PageData.user.is_login = 1;
-    // } catch (error) {}
-    // }, true);
-    //梦姬贴吧助手 by jixun
-    (function () {
-        var w = unsafeWindow,
-            _main;
-        jQuery(function ($) { //有警告
-            var iv = setInterval(function () {
-                if (w.jQuery && w.PageData && w.PageData.tbs) {
-                    clearInterval(iv);
-                    console.log('PageData loaded.');
+					//管用户头像栏的 http://tieba.baidu.com/i/i/*
+				}
+			}
+		}
+	}
+	if (typeof GM_addStyle != "undefined") {
+		GM_addStyle(css);
+	} else if (typeof PRO_addStyle != "undefined") {
+		PRO_addStyle(css); //有警告
+	} else if (typeof addStyle != "undefined") {
+		addStyle(css); //有警告
+	} else {
+		var node = document.createElement("style");
+		node.type = "text/css";
+		node.appendChild(document.createTextNode(css));
+		var heads = document.getElementsByTagName("head");
+		if (heads.length > 0) {
+			heads[0].appendChild(node);
+		} else {
+			// no head yet, stick it whereever
+			document.documentElement.appendChild(node);
+		}
+	}
+	//百度贴吧：不登录即可看贴 by VA
+	//unsafeWindow.Object.freeze = null;
+	//document.addEventListener('DOMContentLoaded', function(event) {
+	// try {
+	//     unsafeWindow.PageData.user.is_login = 1;
+	// } catch (error) {}
+	// }, true);
+	//梦姬贴吧助手 by jixun
+	(function() {
+		var w = unsafeWindow,
+			_main;
+		jQuery(function($) { //有警告
+			var iv = setInterval(function() {
+				if (w.jQuery && w.PageData && w.PageData.tbs) {
+					clearInterval(iv);
+					console.log('PageData loaded.');
 
-                    if (!w.bdShare) { //有警告
-                        w.bdShare = unsafeObject({
-                            ready: false
-                        });
-                    }
+					if (!w.bdShare) { //有警告
+						w.bdShare = unsafeObject({
+							ready: false
+						});
+					}
 
-                    w.PageData.games = unsafeObject([]); //有警告
-                    //有警告
-                    unsafeExec(function () {
-                        // 改进自 congxz6688 的 tieba_quote [#147]
-                        // 节取自 寂寞的原子 的  悬浮窗脚本 [#116]
-                        //2019-11-4 这个会贴吧会报错
-                        /*_.Module.use("common/widget/RichPoster", {},
-                                     function (t) {
-                            t.init();
-                            t.unbindScrollEvent();
-                        });*/
-                    });
+					w.PageData.games = unsafeObject([]); //有警告
+					//有警告
+					unsafeExec(function() {
+						// 改进自 congxz6688 的 tieba_quote [#147]
+						// 节取自 寂寞的原子 的  悬浮窗脚本 [#116]
+						//2019-11-4 这个会贴吧会报错
+						/*_.Module.use("common/widget/RichPoster", {},
+						             function (t) {
+						    t.init();
+						    t.unbindScrollEvent();
+						});*/
+					});
 
-                    _main($, w.PageData);
-                }
-            }, 500);
+					_main($, w.PageData);
+				}
+			}, 500);
 
-            setTimeout(function () {
-                // 15s later force kill waiting.
-                clearInterval(iv);
-            }, 15000);
-        });
+			setTimeout(function() {
+				// 15s later force kill waiting.
+				clearInterval(iv);
+			}, 15000);
+		});
 
-        var __type_floor = 1,
-            __type_lzl = 2,
-            __type_forum = 4,
-            __type_postact = 8;
+		var __type_floor = 1,
+			__type_lzl = 2,
+			__type_forum = 4,
+			__type_postact = 8;
 
-        var __mod_default = 0,
-            __mod_enable = 1,
-            __mod_disable = 2; //关掉模块
+		var __mod_default = 0,
+			__mod_enable = 1,
+			__mod_disable = 2; //关掉模块
 
-        _main = function ($, wPageData) {
-            // 检查是否在贴吧
-            if (!wPageData.forum) return;
-            var isThread = !!wPageData.thread;
-            var _css = $('<style>');
-            var _cssH = $('<style>').text('.ads{display:none !important;}');
+		_main = function($, wPageData) {
+			// 检查是否在贴吧
+			if (!wPageData.forum) return;
+			var isThread = !!wPageData.thread;
+			var _css = $('<style>');
+			var _cssH = $('<style>').text('.ads{display:none !important;}');
 
 
-            //// Function Helper
-            Object.defineProperty(Function.prototype, 'extract', {
-                value: function () {
-                    return this.toString().match(/\/\*([\s\S]+)\*\//)[1];
-                }
-            });
+			//// Function Helper
+			Object.defineProperty(Function.prototype, 'extract', {
+				value: function() {
+					return this.toString().match(/\/\*([\s\S]+)\*\//)[1];
+				}
+			});
 
-            var _function = function (foo, proto) {
-                foo.prototype = proto;
-                return foo;
-            };
+			var _function = function(foo, proto) {
+				foo.prototype = proto;
+				return foo;
+			};
 
-            var $conf = new (_function(function () { }, {
-                get: function (m, def) {
-                    var val = GM_getValue(m, null);
-                    if (!val) return def;
+			var $conf = new(_function(function() {}, {
+				get: function(m, def) {
+					var val = GM_getValue(m, null);
+					if (!val) return def;
 
-                    try {
-                        return JSON.parse(val);
-                    } catch (e) {
-                        return def;
-                    }
-                },
-                set: function (m, val) {
-                    return GM_setValue(m, JSON.stringify(val));
-                },
-                rm: function () {
-                    [].forEach.call(arguments, GM_deleteValue);
-                },
-                ls: function () {
-                    return GM_listValues();
-                }
-            }))();
+					try {
+						return JSON.parse(val);
+					} catch (e) {
+						return def;
+					}
+				},
+				set: function(m, val) {
+					return GM_setValue(m, JSON.stringify(val));
+				},
+				rm: function() {
+					[].forEach.call(arguments, GM_deleteValue);
+				},
+				ls: function() {
+					return GM_listValues();
+				}
+			}))();
 
-            var _hide = function () {
-                _cssH.prepend(Array.prototype.join.call(arguments, ',') + ',');
-            };
+			var _hide = function() {
+				_cssH.prepend(Array.prototype.join.call(arguments, ',') + ',');
+			};
 
-            var _run = function (foo, name) {
-                // console.groupCollapsed ('[贴吧助手]: ' + (name || '[未知区段]'));
+			var _run = function(foo, name) {
+				// console.groupCollapsed ('[贴吧助手]: ' + (name || '[未知区段]'));
 
-                for (var args = [], i = 2, ret; i < arguments.length; i++) {
-                    args.push(arguments[i]);
-                }
+				for (var args = [], i = 2, ret; i < arguments.length; i++) {
+					args.push(arguments[i]);
+				}
 
-                try {
-                    ret = foo.apply(this, args);
-                    if (ret !== undefined) {
-                        console.info('[贴吧助手][返回][%s]: %s', name || '[未知区段]', ret);
-                    }
-                } catch (err) {
-                    console.error('[贴吧助手][错误][%s]: %s', name || '[未知区段]', err.message);
-                    console.error(err);
-                }
-                // console.groupEnd ();
+				try {
+					ret = foo.apply(this, args);
+					if (ret !== undefined) {
+						console.info('[贴吧助手][返回][%s]: %s', name || '[未知区段]', ret);
+					}
+				} catch (err) {
+					console.error('[贴吧助手][错误][%s]: %s', name || '[未知区段]', err.message);
+					console.error(err);
+				}
+				// console.groupEnd ();
 
-                return ret;
-            };
+				return ret;
+			};
 
-            $.fn.getField = function () {
-                // var $data = this.attr('data-field');
-                var $data = this.data('field');
+			$.fn.getField = function() {
+				// var $data = this.attr('data-field');
+				var $data = this.data('field');
 
-                if ('string' == typeof $data[1]) {
-                    return JSON.parse($data.replace(/'/g, '"'));
-                }
-                return $data;
-            };
+				if ('string' == typeof $data[1]) {
+					return JSON.parse($data.replace(/'/g, '"'));
+				}
+				return $data;
+			};
 
-            $.goToEditor = function () {
-                $('#ueditor_replace').focus();
-                $.scrollTo($('#tb_rich_poster_container'), 500);
-            };
-            $.create = function (ele, cls, attr) {
-                var r = $(document.createElement(ele));
+			$.goToEditor = function() {
+				$('#ueditor_replace').focus();
+				$.scrollTo($('#tb_rich_poster_container'), 500);
+			};
+			$.create = function(ele, cls, attr) {
+				var r = $(document.createElement(ele));
 
-                if (cls) {
-                    r.addClass(cls);
-                }
-                if (attr) {
-                    r.attr(attr);
-                }
+				if (cls) {
+					r.addClass(cls);
+				}
+				if (attr) {
+					r.attr(attr);
+				}
 
-                return r;
-            };
-            $.stamp = function () {
-                return +new Date();
-            };
-            $.toDateStr = function (d) {
-                return d.toLocaleString();
-            };
+				return r;
+			};
+			$.stamp = function() {
+				return +new Date();
+			};
+			$.toDateStr = function(d) {
+				return d.toLocaleString();
+			};
 
-            GM_setValue("lzl_zhankai", false);
-            GM_setValue("rm_user_icon", false);
-            var modules = {
-                "rmBottom": {
-                    name: '移除底部工具栏(不完美)',
-                    desc: '移除美化贴吧时底部出现的工具栏。',
-                    flag: 0,
-                    def: false,
-                    _init: function () {
-                        //core_title_wrap_bright clearfix  没底工具栏时
-                        //core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright 有底工具栏时
-                        rmBottom = true;
-                        /*
+			GM_setValue("lzl_zhankai", false);
+			GM_setValue("rm_user_icon", false);
+			var modules = {
+				"rmBottom": {
+					name: '移除底部工具栏(不完美)',
+					desc: '移除美化贴吧时底部出现的工具栏。',
+					flag: 0,
+					def: false,
+					_init: function() {
+						//core_title_wrap_bright clearfix  没底工具栏时
+						//core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright 有底工具栏时
+						rmBottom = true;
+						/*
                 版权声明：本文为CSDN博主「养只猫」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
             原文链接：https://blog.csdn.net/qq_40816649/java/article/details/86512538
                 */
-                        //$('#j_core_title_wrap').remove(); //core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright
-                        //$('#j_core_title_wrap')[0].style = "position: unset !important";
-                        //$('#j_core_title_wrap')[0].className = "core_title_wrap_bright clearfix"; //这样关闭下工具栏不影响贴子顶的标题、收藏和回复
-                    }
-                },
-                "ads_hide": {
-                    name: '广告隐藏、屏蔽',
-                    desc: '屏蔽无用、广告内容',
-                    flag: ~0,
-                    def: true,
-                    _init: function () {
-                        var $ads = [
-                            // 贴吧推广
-                            '.spreadad, .game_frs_step1, .BAIDU_CLB_AD, .dasense, .u9_head',
-                            '.j_click_stats, .p_postlist>div:not(.l_post):not(.p_postlist)',
-                            //'[id="pagelet_frs-header/pagelet/head_content_middle"]',
-                            '[id="pagelet_encourage-appforum/pagelet/my_app"]',
-                            '.life_helper',
+						//$('#j_core_title_wrap').remove(); //core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright
+						//$('#j_core_title_wrap')[0].style = "position: unset !important";
+						//$('#j_core_title_wrap')[0].className = "core_title_wrap_bright clearfix"; //这样关闭下工具栏不影响贴子顶的标题、收藏和回复
+					}
+				},
+				"ads_hide": {
+					name: '广告隐藏、屏蔽',
+					desc: '屏蔽无用、广告内容',
+					flag: ~0,
+					def: true,
+					_init: function() {
+						var $ads = [
+							// 贴吧推广
+							'.spreadad, .game_frs_step1, .BAIDU_CLB_AD, .dasense, .u9_head',
+							'.j_click_stats, .p_postlist>div:not(.l_post):not(.p_postlist)',
+							//'[id="pagelet_frs-header/pagelet/head_content_middle"]',
+							'[id="pagelet_encourage-appforum/pagelet/my_app"]',
+							'.life_helper',
 
-                            // 到处插入的广告
-                            '[data-daid]',
+							// 到处插入的广告
+							'[data-daid]',
 
-                            // 右下角广告
-                            '#game_pop_window',
+							// 右下角广告
+							'#game_pop_window',
 
-                            // 直播
-                            '#game_live_list',
+							// 直播
+							'#game_live_list',
 
-                            // 10 年
-                            '#j_ten_years',
+							// 10 年
+							'#j_ten_years',
 
-                            // 1l 下方的广告
-                            '#sofa_post, .banner_post',
+							// 1l 下方的广告
+							'#sofa_post, .banner_post',
 
-                            // 贴吧顶部广告
-                            '#pb_adbanner',
-                            '.l_banner.banner_theme',
+							// 贴吧顶部广告
+							'#pb_adbanner',
+							'.l_banner.banner_theme',
 
-                            // 图片页面
-                            '.af_head_gamelink',
+							// 图片页面
+							'.af_head_gamelink',
 
-                            // 左右侧
-                            '.j_couplet',
+							// 左右侧
+							'.j_couplet',
 
-                            // 右侧
-                            '#encourage_entry',
-                            '.platform_aside_tieba_partner',
-                            '.search_back_box',
-                            '.topic_list_box',
+							// 右侧
+							'#encourage_entry',
+							'.platform_aside_tieba_partner',
+							'.search_back_box',
+							'.topic_list_box',
 
-                            // 客户端发贴 x 倍经验
-                            '.tb_poster_placeholder',
+							// 客户端发贴 x 倍经验
+							'.tb_poster_placeholder',
 
-                            // 语音按钮 (需要客户端)
-                            '.edui-btn-voice, .j_voice_ad_gif, .lzl_panel_voice',
+							// 语音按钮 (需要客户端)
+							'.edui-btn-voice, .j_voice_ad_gif, .lzl_panel_voice',
 
-                            // 发帖请遵守 ....
-                            '.poster_head_surveillance',
+							// 发帖请遵守 ....
+							'.poster_head_surveillance',
 
-                            // 不水能死何弃疗！
-                            '.lzl_panel_wrapper > tbody > tr > td:first-child > p',
+							// 不水能死何弃疗！
+							'.lzl_panel_wrapper > tbody > tr > td:first-child > p',
 
-                            // 会员相关广告
-                            '.doupiao_offline, .fMember_cnt',
+							// 会员相关广告
+							'.doupiao_offline, .fMember_cnt',
 
-                            // 右上角
-                            '.u_tshow, .u_tbmall, .u_app, .u_wallet, .u_xiu8',
-                            '.u_mytbmall, .u_joinvip, .u_baiduPrivilege, .u_appcenterEntrance',
+							// 右上角
+							'.u_tshow, .u_tbmall, .u_app, .u_wallet, .u_xiu8',
+							'.u_mytbmall, .u_joinvip, .u_baiduPrivilege, .u_appcenterEntrance',
 
-                            // 右下角
-                            '#pop_frame, #__bdyx_tips, #__bdyx_tips_icon',
+							// 右下角
+							'#pop_frame, #__bdyx_tips, #__bdyx_tips_icon',
 
-                            // 猜拳
-                            '.add_guessing_btn, .guessing_watermark',
+							// 猜拳
+							'.add_guessing_btn, .guessing_watermark',
 
-                            // 帖子推荐
-                            '.thread_recommend',
+							// 帖子推荐
+							'.thread_recommend',
 
-                            // 右下角广告
-                            '#__bdyx_tips, #__bdyx_tips_icon, .baidu-tuisong-wrap, .baidutuisong',
+							// 右下角广告
+							'#__bdyx_tips, #__bdyx_tips_icon, .baidu-tuisong-wrap, .baidutuisong',
 
-                            // 打赏、分享
-                            '.reward_btn, .share_btn_wrapper',
+							// 打赏、分享
+							'.reward_btn, .share_btn_wrapper',
 
-                            // 烟花
-                            '.firework_sender_wrap, .global_notice_wrap',
-                            /*.tbui_fbar_share,*/
-                            '.tbui_fbar_tsukkomi, .tbui_fbar_props, .tbui_fbar_square, .tbui_fbar_home',
+							// 烟花
+							'.firework_sender_wrap, .global_notice_wrap',
+							/*.tbui_fbar_share,*/
+							'.tbui_fbar_tsukkomi, .tbui_fbar_props, .tbui_fbar_square, .tbui_fbar_home',
 
-                            '#tshow_out_date_warn, #selectsearch-icon',
+							'#tshow_out_date_warn, #selectsearch-icon',
 
-                            // 贴吧推荐
-                            '#forum_recommend',
+							// 贴吧推荐
+							'#forum_recommend',
 
-                            //贴吧列表右上角的广告
-                            '#mediago-frs-aside',
-                            //贴吧列表内的广告
-                            'div.mediago-ad-wrapper',
+							//贴吧列表右上角的广告
+							'#mediago-frs-aside',
+							//贴吧列表内的广告
+							'div.mediago-ad-wrapper',
 
-                            /*贴吧贴子列表顶的游击广告*/
-                            //".bus-top-activity-wrap",
-                            /*官方号服务中心post_head_official*/
-                            //"li.u_official",
-                        ].join(', ');
-                        $($ads).remove();
-                        //https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
-                        //console.log(GM_getValue("tiebameihua"));
-                        //console.log(window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g));
-                        if (GM_getValue("tiebameihua") && window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g) != -1 /*贴吧主页才执行*/) {
-                            let temp2 = $(".wrap1")[0];
-                            if (temp2 != null) {
-                                temp2.style = "background-image: none !important;";
-                            }
-                        }
-                        $('<style>').text($ads + /* File: ads_hide.css */
-                            (function () {
-                                /*
+							/*贴吧贴子列表顶的游击广告*/
+							//".bus-top-activity-wrap",
+							/*官方号服务中心post_head_official*/
+							//"li.u_official",
+						].join(', ');
+						$($ads).remove();
+						//https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
+						//console.log(GM_getValue("tiebameihua"));
+						//console.log(window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g));
+						if (GM_getValue("tiebameihua") && window.location.href.search(/(https|http):\/\/tieba\.baidu\.com\/(f\?kw|f\?ie=utf-8&kw=)/g) != -1 /*贴吧主页才执行*/ ) {
+							let temp2 = $(".wrap1")[0];
+							if (temp2 != null) {
+								temp2.style = "background-image: none !important;";
+							}
+						}
+						$('<style>').text($ads + /* File: ads_hide.css */
+							(function() {
+								/*
     {
     display:none !important;
     }
@@ -7766,247 +7821,247 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     left: 65px !important;
     }
     */
-                            }).extract()).appendTo(document.head);
+							}).extract()).appendTo(document.head);
 
-                        // 只保留 [看帖、图片、精品、视频] 四个选项，贴吧有一个空白的选项 j_tbnav_tab_a 群组功能没了http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
-                        //$('.j_tbnav_tab').filter(function(i) { return i > 3; }).remove();
-                        let temp = $('.j_tbnav_tab_a');
-                        for (let i = 0; i < temp.length; i++) {
-                            //console.log(temp[i].innerHTML);
-                            //console.log(temp[i].parentNode);
-                            if (temp[i].innerHTML == "" || temp[i].innerHTML == "玩乐" || temp[i].innerHTML == "游戏" /* || temp[i].innerHTML == undefined*占位的*/) {
-                                temp[i].parentNode.style = "display:none;";
-                            }
-                        }
-                        // 执行三次, 确保分隔符会消失
-                        for (var i = 3; i--;) {
-                            setTimeout(function () {
-                                $('.split_text').next('.split_text').remove();
-                                $('.split').filter(function () {
-                                    return this.nextElementSibling === null ||
-                                        this.nextElementSibling.className == this.className ||
-                                        !$(this.nextElementSibling).is(':visible');
-                                }).remove();
-                            }, 3000 * i);
-                        }
+						// 只保留 [看帖、图片、精品(吧主推荐)、视频] 四个选项，贴吧有一个空白的选项 j_tbnav_tab_a 群组功能没了http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
+						//$('.j_tbnav_tab').filter(function(i) { return i > 3; }).remove();
+						let temp = $('.j_tbnav_tab_a');
+						for (let i = 0; i < temp.length; i++) {
+							//console.log(temp[i].innerHTML);
+							//console.log(temp[i].parentNode);
+							if (temp[i].innerHTML == "" || temp[i].innerHTML == "玩乐" || temp[i].innerHTML == "游戏" || temp[i].innerHTML.search(/游戏/g) != -1 /* || temp[i].innerHTML == undefined*占位的*/ ) {
+								temp[i].parentNode.style = "display:none;";
+							}
+						}
+						// 执行三次, 确保分隔符会消失
+						for (var i = 3; i--;) {
+							setTimeout(function() {
+								$('.split_text').next('.split_text').remove();
+								$('.split').filter(function() {
+									return this.nextElementSibling === null ||
+										this.nextElementSibling.className == this.className ||
+										!$(this.nextElementSibling).is(':visible');
+								}).remove();
+							}, 3000 * i);
+						}
 
-                        this.removePromoteThread();
-                    },
+						this.removePromoteThread();
+					},
 
-                    _proc: function (floorType, args) {
-                        if (floorType == __type_forum) {
-                            if (args.thread.find('.threadlist_rep_num').text() == '推广') {
-                                args.thread.remove();
-                            }
-                        }
-                    },
+					_proc: function(floorType, args) {
+						if (floorType == __type_forum) {
+							if (args.thread.find('.threadlist_rep_num').text() == '推广') {
+								args.thread.remove();
+							}
+						}
+					},
 
-                    removePromoteThread: function () {
-                        // 清理帖子列表的推广
-                        var it = document.evaluate('//*[@id="thread_list"]/li/div/div/div[text()="推广"]', document.body, null, XPathResult.ANY_TYPE, null);
-                        var thread, threads = [];
+					removePromoteThread: function() {
+						// 清理帖子列表的推广
+						var it = document.evaluate('//*[@id="thread_list"]/li/div/div/div[text()="推广"]', document.body, null, XPathResult.ANY_TYPE, null);
+						var thread, threads = [];
 
-                        while (thread = it.iterateNext()) {
-                            threads.push(thread);
-                        }
+						while (thread = it.iterateNext()) {
+							threads.push(thread);
+						}
 
-                        $(threads).parents('li').remove();
-                    }
-                },
-                "ads_thread_list": {
-                    name: '屏蔽直播贴等乱七八糟内容 (实验性)',
-                    desc: '并不清楚到底会屏蔽多少东西）',
-                    flag: ~0,
-                    def: false,
-                    _init: function () {
-                        var $ads = [
-                            // 帖子列表顶部, 如直播贴
-                            '#threadListGroupCnt'
-                        ].join(', ');
+						$(threads).parents('li').remove();
+					}
+				},
+				"ads_thread_list": {
+					name: '屏蔽直播贴等乱七八糟内容 (实验性)',
+					desc: '并不清楚到底会屏蔽多少东西）',
+					flag: ~0,
+					def: false,
+					_init: function() {
+						var $ads = [
+							// 帖子列表顶部, 如直播贴
+							'#threadListGroupCnt'
+						].join(', ');
 
-                        $($ads).remove();
-                        $('<style>').text($ads + '{display: none !important}').appendTo('head');
-                    }
-                },
-                "rm_user_icon": {
-                    name: '移除贴子内楼层用户头像',
-                    desc: '移除贴子内楼层用户头像',
-                    flag: 0,
-                    def: false,
-                    _init: function () {
-                        GM_setValue("rm_user_icon", true);
-                    },
-                    _proc: function (floorType, args) {
-                        GM_setValue("rm_user_icon", true);
-                    }
-                },
-                "pingbi_loucengqipao": {
-                    name: '屏蔽楼层气泡',
-                    desc: '屏蔽楼层气泡',
-                    flag: __type_floor,
-                    def: false,
-                    _init: function () {
-                        pingbi_loucengqipao = true;
-                        let temp1 = $(".post_bubble_top");
-                        let temp2 = $(".post_bubble_middle");
-                        let temp3 = $(".post_bubble_bottom");
-                        let i = 0;
-                        for (i = 0; i < temp1.length; i++) {
-                            temp1[i].style = "backgrounde:none;";
-                        }
-                        for (i = 0; i < temp2.length; i++) {
-                            temp2[i].style = "backgrounde:none;padding:unset;";
-                        }
-                        for (i = 0; i < temp3.length; i++) {
-                            temp3[i].style = "backgrounde:none;";
-                        }
-                    },
-                    _proc: function (floorType, args) {
-                        //console.log("666666666666");
-                    }
-                },
-                "qiangdiaoxinxitishi": {
-                    name: '强调信息提示',
-                    desc: '强调信息提示',
-                    flag: __type_floor,
-                    def: false,
-                    _init: function () {
-                        qiangdiaoxinxitishi = true;
-                        let ii = 0;
-                        try {
-                            let t = setInterval(() => {
-                                //let temp1 = $(".u_news_wrap span"); //浮动按钮
-                                //let temp2 = $(".u_notity_bd .category_item"); //浮动按钮
-                                let temp3 = $(".core_reply_tail"); //楼层信息
-                                //let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span"); //浮动按钮
-                                //let temp5 = $("ul.sys_notify_last>li>a>span"); //浮动按钮
-                                //let temp6 = $(".meihua"); //美化开关
-                                if (ii <= 59) {
-                                    ii++;
-                                } else {
-                                    clearInterval(t);
-                                }
-                                /*if (temp6[0] != null) {
-                                        temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+						$($ads).remove();
+						$('<style>').text($ads + '{display: none !important}').appendTo('head');
+					}
+				},
+				"rm_user_icon": {
+					name: '移除贴子内楼层用户头像',
+					desc: '移除贴子内楼层用户头像',
+					flag: 0,
+					def: false,
+					_init: function() {
+						GM_setValue("rm_user_icon", true);
+					},
+					_proc: function(floorType, args) {
+						GM_setValue("rm_user_icon", true);
+					}
+				},
+				"pingbi_loucengqipao": {
+					name: '屏蔽楼层气泡',
+					desc: '屏蔽楼层气泡',
+					flag: __type_floor,
+					def: false,
+					_init: function() {
+						pingbi_loucengqipao = true;
+						let temp1 = $(".post_bubble_top");
+						let temp2 = $(".post_bubble_middle");
+						let temp3 = $(".post_bubble_bottom");
+						let i = 0;
+						for (i = 0; i < temp1.length; i++) {
+							temp1[i].style = "backgrounde:none;";
+						}
+						for (i = 0; i < temp2.length; i++) {
+							temp2[i].style = "backgrounde:none;padding:unset;";
+						}
+						for (i = 0; i < temp3.length; i++) {
+							temp3[i].style = "backgrounde:none;";
+						}
+					},
+					_proc: function(floorType, args) {
+						//console.log("666666666666");
+					}
+				},
+				"qiangdiaoxinxitishi": {
+					name: '强调信息提示',
+					desc: '强调信息提示',
+					flag: __type_floor,
+					def: false,
+					_init: function() {
+						qiangdiaoxinxitishi = true;
+						let ii = 0;
+						try {
+							let t = setInterval(() => {
+								//let temp1 = $(".u_news_wrap span"); //浮动按钮
+								//let temp2 = $(".u_notity_bd .category_item"); //浮动按钮
+								let temp3 = $(".core_reply_tail"); //楼层信息
+								//let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span"); //浮动按钮
+								//let temp5 = $("ul.sys_notify_last>li>a>span"); //浮动按钮
+								//let temp6 = $(".meihua"); //美化开关
+								if (ii <= 59) {
+									ii++;
+								} else {
+									clearInterval(t);
+								}
+								/*if (temp6[0] != null) {
+								        temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
 
-                                    }*/
-                                if (temp3[0] != null) {
-                                    for (i = 0; i < temp3.length; i++) {
-                                        temp3[i].style = "color:#000 !important;";
-                                    }
-                                }
-                                /*if (temp1[0] != null && temp2[0] != null && temp4[0] != null && temp5[0] != null) {
-                                        clearInterval(t);
-                                        let i = 0;
-                                        for (i = 0; i < temp1.length; i++) {
-                                            temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
-                                        }
-                                        for (i = 0; i < temp2.length; i++) {
-                                            temp2[i].style["color"] = "#f00 !important;";
-                                        }
+								    }*/
+								if (temp3[0] != null) {
+									for (i = 0; i < temp3.length; i++) {
+										temp3[i].style = "color:#000 !important;";
+									}
+								}
+								/*if (temp1[0] != null && temp2[0] != null && temp4[0] != null && temp5[0] != null) {
+								        clearInterval(t);
+								        let i = 0;
+								        for (i = 0; i < temp1.length; i++) {
+								            temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
+								        }
+								        for (i = 0; i < temp2.length; i++) {
+								            temp2[i].style["color"] = "#f00 !important;";
+								        }
 
-                                        for (i = 0; i < temp4.length; i++) {
-                                            temp4[i].style = "color:#f00 !important;";
-                                        }
-                                        for (i = 0; i < temp5.length; i++) {
-                                            temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
-                                        }
-                                    }*/
-                            }, 1000);
-                        } catch (err) {
-                            console.log("强调信息提示:" + err);
-                        }
-                    },
-                    _proc: function (floorType, args) {
-                        //console.log("666666666666");
-                    }
-                },
-                /*"audio_download": {
-                        name: '贴吧语音下载(已无效)',
-                        desc: '下载贴吧语音~ 啦啦啦~',
-                        flag: __type_floor | __type_lzl,
-                        _proc: function(floorType, args) {
-                            var _player = $('.voice_player:not(.parsed)', args._main);
-                            if (!_player.size()) return '找不到语音';
+								        for (i = 0; i < temp4.length; i++) {
+								            temp4[i].style = "color:#f00 !important;";
+								        }
+								        for (i = 0; i < temp5.length; i++) {
+								            temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
+								        }
+								    }*/
+							}, 1000);
+						} catch (err) {
+							console.log("强调信息提示:" + err);
+						}
+					},
+					_proc: function(floorType, args) {
+						//console.log("666666666666");
+					}
+				},
+				/*"audio_download": {
+				        name: '贴吧语音下载(已无效)',
+				        desc: '下载贴吧语音~ 啦啦啦~',
+				        flag: __type_floor | __type_lzl,
+				        _proc: function(floorType, args) {
+				            var _player = $('.voice_player:not(.parsed)', args._main);
+				            if (!_player.size()) return '找不到语音';
 
-                            var data = _player.parents('[data-field]').getField(),
-                                pid = data.spid || data.content.post_id;
+				            var data = _player.parents('[data-field]').getField(),
+				                pid = data.spid || data.content.post_id;
 
-                            _player.addClass('parsed').after(
-                                $('<a>').addClass('ui_btn ui_btn_m')
-                                .attr({
-                                    href: '/voice/index?tid=' + wPageData.thread.thread_id + '&pid=' + pid,
-                                    download: '语音-' + (data.user_name || data.author.user_name) + '-' + pid + '.mp3'
-                                })
-                                .css({
-                                    marginLeft: '1em'
-                                })
-                                .append($('<span>').text('下载'))
-                            ).after($('<br>'));
-                        }
-                    },*/
-                "block_post": {
-                    name: '贴吧贴子屏蔽(残废的)',
-                    desc: '根据规则屏蔽指定贴子',
-                    flag: __type_floor | __type_forum | __type_lzl,
-                    def: false,
+				            _player.addClass('parsed').after(
+				                $('<a>').addClass('ui_btn ui_btn_m')
+				                .attr({
+				                    href: '/voice/index?tid=' + wPageData.thread.thread_id + '&pid=' + pid,
+				                    download: '语音-' + (data.user_name || data.author.user_name) + '-' + pid + '.mp3'
+				                })
+				                .css({
+				                    marginLeft: '1em'
+				                })
+				                .append($('<span>').text('下载'))
+				            ).after($('<br>'));
+				        }
+				    },*/
+				"block_post": {
+					name: '贴吧贴子屏蔽(残废的)',
+					desc: '根据规则屏蔽指定贴子',
+					flag: __type_floor | __type_forum | __type_lzl,
+					def: false,
 
-                    // 辅助函数
-                    _match_type: function (_M) {
-                        switch (_M) {
-                            case this.__M_REGEX:
-                                return 'tp_regex';
-                            case this.__M_PLAIN:
-                                return 'tp_plain';
-                        }
+					// 辅助函数
+					_match_type: function(_M) {
+						switch (_M) {
+							case this.__M_REGEX:
+								return 'tp_regex';
+							case this.__M_PLAIN:
+								return 'tp_plain';
+						}
 
-                        return 'undefined_' + _M;
-                    },
-                    // 辅助函数
-                    _range: function (old, min, max) {
-                        return Math.min(Math.max(min, old), max);
-                    },
+						return 'undefined_' + _M;
+					},
+					// 辅助函数
+					_range: function(old, min, max) {
+						return Math.min(Math.max(min, old), max);
+					},
 
-                    // 初始化样式表
-                    _init: function () {
-                        _css
-                            .append('ul#jx_post_kword > li {margin-bottom: .2em}')
-                            .append('.jx_word { padding: 0 .5em; width: 8em } span.regex::before, span.regex::after { content: "/"; color: #777 }')
-                            .append('span.regex > .jx_word { border: 0; padding: 0 .2em }')
-                            .append('.jx_modifier { width: 4em; border: 0; padding: 0 0 0 .2em }')
+					// 初始化样式表
+					_init: function() {
+						_css
+							.append('ul#jx_post_kword > li {margin-bottom: .2em}')
+							.append('.jx_word { padding: 0 .5em; width: 8em } span.regex::before, span.regex::after { content: "/"; color: #777 }')
+							.append('span.regex > .jx_word { border: 0; padding: 0 .2em }')
+							.append('.jx_modifier { width: 4em; border: 0; padding: 0 0 0 .2em }')
 
-                            .append('.jx_post_block_stripe::before{content: "共隐藏 " attr(hide-count) " 个数据"}');
+						.append('.jx_post_block_stripe::before{content: "共隐藏 " attr(hide-count) " 个数据"}');
 
 
-                        $.extend(this, {
-                            // Action to take when match
-                            __ACT_BAR: 0,
-                            __ACT_OPA: 1,
-                            __ACT_HIDE: 2,
+						$.extend(this, {
+							// Action to take when match
+							__ACT_BAR: 0,
+							__ACT_OPA: 1,
+							__ACT_HIDE: 2,
 
-                            // Keyword match method
-                            __M_REGEX: 0,
-                            __M_PLAIN: 1
-                        });
+							// Keyword match method
+							__M_REGEX: 0,
+							__M_PLAIN: 1
+						});
 
-                        this.config = $.extend({
-                            onmatch: this.__ACT_OPA,
-                            opacity: 30,
+						this.config = $.extend({
+							onmatch: this.__ACT_OPA,
+							opacity: 30,
 
-                            kword: [{
-                                type: this.__M_PLAIN,
-                                word: '泽火革'
-                            }],
-                            user: [
-                                '炮弹56',
-                                '炮弹52'
-                            ]
-                        }, $conf.get(this.id));
-                        this._compileRegex();
+							kword: [{
+								type: this.__M_PLAIN,
+								word: '泽火革'
+							}],
+							user: [
+								'炮弹56',
+								'炮弹52'
+							]
+						}, $conf.get(this.id));
+						this._compileRegex();
 
-                        this.$tplConfig = /* File: block_post.html */
-                            (function () {
-                                /*
+						this.$tplConfig = /* File: block_post.html */
+							(function() {
+								/*
     <div class="jx_autoflow">
     <h3>当匹配到时的操作</h3>
     <p>
@@ -8055,10 +8110,10 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     </p>
     </div>
     */
-                            }).extract();
-                        this.$tplAddWord = /* File: block_post_kword.html */
-                            (function () {
-                                /*
+							}).extract();
+						this.$tplAddWord = /* File: block_post_kword.html */
+							(function() {
+								/*
     <li>
     <select class="jx_word_type">
     <option value="0" {{#tp_regex}}selected{{/tp_regex}}>正则</option>
@@ -8071,348 +8126,348 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     [ <a class="ptr jx-rm-key" >删除</a> ]
     </li>
     */
-                            }).extract();
+							}).extract();
 
-                        this.css = $('<style>').appendTo(document.head);
-                        this._rebuildStyle();
-                    },
+						this.css = $('<style>').appendTo(document.head);
+						this._rebuildStyle();
+					},
 
-                    // 重构样式表
-                    _rebuildStyle: function () {
-                        var sBuilder = '.jx_post_block_act {';
-                        switch (this.config.onmatch) {
-                            case this.__ACT_BAR:
-                                sBuilder += 'display: none;';
-                                break;
-                            case this.__ACT_HIDE:
-                                sBuilder += [
-                                    'display: none;',
-                                    '}',
+					// 重构样式表
+					_rebuildStyle: function() {
+						var sBuilder = '.jx_post_block_act {';
+						switch (this.config.onmatch) {
+							case this.__ACT_BAR:
+								sBuilder += 'display: none;';
+								break;
+							case this.__ACT_HIDE:
+								sBuilder += [
+									'display: none;',
+									'}',
 
-                                    '.jx_post_block_stripe {',
-                                    'display: none'
-                                    // , '}'
-                                ].join('');
-                                break;
-                            case this.__ACT_OPA:
-                                sBuilder += [
-                                    'opacity: ' + (this.config.opacity / 100) + ';',
-                                    'transition: opacity .5s;',
-                                    '}',
+									'.jx_post_block_stripe {',
+									'display: none'
+									// , '}'
+								].join('');
+								break;
+							case this.__ACT_OPA:
+								sBuilder += [
+									'opacity: ' + (this.config.opacity / 100) + ';',
+									'transition: opacity .5s;',
+									'}',
 
-                                    '.jx_post_block_act:hover {',
-                                    'opacity: .9;',
-                                    '}',
+									'.jx_post_block_act:hover {',
+									'opacity: .9;',
+									'}',
 
-                                    '.jx_post_block_stripe {',
-                                    'display: none'
-                                    // , '}'
-                                ].join('');
-                                break;
-                        }
+									'.jx_post_block_stripe {',
+									'display: none'
+									// , '}'
+								].join('');
+								break;
+						}
 
-                        sBuilder += '}';
-                        this.css.text(sBuilder);
-                    },
-                    // 编译正则匹配
-                    _compileRegex: function () {
-                        var that = this;
-                        this.config.kword.forEach(function (e) {
-                            try {
-                                if (e.type === that.__M_REGEX) {
-                                    e.regex = new RegExp(e.word, e.modi);
-                                }
-                            } catch (err) {
-                                console.error('编译正则表达式时出错!\n表达式: %s, 开关: %s', err.word, err.modi);
-                                err.regex = {
-                                    test: function () {
-                                        return false;
-                                    }
-                                };
-                            }
-                        });
-                    },
+						sBuilder += '}';
+						this.css.text(sBuilder);
+					},
+					// 编译正则匹配
+					_compileRegex: function() {
+						var that = this;
+						this.config.kword.forEach(function(e) {
+							try {
+								if (e.type === that.__M_REGEX) {
+									e.regex = new RegExp(e.word, e.modi);
+								}
+							} catch (err) {
+								console.error('编译正则表达式时出错!\n表达式: %s, 开关: %s', err.word, err.modi);
+								err.regex = {
+									test: function() {
+										return false;
+									}
+								};
+							}
+						});
+					},
 
-                    // 配置窗口回调
-                    _conf: function () {
-                        var $view = $.extend(true, {}, this.config);
+					// 配置窗口回调
+					_conf: function() {
+						var $view = $.extend(true, {}, this.config);
 
-                        $view.tp_hide = $view.onmatch === this.__ACT_HIDE;
-                        $view.tp_opa = $view.onmatch === this.__ACT_OPA;
-                        $view.tp_bar = $view.onmatch === this.__ACT_BAR;
+						$view.tp_hide = $view.onmatch === this.__ACT_HIDE;
+						$view.tp_opa = $view.onmatch === this.__ACT_OPA;
+						$view.tp_bar = $view.onmatch === this.__ACT_BAR;
 
-                        for (var i = 0; i < $view.kword.length; i++) {
-                            $view.kword[i][this._match_type($view.kword[i].type)] = true;
-                        }
-                        $view.user = $view.user.join('\n');
+						for (var i = 0; i < $view.kword.length; i++) {
+							$view.kword[i][this._match_type($view.kword[i].type)] = true;
+						}
+						$view.user = $view.user.join('\n');
 
-                        var $tpl = $(Mustache.render(this.$tplConfig, $view)); //有警告
+						var $tpl = $(Mustache.render(this.$tplConfig, $view)); //有警告
 
-                        var $wndBlocker = $.dialog.open($tpl, {
-                            title: '贴子关键字屏蔽',
-                            width: 300,
-                            height: 400
-                        });
+						var $wndBlocker = $.dialog.open($tpl, {
+							title: '贴子关键字屏蔽',
+							width: 300,
+							height: 400
+						});
 
-                        var that = this;
-                        $tpl.on('click', 'a.jx-rm-key', function () {
-                            // 移除那一行
-                            $(this).parent().remove();
-                        }).on('change', '.jx_word_type', function () {
-                            var isRegex = parseInt(this.value) === that.__M_REGEX;
+						var that = this;
+						$tpl.on('click', 'a.jx-rm-key', function() {
+							// 移除那一行
+							$(this).parent().remove();
+						}).on('change', '.jx_word_type', function() {
+							var isRegex = parseInt(this.value) === that.__M_REGEX;
 
-                            var line = $(this).parent();
-                            line.find('.jx_word').parent().toggleClass('regex', isRegex);
-                            line.find('.jx_modifier').toggleClass('hide', !isRegex);
-                        }).on('change', '#jx_post_match', function () {
-                            $('#jx_post_opa', $tpl).parent().toggleClass('hide', parseInt(this.value) !== that.__ACT_OPA);
-                        }).on('click', '.ui_btn', function () {
-                            switch ($(this).data('btn')) {
-                                case 'add':
-                                    var $tplAdd = $(Mustache.render(that.$tplAddWord, {
-                                        tp_plain: true
-                                    })); //有警告
-                                    $('#jx_post_kword', $tpl).append($tplAdd);
-                                    $tplAdd.find('.tg_focus').removeClass('.tg_focus').focus();
-                                    break;
-                                case 'save':
-                                    var newConf = {
-                                        onmatch: parseInt($('#jx_post_match', $tpl).val()),
-                                        opacity: that._range(parseInt($('#jx_post_opa', $tpl).val()), 0, 100),
-                                        kword: [],
-                                        user: $('#jx_post_user', $tpl).val().split('\n')
-                                    };
-                                    $('#jx_post_kword > li').each(function () {
-                                        var rule = $(this);
-                                        newConf.kword.push({
-                                            type: parseInt(rule.find('select').val()),
-                                            word: rule.find('.jx_word').val(),
-                                            modi: rule.find('.jx_modifier').val()
-                                        });
-                                    });
-                                    $conf.set(that.id, newConf);
-                                    that.config = newConf;
+							var line = $(this).parent();
+							line.find('.jx_word').parent().toggleClass('regex', isRegex);
+							line.find('.jx_modifier').toggleClass('hide', !isRegex);
+						}).on('change', '#jx_post_match', function() {
+							$('#jx_post_opa', $tpl).parent().toggleClass('hide', parseInt(this.value) !== that.__ACT_OPA);
+						}).on('click', '.ui_btn', function() {
+							switch ($(this).data('btn')) {
+								case 'add':
+									var $tplAdd = $(Mustache.render(that.$tplAddWord, {
+										tp_plain: true
+									})); //有警告
+									$('#jx_post_kword', $tpl).append($tplAdd);
+									$tplAdd.find('.tg_focus').removeClass('.tg_focus').focus();
+									break;
+								case 'save':
+									var newConf = {
+										onmatch: parseInt($('#jx_post_match', $tpl).val()),
+										opacity: that._range(parseInt($('#jx_post_opa', $tpl).val()), 0, 100),
+										kword: [],
+										user: $('#jx_post_user', $tpl).val().split('\n')
+									};
+									$('#jx_post_kword > li').each(function() {
+										var rule = $(this);
+										newConf.kword.push({
+											type: parseInt(rule.find('select').val()),
+											word: rule.find('.jx_word').val(),
+											modi: rule.find('.jx_modifier').val()
+										});
+									});
+									$conf.set(that.id, newConf);
+									that.config = newConf;
 
-                                    that._compileRegex();
-                                    that._rebuildStyle();
-                                    $wndBlocker.close();
-                                    break;
-                                case 'close':
-                                    $wndBlocker.close();
-                                    break;
-                            }
-                        });
-                    },
+									that._compileRegex();
+									that._rebuildStyle();
+									$wndBlocker.close();
+									break;
+								case 'close':
+									$wndBlocker.close();
+									break;
+							}
+						});
+					},
 
-                    // 标记贴子为隐藏
-                    _hit: function (floor) {
-                        floor.addClass('jx_post_block_act');
+					// 标记贴子为隐藏
+					_hit: function(floor) {
+						floor.addClass('jx_post_block_act');
 
-                        if (floor.prev().is('script')) {
-                            floor.prev().remove();
-                        }
+						if (floor.prev().is('script')) {
+							floor.prev().remove();
+						}
 
-                        if (floor.prev().is('.jx_post_block_act')) {
-                            // 寻找横条
-                            var prev = floor.prev();
-                            while (!prev.is('.jx_post_block_stripe')) {
-                                prev = prev.prev();
-                            }
+						if (floor.prev().is('.jx_post_block_act')) {
+							// 寻找横条
+							var prev = floor.prev();
+							while (!prev.is('.jx_post_block_stripe')) {
+								prev = prev.prev();
+							}
 
-                            prev.attr('hide-count', parseInt(prev.attr('hide-count')) + 1);
-                        } else {
-                            $('<div>').addClass('jx_post_block_stripe floor-stripe')
-                                .attr('hide-count', 1).insertBefore(floor);
-                        }
-                    },
+							prev.attr('hide-count', parseInt(prev.attr('hide-count')) + 1);
+						} else {
+							$('<div>').addClass('jx_post_block_stripe floor-stripe')
+								.attr('hide-count', 1).insertBefore(floor);
+						}
+					},
 
-                    _getAuthor: function (f) {
-                        return f.user_name || f.author_name || (f.author ? f.author.user_name : null);
-                    },
+					_getAuthor: function(f) {
+						return f.user_name || f.author_name || (f.author ? f.author.user_name : null);
+					},
 
-                    _proc: function (floorType, args) {
-                        // 首先检查用户名
-                        if (this.config.user.indexOf(this._getAuthor(args._main.getField())) !== -1) {
-                            this._hit(args._main);
-                            return;
-                        }
+					_proc: function(floorType, args) {
+						// 首先检查用户名
+						if (this.config.user.indexOf(this._getAuthor(args._main.getField())) !== -1) {
+							this._hit(args._main);
+							return;
+						}
 
-                        var floorContent;
-                        switch (floorType) {
-                            case __type_forum:
-                                floorContent = $('.threadlist_text', args._main).text();
-                                break;
-                            case __type_floor:
-                                floorContent = $('.d_post_content', args._main).text();
-                                break;
-                            case __type_lzl:
-                                floorContent = $('.lzl_content_main', args._main).text();
-                                break;
-                        }
+						var floorContent;
+						switch (floorType) {
+							case __type_forum:
+								floorContent = $('.threadlist_text', args._main).text();
+								break;
+							case __type_floor:
+								floorContent = $('.d_post_content', args._main).text();
+								break;
+							case __type_lzl:
+								floorContent = $('.lzl_content_main', args._main).text();
+								break;
+						}
 
-                        // 然后循环检查关键字匹配
-                        for (var i = this.config.kword.length; i--;) {
-                            switch (this.config.kword[i].type) {
-                                case this.__M_REGEX:
-                                    if (this.config.kword[i].regex.test(floorContent)) {
-                                        this._hit(args._main);
-                                    }
-                                    break;
+						// 然后循环检查关键字匹配
+						for (var i = this.config.kword.length; i--;) {
+							switch (this.config.kword[i].type) {
+								case this.__M_REGEX:
+									if (this.config.kword[i].regex.test(floorContent)) {
+										this._hit(args._main);
+									}
+									break;
 
-                                case this.__M_PLAIN:
-                                    if (floorContent.indexOf(this.config.kword[i].word) !== -1) {
-                                        this._hit(args._main);
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                },
-                "hide_loops": {
-                    name: '3 天循环隐藏',
-                    desc: '3 天循环屏蔽指定用户的帖子, 统一封锁.',
-                    flag: __type_postact | __type_forum,
-                    def: false,
+								case this.__M_PLAIN:
+									if (floorContent.indexOf(this.config.kword[i].word) !== -1) {
+										this._hit(args._main);
+									}
+									break;
+							}
+						}
+					}
+				},
+				"hide_loops": {
+					name: '3 天循环隐藏',
+					desc: '3 天循环屏蔽指定用户的帖子, 统一封锁.',
+					flag: __type_postact | __type_forum,
+					def: false,
 
-                    _findUser: function (name) {
-                        if (0 === this.blockList.author.length) {
-                            return -1;
-                        }
+					_findUser: function(name) {
+						if (0 === this.blockList.author.length) {
+							return -1;
+						}
 
-                        for (var i = this.blockList.author.length; i--;) {
-                            if (this.blockList.author[i].name == name) {
-                                return i;
-                            }
-                        }
+						for (var i = this.blockList.author.length; i--;) {
+							if (this.blockList.author[i].name == name) {
+								return i;
+							}
+						}
 
-                        return -1;
-                    },
-                    _userExist: function (user) {
-                        return -1 !== this._findUser(user);
-                    },
+						return -1;
+					},
+					_userExist: function(user) {
+						return -1 !== this._findUser(user);
+					},
 
-                    _conf: function () {
-                        var that = this;
+					_conf: function() {
+						var that = this;
 
-                        //有警告
-                        var $tpl = $(Mustache.render(this.tplHideAuthor, {
-                            author: this.blockList.author.map(function (e, i) {
-                                return {
-                                    name: e.name,
-                                    time: e.time ? $.toDateStr(new Date(e.time)) : '尚未'
-                                };
-                            })
-                        }));
+						//有警告
+						var $tpl = $(Mustache.render(this.tplHideAuthor, {
+							author: this.blockList.author.map(function(e, i) {
+								return {
+									name: e.name,
+									time: e.time ? $.toDateStr(new Date(e.time)) : '尚未'
+								};
+							})
+						}));
 
-                        var $wndHideUser = $.dialog.open($tpl, {
-                            title: '3天循环隐藏模组配置 - 记得点一次 [全部封禁]',
-                            width: 370,
-                            height: 400
-                        });
+						var $wndHideUser = $.dialog.open($tpl, {
+							title: '3天循环隐藏模组配置 - 记得点一次 [全部封禁]',
+							width: 370,
+							height: 400
+						});
 
-                        var $inp = $('#jx_new_id', $tpl);
-                        var cbAddName = function () {
-                            var user = $inp.val().trim();
-                            that._updList();
+						var $inp = $('#jx_new_id', $tpl);
+						var cbAddName = function() {
+							var user = $inp.val().trim();
+							that._updList();
 
-                            if (0 === user.length || that._userExist(user)) {
-                                return;
-                            }
+							if (0 === user.length || that._userExist(user)) {
+								return;
+							}
 
-                            $inp.val('');
-                            //有警告
-                            $(Mustache.render(that.tplNewLine, {
-                                name: user,
-                                time: '尚未'
-                            })).insertBefore($('#jx_last_line_of_3day_block', $tpl));
-                            that.blockList.author.push({
-                                name: user,
-                                time: 0
-                            });
-                            that._saveList();
-                        };
+							$inp.val('');
+							//有警告
+							$(Mustache.render(that.tplNewLine, {
+								name: user,
+								time: '尚未'
+							})).insertBefore($('#jx_last_line_of_3day_block', $tpl));
+							that.blockList.author.push({
+								name: user,
+								time: 0
+							});
+							that._saveList();
+						};
 
-                        // 绑定事件
-                        $('#jx_add', $tpl).click(cbAddName);
-                        $inp.keypress(function (e) {
-                            if (e.which === 13) {
-                                cbAddName();
-                            }
-                        });
-                        $tpl
-                            .on('click', '.jx_man_hide, .jx_man_rm', function (e) {
-                                var $l = $(e.target);
-                                if ($l.hasClass('text-disabled')) {
-                                    return;
-                                }
-                                $l.addClass('text-disabled');
+						// 绑定事件
+						$('#jx_add', $tpl).click(cbAddName);
+						$inp.keypress(function(e) {
+							if (e.which === 13) {
+								cbAddName();
+							}
+						});
+						$tpl
+							.on('click', '.jx_man_hide, .jx_man_rm', function(e) {
+								var $l = $(e.target);
+								if ($l.hasClass('text-disabled')) {
+									return;
+								}
+								$l.addClass('text-disabled');
 
 
-                                var $un = $l.parent().data('name');
-                                that._updList();
-                                switch (true) {
-                                    case $l.hasClass('jx_man_hide'):
-                                        that.blockList.author[that._findUser($un)].time = $.stamp();
-                                        that._hide(function () { }, $un);
-                                        break;
-                                    case $l.hasClass('jx_man_rm'):
-                                        that.blockList.author.splice(that._findUser($un), 1);
-                                        $l.parent().hide();
-                                        break;
-                                }
-                                that._saveList();
-                            });
+								var $un = $l.parent().data('name');
+								that._updList();
+								switch (true) {
+									case $l.hasClass('jx_man_hide'):
+										that.blockList.author[that._findUser($un)].time = $.stamp();
+										that._hide(function() {}, $un);
+										break;
+									case $l.hasClass('jx_man_rm'):
+										that.blockList.author.splice(that._findUser($un), 1);
+										$l.parent().hide();
+										break;
+								}
+								that._saveList();
+							});
 
-                        $('#jx_close', $tpl).click($wndHideUser.close.bind($wndHideUser));
-                        $('#jx_all', $tpl).click(function () {
-                            var hideStatus = $('#jx_hide_info', $tpl).show().text('正在初始化…');
+						$('#jx_close', $tpl).click($wndHideUser.close.bind($wndHideUser));
+						$('#jx_all', $tpl).click(function() {
+							var hideStatus = $('#jx_hide_info', $tpl).show().text('正在初始化…');
 
-                            that.hideQueue.onProgress = function (i, t) {
-                                hideStatus.text(Mustache.render('正在隐藏 {{i}} / {{t}}... 请勿关闭该窗口!', {
-                                    i: i,
-                                    t: t
-                                })); //有警告
-                            };
-                            that.hideQueue.onComplete = function () {
-                                that.hideQueue.onProgress = that.hideQueue.onComplete = null;
-                                hideStatus.text('全部用户已成功隐藏!');
-                            };
-                            that.hideQueue.add.apply(
-                                that.hideQueue,
-                                Array.prototype.slice.call($('a.jx.jx_man_hide:not(.text-disabled)').addClass('text-disabled').map(function (i, e) {
-                                    return $(e).parent().data('name');
-                                }))
-                            );
-                        });
-                        return $tpl;
-                    },
+							that.hideQueue.onProgress = function(i, t) {
+								hideStatus.text(Mustache.render('正在隐藏 {{i}} / {{t}}... 请勿关闭该窗口!', {
+									i: i,
+									t: t
+								})); //有警告
+							};
+							that.hideQueue.onComplete = function() {
+								that.hideQueue.onProgress = that.hideQueue.onComplete = null;
+								hideStatus.text('全部用户已成功隐藏!');
+							};
+							that.hideQueue.add.apply(
+								that.hideQueue,
+								Array.prototype.slice.call($('a.jx.jx_man_hide:not(.text-disabled)').addClass('text-disabled').map(function(i, e) {
+									return $(e).parent().data('name');
+								}))
+							);
+						});
+						return $tpl;
+					},
 
-                    _hide: function (cb, author) {
-                        // 检查是否在列表
-                        this._updList();
-                        if (this._userExist(author)) {
-                            // 如果存在, 修正上次隐藏时间
-                            this.blockList.author[this._findUser(author)].time = $.stamp();
-                            this._saveList();
-                        }
-                        console.info('开始隐藏: %s', author);
+					_hide: function(cb, author) {
+						// 检查是否在列表
+						this._updList();
+						if (this._userExist(author)) {
+							// 如果存在, 修正上次隐藏时间
+							this.blockList.author[this._findUser(author)].time = $.stamp();
+							this._saveList();
+						}
+						console.info('开始隐藏: %s', author);
 
-                        $.ajax({
-                            url: '/tphide/add',
-                            type: 'POST',
-                            data: {
-                                type: 1,
-                                hide_un: author,
-                                ie: 'utf-8'
-                            },
-                            dataType: 'json'
-                        }).success(cb);
-                    },
+						$.ajax({
+							url: '/tphide/add',
+							type: 'POST',
+							data: {
+								type: 1,
+								hide_un: author,
+								ie: 'utf-8'
+							},
+							dataType: 'json'
+						}).success(cb);
+					},
 
-                    _init: function () {
-                        this.tplHideAuthor = /* File: hide_loops_config.html */
-                            (function () {
-                                /*
+					_init: function() {
+						this.tplHideAuthor = /* File: hide_loops_config.html */
+							(function() {
+								/*
     <div class="jx_autoflow">
     <h2>3 天循环隐藏的列表</h2>
 
@@ -8437,297 +8492,292 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     </div>
     </div>
     */
-                            }).extract();
-                        this.tplNewLine = /* File: hide_loops_author.html */
-                            (function () {
-                                /*
+							}).extract();
+						this.tplNewLine = /* File: hide_loops_author.html */
+							(function() {
+								/*
     <li data-name="{{name}}"><b>{{name}}</b>
     [ 上次隐藏: <span class="text-red">{{time}}</span> | <a class="jx jx_man_hide">手动</a> | <a class="jx jx_man_rm">移除</a> ]</li>
     */
-                            }).extract();
-                        this._updList();
+							}).extract();
+						this._updList();
 
-                        var _hide = this._hide.bind(this);
-                        this.hideQueue = new IntervalLoop([], _hide, 400).loop(); //有警告
+						var _hide = this._hide.bind(this);
+						this.hideQueue = new IntervalLoop([], _hide, 400).loop(); //有警告
 
-                        var curTime = $.stamp();
-                        var t3Days = 3 * 24 * 60 * 60;
+						var curTime = $.stamp();
+						var t3Days = 3 * 24 * 60 * 60;
 
-                        var that = this;
-                        this.blockList.author.forEach(function (e) {
-                            if (curTime - e.time > t3Days) {
-                                that.hideQueue.add(e.name);
-                            }
-                        });
-                    },
+						var that = this;
+						this.blockList.author.forEach(function(e) {
+							if (curTime - e.time > t3Days) {
+								that.hideQueue.add(e.name);
+							}
+						});
+					},
 
-                    _updList: function () {
-                        this.blockList = $.extend({
-                            author: [
-                                // 格式如下
-                                //{
-                                //	name: '炮弹56',
-                                //	lastHide: 0
-                                //}
-                            ]
-                        }, $conf.get(this.id, {}));
-                    },
-                    _saveList: function () {
-                        $conf.set(this.id, this.blockList);
-                    },
+					_updList: function() {
+						this.blockList = $.extend({
+							author: [
+								// 格式如下
+								//{
+								//	name: '炮弹56',
+								//	lastHide: 0
+								//}
+							]
+						}, $conf.get(this.id, {}));
+					},
+					_saveList: function() {
+						$conf.set(this.id, this.blockList);
+					},
 
-                    _findNameAndHide: function (e) {
-                        var floorData = $(e.target).parents('.lzl_single_post,.l_post')
-                            .first().getField();
-                        var author = floorData.user_name || floorData.author.user_name;
-                        if (this._userExist(author)) { //有警告
-                            $.dialog.alert(Mustache.render( /* File: hide_loops_already_in_list.html */
-                                (function () {
-                                    /*
+					_findNameAndHide: function(e) {
+						var floorData = $(e.target).parents('.lzl_single_post,.l_post')
+							.first().getField();
+						var author = floorData.user_name || floorData.author.user_name;
+						if (this._userExist(author)) { //有警告
+							$.dialog.alert(Mustache.render( /* File: hide_loops_already_in_list.html */
+								(function() {
+									/*
     用户 [<b>{{name}}</b>] 已存在于屏蔽列表!
     */
-                                }).extract(), {
-                                name: author
-                            }), {
-                                title: '3 天循环隐藏'
-                            });
-                            return;
-                        }
-                        this._updList();
-                        this.blockList.author.push({
-                            name: author,
-                            time: $.stamp()
-                        });
-                        this._saveList();
-                        this._hide(function (r) { //有警告
-                            $.dialog.alert(Mustache.render( /* File: hide_loop_result.html */
-                                (function () {
-                                    /*
+								}).extract(), {
+									name: author
+								}), {
+								title: '3 天循环隐藏'
+							});
+							return;
+						}
+						this._updList();
+						this.blockList.author.push({
+							name: author,
+							time: $.stamp()
+						});
+						this._saveList();
+						this._hide(function(r) { //有警告
+							$.dialog.alert(Mustache.render( /* File: hide_loop_result.html */
+								(function() {
+									/*
     对 <b>{{name}}</b> 的隐藏处理结果: {{msg}}({{no}})
     */
-                                }).extract(),
-                                $.extend({
-                                    name: author
-                                }, r)), {
-                                title: '3 天循环隐藏 (楼中楼无效)'
-                            });
-                        }, author);
-                    },
+								}).extract(),
+								$.extend({
+									name: author
+								}, r)), {
+								title: '3 天循环隐藏 (楼中楼无效)'
+							});
+						}, author);
+					},
 
-                    _menu: function (floorType, args) {
-                        var $act = $('.user-hide-post-action', args._main);
-                        var $actHidePost = $.create('a', 'jx jx-post-action');
+					_menu: function(floorType, args) {
+						var $act = $('.user-hide-post-action', args._main);
+						var $actHidePost = $.create('a', 'jx jx-post-action');
 
-                        $actHidePost
-                            .text('加入 3 天循环隐藏列表')
-                            .appendTo($act)
-                            .data('jx', this.id)
-                            .data('eve', args._main.getField().author.user_name)
-                            .click(this._findNameAndHide.bind(this));
-                    }
-                },
-                "icon_hide": {
-                    name: '隐藏用户印记',
-                    desc: '将用户名下方、右方的印记集藏起来。',
-                    flag: ~0,
-                    def: false,
+						$actHidePost
+							.text('加入 3 天循环隐藏列表')
+							.appendTo($act)
+							.data('jx', this.id)
+							.data('eve', args._main.getField().author.user_name)
+							.click(this._findNameAndHide.bind(this));
+					}
+				},
+				"icon_hide": {
+					name: '隐藏用户印记',
+					desc: '将用户名下方、右方的印记集藏起来。',
+					flag: ~0,
+					def: false,
 
-                    _init: function () {
-                        _hide('.icon_wrap');
-                    }
-                },
-                /*"no_text_link": {
-                    name: '屏蔽帖子内文字推广链接(过时了)',
-                    desc: '将帖子内的文字推广搜索链接替换为普通文本',
-                    flag: __type_lzl | __type_floor,
-                    _proc: function(floorType, args) {
-                        this.rmLinkText(args._main);
-                    },
-                    _init: function() {
-                        this.rmLinkText();
-                    },
-                    rmLinkText: function(_p) {
-                        $(_p || 'body').find('a.ps_cb').each(function() {
-                            $(this).after(document.createTextNode(this.textContent));
-                        }).remove();
-                    }
-                },*/
-                "orange": {
-                    name: '移除会员彩名',
-                    desc: '全部变成变成默认链接颜色。',
-                    flag: __type_floor | __type_lzl | __type_forum,
-                    def: false,
+					_init: function() {
+						_hide('.icon_wrap');
+					}
+				},
+				/*"no_text_link": {
+				    name: '屏蔽帖子内文字推广链接(过时了)',
+				    desc: '将帖子内的文字推广搜索链接替换为普通文本',
+				    flag: __type_lzl | __type_floor,
+				    _proc: function(floorType, args) {
+				        this.rmLinkText(args._main);
+				    },
+				    _init: function() {
+				        this.rmLinkText();
+				    },
+				    rmLinkText: function(_p) {
+				        $(_p || 'body').find('a.ps_cb').each(function() {
+				            $(this).after(document.createTextNode(this.textContent));
+				        }).remove();
+				    }
+				},*/
+				"orange": {
+					name: '移除会员彩名',
+					desc: '全部变成变成默认链接颜色。',
+					flag: __type_floor | __type_lzl | __type_forum,
+					def: false,
 
-                    clsList: ['sign_highlight', 'vip_red', 'fiesta_member', 'fiesta_member_red', 'member_thread_title_frs', 'sign_highlight'],
+					clsList: ['sign_highlight', 'vip_red', 'fiesta_member', 'fiesta_member_red', 'member_thread_title_frs', 'sign_highlight'],
 
-                    rmOrange: function (target) {
-                        var $target = $(target);
+					rmOrange: function(target) {
+						var $target = $(target);
 
-                        for (var i = 1; i < this.clsList.length; i++) {
-                            $('.' + this.clsList[i], $target.removeClass(this.clsList[i])).removeClass(this.clsList[i]);
-                        }
-                    },
+						for (var i = 1; i < this.clsList.length; i++) {
+							$('.' + this.clsList[i], $target.removeClass(this.clsList[i])).removeClass(this.clsList[i]);
+						}
+					},
 
-                    _init: function () {
-                        // 标题红名移除
-                        this.rmOrange('body');
-                    },
-                    _proc: function (floorType, args) {
-                        this.rmOrange(args._main);
-                    }
+					_init: function() {
+						// 标题红名移除
+						this.rmOrange('body');
+					},
+					_proc: function(floorType, args) {
+						this.rmOrange(args._main);
+					}
 
-                },
-                "quote": {
-                    name: '引用楼层',
-                    desc: '引用某一层的内容',
-                    flag: __type_floor,
-                    def: true,
-                    _init: function () {
-                    },
-                    _proc: function (floorType, args) {
-                        //console.log("233333333333");
-                        //旧贴吧
-                        $('<li>').addClass('pad-left').append( //<li>
-                            $('<a>').text('#引用').addClass('jx')
-                                .data('jx', 'quote').data('floor', args.floorNum)
-                        ).prependTo($('.p_tail', args._main));
-                        //新贴吧
+				},
+				"quote": {
+					name: '引用楼层',
+					desc: '引用某一层的内容',
+					flag: __type_floor,
+					def: true,
+					_init: function() {},
+					_proc: function(floorType, args) {
+						//console.log("233333333333");
+						//旧贴吧
+						$('<li>').addClass('pad-left').append( //<li>
+							$('<a>').text('#引用').addClass('jx')
+							.data('jx', 'quote').data('floor', args.floorNum)
+						).prependTo($('.p_tail', args._main));
+						//新贴吧
 
-                        $('<li>').addClass('pad-left').append( //<li>
-                            $('<a>').text('#引用').addClass('jx')
-                                .data('jx', 'quote').data('floor', args.floorNum)
-                        ).prependTo($('.post-tail-wrap', args._main));
-                        /*setTimeout(() => {
-                            console.log(args);
-                            var $quote2 = $('.post-tail-wrap').append($('<div>').addClass('pad-left').append( //<li>
-                                $('<a>').text('#引用').addClass('jx')
-                                .data('jx', 'quote').data('floor', "666")
-                            ));
-                        }, 5000);*/
-                    },
-                    _click: function ($ele, $eve) {
-                        var $floor = $ele.parents('.l_post');
-                        var $editor = $('#ueditor_replace');
-                        var $quote = $('<p>').appendTo($editor);
+						$('<li>').addClass('pad-left').append( //<li>
+							$('<a>').text('#引用').addClass('jx')
+							.data('jx', 'quote').data('floor', args.floorNum)
+						).prependTo($('.post-tail-wrap', args._main));
+						/*setTimeout(() => {
+						    console.log(args);
+						    var $quote2 = $('.post-tail-wrap').append($('<div>').addClass('pad-left').append( //<li>
+						        $('<a>').text('#引用').addClass('jx')
+						        .data('jx', 'quote').data('floor', "666")
+						    ));
+						}, 5000);*/
+					},
+					_click: function($ele, $eve) {
+						var $floor = $ele.parents('.l_post');
+						var $editor = $('#ueditor_replace');
+						var $quote = $('<p>').appendTo($editor);
 
-                        $quote
-                            .append('引用 ' + $ele.data('floor') + '楼 @' + $('.p_author_name', $floor).first().text() + ' 的发言：')
-                            .append('<br>')
-                            .append('——————————')
-                            .append('<br>');
+						$quote
+							.append('引用 ' + $ele.data('floor') + '楼 @' + $('.p_author_name', $floor).first().text() + ' 的发言：')
+							.append('<br>')
+							.append('——————————')
+							.append('<br>');
 
-                        $('.j_d_post_content', $floor).contents().each(function (i, ele) {
-                            if (ele.nodeType == 3) {
-                                if (ele.nodeValue.trim() !== '') {
-                                    $quote.append(ele.nodeValue);
-                                }
-                                return;
-                            }
+						$('.j_d_post_content', $floor).contents().each(function(i, ele) {
+							if (ele.nodeType == 3) {
+								if (ele.nodeValue.trim() !== '') {
+									$quote.append(ele.nodeValue);
+								}
+								return;
+							}
 
-                            var $ele = $(ele);
-                            console.log($ele)
-                            //console.log($ele.find('img').length)
-                            //console.log($ele.find('img').attr("class"))
-                            if ($ele.find('img').attr("class") == "BDE_Image") {//新贴吧
-                                $quote.append('[#图片]');//BDE_Image
-                                //$quote.append($ele.text());
-                            } else if ($ele.find('img').attr("class") == "BDE_Smiley") {
-                                $quote.append('[#表情]');//BDE_Smiley
-                            }
-                            else if ($ele.is('img')) {//旧贴吧
-                                if ($ele.attr("class") == "BDE_Image") {
-                                    $quote.append('[#图片]');//BDE_Image
-                                    //$quote.append($ele.text());
-                                } else if ($ele.attr("class") == "BDE_Smiley") {
-                                    $quote.append('[#表情]');//BDE_Smiley
-                                }
-                            }
-                            else if ($ele.attr("class") == "video_src_wrapper") {
-                                $quote.append('[#视频]');//video_src_wrapper
-                            }
-                            else if ($ele.attr("class") == "voice_player voice_player_pb") {
-                                $quote.append('[#语音]');//voice_player voice_player_pb
-                            }
-                            else {
-                                $quote.append($ele.clone())//直接复制内容
-                            }
-                        });
+							var $ele = $(ele);
+							console.log($ele)
+								//console.log($ele.find('img').length)
+								//console.log($ele.find('img').attr("class"))
+							if ($ele.find('img').attr("class") == "BDE_Image") { //新贴吧
+								$quote.append('[#图片]'); //BDE_Image
+								//$quote.append($ele.text());
+							} else if ($ele.find('img').attr("class") == "BDE_Smiley") {
+								$quote.append('[#表情]'); //BDE_Smiley
+							} else if ($ele.is('img')) { //旧贴吧
+								if ($ele.attr("class") == "BDE_Image") {
+									$quote.append('[#图片]'); //BDE_Image
+									//$quote.append($ele.text());
+								} else if ($ele.attr("class") == "BDE_Smiley") {
+									$quote.append('[#表情]'); //BDE_Smiley
+								}
+							} else if ($ele.attr("class") == "video_src_wrapper") {
+								$quote.append('[#视频]'); //video_src_wrapper
+							} else if ($ele.attr("class") == "voice_player voice_player_pb") {
+								$quote.append('[#语音]'); //voice_player voice_player_pb
+							} else {
+								$quote.append($ele.clone()) //直接复制内容
+							}
+						});
 
-                        $quote.append('<br>&gt; ');
-                        $.goToEditor();
-                    }
-                },
-                "quote_lzl": {
-                    name: '楼中楼帖子引用',
-                    desc: '引用楼中楼的回复',
-                    flag: __type_lzl,
-                    def: true,
-                    _init: function () { //新旧版贴吧都生效
-                        tupianfangda = true;
-                        //console.log("123")
-                        //_css.append('.jx_no_overflow { max-width: 100%; }');
-                        //this.rmImg(document);
-                    },
-                    _proc: function (floorType, args) { //仅旧版贴吧生效
-                        $('<a>').text('引用').addClass('jx d_tail')
-                            .insertBefore($('.lzl_time', args._main))
-                            .after($('<span>').addClass('d_tail').text(' | '))
-                            .data('jx', 'quote_lzl');
-                    },
-                    _click: function ($ele, $eve) {
-                        var $editor = $('#ueditor_replace');
-                        var $cnt = $ele.parents('.lzl_cnt');
-                        var $floor = JSON.parse($ele.parents(".j_lzl_container").attr("data-field")).floor_num
-                        //console.log(JSON.parse($ele.parents(".j_lzl_container").attr("data-field")).floor_num)
-                        $('<p>').appendTo($editor)
-                            .append('引用' + $floor + '楼 @' + $cnt.find('.j_user_card').attr('username') + ' 在楼中楼的发言：<br>')
-                            .append($ele.parents('.lzl_cnt').find('.lzl_content_main').text())
-                            .append('<br>')
-                            .append('——————————')
-                            .append('<br> &gt;<br>');
+						$quote.append('<br>&gt; ');
+						$.goToEditor();
+					}
+				},
+				"quote_lzl": {
+					name: '楼中楼帖子引用',
+					desc: '引用楼中楼的回复',
+					flag: __type_lzl,
+					def: true,
+					_init: function() { //新旧版贴吧都生效
+						tupianfangda = true;
+						//console.log("123")
+						//_css.append('.jx_no_overflow { max-width: 100%; }');
+						//this.rmImg(document);
+					},
+					_proc: function(floorType, args) { //仅旧版贴吧生效
+						$('<a>').text('引用').addClass('jx d_tail')
+							.insertBefore($('.lzl_time', args._main))
+							.after($('<span>').addClass('d_tail').text(' | '))
+							.data('jx', 'quote_lzl');
+					},
+					_click: function($ele, $eve) {
+						var $editor = $('#ueditor_replace');
+						var $cnt = $ele.parents('.lzl_cnt');
+						var $floor = JSON.parse($ele.parents(".j_lzl_container").attr("data-field")).floor_num
+							//console.log(JSON.parse($ele.parents(".j_lzl_container").attr("data-field")).floor_num)
+						$('<p>').appendTo($editor)
+							.append('引用' + $floor + '楼 @' + $cnt.find('.j_user_card').attr('username') + ' 在楼中楼的发言：<br>')
+							.append($ele.parents('.lzl_cnt').find('.lzl_content_main').text())
+							.append('<br>')
+							.append('——————————')
+							.append('<br> &gt;<br>');
 
-                        $.goToEditor();
-                    }
-                },
-                "real_url": {
-                    name: '贴吧跳转链解除(beta)', //可以用这个脚本代替 https://greasyfork.org/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC 去除贴吧帖子里链接的跳转
-                    desc: '将百度所谓安全链接改成直链。',
-                    flag: __type_floor | __type_lzl,
-                    def: false,
-                    _proc: function (floorType, args) {
-                        var $floor = $(args._main)
-                        //console.log($floor)
-                        $floor.find('a[class*="j-no-opener-url"]').each(function (i, ele) {
-                            var $ele = $(ele),
-                                $url = $ele.text();
-                            //console.log($ele)
-                            if ($url.indexOf('@') === 0) {
-                                // Do nothing.
-                                //邮箱
-                            } else if (/^https?:\/\//.test($url)) {
-                                //文本内容即是链接
-                                $ele.attr('href', $url);
-                                console.log("/^https?:\/\//:" + $url)
-                            } else {
-                                //链接时文本，需要跳转才能得到真实链接
-                                // HEAD 请求会变成 error ..?
-                                GM_xmlhttpRequest({
-                                    method: 'GET',
-                                    url: ele.href,
-                                    headers: {
-                                        Host: "jump2.bdimg.com",
-                                    },
-                                    onload: function (response) {
-                                        if (response.finalUrl.indexOf('http') === 0) {
-                                            $ele.attr('href', response.finalUrl);
-                                            console.log("jump2.bdimg.com:" + response.finalUrl)
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    /*_proc: function (floorType, args) {
+						$.goToEditor();
+					}
+				},
+				"real_url": {
+					name: '贴吧跳转链解除(beta)', //可以用这个脚本代替 https://greasyfork.org/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC 去除贴吧帖子里链接的跳转
+					desc: '将百度所谓安全链接改成直链。',
+					flag: __type_floor | __type_lzl,
+					def: false,
+					_proc: function(floorType, args) {
+							var $floor = $(args._main)
+								//console.log($floor)
+							$floor.find('a[class*="j-no-opener-url"]').each(function(i, ele) {
+								var $ele = $(ele),
+									$url = $ele.text();
+								//console.log($ele)
+								if ($url.indexOf('@') === 0) {
+									// Do nothing.
+									//邮箱
+								} else if (/^https?:\/\//.test($url)) {
+									//文本内容即是链接
+									$ele.attr('href', $url);
+									console.log("/^https?:\/\//:" + $url)
+								} else {
+									//链接时文本，需要跳转才能得到真实链接
+									// HEAD 请求会变成 error ..?
+									GM_xmlhttpRequest({
+										method: 'GET',
+										url: ele.href,
+										headers: {
+											Host: "jump2.bdimg.com",
+										},
+										onload: function(response) {
+											if (response.finalUrl.indexOf('http') === 0) {
+												$ele.attr('href', response.finalUrl);
+												console.log("jump2.bdimg.com:" + response.finalUrl)
+											}
+										}
+									});
+								}
+							});
+						}
+						/*_proc: function (floorType, args) {
                         var $floor = $(args._main);
                         $floor.find('a[href*="jump.bdimg.com/safecheck"]').each(function (i, ele) {
                             var $ele = $(ele),
@@ -8756,148 +8806,149 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                             }
                         });
                     }*/
-                },
-                /*"rmImgFav": {
-                    name: '移除图片的收藏工具栏（已失效）',
-                    desc: '鼠标悬浮图片时出现的工具栏。',
-                    flag: 0,
-                    _init: function() {
-                        $('.fav-wrapper').remove();
-                    }
-                },*/
-                "save_face": {
-                    name: '隐藏挽尊卡背景图片',
-                    desc: '隐藏挽尊卡背景图片',
-                    flag: __type_floor,
-                    def: true,
-                    _init: function () {
-                        /*
-                        标题: 出一个使用挽尊卡的教程吧
-                        链接：http://tieba.baidu.com/p/5889895156
-                        */
-                        //console.log("555555555555555555")
-                        //_css.append('.save_lz_face::before{content:attr(who) " 使用了挽尊卡"}');
-                        //console.log($('.save_face_post'));
-                        let temp = $('.save_face_post');
-                        //temp.before("隐藏挽尊卡图片");
-                        //console.log(temp.length)
-                        for (let i = 0; i < temp.length; i++) {
-                            //console.log(temp[i].style[0])
-                            //console.log(temp[i].children);
-                            temp[i].style = "background:none;margin-left:0px;color:rgba(204, 204, 204, 0.8) !important;";
-                            temp[i].children[3].style = "display:none;";
-                            temp[i].children[0].style = "top:unset;text-align:unset;font-weight:unset;";
-                            temp[i].children[1].style = "top:unset;text-align:unset;font-weight:unset;";
-                            temp[i].children[2].style = "top:unset;text-align:unset;font-weight:unset;";
-                            temp[i].children[0].children[0].style = "color:rgba(204, 204, 204, 0.8) !important;";
-                            temp[i].children[2].children[0].style = "color:rgba(204, 204, 204, 0.8) !important;";
-                            //temp[i].children[2].children[1].style = "color:rgba(204, 204, 204, 0.3) !important;";
-                        }
-                        //temp.remove();
-                    },
-                    _proc: function (floorType, args) { //chrome测试无效
-                        try {
-                            if ($('.save_face_post', args._main).size()) {
-                                // 发现挽尊卡
-                                $('<div>').addClass('floor-stripe save_lz_face')
-                                    .attr('who', $('.p_author_name', args._main).text())
-                                    .insertBefore(args._main);
-                                args._main.addClass('savedFace').hide();
-                            }
-                        } catch (error) {
-                            console.log("$('.save_face_post', args._main).size():" + error);
-                        }
+				},
+				/*"rmImgFav": {
+				    name: '移除图片的收藏工具栏（已失效）',
+				    desc: '鼠标悬浮图片时出现的工具栏。',
+				    flag: 0,
+				    _init: function() {
+				        $('.fav-wrapper').remove();
+				    }
+				},*/
+				"save_face": {
+					name: '隐藏挽尊卡背景图片',
+					desc: '隐藏挽尊卡背景图片',
+					flag: __type_floor,
+					def: true,
+					_init: function() {
+						/*
+						标题: 出一个使用挽尊卡的教程吧
+						链接：http://tieba.baidu.com/p/5889895156
+						*/
+						//console.log("555555555555555555")
+						//_css.append('.save_lz_face::before{content:attr(who) " 使用了挽尊卡"}');
+						//console.log($('.save_face_post'));
+						let temp = $('.save_face_post');
+						//temp.before("隐藏挽尊卡图片");
+						//console.log(temp.length)
+						for (let i = 0; i < temp.length; i++) {
+							//console.log(temp[i].style[0])
+							//console.log(temp[i].children);
+							temp[i].style = "background:none;margin-left:0px;color:rgba(204, 204, 204, 0.8) !important;";
+							temp[i].children[3].style = "display:none;";
+							temp[i].children[0].style = "top:unset;text-align:unset;font-weight:unset;";
+							temp[i].children[1].style = "top:unset;text-align:unset;font-weight:unset;";
+							temp[i].children[2].style = "top:unset;text-align:unset;font-weight:unset;";
+							temp[i].children[0].children[0].style = "color:rgba(204, 204, 204, 0.8) !important;";
+							temp[i].children[2].children[0].style = "color:rgba(204, 204, 204, 0.8) !important;";
+							//temp[i].children[2].children[1].style = "color:rgba(204, 204, 204, 0.3) !important;";
+						}
+						//temp.remove();
+					},
+					_proc: function(floorType, args) { //chrome测试无效
+						try {
+							//jquery中判断选择器，找没找到元素用$().size()==0
+							if ($('.save_face_post', args._main).size()) {
+								// 发现挽尊卡
+								$('<div>').addClass('floor-stripe save_lz_face')
+									.attr('who', $('.p_author_name', args._main).text())
+									.insertBefore(args._main);
+								args._main.addClass('savedFace').hide();
+							}
+						} catch (error) {
+							console.log("$('.save_face_post', args._main).size():" + error);
+						}
 
-                    }
-                },
-                "rmSaveFace": {
-                    name: '隐藏挽尊卡会员提示',
-                    desc: '隐藏会员发帖的使用挽尊卡提示。',
-                    flag: 0,
-                    _init: function () {
-                        _hide('.save_face_bg');
-                    }
-                },
-                "rm_img_view1": {
-                    name: '看图模式屏蔽',
-                    desc: '还原为旧版贴吧点图看大图功能',
-                    flag: __type_floor,
-                    def: false,
-                    rmImg: function ($root) {
-                        $('img.BDE_Image', $root).each(function () {
-                            var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
-                            if (!m) return;
-                            var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
-                            $('<a>')
-                                .attr('href', imgLink)
-                                .attr('target', '_blank')
-                                .append($('<img>').attr('src', imgLink).addClass('jx_no_overflow'))
-                                .insertAfter(this);
-                            $(this).remove();
-                        });
-                    },
-                    _init: function () { //新旧版贴吧都生效
-                        tupianfangda = false;
-                        //console.log("123")
-                        //_css.append('.jx_no_overflow { max-width: 100%; }');
-                        //this.rmImg(document);
-                    },
-                    _proc: function (floorType, args) { //仅旧版贴吧生效
-                        tupianfangda = false;
-                        //console.log("456")
-                        //this.rmImg(args._main);
-                    }
-                },
-                "rm_img_view2": {
-                    name: '看图模式切换',
-                    desc: '切换为贴吧点图看大图功能',
-                    flag: __type_floor,
-                    def: false,
-                    rmImg: function ($root) {
-                        $('img.BDE_Image', $root).each(function () {
-                            var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
-                            if (!m) return;
-                            var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
-                            $('<a>')
-                                .attr('href', imgLink)
-                                .attr('target', '_blank')
-                                .append($('<img>').attr('src', imgLink).addClass('jx_no_overflow'))
-                                .insertAfter(this);
-                            $(this).remove();
-                        });
-                    },
-                    _init: function () {
-                        if (tupianfangda == true) {
-                            _css.append('.jx_no_overflow { max-width: 100%; }');
-                            this.rmImg(document);
-                        }
+					}
+				},
+				"rmSaveFace": {
+					name: '隐藏挽尊卡会员提示',
+					desc: '隐藏会员发帖的使用挽尊卡提示。',
+					flag: 0,
+					_init: function() {
+						_hide('.save_face_bg');
+					}
+				},
+				"rm_img_view1": {
+					name: '看图模式屏蔽',
+					desc: '还原为旧版贴吧点图看大图功能',
+					flag: __type_floor,
+					def: false,
+					rmImg: function($root) {
+						$('img.BDE_Image', $root).each(function() {
+							var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
+							if (!m) return;
+							var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
+							$('<a>')
+								.attr('href', imgLink)
+								.attr('target', '_blank')
+								.append($('<img>').attr('src', imgLink).addClass('jx_no_overflow'))
+								.insertAfter(this);
+							$(this).remove();
+						});
+					},
+					_init: function() { //新旧版贴吧都生效
+						tupianfangda = false;
+						//console.log("123")
+						//_css.append('.jx_no_overflow { max-width: 100%; }');
+						//this.rmImg(document);
+					},
+					_proc: function(floorType, args) { //仅旧版贴吧生效
+						tupianfangda = false;
+						//console.log("456")
+						//this.rmImg(args._main);
+					}
+				},
+				"rm_img_view2": {
+					name: '看图模式切换',
+					desc: '切换为贴吧点图看大图功能',
+					flag: __type_floor,
+					def: false,
+					rmImg: function($root) {
+						$('img.BDE_Image', $root).each(function() {
+							var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
+							if (!m) return;
+							var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
+							$('<a>')
+								.attr('href', imgLink)
+								.attr('target', '_blank')
+								.append($('<img>').attr('src', imgLink).addClass('jx_no_overflow'))
+								.insertAfter(this);
+							$(this).remove();
+						});
+					},
+					_init: function() {
+						if (tupianfangda == true) {
+							_css.append('.jx_no_overflow { max-width: 100%; }');
+							this.rmImg(document);
+						}
 
-                    },
-                    _proc: function (floorType, args) {
-                        if (tupianfangda == true) {
-                            this.rmImg(args._main);
+					},
+					_proc: function(floorType, args) {
+						if (tupianfangda == true) {
+							this.rmImg(args._main);
 
-                        }
-                    }
-                },
-                "lzl_zhankai": {
-                    name: '贴子内楼中楼自动展开',
-                    desc: '有些展不开的楼中楼折叠是被贴吧隐藏的回复，手动点开也是空内容',
-                    flag: __type_floor,
-                    def: true,
-                    _init: function () {
-                        GM_setValue("lzl_zhankai", true);
-                    },
-                    _proc: function (floorType, args) {
-                        GM_setValue("lzl_zhankai", true);
-                    }
-                }
-            };
+						}
+					}
+				},
+				"lzl_zhankai": {
+					name: '贴子内楼中楼自动展开',
+					desc: '有些展不开的楼中楼折叠是被贴吧隐藏的回复，手动点开也是空内容',
+					flag: __type_floor,
+					def: true,
+					_init: function() {
+						GM_setValue("lzl_zhankai", true);
+					},
+					_proc: function(floorType, args) {
+						GM_setValue("lzl_zhankai", true);
+					}
+				}
+			};
 
-            var _menu = (function () {
-                var $template = /* File: main_config.html */
-                    (function () {
-                        /*
+			var _menu = (function() {
+				var $template = /* File: main_config.html */
+					(function() {
+						/*
             <div style="height: 100%; overflow-y: auto">
             <h2>启用的模组</h2>
             <div id="jx_conf_modules">
@@ -8917,132 +8968,132 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             </div>
             </div>
             */
-                    }).extract();
+					}).extract();
 
-                return _run.bind({}, function () {
-                    var $view = {
-                        modules: []
-                    };
-                    for (var x in modules) {
-                        if (modules.hasOwnProperty(x)) {
-                            var isEnable = lMods.hasOwnProperty(x);
-                            $view.modules.push({
-                                id: x,
-                                name: modules[x].name,
-                                desc: modules[x].desc,
-                                enable: isEnable,
-                                config: isEnable && !!modules[x]._conf
-                            });
-                        }
-                    }
-                    var $tpl = $(Mustache.render($template, $view)); //有警告
+				return _run.bind({}, function() {
+					var $view = {
+						modules: []
+					};
+					for (var x in modules) {
+						if (modules.hasOwnProperty(x)) {
+							var isEnable = lMods.hasOwnProperty(x);
+							$view.modules.push({
+								id: x,
+								name: modules[x].name,
+								desc: modules[x].desc,
+								enable: isEnable,
+								config: isEnable && !!modules[x]._conf
+							});
+						}
+					}
+					var $tpl = $(Mustache.render($template, $view)); //有警告
 
-                    var $wndConfig = $.dialog.open($tpl, {
-                        title: '贴吧助手 - 配置窗口 <span style="color:#f00;">(警告！储存后会自动刷新！)</span>',
-                        height: 200
-                    });
+					var $wndConfig = $.dialog.open($tpl, {
+						title: '贴吧助手 - 配置窗口 <span style="color:#f00;">(警告！储存后会自动刷新！)</span>',
+						height: 200
+					});
 
-                    $('.jx_conf', $tpl).click(function () {
-                        var x = $(this).data('config');
-                        if (lMods.hasOwnProperty(x)) {
-                            _run(lMods[x]._conf.bind(lMods[x]), '模组配置 [' + lMods[x].name + ' (' + x + ')]');
-                        }
-                    });
+					$('.jx_conf', $tpl).click(function() {
+						var x = $(this).data('config');
+						if (lMods.hasOwnProperty(x)) {
+							_run(lMods[x]._conf.bind(lMods[x]), '模组配置 [' + lMods[x].name + ' (' + x + ')]');
+						}
+					});
 
-                    $('#jx_save', $tpl).click(function () {
-                        var newStatus = {};
-                        $('#jx_conf_modules>label>input', $tpl).each(function (i, inp) {
-                            newStatus[$(inp).data('module')] = inp.checked ? __mod_enable : __mod_disable;
-                        });
-                        $conf.set('modules', newStatus);
-                        $wndConfig.close();
-                        window.location.reload();
-                    });
-                    $('#jx_close', $tpl).click($wndConfig.close.bind($wndConfig));
-                }, '助手设定界面');
-            })();
+					$('#jx_save', $tpl).click(function() {
+						var newStatus = {};
+						$('#jx_conf_modules>label>input', $tpl).each(function(i, inp) {
+							newStatus[$(inp).data('module')] = inp.checked ? __mod_enable : __mod_disable;
+						});
+						$conf.set('modules', newStatus);
+						$wndConfig.close();
+						window.location.reload();
+					});
+					$('#jx_close', $tpl).click($wndConfig.close.bind($wndConfig));
+				}, '助手设定界面');
+			})();
 
-            // 未登录用户可以通过 GM 菜单激活配置项
-            GM_registerMenuCommand('助手设置', _menu);
+			// 未登录用户可以通过 GM 菜单激活配置项
+			GM_registerMenuCommand('助手设置', _menu);
 
-            if (unsafeWindow.__YUME_DEBUG__) {
-                GM_registerMenuCommand('打印模组配置', function () {
-                    console.info('助手设置: ');
-                    console.info($conf.get('modules'));
-                });
-            }
+			if (unsafeWindow.__YUME_DEBUG__) {
+				GM_registerMenuCommand('打印模组配置', function() {
+					console.info('助手设置: ');
+					console.info($conf.get('modules'));
+				});
+			}
 
-            _run(function () {
-                var _callMenu = function ($parent) {
-                    console.info('成功捕捉到菜单元素，传递至回调…');
-                    _run(function () {
-                        var $menuItem = $('<li>'),
-                            $menuLink = $('<a>').appendTo($menuItem).addClass('jx').text('助手设置');
-                        //$parent.find('.u_tb_profile').before($menuItem);
-                        $parent.find('.u_tb_profile').parent().prepend($menuItem);
-                        $menuLink.click(_menu);
-                        var $menuItem2 = $('<li>'),
-                            $menuLink2 = $('<a>').appendTo($menuItem2).addClass('jx meihua').text(GM_getValue("tiebameihua") ? '开启美化' : '关闭美化'); //'贴吧美化'
-                        $('.u_tb_profile').before($menuItem2);
-                        if (!GM_getValue("tiebameihua")) {
-                            var lis = $parent.find("ul>li");
-                            //console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
-                            lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
-                        }
-                        $menuLink2.click(function () {
-                            GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
-                            location.reload();
-                        });
-                    }, '菜单召唤');
-                };
+			_run(function() {
+				var _callMenu = function($parent) {
+					console.info('成功捕捉到菜单元素，传递至回调…');
+					_run(function() {
+						var $menuItem = $('<li>'),
+							$menuLink = $('<a>').appendTo($menuItem).addClass('jx').text('助手设置');
+						//$parent.find('.u_tb_profile').before($menuItem);
+						$parent.find('.u_tb_profile').parent().prepend($menuItem);
+						$menuLink.click(_menu);
+						var $menuItem2 = $('<li>'),
+							$menuLink2 = $('<a>').appendTo($menuItem2).addClass('jx meihua').text(GM_getValue("tiebameihua") ? '开启美化' : '关闭美化'); //'贴吧美化'
+						$('.u_tb_profile').before($menuItem2);
+						if (!GM_getValue("tiebameihua")) {
+							var lis = $parent.find("ul>li");
+							//console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
+							lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
+						}
+						$menuLink2.click(function() {
+							GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
+							location.reload();
+						});
+					}, '菜单召唤');
+				};
 
-                var ma = new MutationObserver(function ($q) {
-                    try {
-                        $($q).each(function (i, $eve) {
-                            $($eve.addedNodes).each(function (i, $ele) {
-                                if ($ele.nodeType != 3 && $ele.className == 'u_ddl') {
-                                    throw {
-                                        ele: $($ele),
-                                        name: 's'
-                                    };
-                                }
-                            });
-                        });
-                    } catch (err) {
-                        if (err.ele) {
-                            ma.disconnect();
+				var ma = new MutationObserver(function($q) {
+					try {
+						$($q).each(function(i, $eve) {
+							$($eve.addedNodes).each(function(i, $ele) {
+								if ($ele.nodeType != 3 && $ele.className == 'u_ddl') {
+									throw {
+										ele: $($ele),
+										name: 's'
+									};
+								}
+							});
+						});
+					} catch (err) {
+						if (err.ele) {
+							ma.disconnect();
 
-                            _callMenu(err.ele);
-                            return;
-                        }
+							_callMenu(err.ele);
+							return;
+						}
 
-                        throw err;
-                    }
-                });
+						throw err;
+					}
+				});
 
-                setTimeout(function () {
-                    var _m = $('.u_setting>.u_ddl');
-                    if (_m.length) {
-                        _callMenu(_m);
-                    } else {
-                        try {
-                            ma.observe($('.u_setting')[0], {
-                                childList: true,
-                                subtree: true
-                            });
-                        } catch (error) { }
-                    }
-                }, 1500);
-            }, '捕捉设定');
-            // console.log ($('li.u_setting .u_tb_profile'));
+				setTimeout(function() {
+					var _m = $('.u_setting>.u_ddl');
+					if (_m.length) {
+						_callMenu(_m);
+					} else {
+						try {
+							ma.observe($('.u_setting')[0], {
+								childList: true,
+								subtree: true
+							});
+						} catch (error) {}
+					}
+				}, 1500);
+			}, '捕捉设定');
+			// console.log ($('li.u_setting .u_tb_profile'));
 
-            var lMods = {};
+			var lMods = {};
 
-            _run(function () {
-                _css = $('<style>').appendTo(document.head);
-                _css.append( /* File: tieba.css */
-                    (function () {
-                        /*
+			_run(function() {
+				_css = $('<style>').appendTo(document.head);
+				_css.append( /* File: tieba.css */
+					(function() {
+						/*
             .pull-right	{ float: right			}
             a.jx, .ptr	{ cursor: pointer		}
             .pad-left	{ padding-left: 0.5em	}
@@ -9084,1048 +9135,1040 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             overflow-y: auto;
             }
             */
-                    }).extract());
-                _cssH.insertAfter(_css);
+					}).extract());
+				_cssH.insertAfter(_css);
 
-                // 配置项更新
-                switch ($conf.get('confVer', [0])[0]) {
-                    case 0:
-                        var $disabledMods = $conf.get('modules', []);
-                        var $modsList = {};
-                        $disabledMods.forEach(function (e) {
-                            $modsList[e] = __mod_disable;
-                        });
-                        $conf.set('modules', $modsList);
-                        break;
+				// 配置项更新
+				switch ($conf.get('confVer', [0])[0]) {
+					case 0:
+						var $disabledMods = $conf.get('modules', []);
+						var $modsList = {};
+						$disabledMods.forEach(function(e) {
+							$modsList[e] = __mod_disable;
+						});
+						$conf.set('modules', $modsList);
+						break;
 
-                }
-                $conf.set('confVer', [1]);
+				}
+				$conf.set('confVer', [1]);
 
-                var $mods = $conf.get('modules', {});
+				var $mods = $conf.get('modules', {});
 
-                $.each(modules, function (mId, fMod) {
-                    if ($mods[mId] == __mod_disable ||
-                        (($mods[mId] == __mod_default || !$mods.hasOwnProperty(mId)) &&
-                            fMod.def === false
-                        )
-                    ) return;
+				$.each(modules, function(mId, fMod) {
+					if ($mods[mId] == __mod_disable ||
+						(($mods[mId] == __mod_default || !$mods.hasOwnProperty(mId)) &&
+							fMod.def === false
+						)
+					) return;
 
-                    lMods[mId] = fMod;
-                    lMods[mId].id = mId;
-                    if (lMods[mId]._init) {
-                        console.info('初始化模组: %s[%s]', mId, lMods[mId].name);
-                        lMods[mId]._init.call(lMods[mId]); //有警告
-                    }
+					lMods[mId] = fMod;
+					lMods[mId].id = mId;
+					if (lMods[mId]._init) {
+						console.info('初始化模组: %s[%s]', mId, lMods[mId].name);
+						lMods[mId]._init.call(lMods[mId]); //有警告
+					}
 
-                });
-            }, 'Init. modules');
+				});
+			}, 'Init. modules');
 
-            var _event = function (floorType, otherInfo, _proc) {
-                var fooCB = _proc || '_proc';
-                $.each(lMods, function (mId, m) {
-                    if (!m[fooCB] || !(m.flag & floorType)) {
-                        return;
-                    }
-                    _run(m[fooCB].bind(m, floorType, otherInfo), m.name);
-                });
-            };
+			var _event = function(floorType, otherInfo, _proc) {
+				var fooCB = _proc || '_proc';
+				$.each(lMods, function(mId, m) {
+					if (!m[fooCB] || !(m.flag & floorType)) {
+						return;
+					}
+					_run(m[fooCB].bind(m, floorType, otherInfo), m.name);
+				});
+			};
 
-            //旧贴吧的贴子样式
-            var _procLzlContainer = function (i, tailer) {
-                var $tailer = $(tailer),
-                    _main = $tailer.parents('.l_post');
+			//旧贴吧的贴子样式
+			var _procLzlContainer = function(i, tailer) {
+				var $tailer = $(tailer),
+					_main = $tailer.parents('.l_post');
 
-                //console.log($tailer, _main);
+				//console.log($tailer, _main);
 
-                _event(__type_floor, {
-                    _main: _main,
-                    floor: _main,
-                    // 「'」is not standard, convert to 「"」 first.
-                    floorNum: parseInt($tailer.getField().floor_num),
-                    tail: $('.p_tail', _main)
-                });
+				_event(__type_floor, {
+					_main: _main,
+					floor: _main,
+					// 「'」is not standard, convert to 「"」 first.
+					floorNum: parseInt($tailer.getField().floor_num),
+					tail: $('.p_tail', _main)
+				});
 
-                // 处理解析 lzl 帖子（…
-                // $tailer.find('.lzl_single_post').each(_procLzlPost);
-                return _main;
-            };
+				// 处理解析 lzl 帖子（…
+				// $tailer.find('.lzl_single_post').each(_procLzlPost);
+				return _main;
+			};
 
-            //新贴吧的贴子样式
-            var _procLzlContainer2 = function (i, tailer) {
-                var $tailer = $(tailer).parents('.j_lzl_container'),
-                    _main = $tailer.parents('.l_post');
+			//新贴吧的贴子样式
+			var _procLzlContainer2 = function(i, tailer) {
+				var $tailer = $(tailer).parents('.j_lzl_container'),
+					_main = $tailer.parents('.l_post');
 
-                //console.log($tailer, _main);
+				//console.log($tailer, _main);
 
-                _event(__type_floor, {
-                    _main: _main,
-                    floor: _main,
-                    // 「'」is not standard, convert to 「"」 first.
-                    floorNum: parseInt($tailer.getField().floor_num),
-                    tail: $('.p_tail', _main)
-                });
+				_event(__type_floor, {
+					_main: _main,
+					floor: _main,
+					// 「'」is not standard, convert to 「"」 first.
+					floorNum: parseInt($tailer.getField().floor_num),
+					tail: $('.p_tail', _main)
+				});
 
-                // 处理解析 lzl 帖子（…
-                // $tailer.find('.lzl_single_post').each(_procLzlPost);
-                return _main;
-            };
+				// 处理解析 lzl 帖子（…
+				// $tailer.find('.lzl_single_post').each(_procLzlPost);
+				return _main;
+			};
 
-            var _procThreadList = function (i, threadlist) {
-                var $thread = $(threadlist);
-                _event(__type_forum, {
-                    _main: $thread,
-                    thread: $thread
-                });
-                return $thread;
-            };
+			var _procThreadList = function(i, threadlist) {
+				var $thread = $(threadlist);
+				_event(__type_forum, {
+					_main: $thread,
+					thread: $thread
+				});
+				return $thread;
+			};
 
-            var _procLzlPost = function (i, lzlPost) {
-                var $lzl = $(lzlPost);
-                _event(__type_lzl, {
-                    _main: $lzl,
-                    lzl: $lzl
-                });
-                return $lzl;
-            };
+			var _procLzlPost = function(i, lzlPost) {
+				var $lzl = $(lzlPost);
+				_event(__type_lzl, {
+					_main: $lzl,
+					lzl: $lzl
+				});
+				return $lzl;
+			};
 
-            if (isThread) {
-                //$('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜索'));//出错了
-                $('.lzl_single_post').each(_run.bind({}, _procLzlPost, '初始化楼中楼搜索'));
-            } else {
-                $('.j_thread_list').each(_run.bind({}, _procThreadList, '初始化贴吧页帖子搜索'));
-            }
-            var mo = new MutationObserver(function (eve) {
-                _run(function () {
-                    //console.log("1")
-                    //console.log(eve)
-                    $(eve).each(function (i, eve) {
-                        //console.log("2")
+			if (isThread) {
+				//$('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜索'));//出错了
+				$('.lzl_single_post').each(_run.bind({}, _procLzlPost, '初始化楼中楼搜索'));
+			} else {
+				$('.j_thread_list').each(_run.bind({}, _procThreadList, '初始化贴吧页帖子搜索'));
+			}
+			var mo = new MutationObserver(function(eve) {
+				_run(function() {
+					//console.log("1")
+					//console.log(eve)
+					$(eve).each(function(i, eve) {
+						//console.log("2")
 
-                        if (!eve.addedNodes.length) return;
-                        //console.log("3")
+						if (!eve.addedNodes.length) return;
+						//console.log("3")
 
-                        $(eve.addedNodes).each(function (i, ele) {
-                            // Text node.
-                            //console.log("3")
+						$(eve.addedNodes).each(function(i, ele) {
+							// Text node.
+							//console.log("3")
 
-                            if (ele.nodeType == 3) return;
-                            //console.log("4")
+							if (ele.nodeType == 3) return;
+							//console.log("4")
 
-                            var $ele = $(ele),
-                                _type = 0,
-                                $tmp;
-                            //console.log("5")
+							var $ele = $(ele),
+								_type = 0,
+								$tmp;
+							//console.log("5")
 
-                            // 单贴处理
-                            //console.log($ele)
-                            //贴子内一楼内容太长会导致不触发动作
-                            //j_lzl_c_b_a 
-                            if ($ele.hasClass('j_lzl_c_b_a')) {
-                                //console.log("6")
-                                // _type = __type_floor;
-                                $tmp = _procLzlContainer2(i, $ele);
-                                $tmp.find('.lzl_single_post').each(_procLzlPost);
-                            }
-                            else if ($ele.hasClass('j_lzl_container')) {
-                                //console.log("7")
-                                // _type = __type_floor;
-                                $tmp = _procLzlContainer(i, $ele);
-                                $tmp.find('.lzl_single_post').each(_procLzlPost);
-                            } else if ($ele.hasClass('j_thread_list')) {
-                                // 贴吧主页面
-                                _procThreadList(i, $ele);
-                            } else if ($ele.hasClass('lzl_single_post')) {
-                                // 仅限翻页时触发
-                                _procLzlPost(i, $ele);
-                            } else if ($ele.hasClass('user-hide-post-action') && !$ele.hasClass('jx_post')) {
-                                $ele.addClass('jx_post');
-                                _event(__type_postact, {
-                                    _main: $ele.parents('.l_post'),
-                                    _menu: $ele
-                                }, '_menu');
-                            }
-                        });
-                    });
-                }, '页面元素插入');
-            });
+							// 单贴处理
+							//console.log($ele)
+							//贴子内一楼内容太长会导致不触发动作
+							//j_lzl_c_b_a 
+							if ($ele.hasClass('j_lzl_c_b_a')) {
+								//console.log("6")
+								// _type = __type_floor;
+								$tmp = _procLzlContainer2(i, $ele);
+								$tmp.find('.lzl_single_post').each(_procLzlPost);
+							} else if ($ele.hasClass('j_lzl_container')) {
+								//console.log("7")
+								// _type = __type_floor;
+								$tmp = _procLzlContainer(i, $ele);
+								$tmp.find('.lzl_single_post').each(_procLzlPost);
+							} else if ($ele.hasClass('j_thread_list')) {
+								// 贴吧主页面
+								_procThreadList(i, $ele);
+							} else if ($ele.hasClass('lzl_single_post')) {
+								// 仅限翻页时触发
+								_procLzlPost(i, $ele);
+							} else if ($ele.hasClass('user-hide-post-action') && !$ele.hasClass('jx_post')) {
+								$ele.addClass('jx_post');
+								_event(__type_postact, {
+									_main: $ele.parents('.l_post'),
+									_menu: $ele
+								}, '_menu');
+							}
+						});
+					});
+				}, '页面元素插入');
+			});
 
-            $(document.body).on('click', '.jx', function (eve) {
-                var $eve = $(eve.target);
-                var $data = $eve.data('jx');
-                if (!$data || !lMods[$data] || !lMods[$data]._click) return;
+			$(document.body).on('click', '.jx', function(eve) {
+				var $eve = $(eve.target);
+				var $data = $eve.data('jx');
+				if (!$data || !lMods[$data] || !lMods[$data]._click) return;
 
-                _run.call(lMods[$data], lMods[$data]._click, '>> 单击助手功能: ' + $data, $eve, $eve.data('eve'));
-            });
-            //https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver/observe
-            //https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-            //https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
-            try {
-                mo.observe($('#j_p_postlist,#thread_list').get(0), {
-                    childList: true,
-                    subtree: true
-                });
+				_run.call(lMods[$data], lMods[$data]._click, '>> 单击助手功能: ' + $data, $eve, $eve.data('eve'));
+			});
+			//https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver/observe
+			//https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
+			//https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+			try {
+				mo.observe($('#j_p_postlist,#thread_list').get(0), {
+					childList: true,
+					subtree: true
+				});
 
-            } catch (error) {
-                console.log(error);
-            }
-        };
-    })();
+			} catch (error) {
+				console.log(error);
+			}
+		};
+	})();
 
-    //百度贴吧图片点击放大 by lliwhx
-    //原版的点击图片进入图片列表看图，有一定概率能看到被隐藏的楼层，该楼层需要有图片，如果有文字也会部分显示出来
-    //推荐和这个脚本一起使用https://greasyfork.org/ja/scripts/24204-picviewer-ce
-    setTimeout(() => {
-        if (tupianfangda == true) {
-            (function (window) {
-                "use strict";
-                //CSS
-                var parentElement = document.getElementById("j_p_postlist");
-                GM_addStyle(".BDE_Image,.j_user_sign{cursor:alias;}#Tie_enlargeImage_parentDIV{position:fixed;z-index:1005;top:0;left:0;}.Tie_enlargeImage{position:absolute;box-shadow:1px 1px 10px #000;cursor:move;}.Tie_enlargeImage:hover{z-index:1006;}#Tie_setValue_DIV{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);}.Tie_definedDIV{position:absolute;z-index:10000;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);}.Tie_definedDIV_title{border-bottom:1px solid #f2f2f5;line-height:40px;font-size:15px;font-weight:700;padding:0 0 0 15px;}.Tie_definedDIV_point{padding:20px 40px;}.Tie_definedDIV_groupSubtitle{font-weight:bold;}.Tie_definedDIV_configItem{line-height:30px;margin:0 20px}.Tie_definedDIV_configItem select{margin:0.5em}.Tie_definedDIV_configItem br+label{margin-left:3em}.Tie_definedDIV_configItem input{vertical-align:middle;margin-right:0.5em}#Tie_debugConfig{margin:0.5em}.Tie_debugConfig_icon{position:relative;display:inline-block;top:4px;width:16px;height:16px;background-position:-350px -100px;background-image:url('https://img.t.sinajs.cn/t6/style/images/common/icon.png');background-repeat:no-repeat;}.Tie_bubble_DIV{position:absolute;visibility:hidden;max-width:280px;top:20%}.Tie_definedDIV_configItem label:hover+.Tie_bubble_DIV{visibility:visible}.Tie_bubble_content{position:relative;background:#fff;padding:6px 13px 6px 16px;border:1px solid #ccc;border-radius:3px;}.Tie_bubble_mainTxt{line-height:18px;}.Tie_bubble_bor{position:absolute;overflow:hidden;bottom:-14px;line-height:14px;}.Tie_bubble_line{border-color:#ccc transparent transparent transparent;}.Tie_bubble_br{margin:-1px 0 0 -14px;border-color:#fff transparent transparent transparent;}.Tie_bubble_bor i,.Tie_bubble_bor em{display:inline-block;width:0;height:0;border-width:7px;border-style:solid;vertical-align:top;overflow:hidden;}.Tie_definedDIV_SaveBtn{background-color:#f2f2f5;text-align:center;padding:10px 0;}.Tie_SaveBtn_a{background:#ff8140;color:#fff;font-size:15px;display:inline-block;padding:0 15px;line-height:35px;border-radius:3px;}.Tie_SaveBtn_a:hover{background:#f7671d}");
-                //数据缓存
-                var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function () { },
-                    mouseWheel = /Firefox/.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel",
-                    protocol = window.location.protocol || "https",
-                    doc = window.document,
-                    docHeight = doc.documentElement.clientHeight - 6,
-                    docWidth = doc.documentElement.clientWidth - 6,
-                    definedEvent = GM_getValue("definedEvent", "click,click,1,0,1").split(","),
-                    repairDefinedEvent = GM_getValue("repairDefinedEvent", false),
-                    imageEvent = {
-                        init: function (e) { //主事件
-                            var target = e.target,
-                                image, imageSrc;
-                            if (e.button === 0 && (target.className === "BDE_Image" || target.className === "j_user_sign")) {
-                                log("图片创建", "开始");
-                                imageSrc = target.src.split("?")[0]//直接清理图片链接?后面的参数
-                                imageSrc = imageSrc.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/);//正则表达式获取部分字符串
-                                //console.log(target.src)
-                                log("图片地址获取", function () {
-                                    if (imageSrc) return "成功";
-                                    else return "失败";
-                                }, target.src);
-                                if (!imageSrc) return false;
-                                image = doc.createElement("img");
-                                image.classList.add("Tie_enlargeImage");
-                                //作者已经出了新版，但还没移过来。。。
-                                //修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
-                                //贴吧的链接现在基本都是https了
-                                image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
-                                image.onerror = function () {
-                                    this.src = "https://imgsrc.baidu.com/forum/pic/item/" + imageSrc[1];
-                                    this.onerror = function () {
-                                        this.onerror = null;
-                                        this.onload = null;
-                                        imageSrc = null;
-                                        log("图片请求", "失败");
-                                        alert("图片获取失败\n\n如多次获取失败\n请在设置里勾选“调试脚本”打印脚本日志并截图反馈给作者，以便更好的解决问题");
-                                    };
-                                };
-                                image.onload = function () {
-                                    log("图片创建", "进行中");
-                                    var target = this,
-                                        width = target.width,
-                                        height = target.height,
-                                        Wboolean = width > docWidth,
-                                        Hboolean = height > docHeight,
-                                        X = 6,
-                                        Y = 6;
-                                    target.onerror = null;
-                                    target.onload = null;
-                                    imageSrc = null;
-                                    if (Hboolean && !Wboolean) X = (docWidth - width) / 2;
-                                    else if (!Hboolean && !Wboolean) {
-                                        X = (docWidth - width) / 2;
-                                        Y = (docHeight - height) / 2;
-                                    } else if (!Hboolean && Wboolean) Y = (docHeight - height) / 2;
-                                    target.imageData = {
-                                        width: width,
-                                        height: height,
-                                        X: X,
-                                        Y: Y
-                                    }; //缓存当前图片数据
-                                    target.style.transform = "translate(" + X + "px," + Y + "px)";
-                                    parentDIV.appendChild(target);
-                                    log("图片创建", function () {
-                                        target.id = Date.now();
-                                        if (doc.getElementById(target.id)) return "成功";
-                                        else return "失败";
-                                    }, target.imageData);
-                                };
-                                image = null;
-                            }
-                        },
-                        StopPropagation: function (e) {
-                            if (e.button === 0 && e.target.className === "BDE_Image") {
-                                e.stopPropagation(); //阻止冒泡，阻止图片原事件
-                                log("阻止贴吧图片原事件", "已执行");
-                            }
-                        },
-                        Down: function (e) {
-                            var target = e.target,
-                                imageData = target.imageData;
-                            imageTarget = target;
-                            log("鼠标down事件", function () {
-                                if (!target.id) target.id = Date.now();
-                                return "开始";
-                            });
-                            if (e.button !== 0) return false;
-                            e.preventDefault();
-                            e.stopPropagation();
-                            imageMouse = [e.clientX, e.clientY];
-                            imageCount = [imageData.X - imageMouse[0], imageData.Y - imageMouse[1], 6 - imageData.width, 6 - imageData.height]; //图片宽高的偏移量，图片左右边界预留量
-                            imageButton = true;
-                            doc.addEventListener("mousemove", imageEvent.Move);
-                            doc.addEventListener("mouseup", imageEvent.Up);
-                            log("鼠标down事件", "结束");
-                        },
-                        Move: function (e) {
-                            log("鼠标move事件", "开始");
-                            var target = imageTarget,
-                                X = e.clientX + imageCount[0],
-                                Y = e.clientY + imageCount[1];
-                            imageButton = false;
-                            log("鼠标move事件", "进行中", "X:" + X + "Y:" + Y);
-                            if (X < imageCount[2]) { //左边界
-                                target.style.transform = "translate(" + imageCount[2] + "px," + Y + "px)";
-                                return false;
-                            }
-                            if (X > docWidth) { //右边界
-                                target.style.transform = "translate(" + docWidth + "px," + Y + "px)";
-                                return false;
-                            }
-                            if (Y < imageCount[3]) { //上边界
-                                target.style.transform = "translate(" + X + "px," + imageCount[3] + "px)";
-                                return false;
-                            }
-                            if (Y > docHeight) { //下边界
-                                target.style.transform = "translate(" + X + "px," + docHeight + "px)";
-                                return false;
-                            }
-                            target.style.transform = "translate(" + X + "px," + Y + "px)";
-                            log("鼠标move事件", "结束", target.style.transform);
-                        },
-                        Up: function (e) {
-                            log("鼠标up事件", "开始");
-                            var target = imageTarget,
-                                RegEx;
-                            if (repairDefinedEvent && e.clientX - imageMouse[0] <= 1 && e.clientY - imageMouse[1] <= 1) { //尝试修复关闭图片功能
-                                log("尝试修复关闭图片功能", "已执行");
-                                imageButton = true;
-                            } else if ( /*scriptDebug && */ !imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
-                                log("鼠标click事件判断", "\n一.操作时页面不在激活状态。请保证浏览器正在被操作，在执行一次\n二.关闭图片功能可能损坏，建议修复");
-                                imageButton = true; //不知道能不能解决偶尔关不掉大图片的bug
-                            }
-                            if (!imageButton) {
-                                RegEx = target.style.transform.match(/[-0-9.]+/g);
-                                target.imageData.X = parseFloat(RegEx[0]);
-                                target.imageData.Y = parseFloat(RegEx[1]);
-                            }
-                            imageTarget = null;
-                            imageMouse = null;
-                            imageCount = null;
-                            doc.removeEventListener("mousemove", imageEvent.Move);
-                            doc.removeEventListener("mouseup", imageEvent.Up);
-                            log("鼠标up事件", "结束", imageButton);
-                        },
-                        Close: function (e) {
-                            log("鼠标click事件", "开始");
-                            var target = e.target;
-                            if (imageButton) {
-                                imageButton = null;
-                                delete target.imageData;
-                                parentDIV.removeChild(target);
-                                log("鼠标click事件", function () {
-                                    if (!doc.getElementById(target.id)) return "成功";
-                                    else return "失败";
-                                });
-                            }
-                        },
-                        Wheel: function (e) {
-                            var target = e.target,
-                                imageData = target.imageData,
-                                wheelKey = definedEvent[3],
-                                width = imageData.width,
-                                height = imageData.height,
-                                Wboolean = width > docWidth,
-                                Hboolean = height > docHeight,
-                                wheelXY;
-                            log("鼠标wheel事件", "开始", imageData);
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (wheelKey !== "0") {
-                                if ((e.ctrlKey && wheelKey === "1") || (e.altKey && wheelKey === "2") || (e.shiftKey && wheelKey === "3")) { //判断图片缩放的组合键
-                                    log("鼠标wheel缩放事件", "开始");
-                                    var eX = e.clientX,
-                                        eY = e.clientY,
-                                        ratioX = (eX - imageData.X) / width,
-                                        ratioY = (eY - imageData.Y) / height,
-                                        wheelRatio = width + (e.wheelDelta || -e.detail * 40) * definedEvent[4];
-                                    imageData.width = wheelRatio < 150 ? 150 : wheelRatio;
-                                    imageData.height = imageData.width * height / width;
-                                    imageData.X = eX - (imageData.width * ratioX);
-                                    imageData.Y = eY - (imageData.height * ratioY);
-                                    log("鼠标wheel缩放事件", "进行中", imageData);
-                                    target.width = imageData.width;
-                                    target.style.transform = "translate(" + imageData.X + "px," + imageData.Y + "px)"; //基于鼠标位置的缩放
-                                    log("鼠标wheel缩放事件", "结束", target.style.transform);
-                                    return false;
-                                }
-                            }
-                            if (!Hboolean && !Wboolean) {
-                                log("鼠标wheel滚动事件", "图片小于窗口");
-                                return false;
-                            }
-                            if (Hboolean) {
-                                wheelXY = imageData.Y + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
-                                if (wheelXY > 0 || wheelXY < docHeight - height) {
-                                    wheelXY = wheelXY > 0 ? 6 : docHeight - height;
-                                }
-                                imageData.Y = wheelXY;
-                                log("鼠标wheel垂直滚动事件", "进行中", wheelXY);
-                                target.style.transform = "translate(" + imageData.X + "px," + wheelXY + "px)";
-                                log("鼠标wheel垂直滚动事件", "结束", target.style.transform);
-                            } else if (Wboolean) {
-                                wheelXY = imageData.X + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
-                                if (wheelXY > 0 || wheelXY < docWidth - width) {
-                                    wheelXY = wheelXY > 0 ? 6 : docWidth - width;
-                                }
-                                imageData.X = wheelXY;
-                                log("鼠标wheel水平滚动事件", "进行中", wheelXY);
-                                target.style.transform = "translate(" + wheelXY + "px," + imageData.Y + "px)";
-                                log("鼠标wheel水平滚动事件", "结束", target.style.transform);
-                            }
-                        }
-                    };
-                //图片放大设置
-                var userEvent = {
-                    init: function () {
-                        this.create();
-                        this.Event();
-                    },
-                    create: function () {
-                        var definedDIV = doc.createElement("div"); //创建自定义DIV框架
-                        definedDIV.id = "Tie_setValue_DIV";
-                        definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>图片放大设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作(仅支持贴子内的楼层图片！)</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片，修改配置后刷新一下</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select>若条件允许，推荐选择双击以兼容鼠标移动图片<br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
-                        doc.body.appendChild(definedDIV);
-                        definedDIV = null;
-                    },
-                    Event: function () {
-                        var definedDIV = doc.getElementById("Tie_setValue_DIV"),
-                            repairValue = doc.getElementById("Tie_repairValue"),
-                            debugConfig = doc.getElementById("Tie_debugConfig"),
-                            parentElement = doc.getElementById("j_p_postlist"),
-                            setValue = doc.getElementsByName("Tie_setValue"),
-                            oldDefinedEvent = definedEvent; //备份旧设置
-                        for (var i = 0; i < 5; i++) {
-                            setValue[i].value = oldDefinedEvent[i];
-                        }
-                        if (setValue[3].value === "0") setValue[4].style.visibility = "hidden";
-                        setValue[3].onchange = function () {
-                            setValue[4].style.visibility = this.value === "0" ? "hidden" : "visible";
-                        };
-                        repairValue.checked = repairDefinedEvent;
-                        debugConfig.checked = scriptDebug;
-                        doc.getElementById("Tie_setValue_a").onclick = function () {
-                            definedEvent = [setValue[0].value, setValue[1].value, setValue[2].value, setValue[3].value, setValue[4].value];
-                            repairDefinedEvent = repairValue.checked;
-                            scriptDebug = debugConfig.checked;
-                            if (oldDefinedEvent[0] !== definedEvent[0]) {
-                                if (!parentElement) { } else {
-                                    parentElement.removeEventListener(oldDefinedEvent[0], imageEvent.init, true);
-                                    parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
-                                }
-                            }
-                            if (oldDefinedEvent[1] !== definedEvent[1]) {
-                                if (!parentElement) { } else {
-                                    parentDIV.removeEventListener(oldDefinedEvent[1], imageEvent.Close);
-                                    parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
-                                }
-                            }
-                            log = scriptDebug && function (text, types, data) { //脚本调试，日志
-                                if (typeof types === "function") {
-                                    types = types();
-                                }
-                                if (data === undefined) console.log(text, types);
-                                else console.log(text, types, data);
-                            } || function () { };
-                            log("图片放大设置", "已执行", definedEvent + "," + repairDefinedEvent);
-                            this.onclick = null;
-                            setValue[3].onchange = null;
-                            doc.body.removeChild(definedDIV);
-                            GM_setValue("definedEvent", definedEvent.toString());
-                            GM_setValue("repairDefinedEvent", repairDefinedEvent);
-                            definedDIV = null;
-                            repairValue = null;
-                            debugConfig = null;
-                            parentElement = null;
-                            setValue = null;
-                            oldDefinedEvent = null;
-                        };
-                    }
-                };
-                GM_registerMenuCommand("图片放大设置", function () {
-                    if (!doc.getElementById("Tie_setValue_DIV")) {
-                        userEvent.init();
-                    }
-                });
-                if (!parentElement) {
-                    return;
-                }
-                //创建父DIV
-                var parentDIV = doc.createElement("div");
-                parentDIV.id = "Tie_enlargeImage_parentDIV";
-                doc.body.appendChild(parentDIV);
-                //事件委托
-                parentElement.addEventListener("click", imageEvent.StopPropagation, true);
-                parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
-                parentDIV.addEventListener("mousedown", imageEvent.Down);
-                parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
-                parentDIV.addEventListener(mouseWheel, imageEvent.Wheel);
-                //释放缓存
-                parentElement = null;
+	//百度贴吧图片点击放大 by lliwhx
+	//原版的点击图片进入图片列表看图，有一定概率能看到被隐藏的楼层，该楼层需要有图片，如果有文字也会部分显示出来
+	//推荐和这个脚本一起使用https://greasyfork.org/ja/scripts/24204-picviewer-ce
+	setTimeout(() => {
+		if (tupianfangda == true) {
+			(function(window) {
+				"use strict";
+				//CSS
+				var parentElement = document.getElementById("j_p_postlist");
+				GM_addStyle(".BDE_Image,.j_user_sign{cursor:alias;}#Tie_enlargeImage_parentDIV{position:fixed;z-index:1005;top:0;left:0;}.Tie_enlargeImage{position:absolute;box-shadow:1px 1px 10px #000;cursor:move;}.Tie_enlargeImage:hover{z-index:1006;}#Tie_setValue_DIV{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);}.Tie_definedDIV{position:absolute;z-index:10000;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);}.Tie_definedDIV_title{border-bottom:1px solid #f2f2f5;line-height:40px;font-size:15px;font-weight:700;padding:0 0 0 15px;}.Tie_definedDIV_point{padding:20px 40px;}.Tie_definedDIV_groupSubtitle{font-weight:bold;}.Tie_definedDIV_configItem{line-height:30px;margin:0 20px}.Tie_definedDIV_configItem select{margin:0.5em}.Tie_definedDIV_configItem br+label{margin-left:3em}.Tie_definedDIV_configItem input{vertical-align:middle;margin-right:0.5em}#Tie_debugConfig{margin:0.5em}.Tie_debugConfig_icon{position:relative;display:inline-block;top:4px;width:16px;height:16px;background-position:-350px -100px;background-image:url('https://img.t.sinajs.cn/t6/style/images/common/icon.png');background-repeat:no-repeat;}.Tie_bubble_DIV{position:absolute;visibility:hidden;max-width:280px;top:20%}.Tie_definedDIV_configItem label:hover+.Tie_bubble_DIV{visibility:visible}.Tie_bubble_content{position:relative;background:#fff;padding:6px 13px 6px 16px;border:1px solid #ccc;border-radius:3px;}.Tie_bubble_mainTxt{line-height:18px;}.Tie_bubble_bor{position:absolute;overflow:hidden;bottom:-14px;line-height:14px;}.Tie_bubble_line{border-color:#ccc transparent transparent transparent;}.Tie_bubble_br{margin:-1px 0 0 -14px;border-color:#fff transparent transparent transparent;}.Tie_bubble_bor i,.Tie_bubble_bor em{display:inline-block;width:0;height:0;border-width:7px;border-style:solid;vertical-align:top;overflow:hidden;}.Tie_definedDIV_SaveBtn{background-color:#f2f2f5;text-align:center;padding:10px 0;}.Tie_SaveBtn_a{background:#ff8140;color:#fff;font-size:15px;display:inline-block;padding:0 15px;line-height:35px;border-radius:3px;}.Tie_SaveBtn_a:hover{background:#f7671d}");
+				//数据缓存
+				var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function() {},
+					mouseWheel = /Firefox/.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel",
+					protocol = window.location.protocol || "https",
+					doc = window.document,
+					docHeight = doc.documentElement.clientHeight - 6,
+					docWidth = doc.documentElement.clientWidth - 6,
+					definedEvent = GM_getValue("definedEvent", "click,click,1,0,1").split(","),
+					repairDefinedEvent = GM_getValue("repairDefinedEvent", false),
+					imageEvent = {
+						init: function(e) { //主事件
+							var target = e.target,
+								image, imageSrc;
+							if (e.button === 0 && (target.className === "BDE_Image" || target.className === "j_user_sign")) {
+								log("图片创建", "开始");
+								imageSrc = target.src.split("?")[0] //直接清理图片链接?后面的参数
+								imageSrc = imageSrc.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/); //正则表达式获取部分字符串
+								//console.log(target.src)
+								log("图片地址获取", function() {
+									if (imageSrc) return "成功";
+									else return "失败";
+								}, target.src);
+								if (!imageSrc) return false;
+								image = doc.createElement("img");
+								image.classList.add("Tie_enlargeImage");
+								//作者已经出了新版，但还没移过来。。。
+								//修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
+								//贴吧的链接现在基本都是https了
+								image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1];
+								image.onerror = function() {
+									this.src = "https://imgsrc.baidu.com/forum/pic/item/" + imageSrc[1];
+									this.onerror = function() {
+										this.onerror = null;
+										this.onload = null;
+										imageSrc = null;
+										log("图片请求", "失败");
+										alert("图片获取失败\n\n如多次获取失败\n请在设置里勾选“调试脚本”打印脚本日志并截图反馈给作者，以便更好的解决问题");
+									};
+								};
+								image.onload = function() {
+									log("图片创建", "进行中");
+									var target = this,
+										width = target.width,
+										height = target.height,
+										Wboolean = width > docWidth,
+										Hboolean = height > docHeight,
+										X = 6,
+										Y = 6;
+									target.onerror = null;
+									target.onload = null;
+									imageSrc = null;
+									if (Hboolean && !Wboolean) X = (docWidth - width) / 2;
+									else if (!Hboolean && !Wboolean) {
+										X = (docWidth - width) / 2;
+										Y = (docHeight - height) / 2;
+									} else if (!Hboolean && Wboolean) Y = (docHeight - height) / 2;
+									target.imageData = {
+										width: width,
+										height: height,
+										X: X,
+										Y: Y
+									}; //缓存当前图片数据
+									target.style.transform = "translate(" + X + "px," + Y + "px)";
+									parentDIV.appendChild(target);
+									log("图片创建", function() {
+										target.id = Date.now();
+										if (doc.getElementById(target.id)) return "成功";
+										else return "失败";
+									}, target.imageData);
+								};
+								image = null;
+							}
+						},
+						StopPropagation: function(e) {
+							if (e.button === 0 && e.target.className === "BDE_Image") {
+								e.stopPropagation(); //阻止冒泡，阻止图片原事件
+								log("阻止贴吧图片原事件", "已执行");
+							}
+						},
+						Down: function(e) {
+							var target = e.target,
+								imageData = target.imageData;
+							imageTarget = target;
+							log("鼠标down事件", function() {
+								if (!target.id) target.id = Date.now();
+								return "开始";
+							});
+							if (e.button !== 0) return false;
+							e.preventDefault();
+							e.stopPropagation();
+							imageMouse = [e.clientX, e.clientY];
+							imageCount = [imageData.X - imageMouse[0], imageData.Y - imageMouse[1], 6 - imageData.width, 6 - imageData.height]; //图片宽高的偏移量，图片左右边界预留量
+							imageButton = true;
+							doc.addEventListener("mousemove", imageEvent.Move);
+							doc.addEventListener("mouseup", imageEvent.Up);
+							log("鼠标down事件", "结束");
+						},
+						Move: function(e) {
+							log("鼠标move事件", "开始");
+							var target = imageTarget,
+								X = e.clientX + imageCount[0],
+								Y = e.clientY + imageCount[1];
+							imageButton = false;
+							log("鼠标move事件", "进行中", "X:" + X + "Y:" + Y);
+							if (X < imageCount[2]) { //左边界
+								target.style.transform = "translate(" + imageCount[2] + "px," + Y + "px)";
+								return false;
+							}
+							if (X > docWidth) { //右边界
+								target.style.transform = "translate(" + docWidth + "px," + Y + "px)";
+								return false;
+							}
+							if (Y < imageCount[3]) { //上边界
+								target.style.transform = "translate(" + X + "px," + imageCount[3] + "px)";
+								return false;
+							}
+							if (Y > docHeight) { //下边界
+								target.style.transform = "translate(" + X + "px," + docHeight + "px)";
+								return false;
+							}
+							target.style.transform = "translate(" + X + "px," + Y + "px)";
+							log("鼠标move事件", "结束", target.style.transform);
+						},
+						Up: function(e) {
+							log("鼠标up事件", "开始");
+							var target = imageTarget,
+								RegEx;
+							if (repairDefinedEvent && e.clientX - imageMouse[0] <= 1 && e.clientY - imageMouse[1] <= 1) { //尝试修复关闭图片功能
+								log("尝试修复关闭图片功能", "已执行");
+								imageButton = true;
+							} else if ( /*scriptDebug && */ !imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
+								log("鼠标click事件判断", "\n一.操作时页面不在激活状态。请保证浏览器正在被操作，在执行一次\n二.关闭图片功能可能损坏，建议修复");
+								imageButton = true; //不知道能不能解决偶尔关不掉大图片的bug
+							}
+							if (!imageButton) {
+								RegEx = target.style.transform.match(/[-0-9.]+/g);
+								target.imageData.X = parseFloat(RegEx[0]);
+								target.imageData.Y = parseFloat(RegEx[1]);
+							}
+							imageTarget = null;
+							imageMouse = null;
+							imageCount = null;
+							doc.removeEventListener("mousemove", imageEvent.Move);
+							doc.removeEventListener("mouseup", imageEvent.Up);
+							log("鼠标up事件", "结束", imageButton);
+						},
+						Close: function(e) {
+							log("鼠标click事件", "开始");
+							var target = e.target;
+							if (imageButton) {
+								imageButton = null;
+								delete target.imageData;
+								parentDIV.removeChild(target);
+								log("鼠标click事件", function() {
+									if (!doc.getElementById(target.id)) return "成功";
+									else return "失败";
+								});
+							}
+						},
+						Wheel: function(e) {
+							var target = e.target,
+								imageData = target.imageData,
+								wheelKey = definedEvent[3],
+								width = imageData.width,
+								height = imageData.height,
+								Wboolean = width > docWidth,
+								Hboolean = height > docHeight,
+								wheelXY;
+							log("鼠标wheel事件", "开始", imageData);
+							e.preventDefault();
+							e.stopPropagation();
+							if (wheelKey !== "0") {
+								if ((e.ctrlKey && wheelKey === "1") || (e.altKey && wheelKey === "2") || (e.shiftKey && wheelKey === "3")) { //判断图片缩放的组合键
+									log("鼠标wheel缩放事件", "开始");
+									var eX = e.clientX,
+										eY = e.clientY,
+										ratioX = (eX - imageData.X) / width,
+										ratioY = (eY - imageData.Y) / height,
+										wheelRatio = width + (e.wheelDelta || -e.detail * 40) * definedEvent[4];
+									imageData.width = wheelRatio < 150 ? 150 : wheelRatio;
+									imageData.height = imageData.width * height / width;
+									imageData.X = eX - (imageData.width * ratioX);
+									imageData.Y = eY - (imageData.height * ratioY);
+									log("鼠标wheel缩放事件", "进行中", imageData);
+									target.width = imageData.width;
+									target.style.transform = "translate(" + imageData.X + "px," + imageData.Y + "px)"; //基于鼠标位置的缩放
+									log("鼠标wheel缩放事件", "结束", target.style.transform);
+									return false;
+								}
+							}
+							if (!Hboolean && !Wboolean) {
+								log("鼠标wheel滚动事件", "图片小于窗口");
+								return false;
+							}
+							if (Hboolean) {
+								wheelXY = imageData.Y + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
+								if (wheelXY > 0 || wheelXY < docHeight - height) {
+									wheelXY = wheelXY > 0 ? 6 : docHeight - height;
+								}
+								imageData.Y = wheelXY;
+								log("鼠标wheel垂直滚动事件", "进行中", wheelXY);
+								target.style.transform = "translate(" + imageData.X + "px," + wheelXY + "px)";
+								log("鼠标wheel垂直滚动事件", "结束", target.style.transform);
+							} else if (Wboolean) {
+								wheelXY = imageData.X + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
+								if (wheelXY > 0 || wheelXY < docWidth - width) {
+									wheelXY = wheelXY > 0 ? 6 : docWidth - width;
+								}
+								imageData.X = wheelXY;
+								log("鼠标wheel水平滚动事件", "进行中", wheelXY);
+								target.style.transform = "translate(" + wheelXY + "px," + imageData.Y + "px)";
+								log("鼠标wheel水平滚动事件", "结束", target.style.transform);
+							}
+						}
+					};
+				//图片放大设置
+				var userEvent = {
+					init: function() {
+						this.create();
+						this.Event();
+					},
+					create: function() {
+						var definedDIV = doc.createElement("div"); //创建自定义DIV框架
+						definedDIV.id = "Tie_setValue_DIV";
+						definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>图片放大设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作(仅支持贴子内的楼层图片！)</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片，修改配置后刷新一下</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select>若条件允许，推荐选择双击以兼容鼠标移动图片<br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
+						doc.body.appendChild(definedDIV);
+						definedDIV = null;
+					},
+					Event: function() {
+						var definedDIV = doc.getElementById("Tie_setValue_DIV"),
+							repairValue = doc.getElementById("Tie_repairValue"),
+							debugConfig = doc.getElementById("Tie_debugConfig"),
+							parentElement = doc.getElementById("j_p_postlist"),
+							setValue = doc.getElementsByName("Tie_setValue"),
+							oldDefinedEvent = definedEvent; //备份旧设置
+						for (var i = 0; i < 5; i++) {
+							setValue[i].value = oldDefinedEvent[i];
+						}
+						if (setValue[3].value === "0") setValue[4].style.visibility = "hidden";
+						setValue[3].onchange = function() {
+							setValue[4].style.visibility = this.value === "0" ? "hidden" : "visible";
+						};
+						repairValue.checked = repairDefinedEvent;
+						debugConfig.checked = scriptDebug;
+						doc.getElementById("Tie_setValue_a").onclick = function() {
+							definedEvent = [setValue[0].value, setValue[1].value, setValue[2].value, setValue[3].value, setValue[4].value];
+							repairDefinedEvent = repairValue.checked;
+							scriptDebug = debugConfig.checked;
+							if (oldDefinedEvent[0] !== definedEvent[0]) {
+								if (!parentElement) {} else {
+									parentElement.removeEventListener(oldDefinedEvent[0], imageEvent.init, true);
+									parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
+								}
+							}
+							if (oldDefinedEvent[1] !== definedEvent[1]) {
+								if (!parentElement) {} else {
+									parentDIV.removeEventListener(oldDefinedEvent[1], imageEvent.Close);
+									parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
+								}
+							}
+							log = scriptDebug && function(text, types, data) { //脚本调试，日志
+								if (typeof types === "function") {
+									types = types();
+								}
+								if (data === undefined) console.log(text, types);
+								else console.log(text, types, data);
+							} || function() {};
+							log("图片放大设置", "已执行", definedEvent + "," + repairDefinedEvent);
+							this.onclick = null;
+							setValue[3].onchange = null;
+							doc.body.removeChild(definedDIV);
+							GM_setValue("definedEvent", definedEvent.toString());
+							GM_setValue("repairDefinedEvent", repairDefinedEvent);
+							definedDIV = null;
+							repairValue = null;
+							debugConfig = null;
+							parentElement = null;
+							setValue = null;
+							oldDefinedEvent = null;
+						};
+					}
+				};
+				GM_registerMenuCommand("图片放大设置", function() {
+					if (!doc.getElementById("Tie_setValue_DIV")) {
+						userEvent.init();
+					}
+				});
+				if (!parentElement) {
+					return;
+				}
+				//创建父DIV
+				var parentDIV = doc.createElement("div");
+				parentDIV.id = "Tie_enlargeImage_parentDIV";
+				doc.body.appendChild(parentDIV);
+				//事件委托
+				parentElement.addEventListener("click", imageEvent.StopPropagation, true);
+				parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
+				parentDIV.addEventListener("mousedown", imageEvent.Down);
+				parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
+				parentDIV.addEventListener(mouseWheel, imageEvent.Wheel);
+				//释放缓存
+				parentElement = null;
 
-                if (!GM_getValue("definedEvent")) {
-                    userEvent.init();
-                }
-                window.addEventListener("resize", function () {
-                    if (typeof winResize !== undefined) {
-                        clearTimeout(winResize);
-                    }
-                    winResize = setTimeout(function () {
-                        docHeight = doc.documentElement.clientHeight - 6;
-                        docWidth = doc.documentElement.clientWidth - 6;
-                    }, 334);
-                });
-            })(window);
-        }
-    }, 2000);
+				if (!GM_getValue("definedEvent")) {
+					userEvent.init();
+				}
+				window.addEventListener("resize", function() {
+					if (typeof winResize !== undefined) {
+						clearTimeout(winResize);
+					}
+					winResize = setTimeout(function() {
+						docHeight = doc.documentElement.clientHeight - 6;
+						docWidth = doc.documentElement.clientWidth - 6;
+					}, 334);
+				});
+			})(window);
+		}
+	}, 2000);
 
-    /*(function () { //强制转换部分跳转链接
-        var locationHref = location.href;
+	/*(function () { //强制转换部分跳转链接
+	    var locationHref = location.href;
     
-        function decode(url, target) {
-            GM_xmlhttpRequest({
-                method: 'HEAD',
-                url: url,
-                headers: {
-                    "Referer": locationHref,
-                },
-                onload: function (response) {
-                    var newUrl = response.finalUrl;
-                    //console.log(newUrl);
-                    target.setAttribute('href', newUrl);
-                }
-            });
-        }
+	    function decode(url, target) {
+	        GM_xmlhttpRequest({
+	            method: 'HEAD',
+	            url: url,
+	            headers: {
+	                "Referer": locationHref,
+	            },
+	            onload: function (response) {
+	                var newUrl = response.finalUrl;
+	                //console.log(newUrl);
+	                target.setAttribute('href', newUrl);
+	            }
+	        });
+	    }
     
-        function run() {
-            var urls = document.querySelectorAll('a[href^="http://jump.bdimg.com/safecheck"]');
-            for (var i = 0; i < urls.length; i++) {
-                if (urls[i].parentNode.className == "apc_src_wrapper") {
-                    decode(urls[i], urls[i]);
-                } else {
-                    var url = urls[i].childNodes[0].nodeValue;
-                    if (url.indexOf("http") < 0) {
-                        url = "http://" + url;
-                    }
-                    console.log(url);
-                    urls[i].setAttribute("href", url);
-                }
-            }
-        }
+	    function run() {
+	        var urls = document.querySelectorAll('a[href^="http://jump.bdimg.com/safecheck"]');
+	        for (var i = 0; i < urls.length; i++) {
+	            if (urls[i].parentNode.className == "apc_src_wrapper") {
+	                decode(urls[i], urls[i]);
+	            } else {
+	                var url = urls[i].childNodes[0].nodeValue;
+	                if (url.indexOf("http") < 0) {
+	                    url = "http://" + url;
+	                }
+	                console.log(url);
+	                urls[i].setAttribute("href", url);
+	            }
+	        }
+	    }
     
-        function addMutationObserver(selector, callback) {
-            var watch = document.querySelector(selector);
-            if (!watch) return;
+	    function addMutationObserver(selector, callback) {
+	        var watch = document.querySelector(selector);
+	        if (!watch) return;
     
-            var observer = new MutationObserver(function (mutations) {
-                var nodeAdded = mutations.some(function (x) {
-                    return x.addedNodes.length > 0;
-                });
-                if (nodeAdded) {
-                    // observer.disconnect();
-                    callback();
-                }
-            });
-            observer.observe(watch, {
-                childList: true,
-                subtree: true
-            });
-        }
-        run();
-        addMutationObserver('#j_p_postlist', run);
-    })();*/
+	        var observer = new MutationObserver(function (mutations) {
+	            var nodeAdded = mutations.some(function (x) {
+	                return x.addedNodes.length > 0;
+	            });
+	            if (nodeAdded) {
+	                // observer.disconnect();
+	                callback();
+	            }
+	        });
+	        observer.observe(watch, {
+	            childList: true,
+	            subtree: true
+	        });
+	    }
+	    run();
+	    addMutationObserver('#j_p_postlist', run);
+	})();*/
 
-    //查看发帖 by 文科 2022-1-16 这个失效了，现在强制跳转到https://tieba.baidu.com/index.html
-    /*window.addEventListener('DOMContentLoaded', function () {
-        var $ = unsafeWindow.$;
+	//查看发帖 by 文科 2022-1-16 这个失效了，现在强制跳转到https://tieba.baidu.com/index.html
+	/*window.addEventListener('DOMContentLoaded', function () {
+	    var $ = unsafeWindow.$;
     
-        function getUserHistory(e) {
-            var userName = (JSON.parse(e.target.getAttribute('data'))).un;
-            var barName = "";
-            if ("全贴吧发言记录" != e.target.textContent) {
-                barName = prompt('输入贴吧名', $("#wd1").attr("value"));
-                if (!barName) return;
-            }
-            if (barName == null) barName = "";
-            window.open("http://tieba.baidu.com/f/search/ures?ie=utf-8&kw=" + encodeURIComponent(barName) + "&qw=&rn=100&un=" + encodeURIComponent(userName) + "&sm=1", "_blank");
-        }
-        (function addBtn() {
-            $('.d_author .p_author').each(function () {
-                var data = this.querySelector('.p_author_name').getAttribute('data-field');
-                $(this).append('<li class="user_post_li" style="margin-top:4px"><a style="cursor: pointer;color:#FF6600;" data=' + data + '>全贴吧发言记录</a></li>')
-                $(this).append('<li class="user_post_li" style="margin-top:4px"><a style="cursor: pointer;color:#FF6600;" data=' + data + '>某贴吧发言记录</a></li>')
-                this.querySelectorAll('.user_post_li a')[0].addEventListener('click', getUserHistory)
-                this.querySelectorAll('.user_post_li a')[1].addEventListener('click', getUserHistory)
-            });
-        })();
-    }, false);*/
+	    function getUserHistory(e) {
+	        var userName = (JSON.parse(e.target.getAttribute('data'))).un;
+	        var barName = "";
+	        if ("全贴吧发言记录" != e.target.textContent) {
+	            barName = prompt('输入贴吧名', $("#wd1").attr("value"));
+	            if (!barName) return;
+	        }
+	        if (barName == null) barName = "";
+	        window.open("http://tieba.baidu.com/f/search/ures?ie=utf-8&kw=" + encodeURIComponent(barName) + "&qw=&rn=100&un=" + encodeURIComponent(userName) + "&sm=1", "_blank");
+	    }
+	    (function addBtn() {
+	        $('.d_author .p_author').each(function () {
+	            var data = this.querySelector('.p_author_name').getAttribute('data-field');
+	            $(this).append('<li class="user_post_li" style="margin-top:4px"><a style="cursor: pointer;color:#FF6600;" data=' + data + '>全贴吧发言记录</a></li>')
+	            $(this).append('<li class="user_post_li" style="margin-top:4px"><a style="cursor: pointer;color:#FF6600;" data=' + data + '>某贴吧发言记录</a></li>')
+	            this.querySelectorAll('.user_post_li a')[0].addEventListener('click', getUserHistory)
+	            this.querySelectorAll('.user_post_li a')[1].addEventListener('click', getUserHistory)
+	        });
+	    })();
+	}, false);*/
 
-    //百度贴吧排序
-    //百度贴吧按发帖时间（帖子ID）排序 by NULL
-    //关于回复量的排序 https://greasyfork.org/zh-CN/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta
-    (function () {
-        //不在主题贴列表就不执行
-        if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
-        var backupshunxun = new Array()//用来备份贴吧默认的贴子排列顺序，用于回复时间排序
-        var yipaixun2 = false;
+	//百度贴吧排序
+	//百度贴吧按发帖时间（帖子ID）排序 by NULL
+	//关于回复量的排序 https://greasyfork.org/zh-CN/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta
+	(function() {
+		//不在主题贴列表就不执行
+		if (!/^https?:\/\/tieba\.baidu\.com\/f\?.*$/.test(location.href)) return;
+		var backupshunxun = new Array() //用来备份贴吧默认的贴子排列顺序，用于回复时间排序
+		var yipaixun2 = false;
 
-        const action = (event) => {
-            //console.log(event.animationName)
-            const {
-                target
-            } = event;
-            const {
-                classList
-            } = target
-            //console.log(target.getAttribute("paixun"))
-            if (classList.contains("threadlist_title")) {
-                if (yipaixun2 == false && target.getAttribute("paixun") == null) {//使其只可以执行一次
-                    yipaixun2 = true
-                    console.log(target)
-                    backupshunxun = new Array()
-                    var parentNodex = document.getElementById('thread_list');
-                    if (parentNodex != null) {
-                        var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)');//默认排除置顶贴
-                        if (GM_getValue("select3") == true) {
-                            threadsx = parentNodex.querySelectorAll('.j_thread_list');//默认排除置顶贴
-                        }
-                        for (let i = 0; i < threadsx.length; i++) {
-                            //console.log(threadsx[i]);
-                            backupshunxun.push(threadsx[i]);
-                        }
-                    }
-                    sortById(GM_getValue("select1"))
-                    let t = setTimeout(() => {
-                        yipaixun2 = false
-                        clearTimeout(t)
-                        t = null
-                    }, 3000);
-                }
-            }
-            target.setAttribute('paixun', '1')
-        }
-        function sortById(yipaixun) {
-            var parentNode = document.getElementById('thread_list');
-            if (parentNode == null) {
-                return;
-            }
-            var threads = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
-            //var $lis = $("#thread_list>.j_thread_list:not(.thread_top)");//获取所有排序的li           
-            if (GM_getValue("select3") == true) {
-                threads = parentNode.querySelectorAll('.j_thread_list');
-                //$lis = $("#thread_list>.j_thread_list");//获取所有排序的li
-            }
-            if (yipaixun == 0) {//发贴时间顺序
-                var threadArray = [];
-                for (var thread of threads) {
-                    try {
-                        threadArray.push({
-                            id: JSON.parse(thread.getAttribute('data-field')).id,
-                            thread: thread
-                        });
-                        parentNode.removeChild(thread);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-                threadArray.sort((a, b) => {
-                    return b.id - a.id;
-                });
-                console.log("排序后:", threadArray);
-                for (var thread2 of threadArray) {
-                    parentNode.appendChild(thread2.thread);
-                }
-            }
-            else if (yipaixun == 1) {//发贴时间倒序
-                var threadArray = [];
-                for (var thread of threads) {
-                    try {
-                        threadArray.push({
-                            id: JSON.parse(thread.getAttribute('data-field')).id,
-                            thread: thread
-                        });
-                        parentNode.removeChild(thread);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-                threadArray.sort((a, b) => {
-                    return a.id - b.id;
-                });
-                console.log("排序后:", threadArray);
-                for (var thread2 of threadArray) {
-                    parentNode.appendChild(thread2.thread);
-                }
-            }
-            else if (yipaixun == 2) {//回复时间顺序
-                for (let thread of threads) {
-                    try {
-                        parentNode.removeChild(thread);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-                console.log("排序后:", backupshunxun);
-                for (let i = 0; i < backupshunxun.length; i++) {
-                    parentNode.appendChild(backupshunxun[i]);
-                }
-            }
-            else if (yipaixun == 3) {//回复时间倒序
-                for (let thread of threads) {
-                    try {
-                        parentNode.removeChild(thread);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-                console.log("排序后:", backupshunxun);
-                for (let i = backupshunxun.length - 1; i >= 0; i--) {
-                    parentNode.appendChild(backupshunxun[i]);
-                }
-            }
-            else if (yipaixun == 4) {//回复量顺序
-                var liArray = []; //用于排序的容器
-                for (var thread of threads) {
-                    try {
-                        liArray.push({
-                            count: thread.querySelectorAll("span.threadlist_rep_num.center_text")[0].textContent,
-                            thread: thread
-                        });
-                        //parentNode.removeChild(thread);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-                /*$lis.each(function (index, item) {
-                    var replyCount = $(item).find("span.threadlist_rep_num.center_text").text();
-                    liArray.push({ 'count': replyCount, 'li': item });
-                    try {
-                        parentNode.removeChild(item);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                })*/
-                liArray.sort(function (a, b) {
-                    return b.count - a.count;
-                })
+		const action = (event) => {
+			//console.log(event.animationName)
+			const {
+				target
+			} = event;
+			const {
+				classList
+			} = target
+			//console.log(target.getAttribute("paixun"))
+			if (classList.contains("threadlist_title")) {
+				if (yipaixun2 == false && target.getAttribute("paixun") == null) { //使其只可以执行一次
+					yipaixun2 = true
+					console.log(target)
+					backupshunxun = new Array()
+					var parentNodex = document.getElementById('thread_list');
+					if (parentNodex != null) {
+						var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)'); //默认排除置顶贴
+						if (GM_getValue("select3") == true) {
+							threadsx = parentNodex.querySelectorAll('.j_thread_list'); //默认排除置顶贴
+						}
+						for (let i = 0; i < threadsx.length; i++) {
+							//console.log(threadsx[i]);
+							backupshunxun.push(threadsx[i]);
+						}
+					}
+					sortById(GM_getValue("select1"))
+					let t = setTimeout(() => {
+						yipaixun2 = false
+						clearTimeout(t)
+						t = null
+					}, 3000);
+				}
+			}
+			target.setAttribute('paixun', '1')
+		}
 
-                console.log("排序后:", liArray);
-                for (var thread2 of liArray) {
-                    parentNode.appendChild(thread2.thread);
-                }
-                /*$(liArray).each(function (index, item) {
-                    parentNode.appendChild(item.li);
-                })*/
-            }
-            else if (yipaixun == 5) {//回复量倒序
-                var liArray = []; //用于排序的容器
-                for (var thread of threads) {
-                    try {
-                        liArray.push({
-                            count: thread.querySelectorAll("span.threadlist_rep_num.center_text")[0].textContent,
-                            thread: thread
-                        });
-                        //parentNode.removeChild(thread);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
+		function sortById(yipaixun) {
+				var parentNode = document.getElementById('thread_list');
+				if (parentNode == null) {
+					return;
+				}
+				var threads = parentNode.querySelectorAll('.j_thread_list:not(.thread_top)');
+				//var $lis = $("#thread_list>.j_thread_list:not(.thread_top)");//获取所有排序的li           
+				if (GM_getValue("select3") == true) {
+					threads = parentNode.querySelectorAll('.j_thread_list');
+					//$lis = $("#thread_list>.j_thread_list");//获取所有排序的li
+				}
+				if (yipaixun == 0) { //发贴时间顺序
+					var threadArray = [];
+					for (var thread of threads) {
+						try {
+							threadArray.push({
+								id: JSON.parse(thread.getAttribute('data-field')).id,
+								thread: thread
+							});
+							parentNode.removeChild(thread);
+						} catch (e) {
+							console.log(e);
+						}
+					}
+					threadArray.sort((a, b) => {
+						return b.id - a.id;
+					});
+					console.log("排序后:", threadArray);
+					for (var thread2 of threadArray) {
+						parentNode.appendChild(thread2.thread);
+					}
+				} else if (yipaixun == 1) { //发贴时间倒序
+					var threadArray = [];
+					for (var thread of threads) {
+						try {
+							threadArray.push({
+								id: JSON.parse(thread.getAttribute('data-field')).id,
+								thread: thread
+							});
+							parentNode.removeChild(thread);
+						} catch (e) {
+							console.log(e);
+						}
+					}
+					threadArray.sort((a, b) => {
+						return a.id - b.id;
+					});
+					console.log("排序后:", threadArray);
+					for (var thread2 of threadArray) {
+						parentNode.appendChild(thread2.thread);
+					}
+				} else if (yipaixun == 2) { //回复时间顺序
+					for (let thread of threads) {
+						try {
+							parentNode.removeChild(thread);
+						} catch (e) {
+							console.log(e);
+						}
+					}
+					console.log("排序后:", backupshunxun);
+					for (let i = 0; i < backupshunxun.length; i++) {
+						parentNode.appendChild(backupshunxun[i]);
+					}
+				} else if (yipaixun == 3) { //回复时间倒序
+					for (let thread of threads) {
+						try {
+							parentNode.removeChild(thread);
+						} catch (e) {
+							console.log(e);
+						}
+					}
+					console.log("排序后:", backupshunxun);
+					for (let i = backupshunxun.length - 1; i >= 0; i--) {
+						parentNode.appendChild(backupshunxun[i]);
+					}
+				} else if (yipaixun == 4) { //回复量顺序
+					var liArray = []; //用于排序的容器
+					for (var thread of threads) {
+						try {
+							liArray.push({
+								count: thread.querySelectorAll("span.threadlist_rep_num.center_text")[0].textContent,
+								thread: thread
+							});
+							//parentNode.removeChild(thread);
+						} catch (e) {
+							console.log(e);
+						}
+					}
+					/*$lis.each(function (index, item) {
+					    var replyCount = $(item).find("span.threadlist_rep_num.center_text").text();
+					    liArray.push({ 'count': replyCount, 'li': item });
+					    try {
+					        parentNode.removeChild(item);
+					    } catch (e) {
+					        console.log(e);
+					    }
+					})*/
+					liArray.sort(function(a, b) {
+						return b.count - a.count;
+					})
 
-                liArray.sort(function (a, b) {
-                    return a.count - b.count;
-                })
+					console.log("排序后:", liArray);
+					for (var thread2 of liArray) {
+						parentNode.appendChild(thread2.thread);
+					}
+					/*$(liArray).each(function (index, item) {
+					    parentNode.appendChild(item.li);
+					})*/
+				} else if (yipaixun == 5) { //回复量倒序
+					var liArray = []; //用于排序的容器
+					for (var thread of threads) {
+						try {
+							liArray.push({
+								count: thread.querySelectorAll("span.threadlist_rep_num.center_text")[0].textContent,
+								thread: thread
+							});
+							//parentNode.removeChild(thread);
+						} catch (e) {
+							console.log(e);
+						}
+					}
 
-                console.log("排序后:", liArray);
-                for (var thread2 of liArray) {
-                    parentNode.appendChild(thread2.thread);
-                }
-            }
-            //排序后 重新绑定懒加载图片
-            //console.log($(".thumbnail.vpic_wrap>img"))
-            this.$(".thumbnail.vpic_wrap>img").lazyload();//只有用贴吧自己的jQuery才有lazyload,用this就是使用贴吧的jQuery
-            GM_setValue("select1", yipaixun)
-        }
-        //setInterval(() => {
-        //    try {
-        //        $("div.search_back_box")[0].classList.remove("search-back-fixed");
-        //        $("div.topic_list_box")[0].classList.remove("topic-search-back-fixed");
-        //    } catch (error) { /*alert(error);*/ }
-        //}, 500);
-        setTimeout(() => {
-            var parentNodex = document.getElementById('thread_list');
-            if (parentNodex != null) {
-                var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)');//默认排除置顶贴
-                if (GM_getValue("select3") == true) {
-                    threadsx = parentNodex.querySelectorAll('.j_thread_list');//默认排除置顶贴
-                }
-                for (let i = 0; i < threadsx.length; i++) {
-                    //console.log(threadsx[i]);
-                    backupshunxun.push(threadsx[i]);
-                }
-            }
-            let s = ['按发贴时间排序(贴子ID)', '发贴时间倒序', '按回复时间顺序(这是PC端默认)', '按回复时间倒序', '按回复量顺序', '按回复量倒序']
-            var a = document.createElement('select')
-            a.setAttribute('id', 'select1');
-            var option = document.createElement("option")
-            option.text = s[0]
-            option.setAttribute('value', 0);
-            a.appendChild(option)
-            for (let i = 1; i < s.length; i++) {
-                option = document.createElement("option")
-                option.text = s[i]
-                if (i == 2) {
-                    option.setAttribute('selected', 'selected');
-                }
-                option.setAttribute('value', i);
-                a.appendChild(option)
-            }
-            var b = document.createElement('input')
-            b.setAttribute('type', 'checkbox');
-            b.setAttribute('id', 'select2');
-            var c = document.createElement('p')
-            c.textContent = "翻页保持/排序是否包含置顶贴"
-            c.setAttribute('style', 'position: absolute;left: 3px;top: 30px;')
-            c.appendChild(b)
-            var d = document.createElement('input')
-            d.setAttribute('type', 'checkbox');
-            d.setAttribute('id', 'select3');
-            c.appendChild(d)
-            var f = document.createElement('div')
-            f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: -5px;')
-            f.appendChild(a)
-            f.appendChild(c)
-            //var paixun = false
-            a.addEventListener('change', e => {
-                //console.log(JSON.stringify(e))//{"isTrusted":true}
-                let temp = document.getElementById("select1").value
-                console.log(document.getElementById("select1").value)
-                //if (yipaixun2 == false) {
-                //  yipaixun2 = true;
-                //   let i = 0;
-                //  if (paixun == false) {
-                //     paixun = true
-                sortById(temp)
-                /*let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
-                    if (i <= document.body.scrollHeight) {
-                        window.scrollTo(0, i);
-                        i += 300;
-                    } else {
-                        clearInterval(t);
-                        paixun = false;
-                        sortById(temp);
-                        window.scrollTo(0, 0);
-                    }
-                }, 100);*/
-                // }
-                //} else {
-                //   sortById(temp);
-                // }
-            }, false)
-            b.addEventListener('change', e => {
-                if (document.getElementById("select2").checked == true) {
-                    GM_setValue("select2", true)
-                }
-                else {
-                    GM_setValue("select2", false)
-                }
-            }, false)
-            d.addEventListener('change', e => {
-                if (document.getElementById("select3").checked == true) {
-                    GM_setValue("select3", true)
-                }
-                else {
-                    GM_setValue("select3", false)
-                }
-            }, false)
-            a.addEventListener('dblclick', e => {
-                //if (yipaixun2 == true) {
-                let temp = document.getElementById("select1").selectedIndex
-                console.log("dblclick:" + temp);
+					liArray.sort(function(a, b) {
+						return a.count - b.count;
+					})
 
-                sortById(temp)
-                //}
-            }, false)
-            try {
-                document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(f);
-            } catch (err) {
-                console.log(err);
-            }
-            finally {
-                if (GM_getValue("select2") == true) {
-                    document.getElementById("select1").selectedIndex = GM_getValue("select1")
-                    document.getElementById("select2").checked = true
-                    sortById(GM_getValue("select1"))
-                }
-                if (GM_getValue("select3") == true) {
-                    document.getElementById("select3").checked = true
-                }
-                //用于刷新网页时，阻止动画事件触发导致重复备份贴子列表顺序导致按回复时间排序出错
-                [].forEach.call(document.querySelectorAll(".threadlist_title"), node => {
-                    node.setAttribute('paixun', '1')
-                });
-                PrefixedEvent(document, "AnimationStart", action); //开始
-            }
-        }, 3000);
-    })();
+					console.log("排序后:", liArray);
+					for (var thread2 of liArray) {
+						parentNode.appendChild(thread2.thread);
+					}
+				}
+				//排序后 重新绑定懒加载图片
+				//console.log($(".thumbnail.vpic_wrap>img"))
+				this.$(".thumbnail.vpic_wrap>img").lazyload(); //只有用贴吧自己的jQuery才有lazyload,用this就是使用贴吧的jQuery
+				GM_setValue("select1", yipaixun)
+			}
+			//setInterval(() => {
+			//    try {
+			//        $("div.search_back_box")[0].classList.remove("search-back-fixed");
+			//        $("div.topic_list_box")[0].classList.remove("topic-search-back-fixed");
+			//    } catch (error) { /*alert(error);*/ }
+			//}, 500);
+		setTimeout(() => {
+			var parentNodex = document.getElementById('thread_list');
+			if (parentNodex != null) {
+				var threadsx = parentNodex.querySelectorAll('.j_thread_list:not(.thread_top)'); //默认排除置顶贴
+				if (GM_getValue("select3") == true) {
+					threadsx = parentNodex.querySelectorAll('.j_thread_list'); //默认排除置顶贴
+				}
+				for (let i = 0; i < threadsx.length; i++) {
+					//console.log(threadsx[i]);
+					backupshunxun.push(threadsx[i]);
+				}
+			}
+			let s = ['按发贴时间排序(贴子ID)', '发贴时间倒序', '按回复时间顺序(这是PC端默认)', '按回复时间倒序', '按回复量顺序', '按回复量倒序']
+			var a = document.createElement('select')
+			a.setAttribute('id', 'select1');
+			var option = document.createElement("option")
+			option.text = s[0]
+			option.setAttribute('value', 0);
+			a.appendChild(option)
+			for (let i = 1; i < s.length; i++) {
+				option = document.createElement("option")
+				option.text = s[i]
+				if (i == 2) {
+					option.setAttribute('selected', 'selected');
+				}
+				option.setAttribute('value', i);
+				a.appendChild(option)
+			}
+			var b = document.createElement('input')
+			b.setAttribute('type', 'checkbox');
+			b.setAttribute('id', 'select2');
+			var c = document.createElement('p')
+			c.textContent = "翻页保持/排序是否包含置顶贴"
+			c.setAttribute('style', 'position: absolute;left: 3px;top: 30px;')
+			c.appendChild(b)
+			var d = document.createElement('input')
+			d.setAttribute('type', 'checkbox');
+			d.setAttribute('id', 'select3');
+			c.appendChild(d)
+			var f = document.createElement('div')
+			f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: -5px;')
+			f.appendChild(a)
+			f.appendChild(c)
+				//var paixun = false
+			a.addEventListener('change', e => {
+				//console.log(JSON.stringify(e))//{"isTrusted":true}
+				let temp = document.getElementById("select1").value
+				console.log(document.getElementById("select1").value)
+					//if (yipaixun2 == false) {
+					//  yipaixun2 = true;
+					//   let i = 0;
+					//  if (paixun == false) {
+					//     paixun = true
+				sortById(temp)
+					/*let t = setInterval(() => { //滑动条自动下拉看完网页，以解决排序后图片无法加载的问题
+					    if (i <= document.body.scrollHeight) {
+					        window.scrollTo(0, i);
+					        i += 300;
+					    } else {
+					        clearInterval(t);
+					        paixun = false;
+					        sortById(temp);
+					        window.scrollTo(0, 0);
+					    }
+					}, 100);*/
+					// }
+					//} else {
+					//   sortById(temp);
+					// }
+			}, false)
+			b.addEventListener('change', e => {
+				if (document.getElementById("select2").checked == true) {
+					GM_setValue("select2", true)
+				} else {
+					GM_setValue("select2", false)
+				}
+			}, false)
+			d.addEventListener('change', e => {
+				if (document.getElementById("select3").checked == true) {
+					GM_setValue("select3", true)
+				} else {
+					GM_setValue("select3", false)
+				}
+			}, false)
+			a.addEventListener('dblclick', e => {
+				//if (yipaixun2 == true) {
+				let temp = document.getElementById("select1").selectedIndex
+				console.log("dblclick:" + temp);
 
-    (function () {
-        let jishu = 0;
-        let t = setInterval(() => {
-            if (jishu < 60) {
-                let i = 0;
-                $(".u_tb_profile>a").attr("href", "http://tieba.baidu.com/i/i/profile"); //修复贴吧设置按钮无效bug
-                let temp2 = $(".post_bubble_bottom");
-                if (temp2.length > 0) {
-                    for (let i = 0; i < temp2.length; i++) {
-                        if (temp2[i].style["background-image"] == 'url("//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png")') //修复一个楼层背景气泡内部有白线
-                        {
-                            temp2[i].style = 'background:url(//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png) no-repeat -0px  -4px;height: 111px;'
-                        }
-                    }
-                }
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                    //以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
-                    //u_username_wrap
-                    //u_news_wrap
-                    //u_setting_wrap
-                    /*document.querySelector("a.u_username_wrap").addEventListener("mouseover", () => {
-                        console.log("1");
-                    });*/
-                    /*let temp = $(".u_ddl_con li a"); //a.j_cleardata,u_notify_item
-                    if (temp.length > 0) {
-                        //console.log(temp);
-                        //console.log(temp.length);
-                        //console.log(temp[2]);
-                        for (i = 0; i < temp.length; i++) {
-                            if (temp[i].getAttribute("style") == null) {
-                                temp[i].style = "white-space:normal;";
-                            }
-                        }
-                    }
-                    let temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
-                    if (temp.length > 0) {
-                        for (i = 0; i < temp.length; i++) {
-                            if (temp[i].getAttribute("style") == null) {
-                                temp[i].style = "white-space:normal;";
-                            }
-                        }
-                    }
-                    temp = $("ul.sys_notify_last>li>a"); //a.j_cleardata,u_notify_item
-                    if (temp.length > 0) {
-                        for (i = 0; i < temp.length; i++) {
-                            if (temp[i].getAttribute("style") == null) {
-                                temp[i].style = "white-space:normal;";
-                            }
-                        }
-                    }*/
-                } else {
-                    let temp = $(".u_menu_item"); //尝试解决旧版贴吧右上角选项按钮显示偏前
-                    if (temp.length > 0) {
-                        //console.log(temp);
-                        //console.log(temp.length);
-                        //console.log(temp[2]);
-                        for (i = 0; i < temp.length; i++) {
-                            if (temp[i].getAttribute("style") == null) {
-                                temp[i].style = "padding: 4px 8px 7px;";
-                            }
-                        }
-                    }
-                }
-                jishu++;
-            } else {
-                clearInterval(t);
-            }
-        }, 2000);
-        setTimeout(() => {
-            //把https链接转到http，因为我的收藏页面并不支持https
-            if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
-                let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
-                $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
-            }
-            //let i = 0;
-            //let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
-            //if (temp.length > 0) {
-            //    for (i = 0; i < temp.length; i++) {
-            //        temp[i].style = "position: relative;display: block;/*top: -20px;right: 10px;*/width:60px;";
-            //    }
-            //}
-            //备忘,还有招募图标显示(已修复)
-            if (!GM_getValue("tiebameihua")) { //贴吧美化
-                /*   temp = $(".icon-good"); //显示精品贴，精华贴标识
-                   if (temp.length > 0) {
-                       for (i = 0; i < temp.length; i++) {
-                           temp[i].style = "background-color: #FF6666;";
-                       }
-                   }
-                   temp = $(".icon-top"); //显示置顶标识
-                   if (temp.length > 0) {
-                       for (i = 0; i < temp.length; i++) {
-                           temp[i].style = "background:none;background-color: #4285F5;";
-                       }
-                   }
-                   temp = $(".icon-member-top"); //显示会员置顶标识
-                   if (temp.length > 0) {
-                       for (i = 0; i < temp.length; i++) {
-                           temp[i].style = "background:none;background-color: #FFCC26;";
-                       }
-                   }*/
-                //$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
-                //$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
-                try {
-                    //console.log($(".listEditorCnt"));
-                    if ($(".listEditorCnt")[0] != null) {
-                        $(".listEditorCnt").click(() => {
-                            //console.log("2333");
-                            let temp1 = $(".qp_interview_insertsmiley")[0]; //主题贴列表的话题贴回复框表情按钮修复
-                            if (temp1 != null) {
-                                temp1.style = "background:none !important;";
-                            }
-                            let temp2 = $(".j_banned_tip")[0];
-                            if (temp2 != null) {
-                                temp2.style = "top:0px;";
-                            }
-                        });
-                    }
+				sortById(temp)
+					//}
+			}, false)
+			try {
+				document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(f);
+			} catch (err) {
+				console.log(err);
+			} finally {
+				if (GM_getValue("select2") == true) {
+					document.getElementById("select1").selectedIndex = GM_getValue("select1")
+					document.getElementById("select2").checked = true
+					sortById(GM_getValue("select1"))
+				}
+				if (GM_getValue("select3") == true) {
+					document.getElementById("select3").checked = true
+				}
+				//用于刷新网页时，阻止动画事件触发导致重复备份贴子列表顺序导致按回复时间排序出错
+				[].forEach.call(document.querySelectorAll(".threadlist_title"), node => {
+					node.setAttribute('paixun', '1')
+				});
+				PrefixedEvent(document, "AnimationStart", action); //开始
+			}
+		}, 3000);
+	})();
 
-                } catch (err) {
-                    console.log(err);
-                }
-                try {
-                    let temp = $(".nav_wrap")[0];
-                    if (temp != null) {
-                        let temp2 = temp.parentNode.parentNode.children[0]; //querySelectorAll("div#pagelet_entertainment-game/pagelet/game_head_middle")[0];
-                        //console.log(temp2.getAttribute('id'));
-                        if (temp2.getAttribute('id') == "pagelet_entertainment-game/pagelet/game_head_middle") { //某些游戏类贴吧有特殊头图，例如三国杀吧
-                            temp.style = "background:#eeeff3 !important;" //background-image:-webkit-linear-gradient(top,#eeeff3 0,#eaeef1 100%);"
-                        }
-                    }
-                } catch (err) {
-                    console.log(err);
-                }
-            }
-            try {
-                /*
+	(function() {
+		let jishu = 0;
+		let t = setInterval(() => {
+			if (jishu < 60) {
+				let i = 0;
+				$(".u_tb_profile>a").attr("href", "http://tieba.baidu.com/i/i/profile"); //修复贴吧设置按钮无效bug
+				let temp2 = $(".post_bubble_bottom");
+				if (temp2.length > 0) {
+					for (let i = 0; i < temp2.length; i++) {
+						if (temp2[i].style["background-image"] == 'url("//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png")') //修复一个楼层背景气泡内部有白线
+						{
+							temp2[i].style = 'background:url(//tb1.bdstatic.com/tb/cms/post/bubble/huiyuanai_03.png) no-repeat -0px  -4px;height: 111px;'
+						}
+					}
+				}
+				if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+					//以下为尝试解决右上角的浮动按钮文字超出按钮问题(已彻底解决)
+					//u_username_wrap
+					//u_news_wrap
+					//u_setting_wrap
+					/*document.querySelector("a.u_username_wrap").addEventListener("mouseover", () => {
+					    console.log("1");
+					});*/
+					/*let temp = $(".u_ddl_con li a"); //a.j_cleardata,u_notify_item
+					if (temp.length > 0) {
+					    //console.log(temp);
+					    //console.log(temp.length);
+					    //console.log(temp[2]);
+					    for (i = 0; i < temp.length; i++) {
+					        if (temp[i].getAttribute("style") == null) {
+					            temp[i].style = "white-space:normal;";
+					        }
+					    }
+					}
+					let temp = $("#u_notify_item>li>a"); //a.j_cleardata,u_notify_item
+					if (temp.length > 0) {
+					    for (i = 0; i < temp.length; i++) {
+					        if (temp[i].getAttribute("style") == null) {
+					            temp[i].style = "white-space:normal;";
+					        }
+					    }
+					}
+					temp = $("ul.sys_notify_last>li>a"); //a.j_cleardata,u_notify_item
+					if (temp.length > 0) {
+					    for (i = 0; i < temp.length; i++) {
+					        if (temp[i].getAttribute("style") == null) {
+					            temp[i].style = "white-space:normal;";
+					        }
+					    }
+					}*/
+				} else {
+					let temp = $(".u_menu_item"); //尝试解决旧版贴吧右上角选项按钮显示偏前
+					if (temp.length > 0) {
+						//console.log(temp);
+						//console.log(temp.length);
+						//console.log(temp[2]);
+						for (i = 0; i < temp.length; i++) {
+							if (temp[i].getAttribute("style") == null) {
+								temp[i].style = "padding: 4px 8px 7px;";
+							}
+						}
+					}
+				}
+				jishu++;
+			} else {
+				clearInterval(t);
+			}
+		}, 2000);
+		setTimeout(() => {
+			//把https链接转到http，因为我的收藏页面并不支持https
+			if ($("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5] != null) {
+				let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
+				$("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
+			}
+			//let i = 0;
+			//let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
+			//if (temp.length > 0) {
+			//    for (i = 0; i < temp.length; i++) {
+			//        temp[i].style = "position: relative;display: block;/*top: -20px;right: 10px;*/width:60px;";
+			//    }
+			//}
+			//备忘,还有招募图标显示(已修复)
+			if (!GM_getValue("tiebameihua")) { //贴吧美化
+				/*   temp = $(".icon-good"); //显示精品贴，精华贴标识
+				   if (temp.length > 0) {
+				       for (i = 0; i < temp.length; i++) {
+				           temp[i].style = "background-color: #FF6666;";
+				       }
+				   }
+				   temp = $(".icon-top"); //显示置顶标识
+				   if (temp.length > 0) {
+				       for (i = 0; i < temp.length; i++) {
+				           temp[i].style = "background:none;background-color: #4285F5;";
+				       }
+				   }
+				   temp = $(".icon-member-top"); //显示会员置顶标识
+				   if (temp.length > 0) {
+				       for (i = 0; i < temp.length; i++) {
+				           temp[i].style = "background:none;background-color: #FFCC26;";
+				       }
+				   }*/
+				//$("ul.tbui_aside_float_bar")[0].style = "margin-left: 92% !important;left:unset;"; //解决右侧工具栏消失bug。不设置也行
+				//$("ul.tbui_aside_float_bar")[0].style = "left:50%;margin-left: 498px;"; //解决右侧工具栏消失bug。不设置也行
+				try {
+					//console.log($(".listEditorCnt"));
+					if ($(".listEditorCnt")[0] != null) {
+						$(".listEditorCnt").click(() => {
+							//console.log("2333");
+							let temp1 = $(".qp_interview_insertsmiley")[0]; //主题贴列表的话题贴回复框表情按钮修复
+							if (temp1 != null) {
+								temp1.style = "background:none !important;";
+							}
+							let temp2 = $(".j_banned_tip")[0];
+							if (temp2 != null) {
+								temp2.style = "top:0px;";
+							}
+						});
+					}
+
+				} catch (err) {
+					console.log(err);
+				}
+				try {
+					let temp = $(".nav_wrap")[0];
+					if (temp != null) {
+						let temp2 = temp.parentNode.parentNode.children[0]; //querySelectorAll("div#pagelet_entertainment-game/pagelet/game_head_middle")[0];
+						//console.log(temp2.getAttribute('id'));
+						if (temp2.getAttribute('id') == "pagelet_entertainment-game/pagelet/game_head_middle") { //某些游戏类贴吧有特殊头图，例如三国杀吧
+							temp.style = "background:#eeeff3 !important;" //background-image:-webkit-linear-gradient(top,#eeeff3 0,#eaeef1 100%);"
+						}
+					}
+				} catch (err) {
+					console.log(err);
+				}
+			}
+			try {
+				/*
             尝试兼容别人的"贴吧黑夜模式"样式https://userstyles.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles
             以下推荐用文本编辑器去查找在那里
             tieba-maverick-2018样式还需要修改
@@ -10143,26 +10186,26 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     --m-href-color: hsl(0, 0%, 95%);
     --m-href-visited: hsl(0, 0%, 60%);
             */
-                //$(".meihua")[0].style = "color:#999 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
-                //$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
-                let temp2 = $(".j_tbnav_tab>a"); //为了兼容这个吧？https://greasyfork.org/ja/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta 贴吧助手(屏蔽，排序) beta
-                if (temp2.length > 0) {
-                    temp2[temp2.length - 1].style = "width: 100px !important;color:#777 !important;";
-                    temp2[temp2.length - 2].style = "color:#777 !important;";
-                }
-                if (window.location.href.split("?")[0].split("/")[3] == "f") //如果是在某个贴吧的主题贴列表，就会删掉右边固定悬浮栏的分享按钮
-                {
-                    $('.tbui_fbar_share').remove();
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }, 5000);
-    })();
+				//$(".meihua")[0].style = "color:#999 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+				//$("#frs_list_pager")[0].style = "position: relative;left: 1px; width: 968px;border: 1px solid #e4e6eb;padding: 5px;";
+				let temp2 = $(".j_tbnav_tab>a"); //为了兼容这个吧？https://greasyfork.org/ja/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta 贴吧助手(屏蔽，排序) beta
+				if (temp2.length > 0) {
+					temp2[temp2.length - 1].style = "width: 100px !important;color:#777 !important;";
+					temp2[temp2.length - 2].style = "color:#777 !important;";
+				}
+				if (window.location.href.split("?")[0].split("/")[3] == "f") //如果是在某个贴吧的主题贴列表，就会删掉右边固定悬浮栏的分享按钮
+				{
+					$('.tbui_fbar_share').remove();
+				}
+			} catch (err) {
+				console.log(err);
+			}
+		}, 5000);
+	})();
 
-    (function () { //参考显示用户名和贴子屏蔽检测脚本 https://greasyfork.org/scripts/31207-%E8%B4%B4%E5%90%A7%E6%98%BE%E7%A4%BA%E7%9C%9F%E5%AE%9Eid https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
-        var tiebadongtai = "";
-        tiebadongtai = `
+	(function() { //参考显示用户名和贴子屏蔽检测脚本 https://greasyfork.org/scripts/31207-%E8%B4%B4%E5%90%A7%E6%98%BE%E7%A4%BA%E7%9C%9F%E5%AE%9Eid https://greasyfork.org/zh-CN/scripts/383981-%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%B1%8F%E8%94%BD%E6%A3%80%E6%B5%8B
+		var tiebadongtai = "";
+		tiebadongtai = `
         /* 使用 animation 监测 DOM 变化 */
         @-webkit-keyframes __tieba_action__ {}
         @-moz-keyframes __tieba_action__ {}
@@ -10302,23 +10345,23 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
             top: 60px !important;
         }
     `;
-        if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-            //let t = setTimeout(() => {
-            //   clearTimeout(t);
-            //                if (document.querySelectorAll("#liveIcon")[0].getAttribute("src").search("interview_live_tv_icon.gif") == -1) {
-            //                  tiebadongtai += `
-            //            #liveIcon{/*各种话题贴图标*/
-            //              display: none !important;
-            //        }`;
-            //      } else {
-            //        tiebadongtai += `
-            //  #liveIcon{/*各种话题贴图标*/
-            //     height: 17px !important;
-            // }`;
-            // }
-            // }, 5000);
+		if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+			//let t = setTimeout(() => {
+			//   clearTimeout(t);
+			//                if (document.querySelectorAll("#liveIcon")[0].getAttribute("src").search("interview_live_tv_icon.gif") == -1) {
+			//                  tiebadongtai += `
+			//            #liveIcon{/*各种话题贴图标*/
+			//              display: none !important;
+			//        }`;
+			//      } else {
+			//        tiebadongtai += `
+			//  #liveIcon{/*各种话题贴图标*/
+			//     height: 17px !important;
+			// }`;
+			// }
+			// }, 5000);
 
-            tiebadongtai += `
+			tiebadongtai += `
             #liveIcon{/*各种话题贴图标*/
                 margin-top: 2px !important;
                 height: 19px !important;
@@ -10368,8 +10411,8 @@ margin-top: 20px;
                 left: -6px !important;
             }
     `;
-        } else {
-            tiebadongtai += `
+		} else {
+			tiebadongtai += `
             .threadlist_btn_play{
                 top: 15px !important;/*特殊的今日话题有视频*/
             }
@@ -10386,736 +10429,736 @@ margin-top: 20px;
                 width: 50px;
             }
             `;
-        }
-        if (typeof GM_addStyle != "undefined") {
-            GM_addStyle(tiebadongtai);
-        } else if (typeof PRO_addStyle != "undefined") {
-            PRO_addStyle(tiebadongtai); //有警告
-        } else if (typeof addStyle != "undefined") {
-            addStyle(tiebadongtai); //有警告
-        } else {
-            var node = document.createElement("style");
-            node.type = "text/css";
-            node.appendChild(document.createTextNode(tiebadongtai));
-            var heads = document.getElementsByTagName("head");
-            if (heads.length > 0) {
-                heads[0].appendChild(node);
-            } else {
-                // no head yet, stick it whereever
-                document.documentElement.appendChild(node);
-            }
-        }
-        const tieba_action = async (event) => {
-            const {
-                target
-            } = event;
-            const {
-                classList
-            } = target;
-            //console.log(target);
-            if (classList.contains('core_reply_tail')) {
-                if (qiangdiaoxinxitishi == true) {
-                    //console.log(target.querySelectorAll(".core_reply_tail")[0])
-                    target.style = "color:#000 !important;"; //强调信息显示。楼层的时间。对旧版贴吧作用一般。
-                }
-                if (!GM_getValue("tiebameihua")) { //贴吧美化
-                    //console.log(target.querySelectorAll("ul.p_reply>li>a"));
-                    let temp1 = target.querySelectorAll(".p_reply_first")//新贴吧的贴子
-                    let temp2 = target.querySelectorAll("ul.p_reply>li>a");//老贴吧的贴子样式特殊
-                    if (temp1[0] != null) {
-                        temp1[0].style = "font-size:10px !important;";
-                        //console.log(temp1[0].classList[0]);
-                        if (temp1[0].classList[1] == "p_reply_first") {
-                            temp1[0].innerHTML = "回复楼主";
-                        } else {
-                            temp1[0].innerHTML = "回复";
-                        }
-                    }
-                    if (temp2[0] != null) {
-                        temp2[0].style = "font-size:10px !important;";
-                        //console.log(temp1[0].classList[1]);
-                        if (temp2[0].classList[0] == "p_reply_first") {
-                            temp2[0].innerHTML = "回复楼主";
-                            temp2[0].parentNode.style = "width:auto !important;";
-                        } else {
-                            temp2[0].innerHTML = "回复";
-                        }
-                    }
-                }
-            }
-            if (event.animationName !== '__tieba_action__') {
-                return;
-            }
-            /*图片话题贴*/
-            if (classList.contains('icon_interview_picture')) {
-                //console.log(target.parentNode.parentNode.parentNode.parentNode);
-                let tid = JSON.parse(target.parentNode.parentNode.parentNode.parentNode.getAttribute('tid'));
-                let time = await getWaptiebaxinxi(tid).then(result => {
-                    if (result) {
-                        return result;
-                    } else {
-                        return "";
-                    }
-                });
-                let temp = time;
-                if (temp != "") {
-                    temp = temp.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0];
-                    if (temp.split("-").length == 2 && temp.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
-                    {
-                        temp = new Date().getFullYear().toString() + "-" + temp //2020-2-2
-                    } else if (temp4.split(":").length == 2) { //只有时间，没有年月
-                        temp = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp //2020-02-02 02:00
-                    }
-                    let temp2 = document.createElement("span");
-                    temp2.setAttribute('class', 'createtimecsss');
-                    temp2.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                    if (GM_getValue("tiebameihua") /*贴吧美化后*/) {
-                        temp2.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 10px;top:10px;color: #999;position: absolute');
-                        target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].style = "top: 60px;position: absolute;";
-                    }
-                    temp2.innerHTML = temp;
-                    target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].before(temp2);
-                    //console.log(temp);
-                }
-            }
-            /*文字话题贴*/
-            if (classList.contains('listThreadTitle')) {
-                //console.log(target.parentNode.querySelectorAll(".listReplyNum")[0]);
-                //console.log(target.querySelectorAll(".word_live_title")[0].href.split("/p/")[1]);
-                let tid = JSON.parse(target.querySelectorAll(".word_live_title")[0].href.split("/p/")[1]);
-                let time = await getWaptiebaxinxi(tid).then(result => {
-                    if (result) {
-                        return result;
-                    } else {
-                        return "";
-                    }
-                });
-                let temp = time;
-                if (temp != "") {
-                    temp = temp.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0];
-                    if (temp.split("-").length == 2 && temp.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
-                    {
-                        temp = new Date().getFullYear().toString() + "-" + temp //2020-2-2
-                    } else if (temp.split(":").length == 2) { //只有时间，没有年月
-                        temp = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp //2020-02-02 02:00
-                    }
-                    let temp2 = document.createElement("span");
-                    temp2.setAttribute('class', 'createtimecsss');
-                    temp2.setAttribute('style', 'position: absolute;text-align: center;top:40px;width: 70px;left: 0px;color: #999;');
-                    if (GM_getValue("tiebameihua") /*贴吧美化后*/) {
-                        temp2.setAttribute('style', 'text-align: center;top: 40px !important;width: 70px;left: 10px;top:10px;color: #999;position: absolute');
-                    }
-                    temp2.innerHTML = temp;
-                    target.parentNode.querySelectorAll(".listReplyNum")[0].before(temp2);
-                    //console.log(temp);
-                }
-            }
-            if (classList.contains('icon_retract') || classList.contains('icon_ypic') || classList.contains('icon_turnleft') || classList.contains('icon_turnright')) {
-                target.style = "display:none !important;"
-            }
-            /*图片话题贴清理多余图片工具栏标签+修复大图模式切换图片功能*/
-            var page = 1;
-            var suo2 = false;
-            if (classList.contains('imgtopic_album')) {
-                console.log("整个图片标签刷新");
-                $(".imgtopic_gallery>.thread_pic_show>.threadlist_pic").click((e) => {
-                    let t = setTimeout(() => {
-                        clearTimeout(t);
-                        console.log("点击图片");
-                        let temp = $(".j_media_box");
-                        if (temp.length > 1) {
-                            for (let i = 1; i < temp.length; i++) {
-                                temp[i].remove(); //清理无限自增的多余标签
-                            }
-                        }
-                        page = parseInt($(".j_display_next")[0].getAttribute("cur"));
-                        if (suo2 == false) {
-                            suo2 = true;
-                            /*$(".j_retract").click((e) => {
-                                console.log("关闭");
-                            });*/
-                            $(".j_display_pre").click((e) => {
-                                let target = e.target;
-                                console.log("上一页");
-                                let t2 = setTimeout(() => {
-                                    clearTimeout(t2);
-                                    //console.log(target.getAttribute("cur"));
-                                    //console.log(target.getAttribute("total"));
-                                    page = page - 1;
-                                    let temp1 = $(".j_display_pre");
-                                    for (let i = 0; i < temp1.length; i++) {
-                                        //console.log(temp2[i]);
-                                        temp1[i].setAttribute("cur", page);
-                                    }
-                                    let temp2 = $(".j_display_next");
-                                    for (let i = 0; i < temp2.length; i++) {
-                                        //console.log(temp2[i]);
-                                        temp2[i].setAttribute("cur", page);
-                                    }
-                                }, 0);
-                            });
-                            $(".j_display_next").click((e) => {
-                                let target = e.target;
-                                console.log("下一页");
-                                let t2 = setTimeout(() => {
-                                    clearTimeout(t2);
-                                    //console.log(target.getAttribute("cur"));
-                                    //console.log(target.getAttribute("total"));
-                                    page = page + 1;
-                                    let temp1 = $(".j_display_pre");
-                                    for (let i = 0; i < temp1.length; i++) {
-                                        //console.log(temp2[i]);
-                                        temp1[i].setAttribute("cur", page);
-                                    }
-                                    let temp2 = $(".j_display_next");
-                                    for (let i = 0; i < temp2.length; i++) {
-                                        //console.log(temp2[i]);
-                                        temp2[i].setAttribute("cur", page);
-                                    }
-                                }, 0);
-                            });
-                        }
-                    }, 0);
-                });
-            }
-            if (classList.contains('replace_div')) {
-                /*展开长图片*/
-                //console.log(target);
-                target.classList.add("zhankaichangtupian");
-                target.children[1].classList.add("zhankaichangtupian2");
-                //console.log(target.children[1]);
-            }
-            if (classList.contains('tieba-link-anchor')) { //调整复制链接按钮在旧版贴吧的位置
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                    if (target.parentNode.className == "core_title_btns") {
-                        target.style = "position: absolute;left: 440px;top: 0px;";
-                    }
-                }
-            }
-            /*贴子内页楼层列表*/
-            if (classList.contains('p_postlist')) {
-                let t = setTimeout(() => {
-                    clearTimeout(t);
-                    $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute");
-                }, 1000);
-                /*
+		}
+		if (typeof GM_addStyle != "undefined") {
+			GM_addStyle(tiebadongtai);
+		} else if (typeof PRO_addStyle != "undefined") {
+			PRO_addStyle(tiebadongtai); //有警告
+		} else if (typeof addStyle != "undefined") {
+			addStyle(tiebadongtai); //有警告
+		} else {
+			var node = document.createElement("style");
+			node.type = "text/css";
+			node.appendChild(document.createTextNode(tiebadongtai));
+			var heads = document.getElementsByTagName("head");
+			if (heads.length > 0) {
+				heads[0].appendChild(node);
+			} else {
+				// no head yet, stick it whereever
+				document.documentElement.appendChild(node);
+			}
+		}
+		const tieba_action = async(event) => {
+			const {
+				target
+			} = event;
+			const {
+				classList
+			} = target;
+			//console.log(target);
+			if (classList.contains('core_reply_tail')) {
+				if (qiangdiaoxinxitishi == true) {
+					//console.log(target.querySelectorAll(".core_reply_tail")[0])
+					target.style = "color:#000 !important;"; //强调信息显示。楼层的时间。对旧版贴吧作用一般。
+				}
+				if (!GM_getValue("tiebameihua")) { //贴吧美化
+					//console.log(target.querySelectorAll("ul.p_reply>li>a"));
+					let temp1 = target.querySelectorAll(".p_reply_first") //新贴吧的贴子
+					let temp2 = target.querySelectorAll("ul.p_reply>li>a"); //老贴吧的贴子样式特殊
+					if (temp1[0] != null) {
+						temp1[0].style = "font-size:10px !important;";
+						//console.log(temp1[0].classList[0]);
+						if (temp1[0].classList[1] == "p_reply_first") {
+							temp1[0].innerHTML = "回复楼主";
+						} else {
+							temp1[0].innerHTML = "回复";
+						}
+					}
+					if (temp2[0] != null) {
+						temp2[0].style = "font-size:10px !important;";
+						//console.log(temp1[0].classList[1]);
+						if (temp2[0].classList[0] == "p_reply_first") {
+							temp2[0].innerHTML = "回复楼主";
+							temp2[0].parentNode.style = "width:auto !important;";
+						} else {
+							temp2[0].innerHTML = "回复";
+						}
+					}
+				}
+			}
+			if (event.animationName !== '__tieba_action__') {
+				return;
+			}
+			/*图片话题贴*/
+			if (classList.contains('icon_interview_picture')) {
+				//console.log(target.parentNode.parentNode.parentNode.parentNode);
+				let tid = JSON.parse(target.parentNode.parentNode.parentNode.parentNode.getAttribute('tid'));
+				let time = await getWaptiebaxinxi(tid).then(result => {
+					if (result) {
+						return result;
+					} else {
+						return "";
+					}
+				});
+				let temp = time;
+				if (temp != "") {
+					temp = temp.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0];
+					if (temp.split("-").length == 2 && temp.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+					{
+						temp = new Date().getFullYear().toString() + "-" + temp //2020-2-2
+					} else if (temp4.split(":").length == 2) { //只有时间，没有年月
+						temp = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp //2020-02-02 02:00
+					}
+					let temp2 = document.createElement("span");
+					temp2.setAttribute('class', 'createtimecsss');
+					temp2.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+					if (GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
+						temp2.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 10px;top:10px;color: #999;position: absolute');
+						target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].style = "top: 60px;position: absolute;";
+					}
+					temp2.innerHTML = temp;
+					target.parentNode.parentNode.parentNode.parentNode.querySelectorAll(".threadlist_rep_num")[0].before(temp2);
+					//console.log(temp);
+				}
+			}
+			/*文字话题贴*/
+			if (classList.contains('listThreadTitle')) {
+				//console.log(target.parentNode.querySelectorAll(".listReplyNum")[0]);
+				//console.log(target.querySelectorAll(".word_live_title")[0].href.split("/p/")[1]);
+				let tid = JSON.parse(target.querySelectorAll(".word_live_title")[0].href.split("/p/")[1]);
+				let time = await getWaptiebaxinxi(tid).then(result => {
+					if (result) {
+						return result;
+					} else {
+						return "";
+					}
+				});
+				let temp = time;
+				if (temp != "") {
+					temp = temp.split('<div class="i">1楼.')[1].split('<span class="b">')[1].split("</span>")[0];
+					if (temp.split("-").length == 2 && temp.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) //只有月，没有年
+					{
+						temp = new Date().getFullYear().toString() + "-" + temp //2020-2-2
+					} else if (temp.split(":").length == 2) { //只有时间，没有年月
+						temp = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1).toString() + "-" + new Date().getDate() + " " + temp //2020-02-02 02:00
+					}
+					let temp2 = document.createElement("span");
+					temp2.setAttribute('class', 'createtimecsss');
+					temp2.setAttribute('style', 'position: absolute;text-align: center;top:40px;width: 70px;left: 0px;color: #999;');
+					if (GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
+						temp2.setAttribute('style', 'text-align: center;top: 40px !important;width: 70px;left: 10px;top:10px;color: #999;position: absolute');
+					}
+					temp2.innerHTML = temp;
+					target.parentNode.querySelectorAll(".listReplyNum")[0].before(temp2);
+					//console.log(temp);
+				}
+			}
+			if (classList.contains('icon_retract') || classList.contains('icon_ypic') || classList.contains('icon_turnleft') || classList.contains('icon_turnright')) {
+				target.style = "display:none !important;"
+			}
+			/*图片话题贴清理多余图片工具栏标签+修复大图模式切换图片功能*/
+			var page = 1;
+			var suo2 = false;
+			if (classList.contains('imgtopic_album')) {
+				console.log("整个图片标签刷新");
+				$(".imgtopic_gallery>.thread_pic_show>.threadlist_pic").click((e) => {
+					let t = setTimeout(() => {
+						clearTimeout(t);
+						console.log("点击图片");
+						let temp = $(".j_media_box");
+						if (temp.length > 1) {
+							for (let i = 1; i < temp.length; i++) {
+								temp[i].remove(); //清理无限自增的多余标签
+							}
+						}
+						page = parseInt($(".j_display_next")[0].getAttribute("cur"));
+						if (suo2 == false) {
+							suo2 = true;
+							/*$(".j_retract").click((e) => {
+							    console.log("关闭");
+							});*/
+							$(".j_display_pre").click((e) => {
+								let target = e.target;
+								console.log("上一页");
+								let t2 = setTimeout(() => {
+									clearTimeout(t2);
+									//console.log(target.getAttribute("cur"));
+									//console.log(target.getAttribute("total"));
+									page = page - 1;
+									let temp1 = $(".j_display_pre");
+									for (let i = 0; i < temp1.length; i++) {
+										//console.log(temp2[i]);
+										temp1[i].setAttribute("cur", page);
+									}
+									let temp2 = $(".j_display_next");
+									for (let i = 0; i < temp2.length; i++) {
+										//console.log(temp2[i]);
+										temp2[i].setAttribute("cur", page);
+									}
+								}, 0);
+							});
+							$(".j_display_next").click((e) => {
+								let target = e.target;
+								console.log("下一页");
+								let t2 = setTimeout(() => {
+									clearTimeout(t2);
+									//console.log(target.getAttribute("cur"));
+									//console.log(target.getAttribute("total"));
+									page = page + 1;
+									let temp1 = $(".j_display_pre");
+									for (let i = 0; i < temp1.length; i++) {
+										//console.log(temp2[i]);
+										temp1[i].setAttribute("cur", page);
+									}
+									let temp2 = $(".j_display_next");
+									for (let i = 0; i < temp2.length; i++) {
+										//console.log(temp2[i]);
+										temp2[i].setAttribute("cur", page);
+									}
+								}, 0);
+							});
+						}
+					}, 0);
+				});
+			}
+			if (classList.contains('replace_div')) {
+				/*展开长图片*/
+				//console.log(target);
+				target.classList.add("zhankaichangtupian");
+				target.children[1].classList.add("zhankaichangtupian2");
+				//console.log(target.children[1]);
+			}
+			if (classList.contains('tieba-link-anchor')) { //调整复制链接按钮在旧版贴吧的位置
+				if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+					if (target.parentNode.className == "core_title_btns") {
+						target.style = "position: absolute;left: 440px;top: 0px;";
+					}
+				}
+			}
+			/*贴子内页楼层列表*/
+			if (classList.contains('p_postlist')) {
+				let t = setTimeout(() => {
+					clearTimeout(t);
+					$('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute");
+				}, 1000);
+				/*
                 修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
     目标标签class p_thread thread_theme_5
     加个thread_theme_bright_absolute
                 */
-            }
-            if (classList.contains('u_login')) {
-                $("li.u_login").click(() => { //解决贴子刚加载后，点不出登陆弹窗
-                    if (tieba_custom_pass_login != null && tieba_custom_pass_login != false) {
-                        clearInterval(tieba_custom_pass_login);
-                        tieba_custom_pass_login = null;
-                    }
-                });
-                console.log("未登陆");
-                //百度贴吧：不登录即可看贴 by VA
-                if (!GM_getValue("tiebameihua")) { //贴吧美化
-                    if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
-                        if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
-                            let temp3 = $("div.userbar")[0];
-                            yincangcebianlanx = true;
-                            $("#yincangcebianlan")[0].value = "<<";
-                            if (temp3 != null) {
-                                temp3.style = "display:none;";
-                            }
-                            console.log("全局隐藏侧边栏1");
-                        }
-                    }
-                }
-                let killlogin = 6;
-                tieba_custom_pass_login = setInterval(() => {
-                    if (killlogin == 0) {
-                        clearInterval(tieba_custom_pass_login);
-                        tieba_custom_pass_login = null;
-                    }
-                    try {
-                        document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove(); //解决未登陆贴吧看贴会弹窗的问题
-                    } catch (e) { }
-                    killlogin--;
-                }, 1000);
-            }
-            if (classList.contains('userbar')) {
-                console.log("不登陆看贴")
-                unsafeWindow.PageData.user.is_login = 1
-            }
-            /*侧工具栏*/
-            /*下半部分单独处理以避免偶尔隐藏失败*/
-            if (classList.contains('tbui_aside_float_bar')) {
-                //$("li.tbui_fbar_favor")[0].before();
-                //console.log(target);
-                if (!GM_getValue("tiebameihua")) { //贴吧美化
-                    if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
-                        if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
-                            if (yincangcebianlanx == false) {
-                                yincangcebianlanx = true;
-                                $("#yincangcebianlan")[0].value = "<<";
-                            }
-                            target.style = "display:none;";
-                            console.log("全局隐藏侧边栏2");
-                        }
-                    }
-                }
-                //给贴子和我的贴吧添加一个刷新按钮
-                //https://tieba.baidu.com/home/main?id=
-                //if ((new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href) || (new RegExp("^(https|http)?://(tieba.baidu.com|www.tieba.com)/home/main\\?id\\=.*$")).test(document.location.href)) {
-                let fuzuodian1 = target.querySelectorAll(".tbui_fbar_down")[0] || target.querySelectorAll(".tbui_fbar_top")[0];//tbui_fbar_top .tbui_fbar_down下载app按钮
-                let fuzuodian2 = target.querySelectorAll(".tbui_fbar_top")[0];
-                if (target.querySelectorAll(".tbui_fbar_refresh")[0] == undefined) {
-                    let refresh1 = document.createElement("li"); //创建节点<li/>
-                    let refresh2 = document.createElement("a"); //创建节点<a/>
-                    refresh1.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_refresh');
-                    refresh1.appendChild(refresh2);
-                    fuzuodian1.before(refresh1);
-                    refresh2.addEventListener('click', (e) => {
-                        window.location.reload();
-                    });
-                }
-                let bottom1 = document.createElement("li"); //创建节点<li/>
-                let bottom2 = document.createElement("a"); //创建节点<a/>
-                //temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
-                bottom1.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_bottom');
-                bottom1.appendChild(bottom2);
-                fuzuodian2.after(bottom1);
-                bottom2.addEventListener('click', (e) => {
-                    window.scrollTo(0, document.body.scrollHeight);
-                    /*let i = document.documentElement.scrollTop;
-                    let t = setInterval(() => {
-                        //console.log(document.documentElement.scrollTop)
-                        if (i <= document.body.scrollHeight) {
-                            window.scrollTo(document.documentElement.scrollTop, i);
-                            i += 500;
-                        } else {
-                            clearInterval(t);
-                        }
-                    }, 40);*/
-                });
-                //快速到底按钮动画效果
-                window.addEventListener("scroll", function (e) {
-                    let temp = document.querySelectorAll(".tbui_fbar_bottom")[0]
-                    if (temp != undefined) {
-                        //console.log(document.documentElement.scrollTop)
-                        //console.log(document.body.scrollHeight- 1000)
-                        //console.log(window.scrollY)
-                        if (window.scrollY >= document.body.scrollHeight - 1000) {
-                            temp.setAttribute("style", "visibility: hidden;")
-                        }
-                        else {
-                            temp.setAttribute("style", "visibility: visible;")
-                        }
-                    }
-                });
-                //}
-            }
-            //let checker;
-            //console.log(target);
-            //console.log(classList.contains('j_thread_list'))
-            if (classList.contains('u_menu_username')) {
-                //console.log(target);
-                // @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
-                //console.log(localStorage.getItem("userid"));
-                var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
-                if (localStorage.getItem("userid") == null || localStorage.getItem("userid") != "" || localStorage.getItem("userid") != undefined) { //可能没用？
-                    localStorage.setItem("userid", getIsLogin2)
-                }
-                //console.log(getIsLogin2)
-                if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("tiebameihua") /*关闭贴吧美化后，不显示大头像*/) {
-                    //console.log($("div.edui-icon-bold")[0]);
-                    /*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
-                        //console.log($("div.edui-icon-bold")[0]);
-                        suo = true;
-                        $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
-                        $("div.edui-btn-red")[0].style = "display:block;"
-                    }*/
-                    //贴吧右上角的用户头像
-                    let t = setTimeout(async () => { //增加延时以提高右上角按钮显示用户头像的成功率
-                        clearTimeout(t);
-                        let userimg = "";
-                        let userportrait = unsafeWindow.PageData.user.portrait; //.replace(/\?t=.*/, "");
-                        //https://sign.52fisher.cn/93.html 常用贴吧接口 April 15, 2016
-                        if (userportrait == "") { //解决无法获取到portrait的情况
-                            var c = {
-                                'un': unsafeWindow.PageData.user.name || unsafeWindow.PageData.user.user_name
-                            };
-                            await $.get("/home/get/panel", c,
-                                function (o) {
-                                    if (o != null) {
-                                        console.log("/home/get/panel: " + o.data.portrait);
-                                        userimg = "https://himg.bdimg.com/sys/portrait/item/" + o.data.portrait;
-                                    }
-                                }, "json");
-                        } else {
-                            if (userportrait.search("http") == -1) {
-                                userimg = "https://himg.bdimg.com/sys/portrait/item/" + userportrait
-                            }
-                            else {
-                                userimg = userportrait//有些页面是完整的链接，例如贴吧热议https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=xxxxxx&topic_name=xxxxx
-                            }
-                        }
-                        /*
-                        贴吧用户头像
-                        PC网页端贴吧，自定义头像一天只能更换3次，贴吧默认头像应该不限制次数
-                        时间戳/1000  应该可以选头像
-                        需要填上时间戳才能保证头像显示正确
-                        一般默认显示64*64
-    https://gss0.bdstatic.com/一串大小写字母数字/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
-    https://gss0.baidu.com/一串大小写字母数字/sys/portraith/item/[PageData.user.portrait]?t=时间戳/1000 大图 960*960，580*580
-    https://himg.bdimg.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
-    http://tb.himg.baidu.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
-    https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1000                        */
-                        //console.log(userimg);
-                        if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
-                            $("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
-                        }
-                    }, 1000);
-                }
-            }
-            if (classList.contains('u_news')) {
-                //console.log(target);
-                try {
-                    let ii = 0;
-                    let t = setInterval(() => {
-                        if (qiangdiaoxinxitishi == true) {
-                            let temp1 = $(".u_news_wrap span"); //浮动按钮
-                            let temp2 = $(".u_notity_bd .category_item"); //浮动按钮
-                            let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span"); //浮动按钮
-                            let temp5 = $("ul.sys_notify_last>li>a>span"); //浮动按钮
-                            //console.log(temp1);
-                            //console.log(temp2);
-                            //console.log(temp4);
-                            //console.log(temp5);
-                            if (ii <= 59) {
-                                ii++;
-                            } else {
-                                clearInterval(t);
-                            }
-                            if (temp1[0] != null && temp2[0] != null && temp4[0] != null && temp5[0] != null) {
-                                clearInterval(t);
-                                let i = 0;
-                                for (i = 0; i < temp1.length; i++) {
-                                    temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
-                                }
-                                for (i = 0; i < temp2.length; i++) {
-                                    temp2[i].style["color"] = "#f00 !important;";
-                                }
+			}
+			if (classList.contains('u_login')) {
+				$("li.u_login").click(() => { //解决贴子刚加载后，点不出登陆弹窗
+					if (tieba_custom_pass_login != null && tieba_custom_pass_login != false) {
+						clearInterval(tieba_custom_pass_login);
+						tieba_custom_pass_login = null;
+					}
+				});
+				console.log("未登陆");
+				//百度贴吧：不登录即可看贴 by VA
+				if (!GM_getValue("tiebameihua")) { //贴吧美化
+					if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+						if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
+							let temp3 = $("div.userbar")[0];
+							yincangcebianlanx = true;
+							$("#yincangcebianlan")[0].value = "<<";
+							if (temp3 != null) {
+								temp3.style = "display:none;";
+							}
+							console.log("全局隐藏侧边栏1");
+						}
+					}
+				}
+				let killlogin = 6;
+				tieba_custom_pass_login = setInterval(() => {
+					if (killlogin == 0) {
+						clearInterval(tieba_custom_pass_login);
+						tieba_custom_pass_login = null;
+					}
+					try {
+						document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove(); //解决未登陆贴吧看贴会弹窗的问题
+					} catch (e) {}
+					killlogin--;
+				}, 1000);
+			}
+			if (classList.contains('userbar')) {
+				console.log("不登陆看贴")
+				unsafeWindow.PageData.user.is_login = 1
+			}
+			/*侧工具栏*/
+			/*下半部分单独处理以避免偶尔隐藏失败*/
+			if (classList.contains('tbui_aside_float_bar')) {
+				//$("li.tbui_fbar_favor")[0].before();
+				//console.log(target);
+				if (!GM_getValue("tiebameihua")) { //贴吧美化
+					if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+						if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
+							if (yincangcebianlanx == false) {
+								yincangcebianlanx = true;
+								$("#yincangcebianlan")[0].value = "<<";
+							}
+							target.style = "display:none;";
+							console.log("全局隐藏侧边栏2");
+						}
+					}
+				}
+				//给贴子和我的贴吧添加一个刷新按钮
+				//https://tieba.baidu.com/home/main?id=
+				//if ((new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href) || (new RegExp("^(https|http)?://(tieba.baidu.com|www.tieba.com)/home/main\\?id\\=.*$")).test(document.location.href)) {
+				let fuzuodian1 = target.querySelectorAll(".tbui_fbar_down")[0] || target.querySelectorAll(".tbui_fbar_top")[0]; //tbui_fbar_top .tbui_fbar_down下载app按钮
+				let fuzuodian2 = target.querySelectorAll(".tbui_fbar_top")[0];
+				if (target.querySelectorAll(".tbui_fbar_refresh")[0] == undefined) {
+					let refresh1 = document.createElement("li"); //创建节点<li/>
+					let refresh2 = document.createElement("a"); //创建节点<a/>
+					refresh1.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_refresh');
+					refresh1.appendChild(refresh2);
+					fuzuodian1.before(refresh1);
+					refresh2.addEventListener('click', (e) => {
+						window.location.reload();
+					});
+				}
+				let bottom1 = document.createElement("li"); //创建节点<li/>
+				let bottom2 = document.createElement("a"); //创建节点<a/>
+				//temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
+				bottom1.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_bottom');
+				bottom1.appendChild(bottom2);
+				fuzuodian2.after(bottom1);
+				bottom2.addEventListener('click', (e) => {
+					window.scrollTo(0, document.body.scrollHeight);
+					/*let i = document.documentElement.scrollTop;
+					let t = setInterval(() => {
+					    //console.log(document.documentElement.scrollTop)
+					    if (i <= document.body.scrollHeight) {
+					        window.scrollTo(document.documentElement.scrollTop, i);
+					        i += 500;
+					    } else {
+					        clearInterval(t);
+					    }
+					}, 40);*/
+				});
+				//快速到底按钮动画效果
+				window.addEventListener("scroll", function(e) {
+					let temp = document.querySelectorAll(".tbui_fbar_bottom")[0]
+					if (temp != undefined) {
+						//console.log(document.documentElement.scrollTop)
+						//console.log(document.body.scrollHeight- 1000)
+						//console.log(window.scrollY)
+						if (window.scrollY >= document.body.scrollHeight - 1000) {
+							temp.setAttribute("style", "visibility: hidden;")
+						} else {
+							temp.setAttribute("style", "visibility: visible;")
+						}
+					}
+				});
+				//}
+			}
+			//let checker;
+			//console.log(target);
+			//console.log(classList.contains('j_thread_list'))
+			if (classList.contains('u_menu_username')) {
+				//console.log(target);
+				// @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
+				//console.log(localStorage.getItem("userid"));
+				var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
+				if (localStorage.getItem("userid") == null || localStorage.getItem("userid") != "" || localStorage.getItem("userid") != undefined) { //可能没用？
+					localStorage.setItem("userid", getIsLogin2)
+				}
+				//console.log(getIsLogin2)
+				if (getIsLogin2 != 0 && getIsLogin2 != "" && getIsLogin2 == localStorage.getItem("userid") && !GM_getValue("tiebameihua") /*关闭贴吧美化后，不显示大头像*/ ) {
+					//console.log($("div.edui-icon-bold")[0]);
+					/*if ($("div.edui-btn-bold")[0] != null && $("div.edui-btn-red")[0] != null && suo == false) {
+					    //console.log($("div.edui-icon-bold")[0]);
+					    suo = true;
+					    $("div.edui-btn-bold")[0].style = "display:block;" //让发贴文本编辑器的字体加粗按钮和文字变红按钮一定能显示出来。2020-2-27经测试确定该功能已失效。
+					    $("div.edui-btn-red")[0].style = "display:block;"
+					}*/
+					//贴吧右上角的用户头像
+					if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\/search\//g) == -1) {
+						let t = setTimeout(async() => { //增加延时以提高右上角按钮显示用户头像的成功率
+							clearTimeout(t);
+							let userimg = "";
+							let userportrait = unsafeWindow.PageData.user.portrait; //.replace(/\?t=.*/, "");
+							//https://sign.52fisher.cn/93.html 常用贴吧接口 April 15, 2016
+							if (userportrait == "") { //解决无法获取到portrait的情况
+								var c = {
+									'un': unsafeWindow.PageData.user.name || unsafeWindow.PageData.user.user_name
+								};
+								await $.get("/home/get/panel", c,
+									function(o) {
+										if (o != null) {
+											console.log("/home/get/panel: " + o.data.portrait);
+											userimg = "https://himg.bdimg.com/sys/portrait/item/" + o.data.portrait;
+										}
+									}, "json");
+							} else {
+								if (userportrait.search("http") == -1) {
+									userimg = "https://himg.bdimg.com/sys/portrait/item/" + userportrait
+								} else {
+									userimg = userportrait //有些页面是完整的链接，例如贴吧热议https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=xxxxxx&topic_name=xxxxx
+								}
+							}
+							/*
+                            贴吧用户头像
+                            PC网页端贴吧，自定义头像一天只能更换3次，贴吧默认头像应该不限制次数
+                            时间戳/1000  应该可以选头像
+                            需要填上时间戳才能保证头像显示正确
+                            一般默认显示64*64
+        https://gss0.bdstatic.com/一串大小写字母数字/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
+        https://gss0.baidu.com/一串大小写字母数字/sys/portraith/item/[PageData.user.portrait]?t=时间戳/1000 大图 960*960，580*580
+        https://himg.bdimg.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
+        http://tb.himg.baidu.com/sys/portrait/item/[PageData.user.portrait]?t=时间戳/1000 110*110
+        https://himg.baidu.com/sys/portraitl/item/[PageData.user.portrait]?t=时间戳/1000                        */
+							//console.log(userimg);
+							if ($("img.u_username_avatar")[0] == null && $("span.u_username_title")[0] != null) {
+								$("span.u_username_title").before('<img class="u_username_avatar" src=' + userimg + '>');
+							}
+						}, 1000);
+					}
+				}
+			}
+			if (classList.contains('u_news')) {
+				//console.log(target);
+				try {
+					let ii = 0;
+					let t = setInterval(() => {
+							if (qiangdiaoxinxitishi == true) {
+								let temp1 = $(".u_news_wrap span"); //浮动按钮
+								let temp2 = $(".u_notity_bd .category_item"); //浮动按钮
+								let temp4 = $("ul.j_category_list>li>a>span,ul.j_category_list>#u_notify_item>li>a>span"); //浮动按钮
+								let temp5 = $("ul.sys_notify_last>li>a>span"); //浮动按钮
+								//console.log(temp1);
+								//console.log(temp2);
+								//console.log(temp4);
+								//console.log(temp5);
+								if (ii <= 59) {
+									ii++;
+								} else {
+									clearInterval(t);
+								}
+								if (temp1[0] != null && temp2[0] != null && temp4[0] != null && temp5[0] != null) {
+									clearInterval(t);
+									let i = 0;
+									for (i = 0; i < temp1.length; i++) {
+										temp1[i].style = "display:" + temp1[i].style["display"] + ";color:#f00 !important;";
+									}
+									for (i = 0; i < temp2.length; i++) {
+										temp2[i].style["color"] = "#f00 !important;";
+									}
 
-                                for (i = 0; i < temp4.length; i++) {
-                                    temp4[i].style = "color:#f00 !important;";
-                                }
-                                for (i = 0; i < temp5.length; i++) {
-                                    temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
-                                }
-                            }
-                        }
+									for (i = 0; i < temp4.length; i++) {
+										temp4[i].style = "color:#f00 !important;";
+									}
+									for (i = 0; i < temp5.length; i++) {
+										temp5[i].style = "display:" + temp5[i].style["display"] + ";color:#f00 !important;";
+									}
+								}
+							}
 
-                    },
-                        1000);
-                } catch (err) {
-                    console.log("强调信息提示:" + err);
-                }
-            }
-            if (classList.contains('u_setting')) {
-                //console.log(target);
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
-                    if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
-                        let temp3 = $("div.userbar ")[0];
-                        //let temp4 = $("ul.tbui_aside_float_bar")[0];
-                        yincangcebianlanx = true;
-                        $("#yincangcebianlan")[0].value = "<<";
-                        if (temp3 != null) {
-                            temp3.style = "display:none;";
-                        }
-                        /*if (temp4 != null) {
-                            temp4.style = "display:none;";
-                        }*/
-                        console.log("全局隐藏侧边栏0");
-                    }
-                }
-            }
-            if (classList.contains('icon-member-top')) {
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                    target.style = "background:none;background-color: #FFCC26;";
-                }
-            }
-            if (classList.contains("t_con")) {
-                //console.log("t_con:" + target);
-                let temp6 = target.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
-                let temp9 = target.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
-                let temp10 = target.querySelectorAll(".icon-top")[0]; //显示置顶标识
-                //let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
-                //console.log("temp6:" + temp6[0])
-                //console.log("temp9:" + temp9)
-                //console.log("temp10:" + temp10)
-                //console.log(temp6.childNodes);
-                if (temp6.querySelectorAll(".createtimecsss")[0] != null) {
-                    return false;
-                }
-                if (temp6.children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
-                {
-                    let temp7 = document.createElement("span");
-                    temp7.setAttribute('class', 'createtimecsss');
-                    if (temp6.parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6.parentNode.querySelectorAll(".icon-top")[0] == null) {
-                        temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
-                        temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
-                    } else {
-                        if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
-                            temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                            temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
-                        } else {
-                            temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                            temp6.children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
-                        }
-                    }
-                    //console.log(temp6.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
-                    let temp8 = target.querySelectorAll(".is_show_create_time")[0].innerHTML;
-                    //console.log(temp6.parentNode.querySelectorAll(".icon-member-top"))
-                    //console.log(temp6.parentNode.querySelectorAll(".icon-top"))
-                    if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
-                        temp8 = new Date().getFullYear().toString() + "-" + temp8
-                    }
-                    temp7.innerHTML = temp8;
-                    //console.log(temp8)
-                    temp6.children[0].before(temp7);
-                }
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                    if (temp9 != null) {
-                        temp9.style = "background-color: #FF6666;";
-                    }
-                    if (temp10 != null) {
-                        temp10.style = "background:none;background-color: #4285F5;";
-                    }
-                    // if (temp11 != null) {
-                    //     temp11.style = "background:none;background-color: #FFCC26;";
-                    // }
-                }
-            }
-            if (classList.contains('l_post')) {
-                try {
-                    //console.log(target);
-                } catch (err) {
-                    console.log("l_post:" + err)
-                }
-                //console.log(target.querySelectorAll(".is_show_create_time")[0].innerHTML);
-                //console.log(target.querySelectorAll(".col2_left")[0]);
-                if (pingbi_loucengqipao == true) {
-                    let temp1 = target.querySelectorAll(".post_bubble_top")[0];
-                    let temp2 = target.querySelectorAll(".post_bubble_middle")[0];
-                    let temp3 = target.querySelectorAll(".post_bubble_bottom")[0];
-                    if (temp1 != null && temp1 != null && temp1 != null) {
-                        temp1.style = "backgrounde:none;";
-                        temp2.style = "backgrounde:none;padding:unset;";
-                        temp3.style = "backgrounde:none;";
-                    }
-                }
-            }
-            /*if (classList.contains('pager_theme_4')) {
-            }*/
-            /*if (classList.contains('l_posts_num') || classList.contains('thread_theme_5')) { //贴子内只动态执行一次 thread_theme_5只在第一次打开贴子时执行，翻页执行 ||classList.contains('pager_theme_4')
-                //$("div.replace_div>div.replace_tip").click()
-                        by tency
-                        https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
-                        自动展开百度贴吧帖子的图片
-                        自动展开百度贴吧帖子的图片，方便浏览图片帖
-                        version    0.2
-                        copyright  2014+, LYY
-            }*/
-            if (classList.contains('right')) { //显示移除粉丝按钮
-                //console.log(target);
-                //console.log(target.children[0].querySelectorAll("div")[1]);
-                let temp = target.children[0].querySelectorAll("div")[1];
-                if (temp != null) {
-                    temp.style = "padding:4px 0 0 14px;display:block !important;";
-                }
-            }
-            if (target.getAttribute('id') == "main_aside") { //显示移除粉丝按钮
-                //console.log(target);
-                if ((window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) && !GM_getValue("tiebameihua")) {
-                    target.remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
-                    //http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
-                }
-            }
-            //修复贴吧头像bug1
-            if (target.getAttribute('id') == "j_userhead") {
-                //if (/https:\/\/tieba\.baidu\.com\/home\/main\/.*/.test(window.location.href) == true) {
-                let t = setTimeout(() => {
-                    clearTimeout(t);
-                    $("#j_userhead>a>img")[0].setAttribute("src", unsafeWindow.ihome.Userinfo.portraitRoot.MIDDLE + $("#j_userhead")[0].getAttribute("data-sign")); //重设头像链接
-                }, 1000);
-                // }
-            }
-            //修复贴吧头像bug1
-            if (target.getAttribute('id') == "user_info") {
-                //if (/https:\/\/tieba\.baidu\.com\//.test(window.location.href) == true) {
-                let t = setTimeout(() => {
-                    clearTimeout(t);
-                    $("#user_info>a>img")[0].setAttribute("src", "https://himg.bdimg.com/sys/portrait/item/" + unsafeWindow.PageData.user.portrait); //重设头像链接
-                }, 1000);
-                // }
-            }
-            ///*修复我的贴吧-热门动态-图片显示*/
-            if (classList.contains('m_pic')) {
-                let i = 0;
-                let t = setInterval(() => {
-                    if (target.style[0] != undefined) { //等待图片加载完成
-                        target.style = "width: 100px; height: 100px;";
-                        clearInterval(t);
-                        t = null;
-                    }
-                    if (i == 10) { //超时处理
-                        target.style = "width: 100px; height: 100px;";
-                        clearInterval(t);
-                        t = null;
-                    }
-                    i++;
-                }, 2000);
-                //document.querySelectorAll("ul.new_list>div>div>ul>li>img.m_pic").forEach(pic => pic.style = "width: 100px; height: 100px;");//浏览器开发者工具可用
-            }
-            if (classList.contains('dialog_block')) {
-                target.remove();
-            }
-            if (classList.contains('video_src_wrap_main') || classList.contains('media_disp') || classList.contains('media_box')) {
-                //让视频贴可以下载视频,video_src_wrap_main是贴子内的，media_disp是贴子列表简介的
-                let temp = target.querySelectorAll("video")[0]
-                if (temp != undefined) {
-                    console.log("video:" + target.querySelectorAll("video")[0].outerHTML)
-                    temp.setAttribute("controlslist", "download")
-                }
-            }
-            //个人主页下方的贴子加载按钮
-            if (target.getAttribute('id') == "j_more_hotFeed") {
-                //https://tieba.baidu.com/home/main?id=
-                //"\\"让?和=作为字符串存在，可以用于匹配
-                //$("#j_more_hotFeed>a")[0].click()
-                //如果瞬移到网页底部可能会失效
-                if (window.location.href.search("/home/main\\?id\\=") != -1) {
-                    console.log("j_more_hotFeed" + target.outerHTML);
-                    let t = setTimeout(() => {
-                        target.querySelectorAll("a")[0].click()
-                        clearTimeout(t)
-                        t = null
-                    }, 1000)
-                }
-            }
-        }
-        const initListener = () => {
-            PrefixedEvent(document, "AnimationStart", tieba_action); //开始
-            //document.addEventListener('webkitAnimationStart', tieba_action, false);
-            //document.addEventListener('MSAnimationStart', tieba_action, false);
-            //document.addEventListener('animationstart', tieba_action, false);
-        };
-        var yingcang = false;
-        window.addEventListener("transitionend", function (e) { //解决刷新贴子自动跳转到某个位置可能无法隐藏下工具栏问题，缓解工具栏偶尔出现不隐藏问题
-            const {
-                target
-            } = e;
-            const {
-                classList
-            } = target;
-            //console.log(target);
-            let temp = $('#j_core_title_wrap'); //主体框架
-            if (temp[0] != null) {
-                if (rmBottom == true) {
-                    if (classList.contains('l_thread_info') == true) {
-                        $('.core_title_bg')[0].style = "display:none !important;";
-                        $('.core_title_txt')[0].style = "display:none !important;";
-                        $('.core_title_btns')[0].style = "display: none !important;";
-                        $('#thread_theme_5')[0].style = "display:none !important;";
-                    }
-                } else {
+						},
+						1000);
+				} catch (err) {
+					console.log("强调信息提示:" + err);
+				}
+			}
+			if (classList.contains('u_setting')) {
+				//console.log(target);
+				if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+					if (GM_getValue("yincangcebianlan") == true) { //隐藏侧边栏
+						let temp3 = $("div.userbar ")[0];
+						//let temp4 = $("ul.tbui_aside_float_bar")[0];
+						yincangcebianlanx = true;
+						$("#yincangcebianlan")[0].value = "<<";
+						if (temp3 != null) {
+							temp3.style = "display:none;";
+						}
+						/*if (temp4 != null) {
+						    temp4.style = "display:none;";
+						}*/
+						console.log("全局隐藏侧边栏0");
+					}
+				}
+			}
+			if (classList.contains('icon-member-top')) {
+				if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+					target.style = "background:none;background-color: #FFCC26;";
+				}
+			}
+			if (classList.contains("t_con")) {
+				//console.log("t_con:" + target);
+				let temp6 = target.querySelectorAll(".col2_left")[0]; //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
+				let temp9 = target.querySelectorAll(".icon-good")[0]; //显示精品贴，精华贴标识
+				let temp10 = target.querySelectorAll(".icon-top")[0]; //显示置顶标识
+				//let temp11 = target.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
+				//console.log("temp6:" + temp6[0])
+				//console.log("temp9:" + temp9)
+				//console.log("temp10:" + temp10)
+				//console.log(temp6.childNodes);
+				if (temp6.querySelectorAll(".createtimecsss")[0] != null) {
+					return false;
+				}
+				if (temp6.children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
+				{
+					let temp7 = document.createElement("span");
+					temp7.setAttribute('class', 'createtimecsss');
+					if (temp6.parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6.parentNode.querySelectorAll(".icon-top")[0] == null) {
+						temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
+						temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
+					} else {
+						if (!GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
+							temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+							temp6.children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
+						} else {
+							temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+							temp6.children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
+						}
+					}
+					//console.log(temp6.parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
+					let temp8 = target.querySelectorAll(".is_show_create_time")[0].innerHTML;
+					//console.log(temp6.parentNode.querySelectorAll(".icon-member-top"))
+					//console.log(temp6.parentNode.querySelectorAll(".icon-top"))
+					if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
+						temp8 = new Date().getFullYear().toString() + "-" + temp8
+					}
+					temp7.innerHTML = temp8;
+					//console.log(temp8)
+					temp6.children[0].before(temp7);
+				}
+				if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+					if (temp9 != null) {
+						temp9.style = "background-color: #FF6666;";
+					}
+					if (temp10 != null) {
+						temp10.style = "background:none;background-color: #4285F5;";
+					}
+					// if (temp11 != null) {
+					//     temp11.style = "background:none;background-color: #FFCC26;";
+					// }
+				}
+			}
+			if (classList.contains('l_post')) {
+				try {
+					//console.log(target);
+				} catch (err) {
+					console.log("l_post:" + err)
+				}
+				//console.log(target.querySelectorAll(".is_show_create_time")[0].innerHTML);
+				//console.log(target.querySelectorAll(".col2_left")[0]);
+				if (pingbi_loucengqipao == true) {
+					let temp1 = target.querySelectorAll(".post_bubble_top")[0];
+					let temp2 = target.querySelectorAll(".post_bubble_middle")[0];
+					let temp3 = target.querySelectorAll(".post_bubble_bottom")[0];
+					if (temp1 != null && temp1 != null && temp1 != null) {
+						temp1.style = "backgrounde:none;";
+						temp2.style = "backgrounde:none;padding:unset;";
+						temp3.style = "backgrounde:none;";
+					}
+				}
+			}
+			/*if (classList.contains('pager_theme_4')) {
+			}*/
+			/*if (classList.contains('l_posts_num') || classList.contains('thread_theme_5')) { //贴子内只动态执行一次 thread_theme_5只在第一次打开贴子时执行，翻页执行 ||classList.contains('pager_theme_4')
+			    //$("div.replace_div>div.replace_tip").click()
+			            by tency
+			            https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
+			            自动展开百度贴吧帖子的图片
+			            自动展开百度贴吧帖子的图片，方便浏览图片帖
+			            version    0.2
+			            copyright  2014+, LYY
+			}*/
+			if (classList.contains('right')) { //显示移除粉丝按钮
+				//console.log(target);
+				//console.log(target.children[0].querySelectorAll("div")[1]);
+				let temp = target.children[0].querySelectorAll("div")[1];
+				if (temp != null) {
+					temp.style = "padding:4px 0 0 14px;display:block !important;";
+				}
+			}
+			if (target.getAttribute('id') == "main_aside") { //显示移除粉丝按钮
+				//console.log(target);
+				if ((window.location.href.search("/i/i/fans") != -1 || window.location.href.search("/i/i/concern") != -1) && !GM_getValue("tiebameihua")) {
+					target.remove(); //这两个页面出错后的临时解决方案，直接删了出问题标签23333
+					//http://tieba.baidu.com/i/i/fans?u=XXXXX，http://tieba.baidu.com/i/i/concern?u=XXXXX
+				}
+			}
+			//修复贴吧头像bug1
+			if (target.getAttribute('id') == "j_userhead") {
+				//if (/https:\/\/tieba\.baidu\.com\/home\/main\/.*/.test(window.location.href) == true) {
+				let t = setTimeout(() => {
+					clearTimeout(t);
+					$("#j_userhead>a>img")[0].setAttribute("src", unsafeWindow.ihome.Userinfo.portraitRoot.MIDDLE + $("#j_userhead")[0].getAttribute("data-sign")); //重设头像链接
+				}, 1000);
+				// }
+			}
+			//修复贴吧头像bug1
+			if (target.getAttribute('id') == "user_info") {
+				//if (/https:\/\/tieba\.baidu\.com\//.test(window.location.href) == true) {
+				let t = setTimeout(() => {
+					clearTimeout(t);
+					$("#user_info>a>img")[0].setAttribute("src", "https://himg.bdimg.com/sys/portrait/item/" + unsafeWindow.PageData.user.portrait); //重设头像链接
+				}, 1000);
+				// }
+			}
+			///*修复我的贴吧-热门动态-图片显示*/
+			if (classList.contains('m_pic')) {
+				let i = 0;
+				let t = setInterval(() => {
+					if (target.style[0] != undefined) { //等待图片加载完成
+						target.style = "width: 100px; height: 100px;";
+						clearInterval(t);
+						t = null;
+					}
+					if (i == 10) { //超时处理
+						target.style = "width: 100px; height: 100px;";
+						clearInterval(t);
+						t = null;
+					}
+					i++;
+				}, 2000);
+				//document.querySelectorAll("ul.new_list>div>div>ul>li>img.m_pic").forEach(pic => pic.style = "width: 100px; height: 100px;");//浏览器开发者工具可用
+			}
+			if (classList.contains('dialog_block')) {
+				target.remove();
+			}
+			if (classList.contains('video_src_wrap_main') || classList.contains('media_disp') || classList.contains('media_box')) {
+				//让视频贴可以下载视频,video_src_wrap_main是贴子内的，media_disp是贴子列表简介的
+				let temp = target.querySelectorAll("video")[0]
+				if (temp != undefined) {
+					console.log("video:" + target.querySelectorAll("video")[0].outerHTML)
+					temp.setAttribute("controlslist", "download")
+				}
+			}
+			//个人主页下方的贴子加载按钮
+			if (target.getAttribute('id') == "j_more_hotFeed") {
+				//https://tieba.baidu.com/home/main?id=
+				//"\\"让?和=作为字符串存在，可以用于匹配
+				//$("#j_more_hotFeed>a")[0].click()
+				//如果瞬移到网页底部可能会失效
+				if (window.location.href.search("/home/main\\?id\\=") != -1) {
+					console.log("j_more_hotFeed" + target.outerHTML);
+					let t = setTimeout(() => {
+						target.querySelectorAll("a")[0].click()
+						clearTimeout(t)
+						t = null
+					}, 1000)
+				}
+			}
+		}
+		const initListener = () => {
+			PrefixedEvent(document, "AnimationStart", tieba_action); //开始
+			//document.addEventListener('webkitAnimationStart', tieba_action, false);
+			//document.addEventListener('MSAnimationStart', tieba_action, false);
+			//document.addEventListener('animationstart', tieba_action, false);
+		};
+		var yingcang = false;
+		window.addEventListener("transitionend", function(e) { //解决刷新贴子自动跳转到某个位置可能无法隐藏下工具栏问题，缓解工具栏偶尔出现不隐藏问题
+			const {
+				target
+			} = e;
+			const {
+				classList
+			} = target;
+			//console.log(target);
+			let temp = $('#j_core_title_wrap'); //主体框架
+			if (temp[0] != null) {
+				if (rmBottom == true) {
+					if (classList.contains('l_thread_info') == true) {
+						$('.core_title_bg')[0].style = "display:none !important;";
+						$('.core_title_txt')[0].style = "display:none !important;";
+						$('.core_title_btns')[0].style = "display: none !important;";
+						$('#thread_theme_5')[0].style = "display:none !important;";
+					}
+				} else {
 
-                }
+				}
 
-            }
-        });
-        var scrollY1 = window.scrollY;
-        window.addEventListener("scroll", function (e) {
-            //const { target } = e;
-            //const { classList } = target;
-            //console.log(target);
-            let temp = $('#j_core_title_wrap'); //主体框架
-            //core_title_bg 背景框
-            //core_title_txt 标题
-            //core_title_btns display: none !important; 按钮
-            //p_thread thread_theme_5 页码，页数
-            if (temp[0] != null) { //慢速上下移动网页时，偶尔有工具栏闪烁问题
-                //console.log(temp[0].style["top"]);
-                if (window.scrollY - scrollY1 < 0) {
-                    //console.log("向上滚动");
-                    if (temp[0].className != "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" && temp[0].className != "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/) {
-                        yingcang = false
-                    }
-                    //window.scrollTo(window.scrollY, window.scrollY+10);
-                }
-                if (window.scrollY - scrollY1 > 0) { //当向下滚动时
-                    //console.log("向下滚动");
-                    if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" || temp[0].className == "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/) {
-                        yingcang = true;
-                    }
-                }
-                //console.log(window.scrollY);
-                if (yingcang == true) {
-                    if (rmBottom == true) { //隐藏下工具栏
-                        $('.core_title_bg')[0].style = "display:none !important;";
-                        $('.core_title_txt')[0].style = "display:none !important;";
-                        $('.core_title_btns')[0].style = "display: none !important;";
-                        $('#thread_theme_5')[0].style = "display:none !important;";
-                        //temp[0].style = "display:none !important;";//会产生滚动迟滞卡顿+无法滚动到底
-                    }
-                    $('#thread_theme_5')[0].classList.add("thread_theme_bright_absolute");
-                } else {
-                    if (rmBottom == true) { //隐藏下工具栏
-                        $('.core_title_bg')[0].style = "display:block !important;";
-                        $('.core_title_txt')[0].style = "display:block !important;";
-                        $('.core_title_btns')[0].style = "display:block !important;";
-                        $('#thread_theme_5')[0].style = "display:block !important;";
-                    }
-                    $('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
-                    /*
+			}
+		});
+		var scrollY1 = window.scrollY;
+		window.addEventListener("scroll", function(e) {
+			//const { target } = e;
+			//const { classList } = target;
+			//console.log(target);
+			let temp = $('#j_core_title_wrap'); //主体框架
+			//core_title_bg 背景框
+			//core_title_txt 标题
+			//core_title_btns display: none !important; 按钮
+			//p_thread thread_theme_5 页码，页数
+			if (temp[0] != null) { //慢速上下移动网页时，偶尔有工具栏闪烁问题
+				//console.log(temp[0].style["top"]);
+				if (window.scrollY - scrollY1 < 0) {
+					//console.log("向上滚动");
+					if (temp[0].className != "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" && temp[0].className != "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
+						yingcang = false
+					}
+					//window.scrollTo(window.scrollY, window.scrollY+10);
+				}
+				if (window.scrollY - scrollY1 > 0) { //当向下滚动时
+					//console.log("向下滚动");
+					if (temp[0].className == "core_title_wrap_bright clearfix tbui_follow_fixed core_title_absolute_bright" || temp[0].className == "core_title_wrap core_title_wrap_bright tbui_follow_fixed core_title_absolute_bright" /*旧版贴吧有这个*/ ) {
+						yingcang = true;
+					}
+				}
+				//console.log(window.scrollY);
+				if (yingcang == true) {
+					if (rmBottom == true) { //隐藏下工具栏
+						$('.core_title_bg')[0].style = "display:none !important;";
+						$('.core_title_txt')[0].style = "display:none !important;";
+						$('.core_title_btns')[0].style = "display: none !important;";
+						$('#thread_theme_5')[0].style = "display:none !important;";
+						//temp[0].style = "display:none !important;";//会产生滚动迟滞卡顿+无法滚动到底
+					}
+					$('#thread_theme_5')[0].classList.add("thread_theme_bright_absolute");
+				} else {
+					if (rmBottom == true) { //隐藏下工具栏
+						$('.core_title_bg')[0].style = "display:block !important;";
+						$('.core_title_txt')[0].style = "display:block !important;";
+						$('.core_title_btns')[0].style = "display:block !important;";
+						$('#thread_theme_5')[0].style = "display:block !important;";
+					}
+					$('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute")
+						/*
     修复贴子内下工具栏点翻页按钮后，不再显示翻页列表
     目标标签class p_thread thread_theme_5
     加个thread_theme_bright_absolute
     */
-                }
-                scrollY1 = window.scrollY;
-                //console.log($('#j_core_title_wrap')[0].className);
-            }
+				}
+				scrollY1 = window.scrollY;
+				//console.log($('#j_core_title_wrap')[0].className);
+			}
 
-        });
-        initListener();
-        if (window.location.href.search(/http:\/\/tieba\.baidu\.com\/bawu2\/platform\/listTools\?word=.*/g) != -1) {
-            //console.log("版块分区1");
-            let t = setTimeout(() => {
-                clearTimeout(t);
-                $("#sectionPartitionApp").click(() => {
-                    //console.log("版块分区2");
-                    let t2 = setTimeout(() => {
-                        clearTimeout(t2);
-                        $(".dialogJtxt")[0].parentNode.parentNode.querySelectorAll(".dialogJbody")[0].style = "height:450px;"
-                    }, 1000);
-                });
-            }, 1000);
-        }
-    })();
-    /*
-                参考
-                https://greasyfork.org/scripts/375218-%E8%B4%B4%E5%90%A7%E5%9B%9E%E5%A4%8D%E4%BF%AE%E6%AD%A3 贴吧回复修正
-                https://github.com/indefined/UserScripts/tree/master/tiebaPostAdjustment
-                已知问题继承
-                展开的被折叠楼层会显示隐藏提示（有意没有去掉它）
-                展开的被隐藏楼中楼需要点击两次数字才能收起该层楼中楼（暂时无法解决）
-                可能对某些帖子不管用，如果出现这种情况请反馈准确帖子链接
-                ---
-                https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js 贴吧贴子屏蔽检测
-                */
-    // @version      0.011
-    // @description  还原被折叠隐藏的楼层、楼中楼，附带自动展开楼中楼的查看更多
-    (function () {
-        'use strict';
-        const getTriggerStyle = () => {
-            return `
+		});
+		initListener();
+		if (window.location.href.search(/http:\/\/tieba\.baidu\.com\/bawu2\/platform\/listTools\?word=.*/g) != -1) {
+			//console.log("版块分区1");
+			let t = setTimeout(() => {
+				clearTimeout(t);
+				$("#sectionPartitionApp").click(() => {
+					//console.log("版块分区2");
+					let t2 = setTimeout(() => {
+						clearTimeout(t2);
+						$(".dialogJtxt")[0].parentNode.parentNode.querySelectorAll(".dialogJbody")[0].style = "height:450px;"
+					}, 1000);
+				});
+			}, 1000);
+		}
+	})();
+	/*
+	            参考
+	            https://greasyfork.org/scripts/375218-%E8%B4%B4%E5%90%A7%E5%9B%9E%E5%A4%8D%E4%BF%AE%E6%AD%A3 贴吧回复修正
+	            https://github.com/indefined/UserScripts/tree/master/tiebaPostAdjustment
+	            已知问题继承
+	            展开的被折叠楼层会显示隐藏提示（有意没有去掉它）
+	            展开的被隐藏楼中楼需要点击两次数字才能收起该层楼中楼（暂时无法解决）
+	            可能对某些帖子不管用，如果出现这种情况请反馈准确帖子链接
+	            ---
+	            https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js 贴吧贴子屏蔽检测
+	            */
+	// @version      0.011
+	// @description  还原被折叠隐藏的楼层、楼中楼，附带自动展开楼中楼的查看更多
+	(function() {
+		'use strict';
+		const getTriggerStyle = () => {
+			return `
         /* 使用 animation 监测 DOM 变化 */
         @-webkit-keyframes __tieba_zhankai__ {}
         @-moz-keyframes __tieba_zhankai__ {}
@@ -11128,295 +11171,293 @@ margin-top: 20px;
         animation: __tieba_zhankai__;
         }
         `;
-        };
+		};
 
-        //强调信息提示+修http://tieba.baidu.com/i/i/网页背景
-        try {
-            let ii = 0;
-            let t = setInterval(() => {
-                if (ii <= 59) {
-                    ii++;
-                } else {
-                    clearInterval(t);
-                }
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                    let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
-                    if (temp[0] != null) {
-                        temp[0].style = "background:#fff;";
-                    }
-                }
-                if (qiangdiaoxinxitishi == true) {
-                    let temp6 = $(".meihua"); //美化开关
-                    if (temp6[0] != null) {
-                        clearInterval(t);
-                        temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
-                    }
-                }
+		//强调信息提示+修http://tieba.baidu.com/i/i/网页背景
+		try {
+			let ii = 0;
+			let t = setInterval(() => {
+					if (ii <= 59) {
+						ii++;
+					} else {
+						clearInterval(t);
+					}
+					if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+						let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
+						if (temp[0] != null) {
+							temp[0].style = "background:#fff;";
+						}
+					}
+					if (qiangdiaoxinxitishi == true) {
+						let temp6 = $(".meihua"); //美化开关
+						if (temp6[0] != null) {
+							clearInterval(t);
+							temp6[0].style = "color:#f00 !important;font-weight:bold;white-space:normal;"; //贴吧美化开关按钮文字样式
+						}
+					}
 
-            },
-                1000);
-        } catch (err) {
-            console.log("强调信息提示:" + err);
-        }
+				},
+				1000);
+		} catch (err) {
+			console.log("强调信息提示:" + err);
+		}
 
-        function unfoldPost() { //楼层内容折叠展开
-            [].forEach.call(document.querySelectorAll('[style="display:;"]>.p_forbidden_post_content_fold'), node => {
-                console.log("unfoldPost1:" + node)
-                node.click();
-            });
-        }
-        var louzhonglousuo = false
-        function unfoldPost2() { //楼层内容和楼中楼内容折叠展开，暴力查询版
-            try {
-                unfoldPost();//楼层内容折叠展开
-                [].forEach.call(document.querySelectorAll('div>.j_lzl_container.core_reply_wrapper[style="min-height: 0px; display: none;"]'), node => {
-                    if (JSON.parse(node.getAttribute("data-field")).total_num > 0) {
-                        node.style = "min-height: 1px; display:block;" //和原来的样式有所不同，这样就可以人为收起来楼中楼了。。！
-                        //node.parentNode.children[0].children[0].children[0].click();
-                        //node.classList.add("_yizhankai_");
-                    }
-                    //console.log("unfoldPost2:"+JSON.stringify(node))
-                    //console.log(JSON.parse(node.getAttribute("data-field")).total_num)
-                    //JSON.parse(json).XXXX
-                    //https://blog.csdn.net/weixin_39889465/article/details/86220538 js通过'data-xxx'自定义属性获取dom元素
-                    //https://www.cnblogs.com/landeanfen/p/5159911.html JS组件系列——使用HTML标签的data属性初始化JS组件
-                    //https://www.w3school.com.cn/tags/att_global_data.asp HTML data-* 属性
-                });
-                //console.log(GM_getValue("lzl_zhankai"))
-                let temp1 = document.querySelectorAll("ul.j_lzl_m_w")
-                //console.log("temp1:" + temp1.length)
-                let temp2 = document.querySelectorAll(".l_post")
-                //console.log("temp2:" + temp2.length)
-                if (GM_getValue("lzl_zhankai") == true) {
-                    //console.log(target)'
-                    if (temp1.length > 0 && louzhonglousuo == false) {
-                        for (let i = 0; i < temp1.length; i++) {
-                            //console.log(temp1[i])
-                            let temp3 = temp1[i].querySelectorAll(".lzl_post_hidden")[0]
-                            if (temp3 != undefined) {
-                                //console.log(temp2.getAttribute("style"))
-                                if (temp3.getAttribute("style") != "display:block") {
-                                    temp3.setAttribute('style', 'display:block')
-                                    temp1[i].querySelectorAll(".lzl_more")[0].setAttribute('style', 'display:none')
-                                    temp1[i].querySelectorAll(".lzl_pager")[0].setAttribute('style', 'display:block')
-                                }
+		function unfoldPost() { //楼层内容折叠展开
+			[].forEach.call(document.querySelectorAll('[style="display:;"]>.p_forbidden_post_content_fold'), node => {
+				console.log("unfoldPost1:" + node)
+				node.click();
+			});
+		}
+		var louzhonglousuo = false
 
-                            }//被贴吧隐藏的回复就是undefined,实际手动点击展开回复也是空的 
-                        }
-                        /*console.log(target.parentNode)
-                        console.log(target.parentNode.querySelectorAll(".lzl_post_hidden")[0])
-                        console.log(target.parentNode.querySelectorAll(".lzl_more")[0])
-                        console.log(target.parentNode.querySelectorAll(".lzl_pager")[0])*/
-                    }
-                    if (temp1.length == temp2.length) {
-                        louzhonglousuo = true
-                    }
-                    else {
-                        louzhonglousuo = false
-                    }
-                }
-                if (GM_getValue("rm_user_icon") == true) {
-                    $('ul.p_author .icon').remove();
-                    $('.p_content').each(function (i, e) {
-                        e.style = 'min-height:0;padding:3px 0 0 3px !important;'
-                    });
-                    $('.p_content > br').remove();
-                }
-            }
-            catch (e) {
-                console.error("unfoldPost2:" + e);
-                clearInterval(louzhonglou);
-            }
-        }
-        const unfoldPost3 = (event) => { //楼中楼楼层太长折叠展开，动态版
-            if (event.animationName !== '__tieba_zhankai__') {
-                return;
-            }
-            const {
-                target
-            } = event;
-            const {
-                classList
-            } = target
+		function unfoldPost2() { //楼层内容和楼中楼内容折叠展开，暴力查询版
+			try {
+				unfoldPost(); //楼层内容折叠展开
+				[].forEach.call(document.querySelectorAll('div>.j_lzl_container.core_reply_wrapper[style="min-height: 0px; display: none;"]'), node => {
+					if (JSON.parse(node.getAttribute("data-field")).total_num > 0) {
+						node.style = "min-height: 1px; display:block;" //和原来的样式有所不同，这样就可以人为收起来楼中楼了。。！
+							//node.parentNode.children[0].children[0].children[0].click();
+							//node.classList.add("_yizhankai_");
+					}
+					//console.log("unfoldPost2:"+JSON.stringify(node))
+					//console.log(JSON.parse(node.getAttribute("data-field")).total_num)
+					//JSON.parse(json).XXXX
+					//https://blog.csdn.net/weixin_39889465/article/details/86220538 js通过'data-xxx'自定义属性获取dom元素
+					//https://www.cnblogs.com/landeanfen/p/5159911.html JS组件系列——使用HTML标签的data属性初始化JS组件
+					//https://www.w3school.com.cn/tags/att_global_data.asp HTML data-* 属性
+				});
+				//console.log(GM_getValue("lzl_zhankai"))
+				let temp1 = document.querySelectorAll("ul.j_lzl_m_w")
+					//console.log("temp1:" + temp1.length)
+				let temp2 = document.querySelectorAll(".l_post")
+					//console.log("temp2:" + temp2.length)
+				if (GM_getValue("lzl_zhankai") == true) {
+					//console.log(target)'
+					if (temp1.length > 0 && louzhonglousuo == false) {
+						for (let i = 0; i < temp1.length; i++) {
+							//console.log(temp1[i])
+							let temp3 = temp1[i].querySelectorAll(".lzl_post_hidden")[0]
+							if (temp3 != undefined) {
+								//console.log(temp2.getAttribute("style"))
+								if (temp3.getAttribute("style") != "display:block") {
+									temp3.setAttribute('style', 'display:block')
+									temp1[i].querySelectorAll(".lzl_more")[0].setAttribute('style', 'display:none')
+									temp1[i].querySelectorAll(".lzl_pager")[0].setAttribute('style', 'display:block')
+								}
 
-            //console.log(GM_getValue("lzl_zhankai"))
-            if (GM_getValue("lzl_zhankai") == true) {
-                //console.log(target)
-                if (classList.contains('lzl_li_pager')) {
-                    let temp = target.parentNode.querySelectorAll(".lzl_post_hidden")[0]
-                    if (temp != undefined) {
-                        temp.setAttribute('style', 'display:block')
-                        target.parentNode.querySelectorAll(".lzl_more")[0].setAttribute('style', 'display:none')
-                        target.parentNode.querySelectorAll(".lzl_pager")[0].setAttribute('style', 'display:block')
-                    }//被贴吧隐藏的回复就是undefined,实际手动点击展开回复也是空的
-                    /*console.log(target.parentNode)
-                    console.log(target.parentNode.querySelectorAll(".lzl_post_hidden")[0])
-                    console.log(target.parentNode.querySelectorAll(".lzl_more")[0])
-                    console.log(target.parentNode.querySelectorAll(".lzl_pager")[0])*/
-                }
-            }
-            if (GM_getValue("rm_user_icon") == true) {
-                $('ul.p_author .icon').remove();
-                $('.p_content').each(function (i, e) {
-                    e.style = 'min-height:0;padding:3px 0 0 3px !important;'
-                });
-                $('.p_content > br').remove();
-            }
-            //console.log(target.children[1].children[1])
-            //document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
-        }
-        let liebiao2 = 0;
-        function unfoldPost4() { //要定时循环查找才能找全整个贴吧列表的贴子。。!直接搜索+动态加载一起用
-            try {
-                if (liebiao2 <= 29) {
-                    liebiao2++;
-                }
-                else {
-                    clearInterval(liebiao);
-                    liebiao = null;
-                }
-                //console.log("xxx:" + tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g))
-                let temp6 = document.querySelectorAll(".col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
-                let temp9 = document.querySelectorAll(".icon-good"); //显示精品贴，精华贴标识
-                let temp10 = document.querySelectorAll(".icon-top"); //显示置顶标识
-                //let temp11 = document.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
-                //console.log("temp6x:" + temp6.length)
-                //console.log("temp9:" + temp9)
-                //console.log("temp10:" + temp10)
-                //console.log(temp6.childNodes);
-                let i = 0;
-                if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-                    if (temp9 != null) {
-                        for (i = 0; i < temp9.length; i++) {
-                            temp9[i].style = "background-color: #FF6666;";
-                        }
-                    }
-                    if (temp10 != null) {
-                        for (i = 0; i < temp10.length; i++) {
-                            temp10[i].style = "background:none;background-color: #4285F5;";
-                        }
-                    }
-                    // if (temp11 != null) {
-                    //     temp11.style = "background:none;background-color: #FFCC26;";
-                    // }
-                }
-                if (temp6 != null) {
-                    for (i = 0; i < temp6.length; i++) {
-                        if (temp6[i].children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
-                        {
-                            if (temp6[i].querySelectorAll(".createtimecsss")[0] == null) {
-                                let temp7 = document.createElement("span");
-                                temp7.setAttribute('class', 'createtimecsss');
-                                console.log("temp6:" + temp6[i].outerHTML)
-                                if (temp6[i].parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6[i].parentNode.querySelectorAll(".icon-top")[0] == null) {
-                                    temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
-                                    temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
-                                } else {
-                                    if (!GM_getValue("tiebameihua") /*贴吧美化后*/) {
-                                        temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                                        temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
-                                    } else {
-                                        temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
-                                        temp6[i].children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
-                                    }
-                                }
-                                //console.log(temp6[i].parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
-                                let temp8 = temp6[i].parentNode.querySelectorAll(".is_show_create_time")[0].innerHTML;//得到创建时间
-                                //console.log(temp6[i].parentNode.querySelectorAll(".icon-member-top"))
-                                //console.log(temp6[i].parentNode.querySelectorAll(".icon-top"))
-                                if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
-                                    temp8 = new Date().getFullYear().toString() + "-" + temp8
-                                }
-                                temp7.innerHTML = temp8;
-                                //console.log(temp8)
-                                temp6[i].children[0].before(temp7);
-                            }
-                        }
-                    }
-                }
-                //console.log("unfoldPost4");
-            }
-            catch (e) {
-                console.error("unfoldPost4:" + e);
-                clearInterval(liebiao);
-            }
-        }
-        /**
-         * 初始化样式
-         */
-        const initStyle = () => {
-            const style = document.createElement('style');
-            style.textContent = getTriggerStyle();
-            document.head.appendChild(style);
-        };
+							} //被贴吧隐藏的回复就是undefined,实际手动点击展开回复也是空的 
+						}
+						/*console.log(target.parentNode)
+						console.log(target.parentNode.querySelectorAll(".lzl_post_hidden")[0])
+						console.log(target.parentNode.querySelectorAll(".lzl_more")[0])
+						console.log(target.parentNode.querySelectorAll(".lzl_pager")[0])*/
+					}
+					if (temp1.length == temp2.length) {
+						louzhonglousuo = true
+					} else {
+						louzhonglousuo = false
+					}
+				}
+				if (GM_getValue("rm_user_icon") == true) {
+					$('ul.p_author .icon').remove();
+					$('.p_content').each(function(i, e) {
+						e.style = 'min-height:0;padding:3px 0 0 3px !important;'
+					});
+					$('.p_content > br').remove();
+				}
+			} catch (e) {
+				console.error("unfoldPost2:" + e);
+				clearInterval(louzhonglou);
+			}
+		}
+		const unfoldPost3 = (event) => { //楼中楼楼层太长折叠展开，动态版
+			if (event.animationName !== '__tieba_zhankai__') {
+				return;
+			}
+			const {
+				target
+			} = event;
+			const {
+				classList
+			} = target
 
-        /**
-         * 初始化事件监听
-         *
-         */
-        const initListener = () => {
-            // 使用 animation 事件，方便处理贴吧 ajax 加载数据
-            PrefixedEvent(document, "AnimationStart", unfoldPost3); //开始
-            //document.addEventListener('webkitAnimationStart', unfoldPost3, false);
-            // document.addEventListener('MSAnimationStart', unfoldPost3, false);
-            // document.addEventListener('animationstart', unfoldPost3, false);
-        };
-        if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?ie=utf-8&kw=/g) != -1) {
-            var liebiao = setInterval(unfoldPost4, 2000); //要定时循环查找才能找全整个贴吧列表的贴子。。!
-        }
-        if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\/.*/g) != -1) {
-            var louzhonglou = setInterval(unfoldPost2, 2000); //要定时循环查找才能找全整个贴子的楼中楼。。!
-        }
-        initListener();
-        initStyle();
-    })();
-    (function () {
-        if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
-            let temp = document.createElement("input"); //创建节点<input/>
-            temp.setAttribute('type', 'button');
-            temp.setAttribute('id', "yincangcebianlan");
-            temp.setAttribute('class', 'yincangcebianlan');
-            temp.setAttribute('value', ">>");
-            document.body.appendChild(temp);
-            temp.addEventListener('click', (e) => {
-                const {
-                    target
-                } = e;
-                //console.log(target);
-                let temp3 = $("div.userbar ")[0];
-                let temp4 = $("ul.tbui_aside_float_bar")[0];
-                if (yincangcebianlanx == false) {
-                    yincangcebianlanx = true;
-                    GM_setValue("yincangcebianlan", true)
-                    target.value = "<<";
-                    if (temp3 != null) {
-                        temp3.style = "display:none;";
-                    }
-                    if (temp4 != null) {
-                        temp4.style = "display:none;";
-                    }
-                } else {
-                    yincangcebianlanx = false;
-                    GM_setValue("yincangcebianlan", false)
-                    target.value = ">>";
-                    if (temp3 != null) {
-                        temp3.style = "display:block;z-index: 10005;";
-                    }
-                    if (temp4 != null) {
-                        temp4.style = "display:block;";
-                    }
-                }
-                console.log("隐藏侧边栏");
-            });
-        }
-    })();
+			//console.log(GM_getValue("lzl_zhankai"))
+			if (GM_getValue("lzl_zhankai") == true) {
+				//console.log(target)
+				if (classList.contains('lzl_li_pager')) {
+					let temp = target.parentNode.querySelectorAll(".lzl_post_hidden")[0]
+					if (temp != undefined) {
+						temp.setAttribute('style', 'display:block')
+						target.parentNode.querySelectorAll(".lzl_more")[0].setAttribute('style', 'display:none')
+						target.parentNode.querySelectorAll(".lzl_pager")[0].setAttribute('style', 'display:block')
+					} //被贴吧隐藏的回复就是undefined,实际手动点击展开回复也是空的
+					/*console.log(target.parentNode)
+					console.log(target.parentNode.querySelectorAll(".lzl_post_hidden")[0])
+					console.log(target.parentNode.querySelectorAll(".lzl_more")[0])
+					console.log(target.parentNode.querySelectorAll(".lzl_pager")[0])*/
+				}
+			}
+			if (GM_getValue("rm_user_icon") == true) {
+				$('ul.p_author .icon').remove();
+				$('.p_content').each(function(i, e) {
+					e.style = 'min-height:0;padding:3px 0 0 3px !important;'
+				});
+				$('.p_content > br').remove();
+			}
+			//console.log(target.children[1].children[1])
+			//document.querySelectorAll(".lzl_li_pager")[0].children[1].children[1].click()
+		}
+		let liebiao2 = 0;
+
+		function unfoldPost4() { //要定时循环查找才能找全整个贴吧列表的贴子。。!直接搜索+动态加载一起用
+				try {
+					if (liebiao2 <= 29) {
+						liebiao2++;
+					} else {
+						clearInterval(liebiao);
+						liebiao = null;
+					}
+					//console.log("xxx:" + tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g))
+					let temp6 = document.querySelectorAll(".col2_left"); //主题贴列表添加发贴时间 https://tieba.baidu.com/f?kw=%E6%8A%95%E6%B1%9F%E7%9A%84%E9%B1%BC&ie=utf-8,某些远古贴存在错误发布时间问题
+					let temp9 = document.querySelectorAll(".icon-good"); //显示精品贴，精华贴标识
+					let temp10 = document.querySelectorAll(".icon-top"); //显示置顶标识
+					//let temp11 = document.querySelectorAll(".icon-member-top")[0]; //显示会员置顶标识
+					//console.log("temp6x:" + temp6.length)
+					//console.log("temp9:" + temp9)
+					//console.log("temp10:" + temp10)
+					//console.log(temp6.childNodes);
+					let i = 0;
+					if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) {
+						if (temp9 != null) {
+							for (i = 0; i < temp9.length; i++) {
+								temp9[i].style = "background-color: #FF6666;";
+							}
+						}
+						if (temp10 != null) {
+							for (i = 0; i < temp10.length; i++) {
+								temp10[i].style = "background:none;background-color: #4285F5;";
+							}
+						}
+						// if (temp11 != null) {
+						//     temp11.style = "background:none;background-color: #FFCC26;";
+						// }
+					}
+					if (temp6 != null) {
+						for (i = 0; i < temp6.length; i++) {
+							if (temp6[i].children.length != 0) //有些贴子没有创建时间，例如招募吧主置顶公告贴,话题贴
+							{
+								if (temp6[i].querySelectorAll(".createtimecsss")[0] == null) {
+									let temp7 = document.createElement("span");
+									temp7.setAttribute('class', 'createtimecsss');
+									console.log("temp6:" + temp6[i].outerHTML)
+									if (temp6[i].parentNode.querySelectorAll(".icon-member-top")[0] == null && temp6[i].parentNode.querySelectorAll(".icon-top")[0] == null) {
+										temp7.setAttribute('style', 'position: absolute;text-align: center;top: 0px;width: 70px;left: 0px;color: #999;');
+										temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 20px;');
+									} else {
+										if (!GM_getValue("tiebameihua") /*贴吧美化后*/ ) {
+											temp7.setAttribute('style', 'position: absolute;text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+											temp6[i].children[0].setAttribute('style', 'position: absolute;width: 51px !important;top: 13px;');
+										} else {
+											temp7.setAttribute('style', 'text-align: center;top: -5px;width: 70px;left: 0px;color: #999;');
+											temp6[i].children[0].setAttribute('style', 'width: 51px !important;top: 13px;');
+										}
+									}
+									//console.log(temp6[i].parentNode.querySelectorAll("span.is_show_create_time")[0].innerHTML)
+									let temp8 = temp6[i].parentNode.querySelectorAll(".is_show_create_time")[0].innerHTML; //得到创建时间
+									//console.log(temp6[i].parentNode.querySelectorAll(".icon-member-top"))
+									//console.log(temp6[i].parentNode.querySelectorAll(".icon-top"))
+									if (temp8.split("-").length == 2 && temp8.search(/(\d{4})-((0?([1-9]))|(1[1|2]))/) == -1) {
+										temp8 = new Date().getFullYear().toString() + "-" + temp8
+									}
+									temp7.innerHTML = temp8;
+									//console.log(temp8)
+									temp6[i].children[0].before(temp7);
+								}
+							}
+						}
+					}
+					//console.log("unfoldPost4");
+				} catch (e) {
+					console.error("unfoldPost4:" + e);
+					clearInterval(liebiao);
+				}
+			}
+			/**
+			 * 初始化样式
+			 */
+		const initStyle = () => {
+			const style = document.createElement('style');
+			style.textContent = getTriggerStyle();
+			document.head.appendChild(style);
+		};
+
+		/**
+		 * 初始化事件监听
+		 *
+		 */
+		const initListener = () => {
+			// 使用 animation 事件，方便处理贴吧 ajax 加载数据
+			PrefixedEvent(document, "AnimationStart", unfoldPost3); //开始
+			//document.addEventListener('webkitAnimationStart', unfoldPost3, false);
+			// document.addEventListener('MSAnimationStart', unfoldPost3, false);
+			// document.addEventListener('animationstart', unfoldPost3, false);
+		};
+		if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw=/g) != -1 || tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?ie=utf-8&kw=/g) != -1) {
+			var liebiao = setInterval(unfoldPost4, 2000); //要定时循环查找才能找全整个贴吧列表的贴子。。!
+		}
+		if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\/.*/g) != -1) {
+			var louzhonglou = setInterval(unfoldPost2, 2000); //要定时循环查找才能找全整个贴子的楼中楼。。!
+		}
+		initListener();
+		initStyle();
+	})();
+	(function() {
+		if (!GM_getValue("tiebameihua") /*贴吧美化*/ ) { //隐藏侧边栏
+			let temp = document.createElement("input"); //创建节点<input/>
+			temp.setAttribute('type', 'button');
+			temp.setAttribute('id', "yincangcebianlan");
+			temp.setAttribute('class', 'yincangcebianlan');
+			temp.setAttribute('value', ">>");
+			document.body.appendChild(temp);
+			temp.addEventListener('click', (e) => {
+				const {
+					target
+				} = e;
+				//console.log(target);
+				let temp3 = $("div.userbar ")[0];
+				let temp4 = $("ul.tbui_aside_float_bar")[0];
+				if (yincangcebianlanx == false) {
+					yincangcebianlanx = true;
+					GM_setValue("yincangcebianlan", true)
+					target.value = "<<";
+					if (temp3 != null) {
+						temp3.style = "display:none;";
+					}
+					if (temp4 != null) {
+						temp4.style = "display:none;";
+					}
+				} else {
+					yincangcebianlanx = false;
+					GM_setValue("yincangcebianlan", false)
+					target.value = ">>";
+					if (temp3 != null) {
+						temp3.style = "display:block;z-index: 10005;";
+					}
+					if (temp4 != null) {
+						temp4.style = "display:block;";
+					}
+				}
+				console.log("隐藏侧边栏");
+			});
+		}
+	})();
 })($);
-(function ($) {
-    function closemeihua() {
-        GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
-        window.location.reload(); //刷新网页
-    }
-    GM_registerMenuCommand(GM_getValue("tiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
+(function($) {
+	function closemeihua() {
+		GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
+		window.location.reload(); //刷新网页
+	}
+	GM_registerMenuCommand(GM_getValue("tiebameihua") ? "开启贴吧美化" : "关闭贴吧美化", closemeihua);
 })($);
 //备份3212行 "	background: transparent !important;",
 //备份3538行 "	content: \"\\e160\";",
