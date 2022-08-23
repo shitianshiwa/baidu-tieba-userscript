@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.4
+// @version      2.1.1843.5
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（beta），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 // @author       shitianshiwa && 忆世萧遥
@@ -187,7 +187,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 				$(".old_style_wrapper").append(c); //搜索<div class="old_style_wrapper">添加文本框
 			}
 		} catch (error) {
-			alert("激活发贴文本编辑器:" + error);
+			console.log("激活发贴文本编辑器:" + error);
+		}
+		//给PC端的投票加点提示文本
+		if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw\=/g) != -1 ) {
+			$("a.add_vote_btn")[0].title="安卓客户端可能看不见PC端的投票，反之也如此"
 		}
 	}, 5000);
 	//https://tiebac.baidu.com/c/s/download/pc
@@ -253,6 +257,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     img.close_btn.j_click_close+div,
     p.switch_radios+div,
     #aside_ad,
+	#aside-ad,
     .region_bright#tieba-notice+div,
     .thread_recommend,
     #platform_left_float,
@@ -281,6 +286,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     #pc2client,/*i贴吧页面客户端广告*/
     /*贴吧会员相关项*/
     .u_member,
+	/*我的蓝钻*/
+	li.u_blue,
     #celebrity,
     .aside_region.celebrity,
     .j-placeholder-pay-member,
@@ -290,9 +297,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     /*超级会员各种提示*/
     .poster_success .success-foot-tip,
     .l_thread_manage #notify_bubble,
-    /*官方号服务中心post_head_official*/
     /*贴吧贴子列表顶的游击广告*/
-    li.u_official,
     .bus-top-activity-wrap,
     .quick-reply-desc,
     /*贴吧列表右上角的广告*/
@@ -302,7 +307,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
     /*贴吧游击广告*/
     #lu-frs-aside,
     /*贴吧贴子列表顶的游击广告*/
-    li.u_official,
     .bus-top-activity-wrap,
     /*贴吧顶部广告*/
     #pb_adbanner,
@@ -455,8 +459,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
               /*.tbui_fbar_share,右侧浮层-分享*/
               /*.tbui_fbar_favor,右侧浮层-爱逛的吧*/
-              .tbui_fbar_props,/*右侧浮层-魔法道具*/
-              .tbui_fbar_tsukkomi,/*右侧浮层-神来一句*/
               /*.search_main_fixed,搜索栏浮层,取消隐藏*/
 
 
@@ -2148,7 +2150,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	width: 24px;
                 	vertical-align: top;
                 	text-align: center;
-                	color: #bbb;
+                	/*color: #bbb;*/
                 }
                 .poster_head_text .add_thread_btn:before{
                 	content:\"\\e253\";
@@ -2160,7 +2162,11 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	content:\"\\e01d\";
                 	font-size: 18px;
                 }
-                .poster_head_text a.cur{
+				.poster_head_text .add_opus_btn:before{
+                	content:\"\\e04B\";
+                	font-size: 18px;
+                }
+                .poster_head_text a{
                 	color: #666 !important;
                 }
                 .poster_head_text a.cur:before{
@@ -4996,7 +5002,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
                 .core_title_absolute_bright {
                 	display: block !important;
-                	z-index: 401 !important;
+                	z-index: 3 !important;
                 	top: auto !important;
                 	bottom: 10px !important;
                 	left: 50%;
@@ -5055,7 +5061,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	font-size: 12px !important;
                 	letter-spacing: 2px;
                 	text-indent: 2px;
-                   left: unset !important;/*贴子内标题栏的功能按钮 给旧版贴吧用的，例如火狐吧 解决下工具栏文本右偏*/
+                    left: unset !important;/*贴子内标题栏的功能按钮 给旧版贴吧用的，例如火狐吧 解决下工具栏文本右偏*/
                 }
                 /*fix bug*/
                 .quick_reply{
@@ -5395,7 +5401,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	font-size: 0;
                 	position: absolute;
                 	height: 54px;
-                	width: 80%;
+                	width: 85%;
                 	background: #4879BD !important;
                 }
                 .p_thread.thread_theme_bright_absolute:before,
@@ -5456,7 +5462,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	margin-left: -1.5em !important;
                 }
                 .thread_theme_bright_absolute .l_reply_num~.l_reply_num {
-                	margin-left: 20px !important;
+                	margin-left: 60px !important;
                 }
                 .thread_theme_bright_absolute input {
                 	background: rgba(0, 0, 0, 0.08) !important;
@@ -5623,6 +5629,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
                 	position: fixed;
               /*	left: 50% !important;*/
                 	bottom: 0px !important;
+					/*尝试解决侧边工具栏会覆盖在签到框上面*/
+					z-index: 4 !important;
                 }
                 .tbui_aside_fbar_button {
                 	box-sizing: content-box;
@@ -7500,6 +7508,14 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 					//管用户头像栏的 http://tieba.baidu.com/i/i/*
 				}
 			}
+			css+=`
+			.tbui_fbar_props,/*右侧浮层-魔法道具,动画效果？是基于flash制作的，没有flash插件就不能正常显示*/
+            .tbui_fbar_tsukkomi,/*右侧浮层-神来一句*/
+			/*官方号服务中心post_head_official*/
+			li.u_official
+            {
+              display: none !important;
+            }`
 		}
 	}
 	if (typeof GM_addStyle != "undefined") {
@@ -7756,9 +7772,9 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 							// 会员相关广告
 							'.doupiao_offline, .fMember_cnt',
 
-							// 右上角
+							// 右上角 .u_mytbmall我的商城
 							'.u_tshow, .u_tbmall, .u_app, .u_wallet, .u_xiu8',
-							'.u_mytbmall, .u_joinvip, .u_baiduPrivilege, .u_appcenterEntrance',
+							'.u_joinvip, .u_baiduPrivilege, .u_appcenterEntrance',
 
 							// 右下角
 							'#pop_frame, #__bdyx_tips, #__bdyx_tips_icon',
@@ -7777,8 +7793,8 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
 							// 烟花
 							'.firework_sender_wrap, .global_notice_wrap',
-							/*.tbui_fbar_share,*/
-							'.tbui_fbar_tsukkomi, .tbui_fbar_props, .tbui_fbar_square, .tbui_fbar_home',
+							/*.tbui_fbar_share,.tbui_fbar_props,.tbui_fbar_tsukkomi,*/
+							'.tbui_fbar_square, .tbui_fbar_home',
 
 							'#tshow_out_date_warn, #selectsearch-icon',
 
@@ -7792,8 +7808,6 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 
 							/*贴吧贴子列表顶的游击广告*/
 							//".bus-top-activity-wrap",
-							/*官方号服务中心post_head_official*/
-							//"li.u_official",
 						].join(', ');
 						$($ads).remove();
 						//https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
@@ -9960,7 +9974,7 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 			d.setAttribute('id', 'select3');
 			c.appendChild(d)
 			var f = document.createElement('div')
-			f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: -5px;')
+			f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: 12px;')
 			f.appendChild(a)
 			f.appendChild(c)
 				//var paixun = false
@@ -10013,9 +10027,18 @@ http://tieba.baidu.com/i/i/storethread 使用https链接有bug。原来是http�
 					//}
 			}, false)
 			try {
-				document.getElementsByClassName('card_infoNum')[0].parentNode.appendChild(f);
+				let temp=document.getElementsByClassName('card_infoNum')[0]
+				if(temp!=undefined)
+				{
+					temp.parentNode.appendChild(f);
+				}
+				else
+				{
+					let temp2=document.getElementsByClassName('app_header_focus_btn')[0]
+					temp2.parentNode.appendChild(f);
+				}
 			} catch (err) {
-				console.log(err);
+				console.log("贴子排序按钮添加错误:"+err);
 			} finally {
 				if (GM_getValue("select2") == true) {
 					document.getElementById("select1").selectedIndex = GM_getValue("select1")
@@ -10781,7 +10804,7 @@ margin-top: 20px;
 							let userimg = "";
 							let userportrait = unsafeWindow.PageData.user.portrait; //.replace(/\?t=.*/, "");
 							//https://sign.52fisher.cn/93.html 常用贴吧接口 April 15, 2016
-							if (userportrait == "") { //解决无法获取到portrait的情况
+							if (userportrait == ""|| userportrait == undefined) { //解决无法获取到portrait的情况
 								var c = {
 									'un': unsafeWindow.PageData.user.name || unsafeWindow.PageData.user.user_name
 								};
