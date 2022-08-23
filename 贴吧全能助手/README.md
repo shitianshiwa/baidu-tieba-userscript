@@ -5,6 +5,9 @@
 - 百度贴吧按发帖时间（帖子ID）排序 by NULL https://greasyfork.org/zh-CN/scripts/23356-tiebasortbyid
 - 查看发帖 by 文科 https://github.com/wenketel 
 - 百度贴吧图片点击放大 by lliwhx https://greasyfork.org/zh-CN/scripts/20969-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7
+- 使用的字体，如果网络无法访问字体就会造成按钮图片缺失
+- https://fonts.gstatic.com/s/materialicons/v54/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2
+- https://fonts.gstatic.com/s/opensans/v17/mem8YaGs126MiZpBA-UFUZ0bbck.woff2
 ```
  MIT License
  Copyright (c) 2017 lliwhx
