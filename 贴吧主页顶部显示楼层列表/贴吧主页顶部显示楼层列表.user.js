@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      0.6.1
+// @version      0.6.2
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
@@ -103,7 +103,7 @@ border: 1px solid #3e89fa;
                 }
                 if ($("div.miaoliebiao")[0] == null) {
                     if ($("#frs_list_pager").html() != null) {
-                        let text1 = '<div class="miaoliebiao"><div id="frs_list_pager" class="pagination-default clearfix" style="position:relative;left:1px;width:968px;background: #FEFEFE;border:1px solid #e4e6eb;padding:5px;">&nbsp;&nbsp;&nbsp;&nbsp;' + $("#frs_list_pager").html() + '</div></div>';
+                        let text1 = '<div class="miaoliebiao" style="background-color:#fff;"><div id="frs_list_pager" class="pagination-default clearfix" style="position:relative;left:1px;width:968px;background: #FEFEFE;border:1px solid #e4e6eb;padding:5px;">&nbsp;&nbsp;&nbsp;&nbsp;' + $("#frs_list_pager").html() + '</div></div>';
                         if (hrefs.indexOf("/f/good?kw=") != -1) {
                             $("div.nav_wrap ").after(text1); //专门给https://tieba.baidu.com/f/good?kw=XXXXX用的
                         } else {
