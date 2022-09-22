@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.6
+// @version      2.1.1843.7
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（beta），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
@@ -9816,7 +9816,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				for (var thread2 of threadArray) {
 					parentNode.appendChild(thread2.thread);
 				}
-			} else if (yipaixun == 1) { //发贴时间倒序
+			} else if (yipaixun == 1) { //发贴时间倒序，贴吧只能显示前10000贴，每页50贴，最多201页。贴吧贴子总数少于10000个取尾页数，大于10000固定选10000
 				var threadArray = [];
 				for (var thread of threads) {
 					try {
@@ -9965,11 +9965,15 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 			var d = document.createElement('input')
 			d.setAttribute('type', 'checkbox');
 			d.setAttribute('id', 'select3');
+			var e = document.createElement('p')
+			e.textContent = "贴吧只能显示前10000贴，每页50贴，最多201页"
+			e.setAttribute('style', 'position: absolute;left: 3px;top: 50px;')
 			c.appendChild(d)
 			var f = document.createElement('div')
-			f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: 12px;')
+			f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: -12px;')
 			f.appendChild(a)
 			f.appendChild(c)
+			f.appendChild(e)
 			//var paixun = false
 			a.addEventListener('change', e => {
 				//console.log(JSON.stringify(e))//{"isTrusted":true}
@@ -10704,39 +10708,39 @@ margin-top: 20px;
 						GM_setValue("first", false)
 						alert("刷新网页即可看到弹窗")
 					});
-				}
-				if (GM_getValue("first") == undefined || GM_getValue("first") == false) {
-					GM_setValue("first", true)
-					prompt(`只弹出一次，自行复制输入框内的文本内容`, `
-					不登录状态下，仅有第1页可以查看楼中楼的贴子
-					解决方法详情请看
-					https://github.com/shitianshiwa/baidu-tieba-userscript/issues/9
-					需要另一个浏览器扩展Header Editor
-					https://he.firefoxcn.net/
-					by yilksd
-					以下为代码
-
-					{
-						"request": [
-							{
-								"enable": true,
-								"name": "贴吧楼中楼免登录查看",
-								"ruleType": "redirect",
-								"matchType": "regexp",
-								"pattern": "https\\://tieba\\.baidu\\.com/p/totalComment\\?t=(.*?)pn=[0-9]+&see_lz=0",
-								"exclude": "",
-								"group": "国内网站",
-								"isFunction": true,
-								"action": "redirect",
-								"to": "https://tieba.baidu.com/p/totalComment?&tid=0&fid=0&pn=1&see_lz=0",
-								"code": "\nvar new_url=val.replace(/pn=[0-9]+/,\"pn=\"+Math.ceil(Number(val.match(/pn=[0-9]+/)[0].replace(\"pn=\",\"\"))/2)).replace(/t=[0-9]+/,\"\");\nreturn new_url;"
-							}
-						],
-						"sendHeader": [],
-						"receiveHeader": [],
-						"receiveBody": []
+					if (GM_getValue("first") == undefined || GM_getValue("first") == false) {
+						GM_setValue("first", true)
+						prompt(`只弹出一次，自行复制输入框内的文本内容`, `
+						不登录状态下，仅有第1页可以查看楼中楼的贴子
+						解决方法详情请看
+						https://github.com/shitianshiwa/baidu-tieba-userscript/issues/9
+						需要另一个浏览器扩展Header Editor
+						https://he.firefoxcn.net/
+						by yilksd
+						以下为代码
+	
+						{
+							"request": [
+								{
+									"enable": true,
+									"name": "贴吧楼中楼免登录查看",
+									"ruleType": "redirect",
+									"matchType": "regexp",
+									"pattern": "https\\://tieba\\.baidu\\.com/p/totalComment\\?t=(.*?)pn=[0-9]+&see_lz=0",
+									"exclude": "",
+									"group": "国内网站",
+									"isFunction": true,
+									"action": "redirect",
+									"to": "https://tieba.baidu.com/p/totalComment?&tid=0&fid=0&pn=1&see_lz=0",
+									"code": "\nvar new_url=val.replace(/pn=[0-9]+/,\"pn=\"+Math.ceil(Number(val.match(/pn=[0-9]+/)[0].replace(\"pn=\",\"\"))/2)).replace(/t=[0-9]+/,\"\");\nreturn new_url;"
+								}
+							],
+							"sendHeader": [],
+							"receiveHeader": [],
+							"receiveBody": []
+						}
+						`)
 					}
-					`)
 				}
 				/*https://github.com/shitianshiwa/baidu-tieba-userscript/issues/9
 				不登录状态下，仅有第1页可以查看楼中楼的贴子，其后的页面都不能。很多贴子都是这样，但也有些不是。
