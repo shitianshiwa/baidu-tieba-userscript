@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.8
+// @version      2.1.1843.9
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（beta），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
@@ -20,14 +20,15 @@
 ///document-start,document-idle;必须使用document-body，否则对多个浏览器的兼容性会下降
 ///Google Chrome 75.0.3770.142（正式版本）(64 位)、87.0.4280.66（正式版本)（64 位）可以用,firefox 103.0.2 (64 位) 页面加载样式会慢点，Microsoft Edge版本 105.0.1343.42 (正式版本) (64 位)可以运行
 /// jQuery 留一份自己用。备注贴吧自带的jQuery是修改过的，至少有lazyload功能
-// @require      https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js
-// @require      https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js
 
-/// @require     http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js
-/// @require     http://cdn.staticfile.org/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js
+/// @require      https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js
+// @require     https://cdn.staticfile.org/jquery/3.6.1/jquery.min.js
+/// @require      https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js
+// @require     https://cdn.staticfile.org/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js
+
 /// 配置界面 UI
-// @require     https://cdn.jsdelivr.net/npm/mustache@4.0.1/mustache.min.js
-/// @require     http://cdn.staticfile.org/mustache.js/0.8.1/mustache.min.js
+/// @require     https://cdn.jsdelivr.net/npm/mustache@0.8.1/mustache.min.js 
+// @require     https://cdn.staticfile.org/mustache.js/4.0.1/mustache.min.js
 // @require     https://greasyfork.org/scripts/2657/code/tieba_ui.js
 
 /// 非同步数组枚举回调
@@ -35,6 +36,7 @@
 
 /// 兼容 GM 1.x, 2.x
 // @require     https://greasyfork.org/scripts/2599/code/gm2_port_v103.js
+
 // @grant        unsafeWindow
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -196,7 +198,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 			element.addEventListener(pfx[p] + type, callback, false);
 		}
 	}
-	var tupianfangda = true; //贴吧图片放大
+	var tupianfangda = false; //贴吧图片放大
 	var pingbi_loucengqipao = false; //屏蔽楼层气泡
 	var rmBottom = false; //移除工具栏
 	var yincangcebianlanx = false; //隐藏侧边栏
@@ -5794,7 +5796,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	/*background: none !important;*/
                 }
                 .tbshare_popup_main {
-					padding-right: 6px;
+					padding-right: 0px;
                 	left: 0 !important;
                 	top: 50% !important;
                 	pointer-events: none;
@@ -7527,6 +7529,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 	//     unsafeWindow.PageData.user.is_login = 1;
 	// } catch (error) {}
 	// }, true);
+
 	//梦姬贴吧助手 by jixun
 	(function () {
 		var w = unsafeWindow,
@@ -7793,6 +7796,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							/*贴吧贴子列表顶的游击广告*/
 							//".bus-top-activity-wrap",
 						].join(', ');
+						//$($ads).css({ "display": "none" });//
 						$($ads).remove();
 						//https://tieba.baidu.com/f?kw=epic&ie=utf-8 屏蔽某些吧的背景图
 						//console.log(GM_getValue("tiebameihua"));
@@ -8711,7 +8715,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					flag: __type_lzl,
 					def: true,
 					_init: function () { //新旧版贴吧都生效
-						tupianfangda = true;
+						//tupianfangda = false;
 						//console.log("123")
 						//_css.append('.jx_no_overflow { max-width: 100%; }');
 						//this.rmImg(document);
@@ -8856,7 +8860,6 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 						} catch (error) {
 							console.log("$('.save_face_post', args._main).size():" + error);
 						}
-
 					}
 				},
 				"rmSaveFace": {
@@ -8868,38 +8871,28 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					}
 				},
 				"rm_img_view1": {
-					name: '看图模式屏蔽',
-					desc: '还原为旧版贴吧点图看大图功能',
-					flag: __type_floor,
-					def: false,
-					rmImg: function ($root) {
-						$('img.BDE_Image', $root).each(function () {
-							var m = this.src.match(/\/sign=[a-z0-9]+\/(.+)/i);
-							if (!m) return;
-							var imgLink = '//imgsrc.baidu.com/forum/pic/item/' + m[1];
-							$('<a>')
-								.attr('href', imgLink)
-								.attr('target', '_blank')
-								.append($('<img>').attr('src', imgLink).addClass('jx_no_overflow'))
-								.insertAfter(this);
-							$(this).remove();
-						});
-					},
+					name: '启用贴吧图片放大(注意和贴子直接显示大图互斥)',
+					desc: 'Copyright © 2016-2022 lliwhx MIT;注意和贴子直接显示大图互斥',
+					flag: __type_floor | __type_forum | __type_lzl,
+					def: true,
 					_init: function () { //新旧版贴吧都生效
-						tupianfangda = false;
+						tupianfangda = true;
 						//console.log("123")
 						//_css.append('.jx_no_overflow { max-width: 100%; }');
 						//this.rmImg(document);
 					},
 					_proc: function (floorType, args) { //仅旧版贴吧生效
-						tupianfangda = false;
+						tupianfangda = true;
 						//console.log("456")
 						//this.rmImg(args._main);
-					}
+					},
+					// 让按钮后面显示一个配置按钮;配置窗口回调
+					_conf: function () {
+					},
 				},
 				"rm_img_view2": {
-					name: '看图模式切换',
-					desc: '切换为贴吧点图看大图功能',
+					name: '贴子直接显示大图(注意和贴吧图片放大互斥)',
+					desc: '替换原图片链接为大图片链接,注意和贴吧图片放大互斥;这个有概率后面还要修',
 					flag: __type_floor,
 					def: false,
 					rmImg: function ($root) {
@@ -8916,16 +8909,15 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 						});
 					},
 					_init: function () {
-						if (tupianfangda == true) {
+						if (tupianfangda == false) {
 							_css.append('.jx_no_overflow { max-width: 100%; }');
 							this.rmImg(document);
 						}
 
 					},
 					_proc: function (floorType, args) {
-						if (tupianfangda == true) {
+						if (tupianfangda == false) {
 							this.rmImg(args._main);
-
 						}
 					}
 				},
@@ -9008,6 +9000,17 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 						window.location.reload();
 					});
 					$('#jx_close', $tpl).click($wndConfig.close.bind($wndConfig));
+
+					var temp = $("a.jx_conf")//捕捉图片配置按钮
+					//console.log(temp)
+					for (let i = 0; i < temp.length; i++) {
+						if (temp[i].getAttribute("data-config") == "rm_img_view1") {
+							//console.log(temp[i]);
+							temp[i].addEventListener('click', function () {
+								document.body.classList.add('btzi-enabled');//显示隐藏的图片放大设置界面
+							});
+						}
+					}
 				}, '助手设定界面');
 			})();
 
@@ -9266,6 +9269,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							//console.log("5")
 
 							// 单贴处理
+							//console.log("ele:")
 							//console.log($ele)
 							//贴子内一楼内容太长会导致不触发动作
 							//j_lzl_c_b_a 
@@ -9308,12 +9312,13 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 			//https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
 			//https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
 			try {
-				setTimeout(() => {
-					mo.observe($('#j_p_postlist,#thread_list').get(0), {
+				let temp = $('#j_p_postlist,#thread_list').get(0);
+				if (temp != undefined) {
+					mo.observe(temp, {
 						childList: true,
 						subtree: true
 					});
-				}, 1000)
+				}
 			} catch (error) {
 				//MutationObserver 接口提供了监视对 DOM 树所做更改的能力。它被设计为旧的 Mutation Events 功能的替代品，该功能是 DOM3 Events 规范的一部分。
 				console.log("MutationObserver:" + error);
@@ -9321,341 +9326,469 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 		};
 	})();
 
-	//百度贴吧图片点击放大 by lliwhx
-	//原版的点击图片进入图片列表看图，有一定概率能看到被隐藏的楼层，该楼层需要有图片，如果有文字也会部分显示出来
+	//2022年前原版的点击图片进入图片列表看图，有一定概率能看到被隐藏的楼层，该楼层需要有图片，如果有文字也会部分显示出来
 	//推荐和这个脚本一起使用https://greasyfork.org/ja/scripts/24204-picviewer-ce
 	setTimeout(() => {
 		if (tupianfangda == true) {
-			(function (window) {
+			(function (win, doc) {
 				"use strict";
-				//CSS
-				var parentElement = document.getElementById("j_p_postlist");
-				GM_addStyle(".BDE_Image,.j_user_sign{cursor:alias;}#Tie_enlargeImage_parentDIV{position:fixed;z-index:1005;top:0;left:0;}.Tie_enlargeImage{position:absolute;box-shadow:1px 1px 10px #000;cursor:move;}.Tie_enlargeImage:hover{z-index:1006;}#Tie_setValue_DIV{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);}.Tie_definedDIV{position:absolute;z-index:10000;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);}.Tie_definedDIV_title{border-bottom:1px solid #f2f2f5;line-height:40px;font-size:15px;font-weight:700;padding:0 0 0 15px;}.Tie_definedDIV_point{padding:20px 40px;}.Tie_definedDIV_groupSubtitle{font-weight:bold;}.Tie_definedDIV_configItem{line-height:30px;margin:0 20px}.Tie_definedDIV_configItem select{margin:0.5em}.Tie_definedDIV_configItem br+label{margin-left:3em}.Tie_definedDIV_configItem input{vertical-align:middle;margin-right:0.5em}#Tie_debugConfig{margin:0.5em}.Tie_debugConfig_icon{position:relative;display:inline-block;top:4px;width:16px;height:16px;background-position:-350px -100px;background-image:url('https://img.t.sinajs.cn/t6/style/images/common/icon.png');background-repeat:no-repeat;}.Tie_bubble_DIV{position:absolute;visibility:hidden;max-width:280px;top:20%}.Tie_definedDIV_configItem label:hover+.Tie_bubble_DIV{visibility:visible}.Tie_bubble_content{position:relative;background:#fff;padding:6px 13px 6px 16px;border:1px solid #ccc;border-radius:3px;}.Tie_bubble_mainTxt{line-height:18px;}.Tie_bubble_bor{position:absolute;overflow:hidden;bottom:-14px;line-height:14px;}.Tie_bubble_line{border-color:#ccc transparent transparent transparent;}.Tie_bubble_br{margin:-1px 0 0 -14px;border-color:#fff transparent transparent transparent;}.Tie_bubble_bor i,.Tie_bubble_bor em{display:inline-block;width:0;height:0;border-width:7px;border-style:solid;vertical-align:top;overflow:hidden;}.Tie_definedDIV_SaveBtn{background-color:#f2f2f5;text-align:center;padding:10px 0;}.Tie_SaveBtn_a{background:#ff8140;color:#fff;font-size:15px;display:inline-block;padding:0 15px;line-height:35px;border-radius:3px;}.Tie_SaveBtn_a:hover{background:#f7671d}");
-				//数据缓存
-				var imageTarget, imageMouse, imageCount, imageButton, winResize, scriptDebug, log = function () { },
-					mouseWheel = /Firefox/.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel",
-					protocol = window.location.protocol || "https",
-					doc = window.document,
-					docHeight = doc.documentElement.clientHeight - 6,
-					docWidth = doc.documentElement.clientWidth - 6,
-					definedEvent = GM_getValue("definedEvent", "click,click,1,0,1").split(","),
-					repairDefinedEvent = GM_getValue("repairDefinedEvent", false),
-					imageEvent = {
-						init: function (e) { //主事件
-							var target = e.target,
-								image, imageSrc, tbpicau;
-							if (e.button === 0 && (target.className === "BDE_Image" || target.className === "j_user_sign")) {
-								log("图片创建", "开始");
-								//现在必须要自己判断图片是tiebapic还是imgsa
-								imageSrc = target.src.split("?")[0] //直接清理图片链接?后面的参数
-								tbpicau = target.src.split("?")[1] || "" //获取tbpicau参数
-								imageSrc = imageSrc.match(/([a-z0-9]+\.[a-zA-Z]{3,4})(?:\?v=tbs)?$/); //正则表达式获取部分字符串
-								//console.log(target.src)
-								log("图片地址获取", function () {
-									if (imageSrc) return "成功";
-									else return "失败";
-								}, target.src);
-								if (!imageSrc) return false;
-								image = doc.createElement("img");
-								image.classList.add("Tie_enlargeImage");
-								//作者已经出了新版，但还没移过来。。。
-								//修复代码来自 https://greasyfork.org/zh-CN/forum/discussion/68104/%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7%E5%8A%9F%E8%83%BD%E5%A4%B1%E6%95%88-%E7%82%B9%E5%BC%80%E6%98%BE%E7%A4%BA%E6%9F%A5%E7%9C%8B%E7%9A%84%E5%9B%BE%E7%89%87%E4%B8%8D%E5%AD%98%E5%9C%A8 图片点击放大功能失效，点开显示查看的图片不存在
-								//贴吧的链接现在基本都是https了
-								if (target.src.search(/\/\/tiebapic\.baidu\.com\/forum/g) != -1) {
-									if (tbpicau != "") {
-										image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1] + "?" + tbpicau
-									} else {
-										image.src = protocol + "//tiebapic.baidu.com/forum/pic/item/" + imageSrc[1]
-									}
-								} else {
-									image.src = "https://imgsrc.baidu.com/forum/pic/item/" + imageSrc[1]
-								}
-								image.onerror = function () {
-									this.onerror = function () {
-										this.onerror = null;
-										this.onload = null;
-										imageSrc = null;
-										log("图片请求", "失败");
-										alert("图片获取失败\n\n如多次获取失败\n请在设置里勾选“调试脚本”打印脚本日志并截图反馈给作者，以便更好的解决问题");
-									};
-								};
-								image.onload = function () {
-									log("图片创建", "进行中");
-									var target = this,
-										width = target.width,
-										height = target.height,
-										Wboolean = width > docWidth,
-										Hboolean = height > docHeight,
-										X = 6,
-										Y = 6;
-									target.onerror = null;
-									target.onload = null;
-									imageSrc = null;
-									if (Hboolean && !Wboolean) X = (docWidth - width) / 2;
-									else if (!Hboolean && !Wboolean) {
-										X = (docWidth - width) / 2;
-										Y = (docHeight - height) / 2;
-									} else if (!Hboolean && Wboolean) Y = (docHeight - height) / 2;
-									target.imageData = {
-										width: width,
-										height: height,
-										X: X,
-										Y: Y
-									}; //缓存当前图片数据
-									target.style.transform = "translate(" + X + "px," + Y + "px)";
-									parentDIV.appendChild(target);
-									log("图片创建", function () {
-										target.id = Date.now();
-										if (doc.getElementById(target.id)) return "成功";
-										else return "失败";
-									}, target.imageData);
-								};
-								image = null;
+				/*
+				name           百度贴吧图片点击放大
+				namespace      https://greasyfork.org/users/51104
+				version        1.7.0
+				description    直接在当前页面点击查看原图（包括签名档）。支持图片的多开、拖拽、垂直或水平滚动和缩放旋转
+				author         lliwhx
+				license        MIT
+				copyright      Copyright © 2016-2022 lliwhx
+				*/
+				var iTarget,
+					preferences,
+					gallery,
+					iMouse,
+					debounce,
+					docElement = doc.documentElement,
+					docWidth = docElement.clientWidth - 5,
+					docHeight = docElement.clientHeight - 5;
+
+				// 打开图片函数
+				function open(e) {
+					var image,
+						tbpic,
+						target = e.target;
+					//console.log(target.tagName)// A
+					//console.log(target.parentNode.nodeName)//P
+					//tagName 获取标签名称
+					/* className分别指向BDE_Image新图，j_user_sign签名档，d_content_img老图。只有鼠标左键点击以上图片且不是图册贴里的图片时才会放大图片。（可修改） */
+					if (!e.button && target.tagName !== 'A' && 'className:BDE_Image,j_user_sign,d_content_img'.includes(target.className, 10) && target.parentNode.nodeName !== 'A') {
+						iTarget = target;
+						image = doc.createElement('img');
+						image.className = 'btzi-img';
+
+						// 如果原图加载失败，直接显示贴子里的压缩图片；图片损坏不加载
+						image.onerror = function () {
+							if (this.src !== target.src) {
+								this.src = target.src;
+								console.log(target.src)
+							} else {
+								target = null;
+								tbpic = null;
+								this.onerror = null;
+								this.onload = null;
 							}
-						},
-						StopPropagation: function (e) {
-							if (e.button === 0 && e.target.className === "BDE_Image") {
-								e.stopPropagation(); //阻止冒泡，阻止图片原事件
-								log("阻止贴吧图片原事件", "已执行");
+						};
+
+						// 获取要加载图片的w宽和h高，计算图片的s大小以及x横y纵坐标
+						image.onload = function () {
+							var w = this.width,
+								h = this.height,
+								s = (!+preferences.size) && (docWidth - w < 0 || docHeight - h < 0) ? Math.min((docWidth - 5) / w, (docHeight - 5) / h) : 1, // 等比例缩小到最长边显示在窗口内或1原图显示
+								x = docWidth - w * s - 5 > 0 ? (docWidth - w * s) / 2 : 5, // 判断图片w宽是否小于docWidth窗口宽，是则居中，不是则左上角。5表示预留5px位置不贴合
+								y = docHeight - h * s - 5 > 0 ? (docHeight - h * s) / 2 : 5;
+							this.iData = {
+								width: w,
+								height: h,
+								x: x,
+								y: y,
+								scale: s,
+								rotate: 0
+							};
+							transform(this, x, y, s, 0);
+							target = null;
+							x = null;
+							y = null;
+							s = null;
+							tbpic = null;
+							this.onerror = null;
+							this.onload = null;
+							gallery.appendChild(this); // 将加载好的图片插入到图片框架里显示
+						};
+
+						//使用储存的大图片链接
+						if (target.getAttribute("tbpic-link-text") != undefined) {
+							image.src = target.getAttribute('tbpic-link-text');
+							console.log("使用储存的大图片链接:" + image.src);
+						}
+						else {
+							/*
+							以下两句代码关系着放大后的图片是否是原图，匹配失败打开的则是贴子里被压缩的图片。
+							比如某图片直接右键打开是下面这个地址：
+							http://abc.baidu.com/forum/xxx/sign=xxx/123.jpg?tbpicau=xxx
+							用原贴吧图片功能查到原图是下面这个地址：
+							https://abc.baidu.com/forum/pic/item/123.jpg
+							我们需要获取到点击图片的abc和123的内容，然后补全成原图的地址。
+							需学习“正则表达式”。（可修改）
+							*/
+							tbpic = /https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/.exec(target.src);
+							/**
+								 正则分解结果
+									 0: "http://tiebapic.baidu.com/forum/w%3D580/sign=xxx/xxxx.jpg?tbpicau=2022-12-17-05_"
+									1: "tiebapic"
+									2: "xxxx.jpg?tbpicau=2022-12-17-05_"
+									3: "?tbpicau=2022-12-17-05_"
+								 */
+							if (tbpic && tbpic[3]) {
+								loadComment(image, tbpic[2], target);
+							} else {
+								image.src = tbpic ? `//${tbpic[1]}.baidu.com/forum/pic/item/${tbpic[2]}` : target.src;
+								target.setAttribute('tbpic-link-text', image.src);
+								console.log("使用请求的大图片链接:" + image.src);
 							}
-						},
-						Down: function (e) {
-							var target = e.target,
-								imageData = target.imageData;
-							imageTarget = target;
-							log("鼠标down事件", function () {
-								if (!target.id) target.id = Date.now();
-								return "开始";
-							});
-							if (e.button !== 0) return false;
-							e.preventDefault();
-							e.stopPropagation();
-							imageMouse = [e.clientX, e.clientY];
-							imageCount = [imageData.X - imageMouse[0], imageData.Y - imageMouse[1], 6 - imageData.width, 6 - imageData.height]; //图片宽高的偏移量，图片左右边界预留量
-							imageButton = true;
-							doc.addEventListener("mousemove", imageEvent.Move);
-							doc.addEventListener("mouseup", imageEvent.Up);
-							log("鼠标down事件", "结束");
-						},
-						Move: function (e) {
-							log("鼠标move事件", "开始");
-							var target = imageTarget,
-								X = e.clientX + imageCount[0],
-								Y = e.clientY + imageCount[1];
-							imageButton = false;
-							log("鼠标move事件", "进行中", "X:" + X + "Y:" + Y);
-							if (X < imageCount[2]) { //左边界
-								target.style.transform = "translate(" + imageCount[2] + "px," + Y + "px)";
-								return false;
-							}
-							if (X > docWidth) { //右边界
-								target.style.transform = "translate(" + docWidth + "px," + Y + "px)";
-								return false;
-							}
-							if (Y < imageCount[3]) { //上边界
-								target.style.transform = "translate(" + X + "px," + imageCount[3] + "px)";
-								return false;
-							}
-							if (Y > docHeight) { //下边界
-								target.style.transform = "translate(" + X + "px," + docHeight + "px)";
-								return false;
-							}
-							target.style.transform = "translate(" + X + "px," + Y + "px)";
-							log("鼠标move事件", "结束", target.style.transform);
-						},
-						Up: function (e) {
-							log("鼠标up事件", "开始");
-							var target = imageTarget,
-								RegEx;
-							if (repairDefinedEvent && e.clientX - imageMouse[0] <= 1 && e.clientY - imageMouse[1] <= 1) { //尝试修复关闭图片功能
-								log("尝试修复关闭图片功能", "已执行");
-								imageButton = true;
-							} else if ( /*scriptDebug && */ !imageButton && e.clientX - imageMouse[0] === 0 && e.clientY - imageMouse[1] === 0) {
-								log("鼠标click事件判断", "\n一.操作时页面不在激活状态。请保证浏览器正在被操作，在执行一次\n二.关闭图片功能可能损坏，建议修复");
-								imageButton = true; //不知道能不能解决偶尔关不掉大图片的bug
-							}
-							if (!imageButton) {
-								RegEx = target.style.transform.match(/[-0-9.]+/g);
-								target.imageData.X = parseFloat(RegEx[0]);
-								target.imageData.Y = parseFloat(RegEx[1]);
-							}
-							imageTarget = null;
-							imageMouse = null;
-							imageCount = null;
-							doc.removeEventListener("mousemove", imageEvent.Move);
-							doc.removeEventListener("mouseup", imageEvent.Up);
-							log("鼠标up事件", "结束", imageButton);
-						},
-						Close: function (e) {
-							log("鼠标click事件", "开始");
-							var target = e.target;
-							if (imageButton) {
-								imageButton = null;
-								delete target.imageData;
-								parentDIV.removeChild(target);
-								log("鼠标click事件", function () {
-									if (!doc.getElementById(target.id)) return "成功";
-									else return "失败";
-								});
-							}
-						},
-						Wheel: function (e) {
-							var target = e.target,
-								imageData = target.imageData,
-								wheelKey = definedEvent[3],
-								width = imageData.width,
-								height = imageData.height,
-								Wboolean = width > docWidth,
-								Hboolean = height > docHeight,
-								wheelXY;
-							log("鼠标wheel事件", "开始", imageData);
-							e.preventDefault();
-							e.stopPropagation();
-							if (wheelKey !== "0") {
-								if ((e.ctrlKey && wheelKey === "1") || (e.altKey && wheelKey === "2") || (e.shiftKey && wheelKey === "3")) { //判断图片缩放的组合键
-									log("鼠标wheel缩放事件", "开始");
-									var eX = e.clientX,
-										eY = e.clientY,
-										ratioX = (eX - imageData.X) / width,
-										ratioY = (eY - imageData.Y) / height,
-										wheelRatio = width + (e.wheelDelta || -e.detail * 40) * definedEvent[4];
-									imageData.width = wheelRatio < 150 ? 150 : wheelRatio;
-									imageData.height = imageData.width * height / width;
-									imageData.X = eX - (imageData.width * ratioX);
-									imageData.Y = eY - (imageData.height * ratioY);
-									log("鼠标wheel缩放事件", "进行中", imageData);
-									target.width = imageData.width;
-									target.style.transform = "translate(" + imageData.X + "px," + imageData.Y + "px)"; //基于鼠标位置的缩放
-									log("鼠标wheel缩放事件", "结束", target.style.transform);
-									return false;
-								}
-							}
-							if (!Hboolean && !Wboolean) {
-								log("鼠标wheel滚动事件", "图片小于窗口");
-								return false;
-							}
-							if (Hboolean) {
-								wheelXY = imageData.Y + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
-								if (wheelXY > 0 || wheelXY < docHeight - height) {
-									wheelXY = wheelXY > 0 ? 6 : docHeight - height;
-								}
-								imageData.Y = wheelXY;
-								log("鼠标wheel垂直滚动事件", "进行中", wheelXY);
-								target.style.transform = "translate(" + imageData.X + "px," + wheelXY + "px)";
-								log("鼠标wheel垂直滚动事件", "结束", target.style.transform);
-							} else if (Wboolean) {
-								wheelXY = imageData.X + (-e.wheelDelta || e.detail * 40) * definedEvent[2];
-								if (wheelXY > 0 || wheelXY < docWidth - width) {
-									wheelXY = wheelXY > 0 ? 6 : docWidth - width;
-								}
-								imageData.X = wheelXY;
-								log("鼠标wheel水平滚动事件", "进行中", wheelXY);
-								target.style.transform = "translate(" + wheelXY + "px," + imageData.Y + "px)";
-								log("鼠标wheel水平滚动事件", "结束", target.style.transform);
-							}
+						}
+
+					}
+				}
+
+				function loadComment(image, tbpic, target) {
+					var xhttp = new XMLHttpRequest();
+					var tieziTid = /\d+/.exec(location.pathname)[0];//获取贴子id
+					xhttp.onreadystatechange = function () {
+						if (this.readyState == 4 && this.status == 200) {
+							image.src = JSON.parse(this.responseText).data.img.original.waterurl;
+							target.setAttribute('tbpic-link-text', image.src);
+							console.log("使用请求的大图片链接:" + image.src);
 						}
 					};
-				//图片放大设置
-				var userEvent = {
-					init: function () {
-						this.create();
-						this.Event();
-					},
-					create: function () {
-						var definedDIV = doc.createElement("div"); //创建自定义DIV框架
-						definedDIV.id = "Tie_setValue_DIV";
-						definedDIV.innerHTML = "<div class='Tie_definedDIV'><div class='Tie_definedDIV_title'>图片放大设置</div><div><div class='Tie_definedDIV_point'><div class='Tie_definedDIV_groupSubtitle'>请保证鼠标在图片上进行操作(仅支持贴子内的楼层图片！)</div><div class='Tie_definedDIV_configItem'>默认支持鼠标左键拖拽图片，修改配置后刷新一下</div><div class='Tie_definedDIV_configItem'>查看图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select></div><div class='Tie_definedDIV_configItem'>关闭图片<select name='Tie_setValue'><option value='click'>单击</option><option value='dblclick'>双击</option></select>若条件允许，推荐选择双击以兼容鼠标移动图片<br><label><input id='Tie_repairValue' type='checkbox'>尝试修复关闭图片功能</label></div><div class='Tie_definedDIV_configItem'>滚动图片<select name='Tie_setValue'><option value='1'>滚轮向上，上移/左移</option><option value='-1'>滚轮向下，上移/左移</option></select></div><div class='Tie_definedDIV_configItem'>缩放图片<select name='Tie_setValue'><option value='0'>关闭</option><option value='1'>Ctrl</option><option value='2'>Alt</option><option value='3'>Shift</option></select>+<select name='Tie_setValue'><option value='1'>滚轮向上放大</option><option value='-1'>滚轮向下放大</option></select></div><div class='Tie_definedDIV_configItem'>调试脚本<label><input id='Tie_debugConfig' type='checkbox'><i class='Tie_debugConfig_icon'></i></label><div class='Tie_bubble_DIV'><div class='Tie_bubble_content'><div class='Tie_bubble_mainTxt'>如果您的脚本出现问题，您可以打开调试功能。<strong>在页面进行平常的图片操作，将操作过后在浏览器控制台（快捷键：F12）输出的脚本日志截图反馈给作者</strong>，以便更好的解决问题。<br>注意，<strong>调试功能打开即生效。并且只在当前页面生效一次，刷新或关闭页面都会取消调试功能，需重新打开</strong>。<br>打开调试功能可能会增加内存占用、降低网页的反应速度甚至导致浏览卡顿。仅供维护使用，不建议一般用户打开调试功能。</div><div><span class='Tie_bubble_bor'><i class='Tie_bubble_line'></i><em class='Tie_bubble_br'></em></span></div></div></div></div></div></div><div class='Tie_definedDIV_SaveBtn'><a id='Tie_setValue_a' class='Tie_SaveBtn_a' href='javascript:void(0);'><span>确定</span></a></div></div>";
-						doc.body.appendChild(definedDIV);
-						definedDIV = null;
-					},
-					Event: function () {
-						var definedDIV = doc.getElementById("Tie_setValue_DIV"),
-							repairValue = doc.getElementById("Tie_repairValue"),
-							debugConfig = doc.getElementById("Tie_debugConfig"),
-							parentElement = doc.getElementById("j_p_postlist"),
-							setValue = doc.getElementsByName("Tie_setValue"),
-							oldDefinedEvent = definedEvent; //备份旧设置
-						for (var i = 0; i < 5; i++) {
-							setValue[i].value = oldDefinedEvent[i];
-						}
-						if (setValue[3].value === "0") setValue[4].style.visibility = "hidden";
-						setValue[3].onchange = function () {
-							setValue[4].style.visibility = this.value === "0" ? "hidden" : "visible";
-						};
-						repairValue.checked = repairDefinedEvent;
-						debugConfig.checked = scriptDebug;
-						doc.getElementById("Tie_setValue_a").onclick = function () {
-							definedEvent = [setValue[0].value, setValue[1].value, setValue[2].value, setValue[3].value, setValue[4].value];
-							repairDefinedEvent = repairValue.checked;
-							scriptDebug = debugConfig.checked;
-							if (oldDefinedEvent[0] !== definedEvent[0]) {
-								if (!parentElement) { } else {
-									parentElement.removeEventListener(oldDefinedEvent[0], imageEvent.init, true);
-									parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
-								}
-							}
-							if (oldDefinedEvent[1] !== definedEvent[1]) {
-								if (!parentElement) { } else {
-									parentDIV.removeEventListener(oldDefinedEvent[1], imageEvent.Close);
-									parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
-								}
-							}
-							log = scriptDebug && function (text, types, data) { //脚本调试，日志
-								if (typeof types === "function") {
-									types = types();
-								}
-								if (data === undefined) console.log(text, types);
-								else console.log(text, types, data);
-							} || function () { };
-							log("图片放大设置", "已执行", definedEvent + "," + repairDefinedEvent);
-							this.onclick = null;
-							setValue[3].onchange = null;
-							doc.body.removeChild(definedDIV);
-							GM_setValue("definedEvent", definedEvent.toString());
-							GM_setValue("repairDefinedEvent", repairDefinedEvent);
-							definedDIV = null;
-							repairValue = null;
-							debugConfig = null;
-							parentElement = null;
-							setValue = null;
-							oldDefinedEvent = null;
-						};
-					}
-				};
-				GM_registerMenuCommand("图片放大设置", function () {
-					if (!doc.getElementById("Tie_setValue_DIV")) {
-						userEvent.init();
-					}
-				});
-				if (!parentElement) {
-					return;
+					tbpic = /(\w+)/.exec(tbpic)[0];
+					xhttp.open("GET", "https://tieba.baidu.com/photo/p?alt=jview&pic_id=" + tbpic + "&tid=" + tieziTid, true);
+					xhttp.send();
 				}
-				//创建父DIV
-				var parentDIV = doc.createElement("div");
-				parentDIV.id = "Tie_enlargeImage_parentDIV";
-				doc.body.appendChild(parentDIV);
-				//事件委托
-				parentElement.addEventListener("click", imageEvent.StopPropagation, true);
-				parentElement.addEventListener(definedEvent[0], imageEvent.init, true);
-				parentDIV.addEventListener("mousedown", imageEvent.Down);
-				parentDIV.addEventListener(definedEvent[1], imageEvent.Close);
-				parentDIV.addEventListener(mouseWheel, imageEvent.Wheel);
-				//释放缓存
-				parentElement = null;
 
-				if (!GM_getValue("definedEvent")) {
-					userEvent.init();
-				}
-				window.addEventListener("resize", function () {
-					if (typeof winResize !== undefined) {
-						clearTimeout(winResize);
+				// 鼠标按下图片函数
+				function down(e) {
+					var t,
+						data;
+					if (!e.button) {
+						t = e.target;
+						data = t.iData;
+						iTarget = t;
+						iMouse = { // 获取鼠标按下时的xy坐标和相对图片的xy坐标
+							clientX: e.clientX,
+							clientY: e.clientY,
+							offsetX: data.x - e.clientX,
+							offsetY: data.y - e.clientY
+						};
+						t = null;
+						data = null;
+						e.preventDefault();
+						e.stopPropagation();
+						doc.addEventListener('mousemove', move); // 鼠标按下时给页面注册鼠标移动和鼠标放开事件
+						doc.addEventListener('mouseup', up);
 					}
-					winResize = setTimeout(function () {
-						docHeight = doc.documentElement.clientHeight - 6;
-						docWidth = doc.documentElement.clientWidth - 6;
-					}, 334);
+				}
+
+				// 鼠标移动图片函数
+				function move(e) {
+					var t = iTarget,
+						data = t.iData,
+						x = e.clientX + iMouse.offsetX,
+						y = e.clientY + iMouse.offsetY;
+					e.stopPropagation();
+					transform(t, x, y, data.scale, data.rotate);
+					t = null;
+					x = null;
+					y = null;
+					data = null;
+				}
+
+				// 固定图片位置函数
+				function up(e) {
+					var t,
+						data,
+						translate;
+					if (iMouse.clientX === e.clientX && iMouse.clientY === e.clientY) { // 判断鼠标按下和松开的位置一致才能关闭图片
+						iTarget = null;
+					} else {
+						t = iTarget;
+						data = t.iData;
+						translate = /translate\((-?\d+)px,\s?(-?\d+)px\)/.exec(t.getAttribute('style')); // 获取图片变化后的位置导入图片属性内
+						data.x = translate[1] | 0; // 取整
+						data.y = translate[2] | 0;
+						t = null;
+						data = null;
+						translate = null;
+					}
+					iMouse = null;
+					doc.removeEventListener('mousemove', move); // 鼠标松开后注销页面鼠标移动和鼠标放开事件
+					doc.removeEventListener('mouseup', up);
+				}
+
+				/* 图片关闭函数。（可修改） */
+				function close(e) {
+					var t = e.target;
+					switch (preferences.closeWindow) {
+						case 'btzi_gallery': // 关闭图片范围为图片时，点击图片关闭该图片
+							if (!iTarget) {
+								t.iData = null;
+								t.remove();
+							}
+							break;
+						case 'document': // 当关闭图片方式为页面时，点击要放大的图片以外的区域都会关闭所有图片
+							if (!iTarget || t !== iTarget) {
+								if (doc.body.classList.contains('btzi-enabled') || t.id === 'btzi_settings_save') break; // 打开用户设置界面，不会关闭图片
+								gallery.style.display = 'none';
+								while (gallery.hasChildNodes()) { // 关闭所有图片
+									gallery.firstChild.iData = null;
+									gallery.firstChild.remove();
+								}
+								gallery.style.display = '';
+							}
+							break;
+					}
+					t = null;
+					iTarget = null;
+				}
+
+				// 鼠标滚轮函数
+				function wheel(e) {
+					var t = e.target,
+						data = t.iData,
+						x = data.x,
+						y = data.y,
+						s = data.scale,
+						r = data.rotate,
+						p = preferences,
+						eKey = !e.altKey && !e.ctrlKey && !e.shiftKey,
+						wKey = p.wheelKey,
+						zKey = p.zoomKey,
+						rKey = p.rotateKey,
+						wDirection = p.wheelDirection,
+						zDirection = p.zoomDirection,
+						rDirection = p.rotateDirection,
+						deltaXY = (e.deltaY || e.deltaX) > 0 ? 100 : -100, // 滚轮向下滚动时e.deltaY/e.deltaX返回正值，向上滚动时e.deltaY/e.deltaX返回负值。因使用组合键时浏览器变化的参数不一样，故判断e.deltaY/e.deltaX哪个发生了变化。图片移动设置为一次100px
+						delta,
+						tmp,
+						z;
+					e.preventDefault();
+					e.stopPropagation();
+					if (wKey === 'type' && eKey || wKey !== 'type' && e[wKey]) { // 图片滚轮移动判断
+						tmp = docHeight - data.height * s; // 只要图片高大于窗口高，就上下移动。
+						if (tmp < 0) {
+							delta = r > 90 ? data.height * s : 0; // 图片翻转超过90度后，原本图片的左上角跑到了下方，要增加图片高度计算
+							z = y - deltaXY * wDirection; // 图片y纵坐标移动后的新纵坐标。相对窗口左上角，往上移（图片到底）减小，往下移（图片到顶）增加
+							if (z > 5 + delta) { // 到顶
+								z = 5 + delta;
+							} else if (z < tmp + delta) { // 到底
+								z = tmp + delta;
+							}
+							data.y = z;
+							transform(t, x, z, s, r);
+							return;
+						}
+						tmp = docWidth - data.width * s; // 单单只有图片宽大于窗口宽，才左右移动
+						if (tmp < 0) {
+							delta = r % 270 ? data.width * s : 0;
+							z = x - deltaXY * wDirection;
+							if (z > 5 + delta) {
+								z = 5 + delta;
+							} else if (z < tmp + delta) {
+								z = tmp + delta;
+							}
+							data.x = z;
+							transform(t, z, y, s, r);
+							return;
+						}
+					}
+					if (zKey === 'type' && eKey || zKey !== 'type' && e[zKey]) { // 图片缩放判断
+						delta = deltaXY * zDirection > 0 ? 0.1 : -0.1;
+						z = s + delta;
+						if (z < 0.2) { // 缩放过小不再进行缩放
+							return;
+						}
+						tmp = z / s;
+						data.x = e.clientX - (e.clientX - x) * tmp; // 计算以鼠标位置进行缩放。e.clientX - x为鼠标距离图片边的距离，* tmp为缩放后的距离，e.clientX - 计算得相对鼠标移动缩放后的图片边距
+						data.y = e.clientY - (e.clientY - y) * tmp;
+						data.scale = z;
+						transform(t, data.x, data.y, z, r);
+						return;
+					}
+					if (rKey === 'type' && eKey || rKey !== 'type' && e[rKey]) { // 图片旋转判断
+						tmp = data.width; // 对图片内data.width宽data.height高属性进行调换，使旋转后的图片数据正常计算
+						data.width = data.height;
+						data.height = tmp;
+						delta = deltaXY * rDirection > 0 ? 90 : 270; // 270比-90好计算
+						z = (r + delta) % 360; // 取余。保证为0，90，180，270度
+						tmp = 0.01745329 * delta;
+						data.x = e.clientX - (e.clientX - x) * Math.cos(tmp) + (e.clientY - y) * Math.sin(tmp); // 以鼠标位置(e.clientX,e.clientY)为中心，图片坐标(x,y)旋转tmp弧度，计算新坐标
+						data.y = e.clientY - (e.clientX - x) * Math.sin(tmp) - (e.clientY - y) * Math.cos(tmp);
+						data.rotate = z;
+						transform(t, data.x, data.y, s, z);
+						return;
+					}
+				}
+
+				// 图片动画函数。translate移动，scale缩放，rotate旋转度
+				function transform(t, x, y, s, r) {
+					t.style.transform = `translate(${x | 0}px, ${y | 0}px) scale(${s}) rotate(${r}deg)`;
+				}
+
+				// 关闭图片的范围是w图片框架还是doc页面
+				function frame(w) {
+					return doc.getElementById(w) || doc;
+				}
+
+				// 浏览器窗口缩放后重新计算窗口大小，保证图片打开后的位置基于变化后的窗口大小
+				function resize() {
+					clearTimeout(debounce);
+					debounce = setTimeout(function () {
+						docWidth = docElement.clientWidth - 5;
+						docHeight = docElement.clientHeight - 5;
+					}, 500);
+				}
+
+				/* 添加样式。鼠标放到图片上的cursor鼠标样式，放大后图片的btzi-gallery框架位置，以及btzi-img图片定位和hover鼠标经过图片时置顶并显示阴影，active鼠标按下图片后隐藏阴影。（可修改） */
+				GM_addStyle('.BDE_Image,.d_content_img,.j_user_sign{cursor:zoom-in;}.btzi-gallery{position:fixed;top:0;left:0;z-index:19990801;}.btzi-img{position:absolute;transform-origin:0 0;box-shadow:0 0 7px rgba(0,0,0,.4);}.btzi-img:hover{z-index:20220801;box-shadow:0 0 7px rgb(0,0,0);}.btzi-img:active{box-shadow:0 0 7px rgba(0,0,0,.4);cursor:move;}');
+
+				/*
+				获取btzi-UserSettings用户设置，初次使用设定一个默认值。
+				open鼠标左键打开图片方式；
+				close鼠标左键关闭图片方式，closeWindow可关闭图片的范围；
+				size图片打开后大小；
+				wheelKey滚动图片组合键，wheelDirection滚动图片滚轮方向；
+				zoomKey缩放图片组合键，zoomDirection缩放图片滚轮方向；
+				rotateKey旋转图片组合键，rotateDirection旋转图片滚轮方向。
+				*/
+				preferences = JSON.parse(GM_getValue('btzi-UserSettings', '{"open": "click","close": "click","closeWindow":"btzi_gallery","fanye":"1","size":"100","wheelKey":"type","wheelDirection": "1","zoomKey": "ctrlKey","zoomDirection": "-1","rotateKey": "shiftKey","rotateDirection": "1"}'));
+
+				/* 定位到贴子内容，用来注册事件。（可修改） */
+				var postpage = doc.getElementById('j_p_postlist');
+				//var postpic = doc.querySelectorAll("#j_p_postlist>.j_l_post>.d_post_content_main>.p_content>cc>.j_d_post_content>img");
+
+				/* 阻止贴吧默认打开图片方式函数。（可修改） */
+				var prevent = function (e) {
+					var target = e.target;
+					if (!e.button && target.className === 'BDE_Image' && target.parentNode.nodeName !== 'A' && target.tagName !== 'A') { // t.parentNode.nodeName !== 'A'图册贴里的图片打开方式不取消，仍为默认方式
+						e.stopPropagation();
+					}
+				},
+					/* 贴子翻页删除图片函数。（可修改） */
+					callback = function () {
+						var p = preferences;
+						if (p.fanye == 1) {
+							gallery.style.display = 'none';
+							while (gallery.hasChildNodes()) {
+								gallery.firstChild.iData = null;
+								gallery.firstChild.remove();
+							}
+							gallery.style.display = '';
+						}
+					},
+					observer = new MutationObserver(callback);
+				try {
+					/* 监听贴子是否翻页。（可修改） */
+					observer.observe(postpage, {
+						childList: true
+					});
+				} catch (error) {
+					console.log("图片放大observer:" + error);
+				}
+				//console.log(preferences.fanye);
+
+				if (postpage != undefined) {
+					// 创建存放图片的div框架
+					gallery = doc.createElement('div');
+					gallery.className = 'btzi-gallery';
+					gallery.id = 'btzi_gallery';
+					gallery.addEventListener('mousedown', down); // 给框架注册鼠标按下事件，可以移动关闭图片
+					gallery.addEventListener('wheel', wheel); // 给框架注册鼠标滚轮事件，可以滚动图片
+					doc.body.appendChild(gallery);
+
+					postpage.addEventListener('click', prevent, true); //  给贴子内容注册阻止原图片打开事件
+					postpage.addEventListener(preferences.open, open, true); // 给贴子内容注册打开图片事件
+					frame(preferences.closeWindow).addEventListener(preferences.close, close); // 给关闭图片的范围注册图片关闭图片事件
+					win.addEventListener('resize', resize); // 给浏览器注册窗口缩放事件
+				}
+
+				// 用户设置界面函数
+				var settings = function () {
+
+					// 用户设置界面样式
+					GM_addStyle('.btzi-enabled .btzi-modal,.btzi-enabled .btzi-container{display:flex;}.btzi-modal,.btzi-container{position:fixed;top:0;left:0;display:none;width:100%;height:100%;}.btzi-modal{z-index:20211231;background-color:rgba(0,0,0,.7);}.btzi-container{z-index:20220101;justify-content:center;align-items:center;text-align:left;}.btzi-content{width:335px;border-radius:6px;background-color:#fff;}.btzi-header,.btzi-body,.btzi-footer{padding:11px;}.btzi-header{border-bottom:1px solid #e6ecf0;}.btzi-title{padding:0;margin:0;font:400 20px sans-serif;color:#000;text-align:center;}.btzi-group{padding:0;margin:0;margin-bottom:15px;border:0;}.btzi-legend,.btzi-controls,.btzi-select,.btzi-button{font:14px sans-serif;color:#000;}.btzi-legend{padding:5px 0;margin:0;float:left;width:81px;text-align:right;}.btzi-controls{margin-left:93px;clear:none;}.btzi-select{box-sizing:border-box;padding:4px;margin:0;width:180px;height:30px;border:1px solid #e6ecf0;border-radius:3px;appearance:auto;}.btzi-select:focus{outline:#f0f auto;}.btzi-footer{text-align:center;border-top:1px solid #e6ecf0;}.btzi-button{padding:9px 18px;border:0;border-radius:75px;font-weight:700;color:#fff;background:#4ab3f4;cursor:pointer;transition:box-shadow .17s ease-in-out;}.btzi-button:hover,.btzi-button:active{background:#1da1f2;}.btzi-button:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px #a4d9f9;}.btzi-button:active{box-shadow:0 0 0 2px #fff,0 0 0 4px #4ab3f4;}');
+
+					var html,
+						form,
+						p,
+						prop,
+						KeyIndex,
+						change;
+
+					// 用户设置界面html
+					html = '<div class=btzi-modal></div><div class=btzi-container><div class=btzi-content><div class=btzi-header><h3 class=btzi-title>用户设置</h3></div><div class=btzi-body><form id=btzi_settings_form><fieldset class=btzi-group><legend class=btzi-legend>打开图片</legend><div class=btzi-controls><select class=btzi-select name=btzi[open]><option value=click>鼠标左键，单击图片</option><option value=dblclick>鼠标左键，双击图片</option></select></div></fieldset><fieldset class=btzi-group><legend class=btzi-legend>关闭图片</legend><div class=btzi-controls><select class=btzi-select name=btzi[close]><option value=click>鼠标左键，单击</option><option value=dblclick>鼠标左键，双击</option></select><select class=btzi-select name=btzi[closeWindow]><option value=btzi_gallery>图片，关闭单个图片</option><option value=document>页面，关闭所有图片</option></select></div></fieldset>					<fieldset class=btzi-group><legend class=btzi-legend>是否翻页自动清理图片</legend><div class=btzi-controls><select class=btzi-select name=btzi[fanye]><option value=1>是</option><option value=0>否</option></select></div></fieldset><fieldset class=btzi-group><legend class=btzi-legend>图片大小</legend><div class=btzi-controls><select class=btzi-select name=btzi[size]><option value=100>默认： 原始</option><option value=0>默认： 等比例适应屏幕</option></select></div></fieldset><fieldset class=btzi-group><legend class=btzi-legend>滚动图片</legend><div class=btzi-controls><select class=btzi-select name=btzi[wheelKey]><option value=type>组合键： 无</option><option value=ctrlKey>组合键： Ctrl</option><option value=altKey>组合键： Alt</option><option value=shiftKey>组合键： Shift</option></select><select class=btzi-select name=btzi[wheelDirection]><option value=1>滚轮向下，图片上/左移</option><option value=-1>滚轮向上，图片上/左移</option></select></div></fieldset><fieldset class=btzi-group><legend class=btzi-legend>缩放图片</legend><div class=btzi-controls><select class=btzi-select name=btzi[zoomKey]><option value=type>组合键： 无</option><option value=ctrlKey>组合键： Ctrl</option><option value=altKey>组合键： Alt</option><option value=shiftKey>组合键： Shift</option></select><select class=btzi-select name=btzi[zoomDirection]><option value=1>滚轮向下，图片放大</option><option value=-1>滚轮向上，图片放大</option></select></div></fieldset><fieldset class=btzi-group><legend class=btzi-legend>旋转图片</legend><div class=btzi-controls><select class=btzi-select name=btzi[rotateKey]><option value=type>组合键： 无</option><option value=ctrlKey>组合键： Ctrl</option><option value=altKey>组合键： Alt</option><option value=shiftKey>组合键： Shift</option></select><select class=btzi-select name=btzi[rotateDirection]><option value=1>滚轮向下，顺时针旋转</option><option value=-1>滚轮向上，顺时针旋转</option></select></div></fieldset></form></div><div class=btzi-footer><button class=btzi-button id=btzi_settings_save type=button>保存设置</button> <button class=btzi-button id=btzi_settings_cancel type=button>放弃</button></div></div></div>';
+					doc.body.insertAdjacentHTML('beforeend', html);
+					form = doc.getElementById('btzi_settings_form');
+					p = preferences;
+					for (prop in p) { // 将数据库里的设置导入到用户设置界面显示
+						form[`btzi[${prop}]`].value = p[prop];
+					}
+
+					KeyIndex = { 'btzi[wheelKey]': form['btzi[wheelKey]'].selectedIndex, 'btzi[zoomKey]': form['btzi[zoomKey]'].selectedIndex, 'btzi[rotateKey]': form['btzi[rotateKey]'].selectedIndex };
+
+					// 避免组合键冲突，当选择已有组合键时会互相替换
+					change = function () {
+						var prop, tmp;
+						for (prop in KeyIndex) {
+							if (this.selectedIndex === KeyIndex[prop]) {
+								tmp = KeyIndex[this.name];
+								KeyIndex[prop] = tmp;
+								form[prop].selectedIndex = tmp;
+								break;
+							}
+						}
+						KeyIndex[this.name] = this.selectedIndex;
+						prop = null;
+						tmp = null;
+					};
+
+					form['btzi[wheelKey]'].addEventListener('change', change);
+					form['btzi[zoomKey]'].addEventListener('change', change);
+					form['btzi[rotateKey]'].addEventListener('change', change);
+
+					// 给保存按钮注册事件
+					doc.getElementById('btzi_settings_save').addEventListener('click', function () {
+						var prop,
+							prefer = p,
+							opened = prefer.open,
+							closed = prefer.close,
+							closedWindow = prefer.closeWindow;
+						for (prop in prefer) { // 整合获得的新设置
+							prefer[prop] = form[`btzi[${prop}]`].value;
+						}
+						if (opened !== prefer.open) { // 判断鼠标打开图片的方式是否更换
+							postpage.removeEventListener(opened, open, true);
+							postpage.addEventListener(prefer.open, open, true);
+						}
+						if (closed !== prefer.close || closedWindow !== prefer.closeWindow) { // 判断鼠标关闭图片的范围是否更换
+							frame(closedWindow).removeEventListener(closed, close);
+							frame(prefer.closeWindow).addEventListener(prefer.close, close);
+						}
+						GM_setValue('btzi-UserSettings', JSON.stringify(prefer)); // 将用户的新设置导入到数据库里保存
+						doc.body.classList.remove('btzi-enabled');//通过控制样式来显示关闭设置界面
+						prefer = null;
+					});
+					// 给取消按钮注册事件
+					doc.getElementById('btzi_settings_cancel').addEventListener('click', function () {
+						doc.body.classList.remove('btzi-enabled');//通过控制样式来显示关闭设置界面
+					});
+					settings = null;
+					doc.body.classList.add('btzi-enabled');
+				};
+				if (!GM_getValue('btzi-UserSettings')) { // 第一次使用，弹出设置界面
+					settings();
+				}
+				else {
+					settings();//初始化后隐藏备用
+					doc.body.classList.remove('btzi-enabled');
+				}
+
+				// 在浏览器扩展的菜单列表里添加设置选项
+				GM_registerMenuCommand('图片放大设置', function () {
+					if (settings) {
+						settings();
+					} else {
+						doc.body.classList.add('btzi-enabled');
+					}
 				});
-			})(window);
+				console.log('也许我走了，什么都不会剩下。');
+			})(window, document);
 		}
 	}, 2000);
 
@@ -9960,14 +10093,14 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 			b.setAttribute('id', 'select2');
 			var c = document.createElement('p')
 			c.textContent = "翻页保持/排序是否包含置顶贴"
-			c.setAttribute('style', 'position: absolute;left: 3px;top: 30px;witdh:200px;')
+			c.setAttribute('style', 'position: relative;margin-left: 3px;margin-top: 5px;witdh:200px;')
 			c.appendChild(b)
 			var d = document.createElement('input')
 			d.setAttribute('type', 'checkbox');
 			d.setAttribute('id', 'select3');
 			var e = document.createElement('p')
 			e.textContent = "贴吧只能显示前10000贴，每页50贴，最多201页"
-			e.setAttribute('style', 'position: absolute;left: 3px;top: 50px;')
+			e.setAttribute('style', 'position: relative;margin-left: 3px;margin-top: 5px;')
 			c.appendChild(d)
 			var f = document.createElement('div')
 			f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: -12px;')
@@ -10658,7 +10791,10 @@ margin-top: 20px;
 			if (classList.contains('p_postlist')) {
 				let t = setTimeout(() => {
 					clearTimeout(t);
-					$('#thread_theme_5')[0].classList.remove("thread_theme_bright_absolute");
+					let temp = $('#thread_theme_5')[0];
+					if (temp != null) {
+						temp.classList.remove("thread_theme_bright_absolute");
+					}
 				}, 1000);
 				/*
 				修复贴子内下工具栏点翻页按钮后，不再显示翻页列表

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         复制贴吧贴子内容
-// @version      1.2.2.6
+// @version      1.2.2.7
 /// @name        Copy Tieba Link
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
@@ -215,7 +215,7 @@ if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\//g) != -1) {
                 }
                 console.log("j_core_title_wrap:" + temp2.outerHTML);
             } catch (e) {
-                console.error("T2:" + e);
+                console.log("T2:" + e);
                 clearInterval(T);
                 T = null;
             }
@@ -246,7 +246,7 @@ if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/p\//g) != -1) {
             }
             console.log("core_reply_tail:" + temp3.length);
         } catch (e) {
-            console.error("T3:" + e);
+            console.log("T3:" + e);
             clearInterval(TT);
             TT = null;
         }
@@ -266,6 +266,7 @@ async function copyLink() {
     //console.log(parent.parentNode.parentNode.children[0].children[1].children[1]);//楼层除了第一层
     //console.log(parent.parentNode.parentNode.children[0].children[3].children[1]);//旧版贴吧楼层第一层
     //console.log("this.dataset.linkText:" + JSON.stringify(this.dataset));
+    //https://www.cnblogs.com/jijm123/p/15357924.html 关于JAVASCRIPT中的DATASET
     if (this.dataset.linkText) {
         //直接使用储存的合成文本
         text = this.dataset.linkText;
