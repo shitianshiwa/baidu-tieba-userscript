@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.10
+// @version      2.1.1843.11
 /// @version     2.1
-// @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（beta），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
+// @description  百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录(楼中楼还需要Header Editor脚本才能正常运行），完全去除扰眼和各类广告模块(贴吧活动广告管不了，都是针对某个贴吧弄的，来无影去无踪。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（目前如果一楼太长就会失效），按发贴时间、回复时间、回复量排序/倒序，贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽，可旋转，可跨页。
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
 // @author       shitianshiwa && 忆世萧遥
 // @homepage     https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
@@ -105,7 +105,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 	 * pn: 1
 	 * frsrn: 1
 	 * pbrn: 1
-	 * 需要登陆才能显示30楼
+	 * 需要登录才能显示30楼
 	 */
 	const getThreadMoUrl = tid => `//tieba.baidu.com/mo/q-----1-1-0----/m?kz=${tid}`;
 	/**
@@ -160,7 +160,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 		//把下载app按钮移到扫码下载app的位置
 		let app1 = document.querySelectorAll(".app_download_info")[0]
 		if (app1 != undefined) {
-			let app2 = document.createElement("a"); //创建节点<a/>
+			let app2 = document.createElement("a"); //创建节点<a>
 			app2.setAttribute('href', 'https://tiebac.baidu.com/c/s/download/pc');
 			app2.innerText = "贴吧app下载跳转";
 			app1.after(app2)
@@ -175,9 +175,35 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 		} catch (error) {
 			console.log("激活发贴文本编辑器:" + error);
 		}
-		//给PC端的投票加点提示文本
+		//给PC端的投票发贴按钮加点提示文本
 		if (tieziurl.search(/(https|http):\/\/tieba\.baidu\.com\/f\?kw\=/g) != -1) {
 			$("a.add_vote_btn")[0].title = "安卓客户端可能看不见PC端的投票，反之也如此"
+		}
+		//给PC端选吧主投票贴下面的下载贴吧客户端二维码扫描栏增加关闭按钮和二维码大图链接
+		let guanbi1 = document.querySelector(".bazhu-fixed-daoliu-bar");
+		if (guanbi1 != null) {
+			try {
+				let guanbi2 = document.createElement("div");
+				guanbi2.setAttribute('style', 'float: right;color: white;padding-right: 5px;');
+				guanbi2.innerText = "关闭";
+				guanbi1.querySelector(".bar-content").before(guanbi2);
+				let qcode = document.querySelectorAll(".download-qcode")[0];
+				let url = document.defaultView.getComputedStyle(qcode, null)["background-image"].split('"')[1];//获取一个标签里的样式 https://www.cnblogs.com/daysme/p/6117174.html
+				let temp = document.querySelectorAll(".download-title")[0];
+				let qcode2 = document.createElement("a");
+				qcode2.setAttribute('style', 'color:#FFF;');
+				qcode2.setAttribute('target', '_Blank');
+				qcode2.setAttribute('href', url);
+				qcode2.innerText = "二维码大图";
+				temp.after(qcode2);
+				guanbi2.addEventListener("click", function (event) {
+					guanbi1.remove();
+					guanbi2 = null;
+				});
+			}
+			catch (e) {
+				console.log("qcode:" + e);
+			}
 		}
 	}, 5000);
 	//https://tiebac.baidu.com/c/s/download/pc
@@ -204,7 +230,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 	var yincangcebianlanx = false; //隐藏侧边栏
 	var qiangdiaoxinxitishi = false; //强调信息显示
 	var tieba_custom_pass_login = false;
-	var nologin = false;//未登陆
+	var nologin = false;//未登录
 	var css = "";
 	css +=
 		`/*广告和无用功能*/
@@ -3071,7 +3097,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	white-space: nowrap !important;
                 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
                 }
-				/*右上角登陆注册设置等按钮样式*/
+				/*右上角登录注册设置等按钮样式*/
                 .u_ddl {
                 	position: absolute !important;
                 	display: block !important;
@@ -7584,8 +7610,8 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 			__mod_disable = 2; //关掉模块
 
 		_main = function ($, wPageData) {
-			// 检查是否在贴吧
-			if (!wPageData.forum) return;
+			// 检查是否在贴吧,避开某些页面
+			if (wPageData.forum == undefined && wPageData.page == undefined) return;
 			var isThread = !!wPageData.thread;
 			var _css = $('<style>');
 			var _cssH = $('<style>').text('.ads{display:none !important;}');
@@ -9034,7 +9060,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					console.info('成功捕捉到菜单元素，传递至回调…');
 					console.info($parent);
 					_run(function () {
-						if (nologin==false) {
+						if (nologin == false) {
 							var $menuItem = $('<li>'),
 								$menuLink = $('<a>').appendTo($menuItem).addClass('jx').text('助手设置');
 							//$parent.find('.u_tb_profile').before($menuItem);
@@ -9048,6 +9074,15 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 								var lis = $parent.find("ul>li");
 								//console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
 								lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
+								let temp = $parent.parent().parent().children();//把没有内容的按钮隐藏掉，防止在某些浏览器出现占位现象
+								for (let i = 0; i < temp.length; i++) {
+									//console.log(temp[i].children.length)
+									if(temp[i].children.length==0)
+									{
+										temp[i].style.display = "none";
+									}
+								}
+								//console.log($parent.parent().parent().children()[0].children.length)
 							}
 						}
 						else {
@@ -9222,8 +9257,8 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 								subtree: true
 							});
 						} catch (error) {
-							console.log(".u_setting:"+error)
-						 }
+							console.log(".u_setting:" + error)
+						}
 					}
 				}, 1500);
 			}, '捕捉设定');
@@ -9509,8 +9544,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 						image.onerror = function () {
 							if (this.src !== target.src) {
 								//尝试加第二道防御，防止出现循环请求
-								if(target.src.search(/https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/)!=-1)
-								{
+								if (target.src.search(/https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/) != -1) {
 									this.src = target.src;
 								}
 								console.log(target.src)
@@ -10541,9 +10575,9 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
         .user>.right,
         /*删除某些页面会出现的错误头像*/
         .userbar,
-        /*右上角包住登陆按钮的大框架*/
+        /*右上角包住登录按钮的大框架*/
         #main_aside,
-        /*登陆按钮*/
+        /*登录按钮*/
         .u_login,
         /*贴子内容列表框架*/
         .p_postlist,
@@ -10948,13 +10982,13 @@ margin-top: 20px;
 				*/
 			}
 			if (classList.contains('u_login')) {
-				$("li.u_login").click(() => { //解决贴子刚加载后，点不出登陆弹窗
+				$("li.u_login").click(() => { //解决贴子刚加载后，点不出登录弹窗
 					if (tieba_custom_pass_login != null && tieba_custom_pass_login != false) {
 						clearInterval(tieba_custom_pass_login);
 						tieba_custom_pass_login = null;
 					}
 				});
-				console.log("未登陆");
+				console.log("未登录");
 				//百度贴吧：不登录即可看贴 by VA
 				if (!GM_getValue("tiebameihua")) { //贴吧美化
 					if (!GM_getValue("tiebameihua") /*贴吧美化*/) { //隐藏侧边栏
@@ -10976,13 +11010,13 @@ margin-top: 20px;
 						tieba_custom_pass_login = null;
 					}
 					try {
-						document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove(); //解决未登陆贴吧看贴会弹窗的问题
+						document.querySelectorAll('div[class="tieba-custom-pass-login"]')[0].remove(); //解决未登录贴吧看贴会弹窗的问题
 					} catch (e) { }
 					killlogin--;
 				}, 1000);
 			}
 			if (classList.contains('userbar')) {
-				console.log("不登陆看贴")
+				console.log("不登录看贴")
 				if (unsafeWindow.PageData.user.is_login == 0) {
 					unsafeWindow.PageData.user.is_login = 1
 					nologin = true;
@@ -10999,7 +11033,7 @@ margin-top: 20px;
 						需要另一个浏览器扩展Header Editor
 						https://he.firefoxcn.net/
 						by yilksd
-						以下为代码
+						以下为代码，复制出来保存在一个空白的xxxxx.json文件里，用Header Editor导入功能载入
 	
 						{
 							"request": [
@@ -11021,13 +11055,15 @@ margin-top: 20px;
 							"receiveHeader": [],
 							"receiveBody": []
 						}
+
+						注意,如果登录了贴吧记得要关掉Header Editor里的"贴吧楼中楼免登录查看"脚本，否则也会影响到楼层楼中楼显示
 						`)
 					}
 				}
 				/*https://github.com/shitianshiwa/baidu-tieba-userscript/issues/9
 				不登录状态下，仅有第1页可以查看楼中楼的贴子，其后的页面都不能。很多贴子都是这样，但也有些不是。
 				解释：百度贴吧在登录状态跟未登录状态下每页显示的回贴数量不一样，未登录状态下2页的回贴量才等于登录状态下1页的，所以两种状态下页码是不一样的。而百度请求楼中楼的json时得到的响应却是按照登录状态下的，所以不对应了，自然楼中楼内容无法加载
-				服务器提供的网页会因为登陆状态而有所不同
+				服务器提供的网页会因为登录状态而有所不同
 				*/
 			}
 			/*侧工具栏*/
@@ -11102,7 +11138,7 @@ margin-top: 20px;
 			//console.log(classList.contains('j_thread_list'))
 			if (classList.contains('u_menu_username')) {
 				//console.log(target);
-				// @returns {number|""} 是否登录，不登陆为0或"",为了适配不登陆看贴功能
+				// @returns {number|""} 是否登录，不登录为0或"",为了适配不登录看贴功能
 				//console.log(localStorage.getItem("userid"));
 				var getIsLogin2 = unsafeWindow.PageData.user.id || unsafeWindow.PageData.user.user_id; //获取用户id
 				if (localStorage.getItem("userid") == null || localStorage.getItem("userid") != "" || localStorage.getItem("userid") != undefined) { //可能没用？
