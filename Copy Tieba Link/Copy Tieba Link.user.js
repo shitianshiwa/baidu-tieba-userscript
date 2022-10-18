@@ -37,7 +37,7 @@
 //目前本脚本不适合复制贴吧里面的代码，容易少复制内容！
 //document-start
 console.log("jquery版本号: " + $.fn.jquery);
-console.log("Copy Tieba Link版本号: 1.2.2.3");
+console.log("Copy Tieba Link版本号: 1.2.2.7");
 if (document.body.className == "page404") {
     return
 }
