@@ -41,7 +41,6 @@ $('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜
 * 显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
 * 未完。。。
 # 备注
-* 引用功能只有在旧版贴吧才会有效（不开脚本贴子UI看起来比较老的样子）
 * 有些贴吧账号PC端贴吧有夜间模式可选，这个会导致样式显示不正常
 * 在tieba.baidu.com/i/i/fans这个页面有显示bug
 * 尝试兼容别人的"贴吧黑夜模式"样式https://userstyles.org/styles/124770/tieba-maverick-2018   https://userstyles.org/styles/161224/maverick-demo-styles
