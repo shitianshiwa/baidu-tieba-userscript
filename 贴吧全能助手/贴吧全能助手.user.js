@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.9
+// @version      2.1.1843.10
 /// @version     2.1
 // @description  【装这一个脚本就够了～可能是你遇到的最好用的贴吧增强脚本】(不存在的)，百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录，完全去除扰眼和各类广告模块(贴吧活动广告不管了，都是针对某个贴吧弄的，来无影去无踪，能证明PC贴吧还有人管。。。)，全面精简并美化各种贴吧页面（算不算好要看个人喜好），去除贴吧帖子里链接的跳转（beta），按发贴时间排序/倒序，查看贴吧用户发言记录（有些用户查不了;已经废了），贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
@@ -204,6 +204,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 	var yincangcebianlanx = false; //隐藏侧边栏
 	var qiangdiaoxinxitishi = false; //强调信息显示
 	var tieba_custom_pass_login = false;
+	var nologin = false;//未登陆
 	var css = "";
 	css +=
 		`/*广告和无用功能*/
@@ -475,9 +476,13 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 
                 /*让一楼的回复按钮看起来更好看点？*/
                 .p_reply_first{
-                right:9px !important;
+                  right: 9px !important;
+				  font-size: 0px !important;
                 }
-
+				.p_reply_first:before{
+					font-size: 10px;
+					content: \"回复楼主\";
+				}
                 /*楼层气泡,也给显示吧*/
                 .post_bubble_top,.post_bubble_bottom{
                 /*    display: none !important;*/
@@ -3050,7 +3055,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 }
                 .u_news_wrap span {
                 	color: #fff !important;
-                   font-weight: bold;
+                    font-weight: bold;
                 	display: block;
                 	background: #4879BD !important;
                 	line-height: 12px !important;
@@ -3066,6 +3071,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	white-space: nowrap !important;
                 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
                 }
+				/*右上角登陆注册设置等按钮样式*/
                 .u_ddl {
                 	position: absolute !important;
                 	display: block !important;
@@ -3181,15 +3187,15 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
                 	font-family: inherit !important;
                 }
+				.u_ddl_con li a:hover {
+                	color: #fff !important;
+                	background: #4285F4 !important;
+                	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1), 0 2px 16px 0 rgba(0, 0, 0, 0.08);
+                }
                 .sys_notify li a {
                 	display: block !important;
                 	left: 50% !important;
                 	transform: translateX(-50%) !important;
-                }
-                .u_ddl_con li a:hover {
-                	color: #fff !important;
-                	background: #4285F4 !important;
-                	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1), 0 2px 16px 0 rgba(0, 0, 0, 0.08);
                 }
                 .u_notity_bd .category_item .unread_num,
                 .u_notity_bd .category_item .unread-num{
@@ -3213,7 +3219,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 }
                 .sys_notify_last .unread-num,
                 .sys_notify_last .unread_num {
-              /*	left: 25px !important;*/
+                /*	left: 25px !important;*/
                 }
                 .u_ddl_con li a:hover .unread-num,
                 .u_ddl_con li a:hover .unread_num {
@@ -3751,10 +3757,9 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 }
                 .post-tail-wrap {
                 	/*消灭分割线*/
-
                 	font-size: 0 !important;
                 }
-                .post-tail-wrap > * {
+                .post-tail-wrap > *:not(.p_reply_first) {
                 	font-size: 14px !important;
                 }
                 .p_mtail > li {
@@ -9027,20 +9032,150 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 			_run(function () {
 				var _callMenu = function ($parent) {
 					console.info('成功捕捉到菜单元素，传递至回调…');
+					console.info($parent);
 					_run(function () {
-						var $menuItem = $('<li>'),
-							$menuLink = $('<a>').appendTo($menuItem).addClass('jx').text('助手设置');
-						//$parent.find('.u_tb_profile').before($menuItem);
-						$parent.find('.u_tb_profile').parent().prepend($menuItem);
-						$menuLink.click(_menu);
-						var $menuItem2 = $('<li>'),
-							$menuLink2 = $('<a>').appendTo($menuItem2).addClass('jx meihua').text(GM_getValue("tiebameihua") ? '开启美化' : '关闭美化'); //'贴吧美化'
-						$('.u_tb_profile').before($menuItem2);
-						if (!GM_getValue("tiebameihua")) {
-							var lis = $parent.find("ul>li");
-							//console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
-							lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
+						if (nologin==false) {
+							var $menuItem = $('<li>'),
+								$menuLink = $('<a>').appendTo($menuItem).addClass('jx').text('助手设置');
+							//$parent.find('.u_tb_profile').before($menuItem);
+							$parent.find('.u_tb_profile').parent().prepend($menuItem);
+
+							var $menuItem2 = $('<li>'),
+								$menuLink2 = $('<a>').appendTo($menuItem2).addClass('jx meihua').text(GM_getValue("tiebameihua") ? '开启美化' : '关闭美化'); //'贴吧美化'
+							$('.u_tb_profile').before($menuItem2);
+
+							if (!GM_getValue("tiebameihua")) {
+								var lis = $parent.find("ul>li");
+								//console.log(lis);//在 http://tieba.baidu.com/i/i/replyme 中不生效
+								lis[1].style.display = lis[2].style.display = lis[7].style.display = "none"; //取消屏蔽服务中心 = lis[6].style.display
+							}
 						}
+						else {
+							var css = `
+							/*旧版贴吧样式右上角更多按钮样式*/
+							.u_ddl {
+								position: absolute !important;
+								display: block !important;
+								left: 50% !important;
+								transform: translateX(-50%);
+								right: auto !important;
+								overflow: visible !important;
+								pointer-events: none;
+								opacity: 0;
+								transition-property: opacity;
+								transition-duration: .5s;
+								transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+							}
+							.u_menu_hover~.u_ddl,
+							li:hover>.u_ddl {
+								pointer-events: auto;
+								opacity: 1;
+							}
+							.u_ddl_con {
+								position: relative !important;
+								border: none !important;
+								background: transparent !important;
+								overflow: visible !important;
+							}
+							.u_ddl_con_top {
+								background: transparent !important;
+							}
+							.u_ddl_tit {
+								background: transparent !important;
+							}
+							.u_ddl_con ul {
+								display: block;
+								overflow: visible;
+								padding-bottom: 0 !important;
+							}
+							.u_ddl_con ul.sys_notify_last {
+								padding-top: 0 !important;
+							}
+							.u_ddl_con li a,#u_notify_item li a,ul.sys_notify_last li a{/*解决右上角的浮动按钮文字超出按钮问题*/
+							   white-space:normal !important;
+							}
+							.u_ddl_con li {
+								margin-top: 10px;
+								padding: 0 !important;
+								width: auto !important;
+								transform: translateX(-50px) rotateY(90deg) translateZ(-60px);
+								opacity: 0;
+								transform-origin: 100% 50%;
+								transition-property: transform, opacity;
+								transition-duration: 1s;
+								transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+							}
+							.u_ddl_con li:nth-of-type(1) {
+								transition-delay: 0s;
+							}
+							.u_ddl_con li:nth-of-type(2) {
+								transition-delay: .05s;
+							}
+							.u_ddl_con li:nth-of-type(3) {
+								transition-delay: .1s;
+							}
+							.u_ddl_con li:nth-of-type(4) {
+								transition-delay: .15s;
+							}
+							.u_ddl_con li:nth-of-type(5) {
+								transition-delay: .2s;
+							}
+							.u_ddl_con li:nth-of-type(6) {
+								transition-delay: .25s;
+							}
+							.u_ddl_con li:nth-of-type(7) {
+								transition-delay: .3s;
+							}
+							.u_ddl_con li:nth-of-type(8) {
+								transition-delay: .35s;
+							}
+							.u_ddl_con li:nth-of-type(9) {
+								transition-delay: .4s;
+							}
+							.category_item_last {
+								transition-delay: .3s !important;
+							}
+							.u_menu_hover~.u_ddl .u_ddl_con li,
+							li:hover>.u_ddl .u_ddl_con li {
+								opacity: 1;
+								transform: none;
+							}
+							.u_ddl_con li a {
+								color: #999 !important;
+								background: #fff !important;
+								width: 50px !important;
+								height: auto !important;
+							}
+							.u_ddl_con li a:hover {
+								color: #fff !important;
+								background: #4285F4 !important;
+								box-shadow: 0 2px 8px 0 rgb(0 0 0 / 10%), 0 2px 16px 0 rgb(0 0 0 / 8%);
+							}
+							`;
+							GM_addStyle(css);
+							var $setting = $('<li>').addClass('u_setting');
+							var $setting2 = $('<div>').appendTo($setting).addClass('u_menu_item u_menu_setting');
+							$('<a>').appendTo($setting2).addClass('u_setting_wrap').text('更多');
+							var $setting3 = $('<div>').appendTo($setting).addClass('u_ddl');
+
+							var $setting4 = $('<div>').appendTo($setting3).addClass('u_ddl_con');
+							$('<div>').appendTo($setting4).addClass('u_ddl_arrow');
+							var $setting5 = $('<div>').appendTo($setting4).addClass('u_ddl_con_top');
+							$('<div>').appendTo($setting4).addClass('d_ddl_con_bottom');
+
+							var $setting6 = $('<ul>').appendTo($setting5);
+							var $menuItem = $("<li>").appendTo($setting6);
+
+							var $menuLink = $("<a>").appendTo($menuItem).addClass("jx").text('助手设置');
+							var $menuItem2 = $("<li>").appendTo($setting6);
+
+							var $menuLink2 = $('<a>').appendTo($menuItem2).addClass('jx meihua').text(GM_getValue("tiebameihua") ? '开启美化' : '关闭美化'); //'贴吧美化'
+							$('.u_member').before($setting);
+						}
+						//<div class="u_menu_item u_menu_setting"><a class="u_setting_wrap" href="#" onclick="return false;">更多<i class="i-arrow-down"></i></a></div>
+						//$('.u_member').before($menuItem);
+						$menuLink.click(_menu);
+
 						$menuLink2.click(function () {
 							GM_setValue("tiebameihua", GM_getValue("tiebameihua") ? false : true);
 							location.reload();
@@ -9077,12 +9212,18 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					if (_m.length) {
 						_callMenu(_m);
 					} else {
+						_m = $('.u_member')
+						if (_m.length) {
+							_callMenu(_m);
+						}
 						try {
 							ma.observe($('.u_setting')[0], {
 								childList: true,
 								subtree: true
 							});
-						} catch (error) { }
+						} catch (error) {
+							console.log(".u_setting:"+error)
+						 }
 					}
 				}, 1500);
 			}, '捕捉设定');
@@ -9359,7 +9500,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					//console.log(target.parentNode.nodeName)//P
 					//tagName 获取标签名称
 					/* className分别指向BDE_Image新图，j_user_sign签名档，d_content_img老图。只有鼠标左键点击以上图片且不是图册贴里的图片时才会放大图片。（可修改） */
-					if (!e.button && target.tagName !== 'A' && 'className:BDE_Image,j_user_sign,d_content_img'.includes(target.className, 10) && target.parentNode.nodeName !== 'A') {
+					if (!e.button && target.tagName !== 'A' && ["className:BDE_Image", "j_user_sign", "d_content_img"].includes(target.className, 10) && target.parentNode.nodeName !== 'A') {
 						iTarget = target;
 						image = doc.createElement('img');
 						image.className = 'btzi-img';
@@ -9367,7 +9508,11 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 						// 如果原图加载失败，直接显示贴子里的压缩图片；图片损坏不加载
 						image.onerror = function () {
 							if (this.src !== target.src) {
-								this.src = target.src;
+								//尝试加第二道防御，防止出现循环请求
+								if(target.src.search(/https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/)!=-1)
+								{
+									this.src = target.src;
+								}
 								console.log(target.src)
 							} else {
 								target = null;
@@ -10617,7 +10762,7 @@ margin-top: 20px;
 					//console.log(target.querySelectorAll("ul.p_reply>li>a"));
 					let temp1 = target.querySelectorAll(".p_reply_first") //新贴吧的贴子
 					let temp2 = target.querySelectorAll("ul.p_reply>li>a"); //老贴吧的贴子样式特殊
-					if (temp1[0] != null) {
+					/*if (temp1[0] != null) {
 						temp1[0].style = "font-size:10px !important;";
 						//console.log(temp1[0].classList[0]);
 						if (temp1[0].classList[1] == "p_reply_first") {
@@ -10635,7 +10780,7 @@ margin-top: 20px;
 						} else {
 							temp2[0].innerHTML = "回复";
 						}
-					}
+					}*/
 				}
 			}
 			if (event.animationName !== '__tieba_action__') {
@@ -10840,6 +10985,7 @@ margin-top: 20px;
 				console.log("不登陆看贴")
 				if (unsafeWindow.PageData.user.is_login == 0) {
 					unsafeWindow.PageData.user.is_login = 1
+					nologin = true;
 					GM_registerMenuCommand("再显示一次不登录看贴提示弹窗", function () {
 						GM_setValue("first", false)
 						alert("刷新网页即可看到弹窗")
