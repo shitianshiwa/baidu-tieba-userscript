@@ -9500,7 +9500,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					//console.log(target.parentNode.nodeName)//P
 					//tagName 获取标签名称
 					/* className分别指向BDE_Image新图，j_user_sign签名档，d_content_img老图。只有鼠标左键点击以上图片且不是图册贴里的图片时才会放大图片。（可修改） */
-					if (!e.button && target.tagName !== 'A' && ["className:BDE_Image", "j_user_sign", "d_content_img"].includes(target.className, 10) && target.parentNode.nodeName !== 'A') {
+					if (!e.button && target.tagName !== 'A' && ["BDE_Image", "j_user_sign", "d_content_img"].includes(target.className) && target.parentNode.nodeName !== 'A') {
 						iTarget = target;
 						image = doc.createElement('img');
 						image.className = 'btzi-img';
