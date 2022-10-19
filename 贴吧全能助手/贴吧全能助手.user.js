@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.11
+// @version      2.1.1843.12
 /// @version     2.1
-// @description  百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录(楼中楼还需要Header Editor脚本才能正常运行），完全去除扰眼和各类广告模块(贴吧活动广告管不了，都是针对某个贴吧弄的，来无影去无踪。。。)，全面精简并美化各种贴吧页面（算不算好看看个人喜好），去除贴吧帖子里链接的跳转（目前如果一楼太长就会失效），按发贴时间、回复时间、回复量排序/倒序，贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽，可旋转，可跨页。
+// @description  百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录(楼中楼还需要Header Editor脚本才能正常运行），完全去除扰眼和各类广告模块(贴吧活动广告管不了，都是针对某个贴吧弄的，来无影去无踪。。。)，全面精简并美化各种贴吧页面（算不算好看看个人喜好），去除贴吧贴子里链接的跳转（目前如果一楼太长就会失效），按发贴时间、回复时间、回复量排序/倒序，贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽，可旋转，可跨页。
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
 // @author       shitianshiwa && 忆世萧遥
 // @homepage     https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
@@ -49,9 +49,9 @@
 ///该脚本是多个脚本的集合
 ///贴吧全能助手 by 忆世萧遥 https://greasyfork.org/en/scripts/26992-%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B 
 ///梦姬贴吧助手 by jixun https://github.com/jixunmoe/yume-tieba-helper https://openuserjs.org/scripts/JixunMoe/%E6%A2%A6%E5%A7%AC%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B MIT License https://github.com/jixunmoe/yume-tieba-helper/blob/master/LICENSE ;tieba_ui.js,Interval_Looper.js,gm2_port_v103.js by Jixun.Moe https://greasyfork.org/scripts/2657/code/tieba_ui.js
-///查看发帖 by 文科 https://github.com/wenketel 
+///查看发贴 by 文科 https://github.com/wenketel 
 ///百度贴吧：不登录即可看贴 by VA 
-///百度贴吧按发帖时间（帖子ID）排序 by NULL https://greasyfork.org/zh-CN/scripts/23356-tiebasortbyid
+///百度贴吧按发贴时间（贴子ID）排序 by NULL https://greasyfork.org/zh-CN/scripts/23356-tiebasortbyid
 ///百度贴吧图片点击放大 by lliwhx https://greasyfork.org/zh-CN/scripts/20969-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%9B%BE%E7%89%87%E7%82%B9%E5%87%BB%E6%94%BE%E5%A4%A7
 ///MIT License
 ///Copyright (c) 2017 lliwhx
@@ -184,7 +184,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 		if (guanbi1 != null) {
 			try {
 				let guanbi2 = document.createElement("div");
-				guanbi2.setAttribute('style', 'float: right;color: white;padding-right: 5px;');
+				guanbi2.setAttribute('style', 'float: right;color: white;padding-right: 5px;cursor: pointer;font-weight: bold;');
 				guanbi2.innerText = "关闭";
 				guanbi1.querySelector(".bar-content").before(guanbi2);
 				let qcode = document.querySelectorAll(".download-qcode")[0];
@@ -285,14 +285,14 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
     [id=\"pagelet_frs-aside/pagelet/ad\"],
     div[id=\"pagelet_frs-header/pagelet/head_content_middle\"] > div:first-child > div[class^=\"iframe_\"],
     .j_voice_ad_gif,
-    .p_share_ding,/*发帖域顶部分享控件*/
+    .p_share_ding,/*发贴域顶部分享控件*/
     .p_mall_tail,/*层主使用了贴吧特权标识*/
     #pop_frame,/*右下弹窗*/
     #encourage_entry,/*右边栏-我的应用*/
     #global_notice_wrap,/*全贴吧底部公共通知*/
     .firework-wrap,.firework-wrap2,/*烟花*/
-    ul#thread_list>li:not([data-field]):not(.thread_top_list_folder),/*帖子列表所有项*/
-    #j_p_postlist>div:nth-of-type(1)~div:not([data-field]):not(#j_p_postlist),/*帖子内页所有楼层*/
+    ul#thread_list>li:not([data-field]):not(.thread_top_list_folder),/*贴子列表所有项*/
+    #j_p_postlist>div:nth-of-type(1)~div:not([data-field]):not(#j_p_postlist),/*贴子内页所有楼层*/
     ul#thread_list>li.j_df_card,/*推广*/
     #j_p_postlist>div[data-isautoreply]:not(:first-of-type),/*推广*/
     .diamond-mall-aside,/*贴吧夺宝*/
@@ -478,7 +478,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 
                 .edui-btn-toolbar .edui-btn-medal,/*编辑框贴吧特权按钮*/
                 .save_face_bg,.achievement_medal_section,.achievement_medal_wrapper,/*楼层挽尊按钮,徽章*/
-                .lzl_cnt .pre_icon_wrap,.p_postlist .pre_icon_wrap,/*帖子内页会员标识*/
+                .lzl_cnt .pre_icon_wrap,.p_postlist .pre_icon_wrap,/*贴子内页会员标识*/
                 .share_thread,/*一楼分享按钮*/
                 .post-foot-send-gift-btn,/*一楼送礼物按钮*/
 
@@ -488,7 +488,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 
 
                 [id=\"pagelet_frs-aside/pagelet/hottopic\"],
-                .l_container .plat_head_v2_unmain_wrapper,/*认证吧帖子内页头部详细信息*/
+                .l_container .plat_head_v2_unmain_wrapper,/*认证吧贴子内页头部详细信息*/
                 .p_reply_first,.d_post_content_firstfloor .core_reply_tail .p_reply,/*屏蔽具有误导性的一楼内容下方回复按钮*/
                 .suggestion_list >li[data-field*=\"operation_title\"],.suggestion_list >li[data-field*=\"operation_item\"],.bdfengyun,/*搜索悬浮窗-大伙正在聊*/
                 .suggestion_list >li[data-field*=\"relation_game_title\"],.suggestion_list >li[data-field*=\"game_item\"],/*搜索悬浮窗-相关游戏*/
@@ -525,7 +525,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .pprefix-item{
                 	text-align: center !important;
                 }
-                /*帖子列表页会员标识和非实名认证印记*/
+                /*贴子列表页会员标识和非实名认证印记*/
                 /*悬停显示*/
                 .frs_bright_preicon,
                 .frs_bright_icons>*:not([data-name=\"user_type\"]):not([data-name=\"is_verify\"]){
@@ -1349,7 +1349,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .star_class_tip{
                 	display: none !important;
                 }
-                /*帖子排序按钮*/
+                /*贴子排序按钮*/
                 .thread_list_order {
                 	position: absolute;
                 	top: auto;
@@ -1488,7 +1488,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .right_section >div[id] {
                 	display: block !important;
                 }
-                /*首页帖子列表块*/
+                /*首页贴子列表块*/
                 .forum_content{
                 	display: flex;
                 }
@@ -1896,7 +1896,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	padding-left: 6px;
                 	padding-top: 2px;
                 }*/
-                /*帖子缩略图*/
+                /*贴子缩略图*/
                 .threadlist_bright .small_wrap,
                 .threadlist_bright .small_list{
                 	position: relative;
@@ -2118,7 +2118,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	transform: translate(-50%,-50%);
                 	padding-bottom: 6px !important;
                 }
-                /*发帖编辑框*/
+                /*发贴编辑框*/
 
                 .tb_rich_poster {
                 	margin: 0 20px !important;
@@ -2431,7 +2431,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	font-size: 20px;
                 }
                 .edui-btn-name-portrait .edui-icon-medal:after {
-                	content: \"发帖气泡\";
+                	content: \"发贴气泡\";
                 }
                 .edui-icon-image:before {
                 	content: \"\\e251\";
@@ -2480,7 +2480,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	content: \"\\e539\";
                 }
                 .edui-icon-quick-reply:after {
-                	content: \"快速回帖\";
+                	content: \"快速回贴\";
                 }
                 .edui-icon-topic:before {
                 	content: \'#\';
@@ -2656,7 +2656,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	right: 5px !important;
                 	top: -2px !important;
                 }
-                /*发帖成功提示*/
+                /*发贴成功提示*/
                 .tb_poster_info {
                 	position: absolute !important;
                 	left: 50% !important;
@@ -3490,7 +3490,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	margin-top: 0 !important;
                 }
 
-                /*帖子内页*/
+                /*贴子内页*/
 
                 .pb_content {
                 	background: none !important;
@@ -4388,7 +4388,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	top: auto !important;
                 }
                 .core_title_wrap_bright {
-                	/*帖子标题*/
+                	/*贴子标题*/
 
                 	top: 0 !important;
                 	border: none !important;
@@ -4880,7 +4880,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	text-align: center;
                 	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 2px 16px 6px rgba(0, 0, 0, 0.2) !important;
                 }
-                /*帖子内页-标题栏*/
+                /*贴子内页-标题栏*/
 
                 .core_title_bg {
                 	background: rgba(0,0,0,.01) !important;
@@ -5015,7 +5015,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .core_title_btns>.quick_reply:before {
                 	content: \"\\e24c\";
                 }
-                /*帖子内页底侧浮层,这个是靠贴吧自带的样式变化触发的*/
+                /*贴子内页底侧浮层,这个是靠贴吧自带的样式变化触发的*/
 
                 .core_title_absolute_bright {
                 	display: block !important;
@@ -5570,7 +5570,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 
                 /*细节处理*/
 
-                /*帖子内容图片宽度限制*/
+                /*贴子内容图片宽度限制*/
                 .d_post_content .BDE_Image{
                 	height: auto !important;
                 	max-width: 100% !important;
@@ -5609,13 +5609,13 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	float: right;
                 }
                 .thread_theme_bright_absolute .pb_list_pager:empty+.l_reply_num {
-                	/*帖子内页页数为1时增大功能栏项目间距*/
+                	/*贴子内页页数为1时增大功能栏项目间距*/
 
                 	margin-right: 20px !important;
                 }
 
                 .core_reply {
-                	/*楼中楼的最小高度导致帖子内页滚动时跳动*/
+                	/*楼中楼的最小高度导致贴子内页滚动时跳动*/
 
                 	min-height: 0 !important;
                 }
@@ -5630,7 +5630,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 
                 	border-top: none;
                 }
-                /*编辑快速回帖 输入框宽度问题*/
+                /*编辑快速回贴 输入框宽度问题*/
 
                 #quick-reply-edit-wrapper .quick-reply-item {
                 	margin-right: 0 !important;
@@ -5863,7 +5863,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	font-size: 100px;
                 	line-height: 100px;
                 }
-                /*帖子标题标识*/
+                /*贴子标题标识*/
                 .threadlist_title i:not(.icon-bazhurecruit):not(.icon-bazhupublicity/*排除吧主投票贴和公示贴*/):not(.icon-bazhuvote){
                 	flex: 0 0 auto;
                 	background-image: none !important;
@@ -6047,7 +6047,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 
                 .threadlist_title .tb_tag_forward:after,
                 .threadlist_title .icon-repost:after {
-                	content: \"转帖\";
+                	content: \"转贴\";
                 }
                 .threadlist_title img[src*=\"membertop_icon.png\"],
                 .threadlist_title .icon-member-top {
@@ -6192,7 +6192,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	width: 1002px !important;
                 }
 
-                /*帖子列表页话题*/
+                /*贴子列表页话题*/
                 .interview .threadListGroupCnt{
                 	padding: 12px 0 !important;
                 	background: none;
@@ -6553,7 +6553,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .playing .speaker:before{
                 	content: \'\\e047\';
                 }
-                /*发帖话题*/
+                /*发贴话题*/
                 .topic_sug_box_wrapper{
                 	z-index: 9999;
                 	margin-top: 20px;
@@ -6610,7 +6610,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .tb_rich_poster .poster_body .topic_add_btn:hover:after{
                 	transform: translate(-50%, -50%);
                 }
-                /*帖子内页投票*/
+                /*贴子内页投票*/
                 #voteFlashPanel .vote_buttons button{
                 	text-indent: 0;
                 }
@@ -6847,7 +6847,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				}
 				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+.*$")).test(document.location.href)) {
 					css += `
-                   /*帖子内页调整*/
+                   /*贴子内页调整*/
 
                    .tbui_aside_float_bar {
                    	margin-bottom: 0px;
@@ -6874,7 +6874,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				}
 				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+\\d+.*\\?(.*&)*see_lz=[1-9]+\\d*.*$")).test(document.location.href)) {
 					css += `
-                    /*帖子内页-只看楼主*/
+                    /*贴子内页-只看楼主*/
 
                     .core_title_btns #lzonly_cntn:before {
                     	content: \"\\e8f5\" !important;
@@ -7781,7 +7781,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							// 语音按钮 (需要客户端)
 							'.edui-btn-voice, .j_voice_ad_gif, .lzl_panel_voice',
 
-							// 发帖请遵守 ....
+							// 发贴请遵守 ....
 							'.poster_head_surveillance',
 
 							// 不水能死何弃疗！
@@ -7800,7 +7800,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							// 猜拳
 							'.add_guessing_btn, .guessing_watermark',
 
-							// 帖子推荐
+							// 贴子推荐
 							'.thread_recommend',
 
 							// 右下角广告
@@ -7856,7 +7856,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 	*/
 							}).extract()).appendTo(document.head);
 
-						// 只保留 [看帖、图片、精品(吧主推荐)、视频] 四个选项，贴吧有一个空白的选项 j_tbnav_tab_a 群组功能没了http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
+						// 只保留 [看贴、图片、精品(吧主推荐)、视频] 四个选项，贴吧有一个空白的选项 j_tbnav_tab_a 群组功能没了http*://tieba.baidu.com/f?kw=*&ie=utf-8&tab=group 贴吧已去掉群组功能 标题: 【公告】贴吧群组功能下线通知 链接：https://tieba.baidu.com/p/6698238206 百度贴吧: 贴吧意见反馈吧 发贴时间: 2020-5-22 19:24
 						//$('.j_tbnav_tab').filter(function(i) { return i > 3; }).remove();
 						let temp = $('.j_tbnav_tab_a');
 						for (let i = 0; i < temp.length; i++) {
@@ -7890,7 +7890,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					},
 
 					removePromoteThread: function () {
-						// 清理帖子列表的推广
+						// 清理贴子列表的推广
 						var it = document.evaluate('//*[@id="thread_list"]/li/div/div/div[text()="推广"]', document.body, null, XPathResult.ANY_TYPE, null);
 						var thread, threads = [];
 
@@ -7908,7 +7908,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					def: false,
 					_init: function () {
 						var $ads = [
-							// 帖子列表顶部, 如直播贴
+							// 贴子列表顶部, 如直播贴
 							'#threadListGroupCnt'
 						].join(', ');
 
@@ -8358,7 +8358,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				},
 				"hide_loops": {
 					name: '3 天循环隐藏',
-					desc: '3 天循环屏蔽指定用户的帖子, 统一封锁.',
+					desc: '3 天循环屏蔽指定用户的贴子, 统一封锁.',
 					flag: __type_postact | __type_forum,
 					def: false,
 
@@ -8625,8 +8625,8 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					}
 				},
 				/*"no_text_link": {
-					name: '屏蔽帖子内文字推广链接(过时了)',
-					desc: '将帖子内的文字推广搜索链接替换为普通文本',
+					name: '屏蔽贴子内文字推广链接(过时了)',
+					desc: '将贴子内的文字推广搜索链接替换为普通文本',
 					flag: __type_lzl | __type_floor,
 					_proc: function(floorType, args) {
 						this.rmLinkText(args._main);
@@ -8741,7 +8741,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					}
 				},
 				"quote_lzl": {
-					name: '楼中楼帖子引用',
+					name: '楼中楼贴子引用',
 					desc: '引用楼中楼的回复',
 					flag: __type_lzl,
 					def: true,
@@ -8773,7 +8773,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					}
 				},
 				"real_url": {
-					name: '贴吧跳转链解除(beta)', //可以用这个脚本代替 https://greasyfork.org/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC 去除贴吧帖子里链接的跳转
+					name: '贴吧跳转链解除(beta)', //可以用这个脚本代替 https://greasyfork.org/scripts/783-%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E4%B8%8D%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B7%B3%E8%BD%AC 去除贴吧贴子里链接的跳转
 					desc: '将百度所谓安全链接改成直链。',
 					flag: __type_floor | __type_lzl,
 					def: false,
@@ -8895,7 +8895,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				},
 				"rmSaveFace": {
 					name: '隐藏挽尊卡会员提示',
-					desc: '隐藏会员发帖的使用挽尊卡提示。',
+					desc: '隐藏会员发贴的使用挽尊卡提示。',
 					flag: 0,
 					_init: function () {
 						_hide('.save_face_bg');
@@ -9373,7 +9373,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					tail: $('.p_tail', _main)
 				});
 
-				// 处理解析 lzl 帖子（…
+				// 处理解析 lzl 贴子（…
 				// $tailer.find('.lzl_single_post').each(_procLzlPost);
 				return _main;
 			};
@@ -9393,7 +9393,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					tail: $('.p_tail', _main)
 				});
 
-				// 处理解析 lzl 帖子（…
+				// 处理解析 lzl 贴子（…
 				// $tailer.find('.lzl_single_post').each(_procLzlPost);
 				return _main;
 			};
@@ -9417,10 +9417,10 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 			};
 
 			if (isThread) {
-				//$('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化帖子搜索'));//出错了
+				//$('.j_lzl_container').each(_run.bind ({}, _procLzlContainer, '初始化贴子搜索'));//出错了
 				$('.lzl_single_post').each(_run.bind({}, _procLzlPost, '初始化楼中楼搜索'));
 			} else {
-				$('.j_thread_list').each(_run.bind({}, _procThreadList, '初始化贴吧页帖子搜索'));
+				$('.j_thread_list').each(_run.bind({}, _procThreadList, '初始化贴吧页贴子搜索'));
 			}
 			var mo = new MutationObserver(function (eve) {
 				_run(function () {
@@ -10027,7 +10027,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 		addMutationObserver('#j_p_postlist', run);
 	})();*/
 
-	//查看发帖 by 文科 2022-1-16 这个失效了，现在强制跳转到https://tieba.baidu.com/index.html
+	//查看发贴 by 文科 2022-1-16 这个失效了，现在强制跳转到https://tieba.baidu.com/index.html
 	/*window.addEventListener('DOMContentLoaded', function () {
 		var $ = unsafeWindow.$;
     
@@ -10053,7 +10053,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 	}, false);*/
 
 	//百度贴吧排序
-	//百度贴吧按发帖时间（帖子ID）排序 by NULL
+	//百度贴吧按发贴时间（贴子ID）排序 by NULL
 	//关于回复量的排序 https://greasyfork.org/zh-CN/scripts/33145-%E8%B4%B4%E5%90%A7%E5%8A%A9%E6%89%8B-%E5%B1%8F%E8%94%BD-%E6%8E%92%E5%BA%8F-beta
 	(function () {
 		//不在主题贴列表就不执行
@@ -11341,8 +11341,8 @@ margin-top: 20px;
 				//$("div.replace_div>div.replace_tip").click()
 						by tency
 						https://greasyfork.org/zh-CN/scripts/396083-%E8%87%AA%E5%8A%A8%E5%B1%95%E5%BC%80%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B8%96%E5%AD%90%E7%9A%84%E5%9B%BE%E7%89%87
-						自动展开百度贴吧帖子的图片
-						自动展开百度贴吧帖子的图片，方便浏览图片帖
+						自动展开百度贴吧贴子的图片
+						自动展开百度贴吧贴子的图片，方便浏览图片贴
 						version    0.2
 						copyright  2014+, LYY
 			}*/
@@ -11530,7 +11530,7 @@ margin-top: 20px;
 				已知问题继承
 				展开的被折叠楼层会显示隐藏提示（有意没有去掉它）
 				展开的被隐藏楼中楼需要点击两次数字才能收起该层楼中楼（暂时无法解决）
-				可能对某些帖子不管用，如果出现这种情况请反馈准确帖子链接
+				可能对某些贴子不管用，如果出现这种情况请反馈准确贴子链接
 				---
 				https://github.com/FirefoxBar/userscript/raw/master/Tieba_Blocked_Detect/Tieba_Blocked_Detect.user.js 贴吧贴子屏蔽检测
 				*/
