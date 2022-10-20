@@ -9789,7 +9789,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 						//console.log("preferences.size")
 						//console.log(preferences.size)//100或0
 						if (preferences.size == 100) {//暂时这样解决问题1，但多了如果图片失去使用焦点会导致既找不到图片，也关不掉图片问题。缩放过头会导致图片垂直翻转
-							if (z < 0.2) { 
+							if (z < 0.2) {
 								return;// 缩放过小不再进行缩放。
 							}
 						}
@@ -10457,24 +10457,6 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
 				$("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
 			}
-			//我的i贴吧 https://tieba.baidu.com/i/i/ 解决图片表情不显示问题
-			let temp = $("div.feed_rich>img");
-			if (temp != null) {
-				for (let i = 0; i < temp.length; i++) {
-					let temp2 = temp[i].getAttribute("url");
-					if (temp2.search(/https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/) != -1) {
-						let temp3 = /https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/.exec(temp2);
-						/**
-							 正则分解结果
-								0: "http://tiebapic.baidu.com/forum/w%3D580/sign=xxx/xxxx.jpg?tbpicau=2022-12-17-05_"
-								1: "tiebapic"
-								2: "xxxx.jpg?tbpicau=2022-12-17-05_"
-								3: "?tbpicau=2022-12-17-05_"
-							 */
-						temp[i].setAttribute("url", '//imgsrc.baidu.com/forum/pic/item/' + temp3[2]);
-					}
-				}
-			}
 			//let i = 0;
 			//let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
 			//if (temp.length > 0) {
@@ -11122,6 +11104,24 @@ margin-top: 20px;
 					let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
 					if (temp[0] != null) {
 						temp[0].style = "background:#fff;";
+					}
+				}
+				//我的i贴吧 https://tieba.baidu.com/i/i/ 解决图片表情不显示问题
+				let temp = $("div.feed_rich>img");
+				if (temp != null) {
+					for (let i = 0; i < temp.length; i++) {
+						let temp2 = temp[i].getAttribute("url");
+						if (temp2.search(/https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/) != -1) {
+							let temp3 = /https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/.exec(temp2);
+							/**
+								 正则分解结果
+									0: "http://tiebapic.baidu.com/forum/w%3D580/sign=xxx/xxxx.jpg?tbpicau=2022-12-17-05_"
+									1: "tiebapic"
+									2: "xxxx.jpg?tbpicau=2022-12-17-05_"
+									3: "?tbpicau=2022-12-17-05_"
+								 */
+							temp[i].setAttribute("url", '//imgsrc.baidu.com/forum/pic/item/' + temp3[2]);
+						}
 					}
 				}
 			}
