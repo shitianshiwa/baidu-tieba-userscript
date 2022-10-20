@@ -195,10 +195,10 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				qcode2.setAttribute('target', '_Blank');//https://www.runoob.com/tags/att-a-target.html
 				/*
 				_blank	在新窗口中打开被链接文档。
-                _self	默认。在相同的框架中打开被链接文档。
-                _parent	在父框架集中打开被链接文档。
-                _top	在整个窗口中打开被链接文档。
-                framename	在指定的框架中打开被链接文档。
+				_self	默认。在相同的框架中打开被链接文档。
+				_parent	在父框架集中打开被链接文档。
+				_top	在整个窗口中打开被链接文档。
+				framename	在指定的框架中打开被链接文档。
 				*/
 				qcode2.setAttribute('href', url);
 				qcode2.innerText = "二维码大图";
@@ -9783,11 +9783,15 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							return;
 						}
 					}
-					if (zKey === 'type' && eKey || zKey !== 'type' && e[zKey]) { // 图片缩放判断
+					if (zKey === 'type' && eKey || zKey !== 'type' && e[zKey]) { // 图片缩放判断;问题1、长图片在缩放模式为等比例适应屏幕时会无法控制缩放
 						delta = deltaXY * zDirection > 0 ? 0.1 : -0.1;
 						z = s + delta;
-						if (z < 0.2) { // 缩放过小不再进行缩放
-							return;
+						//console.log("preferences.size")
+						//console.log(preferences.size)//100或0
+						if (preferences.size == 100) {//暂时这样解决问题1，但多了如果图片失去使用焦点会导致既找不到图片，也关不掉图片问题。缩放过头会导致图片垂直翻转
+							if (z < 0.2) { 
+								return;// 缩放过小不再进行缩放。
+							}
 						}
 						tmp = z / s;
 						data.x = e.clientX - (e.clientX - x) * tmp; // 计算以鼠标位置进行缩放。e.clientX - x为鼠标距离图片边的距离，* tmp为缩放后的距离，e.clientX - 计算得相对鼠标移动缩放后的图片边距
@@ -9831,7 +9835,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				}
 
 				/* 添加样式。鼠标放到图片上的cursor鼠标样式，放大后图片的btzi-gallery框架位置，以及btzi-img图片定位和hover鼠标经过图片时置顶并显示阴影，active鼠标按下图片后隐藏阴影。（可修改） */
-				GM_addStyle('.BDE_Image,.d_content_img,.j_user_sign{cursor:zoom-in;}.btzi-gallery{position:fixed;top:0;left:0;z-index:19990801;}.btzi-img{position:absolute;transform-origin:0 0;box-shadow:0 0 7px rgba(0,0,0,.4);}.btzi-img:hover{z-index:20220801;box-shadow:0 0 7px rgb(0,0,0);}.btzi-img:active{box-shadow:0 0 7px rgba(0,0,0,.4);cursor:move;}');
+				GM_addStyle('.BDE_Image,.d_content_img,.j_user_sign{cursor:zoom-in;}.btzi-gallery{position:fixed;top:0;left:0;z-index:19990801;}.btzi-img{position:absolute;transform-origin:0 0;box-shadow:0 0 7px rgba(0,0,0,.4);cursor: pointer;}.btzi-img:hover{z-index:20220801;box-shadow:0 0 7px rgb(0,0,0);}.btzi-img:active{box-shadow:0 0 7px rgba(0,0,0,.4);cursor:move;}');
 
 				/*
 				获取btzi-UserSettings用户设置，初次使用设定一个默认值。
