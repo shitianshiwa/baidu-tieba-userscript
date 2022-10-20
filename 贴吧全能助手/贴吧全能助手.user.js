@@ -192,7 +192,14 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				let temp = document.querySelectorAll(".download-title")[0];
 				let qcode2 = document.createElement("a");
 				qcode2.setAttribute('style', 'color:#FFF;');
-				qcode2.setAttribute('target', '_Blank');
+				qcode2.setAttribute('target', '_Blank');//https://www.runoob.com/tags/att-a-target.html
+				/*
+				_blank	在新窗口中打开被链接文档。
+                _self	默认。在相同的框架中打开被链接文档。
+                _parent	在父框架集中打开被链接文档。
+                _top	在整个窗口中打开被链接文档。
+                framename	在指定的框架中打开被链接文档。
+				*/
 				qcode2.setAttribute('href', url);
 				qcode2.innerText = "二维码大图";
 				temp.after(qcode2);
@@ -10281,14 +10288,14 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 			b.setAttribute('id', 'select2');
 			var c = document.createElement('p')
 			c.textContent = "翻页保持/排序是否包含置顶贴"
-			c.setAttribute('style', 'position: relative;margin-left: 3px;margin-top: 5px;witdh:200px;')
+			c.setAttribute('style', 'position: relative;margin-left: 3px;margin-top: 5px;width:200px;z-index: 1000;')
 			c.appendChild(b)
 			var d = document.createElement('input')
 			d.setAttribute('type', 'checkbox');
 			d.setAttribute('id', 'select3');
 			var e = document.createElement('p')
 			e.textContent = "贴吧只能显示前10000贴，每页50贴，最多201页"
-			e.setAttribute('style', 'position: relative;margin-left: 3px;margin-top: 5px;')
+			e.setAttribute('style', 'position: relative;margin-left: 3px;margin-top: 5px;z-index: 1000;')
 			c.appendChild(d)
 			var f = document.createElement('div')
 			f.setAttribute('style', 'position: absolute;left: 480px;float: right;top: -12px;')
