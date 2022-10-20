@@ -3756,12 +3756,16 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	float: right;
                 	box-sizing: border-box;
                 }
-
-
                 .post-tail-wrap {
-                	position: static !important;
-                   width: auto
+                	/*消灭分割线*/
+                	font-size: 0 !important;
+					position: static !important;
+                    width: auto;
                 }
+				.icon-jubao{
+					/*贴子楼层举报按钮样式*/
+					vertical-align: unset !important;
+				}
                 .core_reply_tail > *,
                 .core_reply_tail > * > * {
                 	float: left !important;
@@ -3772,7 +3776,6 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 }
                 .core_reply_tail > *:not(.p_reply) {
                 	/*楼层信息*/
-
                 	display: block;
                 	background: rgba(0, 0, 0, .04);
                 	padding: 0 !important;
@@ -3787,10 +3790,6 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .core_reply_tail a[href]:hover:not(.tail-info),
                 .p_reply:hover {
                 	color: #999 !important;
-                }
-                .post-tail-wrap {
-                	/*消灭分割线*/
-                	font-size: 0 !important;
                 }
                 .post-tail-wrap > *:not(.p_reply_first) {
                 	font-size: 14px !important;
