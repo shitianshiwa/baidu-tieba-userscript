@@ -7790,7 +7790,8 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							'#encourage_entry',
 							'.platform_aside_tieba_partner',
 							'.search_back_box',
-							'.topic_list_box',
+							//'.topic_list_box',
+							//贴吧热议榜
 
 							// 客户端发贴 x 倍经验
 							'.tb_poster_placeholder',
