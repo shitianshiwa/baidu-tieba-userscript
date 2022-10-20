@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.12
+// @version      2.1.1843.13
 /// @version     2.1
 // @description  百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录(楼中楼还需要Header Editor脚本才能正常运行），完全去除扰眼和各类广告模块(贴吧活动广告管不了，都是针对某个贴吧弄的，来无影去无踪。。。)，全面精简并美化各种贴吧页面（算不算好看看个人喜好），去除贴吧贴子里链接的跳转（目前如果一楼太长就会失效），按发贴时间、回复时间、回复量排序/倒序，贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽，可旋转，可跨页。
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
@@ -7521,8 +7521,18 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                     .pager >*{
                     	font-family: inherit !important;
                     	left: 0 !important;
-                    }`;
-					//管用户头像栏的 http://tieba.baidu.com/i/i/*
+                    }
+					/*管用户头像栏的 http://tieba.baidu.com/i/i/*/
+					/*我的i贴吧 tieba.baidu.com/i/i/ 解决图片表情不显示问题*/
+					div.feed_rich>img{
+						width: auto !important;
+						height: auto !important;
+					}
+					.large_status>div.j_remove>div.large_box>div.large_main>img.j_fold{
+						width: auto !important;
+						height: auto !important;
+					}
+					`;
 				}
 			}
 			css += `
@@ -9077,8 +9087,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 								let temp = $parent.parent().parent().children();//把没有内容的按钮隐藏掉，防止在某些浏览器出现占位现象
 								for (let i = 0; i < temp.length; i++) {
 									//console.log(temp[i].children.length)
-									if(temp[i].children.length==0)
-									{
+									if (temp[i].children.length == 0) {
 										temp[i].style.display = "none";
 									}
 								}
@@ -9600,7 +9609,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							tbpic = /https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/.exec(target.src);
 							/**
 								 正则分解结果
-									 0: "http://tiebapic.baidu.com/forum/w%3D580/sign=xxx/xxxx.jpg?tbpicau=2022-12-17-05_"
+									0: "http://tiebapic.baidu.com/forum/w%3D580/sign=xxx/xxxx.jpg?tbpicau=2022-12-17-05_"
 									1: "tiebapic"
 									2: "xxxx.jpg?tbpicau=2022-12-17-05_"
 									3: "?tbpicau=2022-12-17-05_"
@@ -10437,6 +10446,24 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 				let temp = $("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href.split("https")[1];
 				$("#u_notify_item").children("li.category_item").children("a.j_cleardata")[5].href = "http" + temp;
 			}
+			//我的i贴吧 https://tieba.baidu.com/i/i/ 解决图片表情不显示问题
+			let temp = $("div.feed_rich>img");
+			if (temp != null) {
+				for (let i = 0; i < temp.length; i++) {
+					let temp2 = temp[i].getAttribute("url");
+					if (temp2.search(/https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/) != -1) {
+						let temp3 = /https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/.exec(temp2);
+						/**
+							 正则分解结果
+								0: "http://tiebapic.baidu.com/forum/w%3D580/sign=xxx/xxxx.jpg?tbpicau=2022-12-17-05_"
+								1: "tiebapic"
+								2: "xxxx.jpg?tbpicau=2022-12-17-05_"
+								3: "?tbpicau=2022-12-17-05_"
+							 */
+						temp[i].setAttribute("url", '//imgsrc.baidu.com/forum/pic/item/' + temp3[2]);
+					}
+				}
+			}
 			//let i = 0;
 			//let temp = $("span.is_show_create_time"); //显示主题贴列表里的主题贴创建时间。备注：贴吧自带的创建日期，缺失年或日
 			//if (temp.length > 0) {
@@ -10794,9 +10821,9 @@ margin-top: 20px;
 				}
 				if (!GM_getValue("tiebameihua")) { //贴吧美化
 					//console.log(target.querySelectorAll("ul.p_reply>li>a"));
-					let temp1 = target.querySelectorAll(".p_reply_first") //新贴吧的贴子
+					/*let temp1 = target.querySelectorAll(".p_reply_first") //新贴吧的贴子
 					let temp2 = target.querySelectorAll("ul.p_reply>li>a"); //老贴吧的贴子样式特殊
-					/*if (temp1[0] != null) {
+					if (temp1[0] != null) {
 						temp1[0].style = "font-size:10px !important;";
 						//console.log(temp1[0].classList[0]);
 						if (temp1[0].classList[1] == "p_reply_first") {
@@ -11065,6 +11092,27 @@ margin-top: 20px;
 				解释：百度贴吧在登录状态跟未登录状态下每页显示的回贴数量不一样，未登录状态下2页的回贴量才等于登录状态下1页的，所以两种状态下页码是不一样的。而百度请求楼中楼的json时得到的响应却是按照登录状态下的，所以不对应了，自然楼中楼内容无法加载
 				服务器提供的网页会因为登录状态而有所不同
 				*/
+				//在我的i贴吧显示刷新按钮
+				var fuzuodian3 = document.querySelectorAll("#goTop")[0];
+				if (fuzuodian3 != null) {
+					let bottom3 = document.createElement("div"); //创建节点<li/>
+					let bottom4 = document.createElement("a"); //创建节点<li/>
+
+					//temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
+					bottom3.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_refresh');
+					bottom3.setAttribute('style', 'left: 50%;position: fixed;bottom: 93px;margin-left: 490px;cursor: pointer;');
+					bottom3.append(bottom4);
+					fuzuodian3.before(bottom3);
+					bottom3.addEventListener('click', (e) => {
+						window.location.reload();
+					});
+				}
+				if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+					let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
+					if (temp[0] != null) {
+						temp[0].style = "background:#fff;";
+					}
+				}
 			}
 			/*侧工具栏*/
 			/*下半部分单独处理以避免偶尔隐藏失败*/
@@ -11562,12 +11610,6 @@ margin-top: 20px;
 					ii++;
 				} else {
 					clearInterval(t);
-				}
-				if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-					let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
-					if (temp[0] != null) {
-						temp[0].style = "background:#fff;";
-					}
 				}
 				if (qiangdiaoxinxitishi == true) {
 					let temp6 = $(".meihua"); //美化开关
