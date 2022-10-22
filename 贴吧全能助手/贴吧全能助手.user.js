@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.13
+// @version      2.1.1843.14
 /// @version     2.1
 // @description  百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录(楼中楼还需要Header Editor脚本才能正常运行），完全去除扰眼和各类广告模块(贴吧活动广告管不了，都是针对某个贴吧弄的，来无影去无踪。。。)，全面精简并美化各种贴吧页面（算不算好看看个人喜好），去除贴吧贴子里链接的跳转（目前如果一楼太长就会失效），按发贴时间、回复时间、回复量排序/倒序，贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽，可旋转，可跨页。
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
@@ -9718,7 +9718,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							}
 							break;
 						case 'document': // 当关闭图片方式为页面时，点击要放大的图片以外的区域都会关闭所有图片
-							if (!iTarget || t !== iTarget) {
+							if (!iTarget || (t !== iTarget && t !== docElement)) {//v1.7.2 修复图片大小“等比例适应屏幕”，打开图片后过小而无法缩放的问题；修复图片移出窗口就会“关闭所有图片”的问题。
 								if (doc.body.classList.contains('btzi-enabled') || t.id === 'btzi_settings_save') break; // 打开用户设置界面，不会关闭图片
 								gallery.style.display = 'none';
 								while (gallery.hasChildNodes()) { // 关闭所有图片
@@ -9783,16 +9783,15 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 							return;
 						}
 					}
-					if (zKey === 'type' && eKey || zKey !== 'type' && e[zKey]) { // 图片缩放判断;问题1、长图片在缩放模式为等比例适应屏幕时会无法控制缩放
+					if (zKey === 'type' && eKey || zKey !== 'type' && e[zKey]) { // 图片缩放判断
 						delta = deltaXY * zDirection > 0 ? 0.1 : -0.1;
 						z = s + delta;
 						//console.log("preferences.size")
 						//console.log(preferences.size)//100或0
-						if (preferences.size == 100) {//暂时这样解决问题1，但多了如果图片失去使用焦点会导致既找不到图片，也关不掉图片问题。缩放过头会导致图片垂直翻转
-							if (z < 0.2) {
-								return;// 缩放过小不再进行缩放。
-							}
+						if ((z < 0.2 && s >= 0.1) || (s < 0.1 && z < 0)) { // 缩放过小不再进行缩放
+							return;
 						}
+						//v1.7.2 修复图片大小“等比例适应屏幕”，打开图片后过小而无法缩放的问题；修复图片移出窗口就会“关闭所有图片”的问题。
 						tmp = z / s;
 						data.x = e.clientX - (e.clientX - x) * tmp; // 计算以鼠标位置进行缩放。e.clientX - x为鼠标距离图片边的距离，* tmp为缩放后的距离，e.clientX - 计算得相对鼠标移动缩放后的图片边距
 						data.y = e.clientY - (e.clientY - y) * tmp;
