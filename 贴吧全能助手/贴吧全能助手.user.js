@@ -5653,7 +5653,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .tbui_aside_float_bar {
                 	border-top: none !important;
                 	position: fixed;
-                	left: 50% !important;
+                	left: 50%;
                 	bottom: 0px !important;
 					margin-left: 498px;
 					/*尝试解决侧边工具栏会覆盖在签到框上面*/
@@ -6976,7 +6976,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                     }
                     /*解决返回顶部按钮显示错位问题*/
                     .tbui_aside_float_bar {
-                    	margin-left: 90% !important;
+                    	/*margin-left: 90% !important;*/
                     /*	margin-left: 600px !important;*/
                     }
                     `;
