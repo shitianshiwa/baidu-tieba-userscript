@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.14
+// @version      2.1.1843.15
 /// @version     2.1
 // @description  百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录(楼中楼还需要Header Editor脚本才能正常运行），完全去除扰眼和各类广告模块(贴吧活动广告管不了，都是针对某个贴吧弄的，来无影去无踪。。。)，全面精简并美化各种贴吧页面（算不算好看看个人喜好），去除贴吧贴子里链接的跳转（目前如果一楼太长就会失效），按发贴时间、回复时间、回复量排序/倒序，贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽，可旋转，可跨页。
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
@@ -2915,6 +2915,9 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	border-radius: 0 0 40px 40px;
                 	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.08) !important;
                 }
+				.search_main_fixed.change:before {
+                	display: none;
+                }
                 .search_main_fixed .search_btn_wrap+.search_btn_wrap{
                 	margin-right: 0px !important;/*让后面的高级搜索按钮可以紧贴前面的按钮*/
                 }
@@ -5650,8 +5653,9 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 .tbui_aside_float_bar {
                 	border-top: none !important;
                 	position: fixed;
-              /*	left: 50% !important;*/
+                	left: 50% !important;
                 	bottom: 0px !important;
+					margin-left: 498px;
 					/*尝试解决侧边工具栏会覆盖在签到框上面*/
 					z-index: 4 !important;
                 }
@@ -7471,6 +7475,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                     	visibility: visible;
                     }
                     .goTop{
+						bottom:60px !important;
                     	background: #fefefe !important;
                     	width: 45px !important;
                     	height: 50px !important;
@@ -10570,7 +10575,7 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
         }
         .t_con,/*.threadlist_lz,*/.l_post,/*.pager_theme_4,*/.thread_theme_5,.l_posts_num,.icon-member-top,.u_menu_username,.u_news,.u_setting,.user>.right,#main_aside,.u_login,.p_postlist,.tbui_aside_float_bar,.j_d_post_content>.replace_div,
         .tieba-link-anchor,.imgtopic_album,.icon_interview_picture,.listThreadTitle,.userbar,#j_userhead,#user_info,img.m_pic,div.dialog_block,.video_src_wrap_main,.media_disp,#j_more_hotFeed{
-            animation-duration: 0.001 s;
+            animation-duration: 0.001s;
             animation-name: tiebaaction;
         }
         /* 主题贴 */
@@ -11018,6 +11023,13 @@ margin-top: 20px;
 							if (temp3 != null) {
 								temp3.style = "display:none;";
 							}
+							setTimeout(() => {
+								let temp5 = document.querySelector(".search_main_fixed");
+								//console.log("temp5:" + temp5);
+								if (temp5 != null) {
+									temp5.classList.add('change');//隐藏右上角头像背景
+								}
+							}, 1000);
 							console.log("全局隐藏侧边栏1");
 						}
 					}
@@ -11089,27 +11101,62 @@ margin-top: 20px;
 				if (fuzuodian3 != null) {
 					let bottom3 = document.createElement("div"); //创建节点<li/>
 					let bottom4 = document.createElement("a"); //创建节点<li/>
-
 					//temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
 					bottom3.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_refresh');
-					bottom3.setAttribute('style', 'left: 50%;position: fixed;bottom: 93px;margin-left: 490px;cursor: pointer;');
+					bottom3.setAttribute('style', 'left: 50%;position: fixed;bottom: 108px;margin-left: 490px;cursor: pointer;');
 					bottom3.append(bottom4);
 					fuzuodian3.before(bottom3);
 					bottom3.addEventListener('click', (e) => {
 						window.location.reload();
 					});
-				}
-				if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
-					let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
-					if (temp[0] != null) {
-						temp[0].style = "background:#fff;";
+					if (document.querySelectorAll(".tbui_fbar_bottom")[0] == null) {
+						let bottom5 = document.createElement("div"); //创建节点<li/>
+						let bottom6 = document.createElement("a"); //创建节点<a/>
+						//temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
+						bottom5.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_bottom');
+						bottom5.setAttribute('style', 'left: 50%;position: fixed;bottom: 0px;margin-left: 490px;cursor: pointer;');
+						bottom5.appendChild(bottom6);
+						fuzuodian3.after(bottom5);
+						bottom6.addEventListener('click', (e) => {
+							window.scrollTo(0, document.body.scrollHeight);
+							/*let i = document.documentElement.scrollTop;
+							let t = setInterval(() => {
+								//console.log(document.documentElement.scrollTop)
+								if (i <= document.body.scrollHeight) {
+									window.scrollTo(document.documentElement.scrollTop, i);
+									i += 500;
+								} else {
+									clearInterval(t);
+								}
+							}, 40);*/
+						});
+						//快速到底按钮动画效果
+						window.addEventListener("scroll", function (e) {
+							let temp = document.querySelectorAll(".tbui_fbar_bottom")[0]
+							if (temp != undefined) {
+								//console.log(document.documentElement.scrollTop)
+								//console.log(document.body.scrollHeight- 1000)
+								//console.log(window.scrollY)
+								if (window.scrollY >= document.body.scrollHeight - 1000) {
+									temp.setAttribute("style", "left: 50%;position: fixed;bottom: 0px;margin-left: 490px;cursor: pointer;visibility: hidden;")
+								} else {
+									temp.setAttribute("style", "left: 50%;position: fixed;bottom: 0px;margin-left: 490px;cursor: pointer;visibility: visible;")
+								}
+							}
+						});
+						if (!GM_getValue("tiebameihua") /*贴吧美化*/) {
+							let temp = $("div.ibody"); //我的回复网页背景 http://tieba.baidu.com/i/i/replyme
+							if (temp[0] != null) {
+								temp[0].style = "background:#fff;";
+							}
+						}
 					}
 				}
 				//我的i贴吧 https://tieba.baidu.com/i/i/ 解决图片表情不显示问题
 				let temp = $("div.feed_rich>img");
 				if (temp != null) {
 					for (let i = 0; i < temp.length; i++) {
-						let temp2 = temp[i].getAttribute("url");
+						let temp2 = temp[i].getAttribute("url");//图片+新表情
 						if (temp2.search(/https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/) != -1) {
 							let temp3 = /https?:\/\/(\w+)\.baidu\.com\/.+\/(\w+\.[a-zA-Z]{3,4}([^_]*_?))/.exec(temp2);
 							/**
@@ -11120,6 +11167,19 @@ margin-top: 20px;
 									3: "?tbpicau=2022-12-17-05_"
 								 */
 							temp[i].setAttribute("url", '//imgsrc.baidu.com/forum/pic/item/' + temp3[2]);
+						}
+						//"http://static.tieba.baidu.com/tb/editor/images/client/image_emoticon2.png".search(/http?:\/\/(\w+)\.tieba\.baidu\.com(\/tb\/editor\/images\/client\/(\w+)\.(\w+))/g)
+						if (temp2.search(/http?:\/\/(\w+)\.tieba\.baidu\.com(\/tb\/editor\/images\/client\/(\w+)\.(\w+))/g) != -1) {//旧表情，由于旧表情的https验证有问题，所以可能请求资源失败
+							let temp4 = /http?:\/\/(\w+)\.tieba\.baidu\.com(\/tb\/editor\/images\/client\/(\w+)\.(\w+))/g.exec(temp2);
+							///http?:\/\/(\w+)\.tieba\.baidu\.com(\/tb\/editor\/images\/client\/(\w+)\.(\w+))/g.exec("http://static.tieba.baidu.com/tb/editor/images/client/image_emoticon2.png")
+							/*
+							0: "http://static.tieba.baidu.com/tb/editor/images/client/image_emoticon2.png"
+							1: "static"
+							2: "/tb/editor/images/client/image_emoticon2.png"
+							3: "image_emoticon2"
+							4: "png"
+							 */
+							temp[i].setAttribute("url", temp4[2]);
 						}
 					}
 				}
@@ -11137,6 +11197,13 @@ margin-top: 20px;
 								$("#yincangcebianlan")[0].value = "<<";
 							}
 							target.style = "display:none;";
+							setTimeout(() => {
+								let temp5 = document.querySelector(".search_main_fixed");
+								//console.log("temp5:" + temp5);
+								if (temp5 != null) {
+									temp5.classList.add('change');//隐藏右上角头像背景
+								}
+							}, 1000);
 							console.log("全局隐藏侧边栏2");
 						}
 					}
@@ -11156,39 +11223,41 @@ margin-top: 20px;
 						window.location.reload();
 					});
 				}
-				let bottom1 = document.createElement("li"); //创建节点<li/>
-				let bottom2 = document.createElement("a"); //创建节点<a/>
-				//temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
-				bottom1.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_bottom');
-				bottom1.appendChild(bottom2);
-				fuzuodian2.after(bottom1);
-				bottom2.addEventListener('click', (e) => {
-					window.scrollTo(0, document.body.scrollHeight);
-					/*let i = document.documentElement.scrollTop;
-					let t = setInterval(() => {
-						//console.log(document.documentElement.scrollTop)
-						if (i <= document.body.scrollHeight) {
-							window.scrollTo(document.documentElement.scrollTop, i);
-							i += 500;
-						} else {
-							clearInterval(t);
+				if (target.querySelectorAll(".tbui_fbar_bottom")[0] == undefined) {
+					let bottom1 = document.createElement("li"); //创建节点<li/>
+					let bottom2 = document.createElement("a"); //创建节点<a/>
+					//temp2.setAttribute('href', '#');//这个会导致强制拉到页面最上面
+					bottom1.setAttribute('class', 'tbui_aside_fbar_button tbui_fbar_bottom');
+					bottom1.appendChild(bottom2);
+					fuzuodian2.after(bottom1);
+					bottom2.addEventListener('click', (e) => {
+						window.scrollTo(0, document.body.scrollHeight);
+						/*let i = document.documentElement.scrollTop;
+						let t = setInterval(() => {
+							//console.log(document.documentElement.scrollTop)
+							if (i <= document.body.scrollHeight) {
+								window.scrollTo(document.documentElement.scrollTop, i);
+								i += 500;
+							} else {
+								clearInterval(t);
+							}
+						}, 40);*/
+					});
+					//快速到底按钮动画效果
+					window.addEventListener("scroll", function (e) {
+						let temp = document.querySelectorAll(".tbui_fbar_bottom")[0]
+						if (temp != undefined) {
+							//console.log(document.documentElement.scrollTop)
+							//console.log(document.body.scrollHeight- 1000)
+							//console.log(window.scrollY)
+							if (window.scrollY >= document.body.scrollHeight - 1000) {
+								temp.setAttribute("style", "visibility: hidden;")
+							} else {
+								temp.setAttribute("style", "visibility: visible;")
+							}
 						}
-					}, 40);*/
-				});
-				//快速到底按钮动画效果
-				window.addEventListener("scroll", function (e) {
-					let temp = document.querySelectorAll(".tbui_fbar_bottom")[0]
-					if (temp != undefined) {
-						//console.log(document.documentElement.scrollTop)
-						//console.log(document.body.scrollHeight- 1000)
-						//console.log(window.scrollY)
-						if (window.scrollY >= document.body.scrollHeight - 1000) {
-							temp.setAttribute("style", "visibility: hidden;")
-						} else {
-							temp.setAttribute("style", "visibility: visible;")
-						}
-					}
-				});
+					});
+				}
 				//}
 			}
 			//let checker;
@@ -11313,6 +11382,13 @@ margin-top: 20px;
 						/*if (temp4 != null) {
 							temp4.style = "display:none;";
 						}*/
+						setTimeout(() => {
+							let temp5 = document.querySelector(".search_main_fixed");
+							//console.log("temp5:" + temp5);
+							if (temp5 != null) {
+								temp5.classList.add('change');//隐藏右上角头像背景
+							}
+						}, 1000);
 						console.log("全局隐藏侧边栏0");
 					}
 				}
@@ -11859,15 +11935,22 @@ margin-top: 20px;
 				//console.log(target);
 				let temp3 = $("div.userbar ")[0];
 				let temp4 = $("ul.tbui_aside_float_bar")[0];
+				let temp5 = document.querySelector(".search_main_fixed");
+				//console.log("temp5:" + temp5);
 				if (yincangcebianlanx == false) {
 					yincangcebianlanx = true;
 					GM_setValue("yincangcebianlan", true)
 					target.value = "<<";
+					//https://www.it610.com/article/1988983.htm js如何控制css伪元素内容（before，after）
+					//window.getComputedStyle(document.querySelector(".search_main_fixed"),":before").getPropertyValue('color')
 					if (temp3 != null) {
 						temp3.style = "display:none;";
 					}
 					if (temp4 != null) {
 						temp4.style = "display:none;";
+					}
+					if (temp5 != null) {
+						temp5.classList.add('change');//隐藏右上角头像背景
 					}
 				} else {
 					yincangcebianlanx = false;
@@ -11878,6 +11961,9 @@ margin-top: 20px;
 					}
 					if (temp4 != null) {
 						temp4.style = "display:block;";
+					}
+					if (temp5 != null) {
+						temp5.classList.remove('change');//显示右上角头像背景
 					}
 				}
 				console.log("隐藏侧边栏");
