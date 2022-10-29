@@ -11518,12 +11518,12 @@ margin-top: 20px;
 				let i = 0;
 				let t = setInterval(() => {
 					if (target.style[0] != undefined) { //等待图片加载完成
-						target.style = "width: 100px; height: 100px;";
+						target.style = "width: auto; height: 100px;";
 						clearInterval(t);
 						t = null;
 					}
 					if (i == 10) { //超时处理
-						target.style = "width: 100px; height: 100px;";
+						target.style = "width: auto; height: 100px;";
 						clearInterval(t);
 						t = null;
 					}
