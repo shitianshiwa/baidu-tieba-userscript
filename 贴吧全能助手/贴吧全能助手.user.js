@@ -6880,7 +6880,11 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                    	text-align: center;
                    	color: #777;
                    	margin: 0 -4px;
-                   }`;
+                   }
+				   .top_toutu_admarks{
+					display: none !important; 
+				   }
+				   `;
 				}
 				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+p/+\\d+.*\\?(.*&)*see_lz=[1-9]+\\d*.*$")).test(document.location.href)) {
 					css += `
@@ -6898,7 +6902,11 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                     }
                     .louzhubiaoshi_wrap {
                     	display: none !important;
-                    }`;
+                    }
+					.top_toutu_admarks{
+						display: none !important; 
+					}
+					`;
 				}
 				if (false || (new RegExp("^https?://(tieba.baidu.com|www.tieba.com)/+home/+.*$")).test(document.location.href)) {
 					css += `
