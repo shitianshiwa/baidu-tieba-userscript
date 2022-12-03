@@ -8,6 +8,8 @@
 // @author       shitianshiwa && 忆世萧遥
 // @homepage     https://github.com/shitianshiwa/baidu-tieba-userscript/tree/master/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B
 // @license      MIT
+// @updateURL https://openuserjs.org/meta/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9).meta.js
+// @downloadURL https://openuserjs.org/install/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9).user.js
 // @include      http*://tieba.baidu.com/*
 // @include      http*://c.tieba.baidu.com/p/*
 // @include      http*://jump2.bdimg.com/f?kw=*
