@@ -4,6 +4,9 @@
 /// @name        Copy Tieba Link
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
+// @license      MIT
+// @updateURL https://openuserjs.org/meta/shitianshiwa/%E5%A4%8D%E5%88%B6%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%86%85%E5%AE%B9.meta.js
+// @downloadURL https://openuserjs.org/install/shitianshiwa/%E5%A4%8D%E5%88%B6%E8%B4%B4%E5%90%A7%E8%B4%B4%E5%AD%90%E5%86%85%E5%AE%B9.user.js
 // @include      http*://tieba.baidu.com/f?kw=*
 // @include      http*://tieba.baidu.com/f/good?kw=*
 // @include      http*://tieba.baidu.com/p/*
@@ -24,7 +27,6 @@
 // @grant        GM.xmlHttpRequest
 /// @grant        GM_xmlHttpRequest
 /// @namespace    http://ext.ccloli.com
-// @license      MIT
 ///这个脚本的维护地址 https://github.com/shitianshiwa/baidu-tieba-userscript/
 ///原脚本地址：https://greasyfork.org/zh-CN/scripts/17375-copy-tieba-link https://github.com/ccloli
 ///【噗通一声跪下】求大神发布一个PC端一键复制帖子标题和链接脚本
@@ -37,7 +39,7 @@
 //目前本脚本不适合复制贴吧里面的代码，容易少复制内容！
 //document-start
 console.log("jquery版本号: " + $.fn.jquery);
-console.log("Copy Tieba Link版本号: 1.2.2.7");
+console.log("Copy Tieba Link版本号: 1.2.2.3");
 if (document.body.className == "page404") {
     return
 }
