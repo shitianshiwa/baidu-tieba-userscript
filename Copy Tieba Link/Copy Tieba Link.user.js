@@ -27,12 +27,12 @@
 // @grant        GM.xmlHttpRequest
 /// @grant        GM_xmlHttpRequest
 /// @namespace    http://ext.ccloli.com
-///这个脚本的维护地址 https://github.com/shitianshiwa/baidu-tieba-userscript/
-///原脚本地址：https://greasyfork.org/zh-CN/scripts/17375-copy-tieba-link https://github.com/ccloli
-///【噗通一声跪下】求大神发布一个PC端一键复制帖子标题和链接脚本
-///@狐狸已经乱了
-///http://tieba.baidu.com/p/4371750793
 // ==/UserScript==
+//这个脚本的维护地址 https://github.com/shitianshiwa/baidu-tieba-userscript/
+//原脚本地址：https://greasyfork.org/zh-CN/scripts/17375-copy-tieba-link https://github.com/ccloli
+//【噗通一声跪下】求大神发布一个PC端一键复制帖子标题和链接脚本
+//@狐狸已经乱了
+//http://tieba.baidu.com/p/4371750793
 //仅支持有图片的贴子获取最后回复时间
 //语音和表情内容不好处理
 //未来计划增加一个UI界面
