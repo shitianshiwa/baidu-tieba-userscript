@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.16
+// @version      2.1.1843.17
 /// @version     2.1
 // @description  百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录(楼中楼还需要Header Editor脚本才能正常运行），完全去除扰眼和各类广告模块(贴吧活动广告管不了，都是针对某个贴吧弄的，来无影去无踪。。。)，全面精简并美化各种贴吧页面（算不算好看看个人喜好），去除贴吧贴子里链接的跳转（目前如果一楼太长就会失效），按发贴时间、回复时间、回复量排序/倒序，贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽，可旋转，可跨页。
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
@@ -7555,6 +7555,20 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
 					}
 					`;
 				}
+				//贴吧热议榜
+				if (false || (new RegExp("^https?:\/\/(tieba.baidu.com|www.tieba.com)\/hottopic\/browse\/hottopic\?.*$")).test(document.location.href)) {
+					css += `p.content{
+						height: auto;
+                        padding: 10px;
+	                    width: 100% !important;
+						overflow: unset !important;
+						white-space: unset !important;
+						box-shadow: unset !important;
+                        border: unset !important;
+						box-sizing: unset !important;
+						margin-top: -8px !important;
+					}`;
+			    }
 			}
 			css += `
 			.tbui_fbar_props,/*右侧浮层-魔法道具,动画效果？是基于flash制作的，没有flash插件就不能正常显示*/
