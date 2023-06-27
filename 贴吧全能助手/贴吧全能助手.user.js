@@ -4027,7 +4027,8 @@ https://github.com/shitianshiwa/baidu-tieba-userscript/blob/master/%E8%B4%B4%E5%
                 	height: 28px !important;
                 	line-height: 28px !important;
                 	margin: 0 !important;
-                	width: 30px;
+                	width: auto;
+                    min-width: 30px;
                 }
                 .p_reply > *:before {
                 	font-family: \'Material Icons\';
