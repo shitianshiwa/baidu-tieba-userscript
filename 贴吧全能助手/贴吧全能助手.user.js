@@ -11441,7 +11441,7 @@ IntervalLoop.prototype = {
 			}
 			//排序后 重新绑定懒加载图片
 			//console.log($(".thumbnail.vpic_wrap>img"))
-			this.$(".thumbnail.vpic_wrap>img").lazyload(); //只有用贴吧自己的jQuery才有lazyload,用this就是使用贴吧的jQuery
+			this.$(".thumbnail.vpic_wrap>img").lazyload(); //只有用贴吧自己的jQuery才有lazyload,用this就是使用贴吧的jQuery，其它脚本也只能用贴吧的jQuery。
 			GM_setValue("select1", yipaixun)
 		}
 		//setInterval(() => {
