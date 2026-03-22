@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         复制贴吧贴子内容
-// @version      1.2.2.7
+// @version      1.2.2.8
 /// @name        Copy Tieba Link
 /// @version     1.1(0.013465)
 // @description  复制贴吧的贴子标题与链接
@@ -43,6 +43,20 @@ console.log("Copy Tieba Link版本号: 1.2.2.3");
 if (document.body.className == "page404") {
     return
 }
+	//https://jump2.bdimg.com/f?kw=
+	//https://jump2.bdimg.com/p/
+	//https://live.baidu.com/f?kw=
+	//贴子不存在就直接退出
+	//尝试排除新版PC网页版
+	if (document.body.getAttribute("class") == 'cos-tieba') {
+			console.log("不是旧版pc端贴吧，退出执行脚本")
+			return
+	}
+	//尝试排除移动网页版
+	if (document.body.getAttribute("class") == 'ue_revision' || document.querySelectorAll("div.main-page-wrap")[0] != undefined || document.querySelectorAll("div.tb-mobile-viewport")[0] != undefined) {
+		console.log("不是pc端贴吧，退出执行脚本")
+		return
+	}
 var setting = {
     title: true,
     author: true,
