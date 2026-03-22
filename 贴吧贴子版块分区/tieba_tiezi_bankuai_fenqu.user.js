@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧贴子版块分区修改(仅吧主有用)
 // @namespace    http://tampermonkey.net/
-// @version      0.0.3.1
+// @version      0.0.3.2
 // @description  修改贴子的版块分区，仅吧主可用。备注：并无法看到贴子的版块分区，也就是需要配合贴吧客户端使用才行（贴吧客户端还支持批量操作，而这个脚本仅支持单个贴子。这脚本有用吗？233）
 // @author       shitianshiwa
 // @run-at       document-idle
@@ -15,6 +15,24 @@
 (function () {
     'use strict';
     console.log("New Userscript jquery版本号：" + $.fn.jquery);
+	//https://jump2.bdimg.com/f?kw=
+	//https://jump2.bdimg.com/p/
+	//https://live.baidu.com/f?kw=
+	//贴子不存在就直接退出
+	if (document.body.className == "page404") {
+		console.log("404界面，退出执行脚本")
+		return
+	}
+	//尝试排除新版PC网页版
+	if (document.body.getAttribute("class") == 'cos-tieba') {
+			console.log("不是旧版pc端贴吧，退出执行脚本")
+			return
+	}
+	//尝试排除移动网页版
+	if (document.body.getAttribute("class") == 'ue_revision' || document.querySelectorAll("div.main-page-wrap")[0] != undefined || document.querySelectorAll("div.tb-mobile-viewport")[0] != undefined) {
+		console.log("不是pc端贴吧，退出执行脚本")
+		return
+	}
     const patt = /^\d+$/; //判断是否全是数字的正则表达式
     async function BB() {
         let temp3 = await $.post("/bawu2/platform/listForumTab?word=" + unsafeWindow.PageData.forum.name + "&tbs=" + (unsafeWindow.PageData.tbs || unsafeWindow.PageData.user.tbs).toString() + "&ie=utf-8", "", function (o) {
