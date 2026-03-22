@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧主页顶部显示楼层列表
 // @namespace    http://tampermonkey.net/
-// @version      0.6.2
+// @version      0.6.3
 // @description  让电脑端贴吧使用起来更便利点.增加了顶部楼层列表，跳转按钮
 // @include      http*://tieba.baidu.com/p/*
 // @include      http*://tieba.baidu.com/f?*
@@ -82,6 +82,20 @@ border: 1px solid #3e89fa;
 }
 `;
     if (document.body.className == "page404") {
+        return
+    }
+    //https://jump2.bdimg.com/f?kw=
+    //https://jump2.bdimg.com/p/
+    //https://live.baidu.com/f?kw=
+    //贴子不存在就直接退出
+    //尝试排除新版PC网页版
+    if (document.body.getAttribute("class") == 'cos-tieba') {
+        console.log("不是旧版pc端贴吧，退出执行脚本")
+        return
+    }
+    //尝试排除移动网页版
+    if (document.body.getAttribute("class") == 'ue_revision' || document.querySelectorAll("div.main-page-wrap")[0] != undefined || document.querySelectorAll("div.tb-mobile-viewport")[0] != undefined) {
+        console.log("不是pc端贴吧，退出执行脚本")
         return
     }
     const style = document.createElement('style'); //创建新样式节点
@@ -265,7 +279,7 @@ border: 1px solid #3e89fa;
                 temp.remove()//删除节点
                 console.log("贴子内翻页按钮:/p/" + PageData.thread.thread_id)
                 $("li.pager_theme_4>a").click((e) => {
-                    console.log("贴子内翻页:" +  e.target.getAttribute("href"))
+                    console.log("贴子内翻页:" + e.target.getAttribute("href"))
                     //console.log("贴子内翻页:/p/" + PageData.thread.thread_id + "?pn=" + e.target.innerHTML)
                     e.preventDefault()//阻止点击刷新网页
                     $(".loading-tip")[0].style = "display:block"
