@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         贴吧全能助手(第三方修改)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.1843.19
+// @version      2.1.1843.20
 /// @version     2.1
 // @description  百度贴吧 tieba.baidu.com 看贴（包括楼中楼）无须登录(楼中楼还需要Header Editor脚本才能正常运行），完全去除扰眼和各类广告模块(贴吧活动广告管不了，都是针对某个贴吧弄的，来无影去无踪。。。)，全面精简并美化各种贴吧页面（算不算好看看个人喜好），去除贴吧贴子里链接的跳转（目前如果一楼太长就会失效），按发贴时间、回复时间、回复量排序/倒序，贴子关键字屏蔽（作用不大），移除会员彩名，直接在当前页面查看原图，可缩放，可多开，可拖拽，可旋转，可跨页。
 ///该脚本未发布在https://greasyfork.org/上，因为代码授权原因被下架了，包括源作者的版本/无奈。目前替代发布用网站(至少能保证访问到)https://openuserjs.org/scripts/shitianshiwa/%E8%B4%B4%E5%90%A7%E5%85%A8%E8%83%BD%E5%8A%A9%E6%89%8B(%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BF%AE%E6%94%B9)
@@ -1275,6 +1275,11 @@ IntervalLoop.prototype = {
 	if (document.body.className == "page404") {
 		console.log("404界面，退出执行脚本")
 		return
+	}
+	//尝试排除新版PC网页版
+	if (document.body.getAttribute("class") == 'cos-tieba') {
+			console.log("不是旧版pc端贴吧，退出执行脚本")
+			return
 	}
 	//尝试排除移动网页版
 	if (document.body.getAttribute("class") == 'ue_revision' || document.querySelectorAll("div.main-page-wrap")[0] != undefined || document.querySelectorAll("div.tb-mobile-viewport")[0] != undefined) {
@@ -4048,7 +4053,7 @@ IntervalLoop.prototype = {
                 	height: 39px;
                 	width: 60px;
                 	top: 46px;
-                	right: 25px;
+                	right: 90px;
                 	font-size: 0;
                 	background: #fafafa;
                 	border-radius: 0 0 40px 40px;
@@ -4154,7 +4159,7 @@ IntervalLoop.prototype = {
                 	opacity: 1;
                 	transform: none;
                 }
-                .u_menu_item {
+                .u_menu_item:not(.u_menu_version_switch) {
                 	display: block;
                 	margin: 0 auto !important;
                 	padding: 0 !important;
@@ -4170,9 +4175,23 @@ IntervalLoop.prototype = {
                 	transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
                 }
                 .u_menu_item.u_menu_hover,
-                .u_menu_item:hover {
+                .u_menu_item:hover:not(.u_menu_version_switch) {
                 	background: #fff;
                 	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1), 0 2px 16px 0 rgba(0, 0, 0, 0.08);
+                }
+				div.u_menu_version_switch{
+                	display: block;
+                	margin: 0 auto !important;
+                	padding: 0 !important;
+                	position: relative !important;
+                	height: 50px !important;
+                	width: 50px !important;
+                	border: none !important;
+                	border-radius: 50%;
+                	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+                	transition-property: box-shadow, color, background;
+                	transition-duration: .5s;
+                	transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
                 }
                 body>.userbar>ul>li>a,
                 .u_menu_wrap,
@@ -4638,6 +4657,11 @@ IntervalLoop.prototype = {
                 	transform: none !important;
                 	margin-top: 0 !important;
                 }
+				/*切换到新PC端贴吧按钮*/
+				.u_menu_version_switch_text
+				{
+					line-height: 49px !important;
+				}
 
                 /*贴子内页*/
 
