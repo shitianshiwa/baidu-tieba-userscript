@@ -1267,7 +1267,6 @@ IntervalLoop.prototype = {
 	}, 2000)
 	console.log("贴吧全能脚本版本号:" + JSON.parse(JSON.stringify(GM_info)).script.version);
 	let tieziurl = window.location.href;
-	//https://www.v2ex.com/t/611007
 	//https://jump2.bdimg.com/f?kw=
 	//https://jump2.bdimg.com/p/
 	//https://live.baidu.com/f?kw=
